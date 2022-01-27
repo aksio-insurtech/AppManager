@@ -1,0 +1,23 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <NoWarn>$(NoWarn);CS8019;SA1600;SA1601;CS1591;</NoWarn>
+        <NoWarn>$(NoWarn);CS0012;RCS1090;CA2007</NoWarn>    <!-- ConfigureAwait requirement, https://devblogs.microsoft.com/dotnet/configureawait-faq/#when-should-i-use-configureawaitfalse -->
+
+        <AksioProxyOutput>$(MSBuildThisFileDirectory)/Web/API</AksioProxyOutput>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="$(MSBuildThisFileDirectory)/GlobalUsings.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aksio.Defaults" Version="1.5.8" />
+        <PackageReference Include="Aksio.Cratis.Applications" Version="5.0.6" />
+        <PackageReference Include="Aksio.Cratis.Applications.CQRS" Version="5.0.6" />
+        <PackageReference Include="Aksio.Cratis.Applications.CQRS.MongoDB" Version="5.0.6" />
+        <PackageReference Include="Aksio.Cratis.Applications.ProxyGenerator" Version="5.0.6" />
+    </ItemGroup>
+</Project>
