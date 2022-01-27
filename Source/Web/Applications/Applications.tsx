@@ -8,6 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import { default as styles } from './Applications.module.scss';
 import { IModalProps, ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
+import { CreateApplication } from 'API/Applications/CreateApplication';
+import { Guid } from '@aksio/cratis-fundamentals';
+import { AllApplications } from 'API/Applications/AllApplications';
 
 
 const navStyles: Partial<INavStyles> = {
@@ -20,35 +23,33 @@ const navStyles: Partial<INavStyles> = {
     },
 };
 
-const groups: INavLinkGroup[] = [
-    {
-        links: [
-            {
-                name: 'Home',
-                url: '',
-                route: '/'
-            },
-            {
-                name: 'Applications',
-                url: 'applications',
-                route: '/applications'
-            }
-        ]
-    }
-];
-
-
 export const Applications = () => {
     const [selectedNav, setSelectedNav] = useState('');
     const [showCreateApplicationDialog] = useModal(
         "Create application",
         ModalButtons.OkCancel,
         CreateApplicationDialog,
-        (result, output) => {
+        async (result, output) => {
             if (result == ModalResult.Success && output) {
+                const command = new CreateApplication();
+                command.applicationId = Guid.create().toString();
+                command.name = output.name;
+                await command.execute();
             }
         }
     );
+    const [applications] = AllApplications.use();
+
+    const groups: INavLinkGroup[] = [
+        {
+            links: applications.data.map(application => {
+                return {
+                    name: application.name,
+                    url: '',
+                    route: ''
+                };
+            })
+        }];
 
     const history = useNavigate();
 
@@ -72,7 +73,7 @@ export const Applications = () => {
                     selectedKey={selectedNav} />
             </div>
             <div style={{ width: '100%' }}>
-                Hello
+
             </div>
         </div>
     );

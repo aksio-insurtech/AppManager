@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/Source/Main/bin/Debug/net6.0/Main.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Main",
+            "cwd": "${workspaceFolder}/Source/Main",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
@@ -27,7 +27,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/Source/Main/bin/Debug/net6.0/Main.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Main",
+            "cwd": "${workspaceFolder}/Source/Main",
             "stopAtEntry": false,
             "justMyCode": false,
             "requireExactSource": false,
