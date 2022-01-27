@@ -24,6 +24,11 @@ const groups: INavLinkGroup[] = [
                 name: 'Home',
                 url: '',
                 route: '/'
+            },
+            {
+                name: 'Applications',
+                url: 'applications',
+                route: '/applications'
             }
         ]
     }

@@ -8,8 +8,11 @@ import './index.scss';
 import './Styles/theme';
 
 import { App } from './App';
+import { ModalProvider } from '@aksio/cratis-fluentui';
 
 ReactDOM.render(
-    <App />,
+    <ModalProvider>
+        <App />
+    </ModalProvider>,
     document.getElementById('root')
 );

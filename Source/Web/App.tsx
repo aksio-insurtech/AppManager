@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { default as styles } from './App.module.scss';
 import { Navigation } from './Navigation';
 import { Home } from './Home';
+import { Applications } from './Applications/Applications';
 
 export const App = () => {
     return (
@@ -16,6 +17,7 @@ export const App = () => {
                 <div style={{ width: '100%' }}>
                     <Routes>
                         <Route path="/" element={<Home/>}/>
+                        <Route path="/applications" element={<Applications/>}/>
                     </Routes>
                 </div>
             </div>

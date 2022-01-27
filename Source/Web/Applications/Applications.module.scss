@@ -1,0 +1,23 @@
+// Copyright (c) Aksio Insurtech. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+@import "../Styles/theme-colors.scss";
+
+.applicationsContainer {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    height: calc(100%);
+    margin: 0;
+    padding: 0;
+}
+
+.applicationsNavigation {
+    background-color: darken($ms-color-white, 3%);
+    height: calc(100%);
+    overflow-y: auto;
+}
+
+.actions {
+    padding: 1rem;
+}

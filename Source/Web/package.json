@@ -12,6 +12,7 @@
         "ci": "yarn clean && yarn lint:ci && yarn build"
     },
     "dependencies": {
+        "@aksio/cratis-fluentui": "5.0.6",
         "@aksio/cratis-react": "5.0.6",
         "@aksio/cratis-fundamentals": "5.0.6",
         "@aksio/cratis-applications-frontend": "5.0.6",
@@ -22,7 +23,8 @@
         "@fluentui/font-icons-mdl2": "8.1.20",
         "@fluentui/react": "8.51.1",
         "@fluentui/react-hooks": "8.3.9",
-        "@fluentui/react-icons": "1.1.145"
+        "@fluentui/react-icons": "1.1.145",
+        "@fluentui/react-experiments": "8.4.17"
     },
     "devDependencies": {
         "@aksio/cratis-webpack": "5.0.6",
