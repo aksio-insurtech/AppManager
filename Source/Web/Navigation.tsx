@@ -24,25 +24,7 @@ const groups: INavLinkGroup[] = [
                 name: 'Home',
                 url: '',
                 route: '/'
-            },
-            {
-                name: 'Accounts',
-                url: '',
-                links: [
-                    {
-                        name: 'Debit',
-                        key: 'debit',
-                        url: '',
-                        route: '/accounts/debit'
-                    }
-                ]
-            },
-            {
-                name: 'Integration',
-                url: '',
-                route: '/integration'
-            },
-
+            }
         ]
     }
 ];
