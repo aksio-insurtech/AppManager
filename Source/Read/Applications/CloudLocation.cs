@@ -3,8 +3,7 @@
 
 using Concepts.Applications;
 
-namespace Events.Applications
+namespace Read.Applications
 {
-    [EventType("689de713-b3b8-4f09-9943-ebf959667852")]
-    public record ApplicationCreated(ApplicationName Name, CloudLocationKey CloudLocation);
+    public record CloudLocation(CloudLocationKey Key, CloudLocationDisplayName DisplayName);
 }

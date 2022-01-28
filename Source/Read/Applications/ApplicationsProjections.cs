@@ -12,6 +12,7 @@ namespace Read.Applications
 
         public void Define(IProjectionBuilderFor<Application> builder) => builder
             .From<ApplicationCreated>(_ => _
-                .Set(m => m.Name).To(e => e.Name));
+                .Set(m => m.Name).To(e => e.Name)
+                .Set(m => m.CloudLocation).To(e => e.CloudLocation));
     }
 }

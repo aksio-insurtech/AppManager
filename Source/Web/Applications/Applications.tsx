@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Nav, INavLinkGroup, INavLink, INavStyles, DefaultButton } from '@fluentui/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { default as styles } from './Applications.module.scss';
 import { IModalProps, ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
@@ -24,6 +24,9 @@ const navStyles: Partial<INavStyles> = {
 };
 
 export const Applications = () => {
+    const params = useParams();
+    console.log(params);
+
     const [selectedNav, setSelectedNav] = useState('');
     const [showCreateApplicationDialog] = useModal(
         "Create application",
@@ -34,6 +37,7 @@ export const Applications = () => {
                 const command = new CreateApplication();
                 command.applicationId = Guid.create().toString();
                 command.name = output.name;
+                command.cloudLocation = output.cloudLocation;
                 await command.execute();
             }
         }
@@ -46,7 +50,7 @@ export const Applications = () => {
                 return {
                     name: application.name,
                     url: '',
-                    route: ''
+                    route: `/applications/${application.id}`
                 };
             })
         }];
@@ -54,7 +58,12 @@ export const Applications = () => {
     const history = useNavigate();
 
     const navItemClicked = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
+        if (item) {
+            setSelectedNav(item.key!);
+            history(item.route);
+        }
     };
+
     return (
 
         <div className={styles.applicationsContainer}>

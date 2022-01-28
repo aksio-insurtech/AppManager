@@ -13,6 +13,6 @@ namespace Domain.Applications
         public Applications(IEventLog eventLog) => _eventLog = eventLog;
 
         [HttpPost]
-        public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name));
+        public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.CloudLocation));
     }
 }

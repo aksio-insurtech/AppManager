@@ -17,7 +17,7 @@ export const App = () => {
                 <div style={{ width: '100%' }}>
                     <Routes>
                         <Route path="/" element={<Home/>}/>
-                        <Route path="/applications" element={<Applications/>}/>
+                        <Route path="/applications/*" element={<Applications/>}/>
                     </Routes>
                 </div>
             </div>

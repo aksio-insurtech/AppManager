@@ -6,5 +6,5 @@ using ApplicationId = Concepts.Applications.ApplicationId;
 
 namespace Domain.Applications
 {
-    public record CreateApplication(ApplicationId ApplicationId, ApplicationName Name);
+    public record CreateApplication(ApplicationId ApplicationId, ApplicationName Name, CloudLocationKey CloudLocation);
 }
