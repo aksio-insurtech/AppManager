@@ -4,7 +4,19 @@
 import { ScrollableDetailsList } from '@aksio/cratis-fluentui';
 import { CommandBar, IColumn, ICommandBarItemProps, Pivot, PivotItem, Stack } from '@fluentui/react';
 import { useParams } from 'react-router-dom';
+import { ApplicationSettings } from './ApplicationSettings';
 import { MicroserviceSettings } from './MicroserviceSettings';
+import { Tenants } from './Tenants';
+
+
+const columns: IColumn[] = [
+    {
+        key: 'name',
+        name: 'Name',
+        fieldName: 'name',
+        minWidth: 200
+    }
+];
 
 export const Application = () => {
     const params = useParams();
@@ -18,15 +30,6 @@ export const Application = () => {
         }
     ];
 
-    const columns: IColumn[] = [
-        {
-            key: 'name',
-            name: 'Name',
-            fieldName: 'name',
-            minWidth: 200
-        }
-    ];
-
     const items: any[] = [];
 
     return (
@@ -36,9 +39,13 @@ export const Application = () => {
                 <ScrollableDetailsList columns={columns} items={items} />
             </Stack.Item>
             <Stack.Item grow={1}>
-
-
                 <Pivot>
+                    <PivotItem headerText='General'>
+                        <ApplicationSettings/>
+                    </PivotItem>
+                    <PivotItem headerText='Tenants'>
+                        <Tenants />
+                    </PivotItem>
                     <PivotItem headerText='Production'>
                         <MicroserviceSettings />
                     </PivotItem>
