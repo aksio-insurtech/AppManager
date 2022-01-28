@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 import { Nav, INavLinkGroup, INavLink, INavStyles } from '@fluentui/react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { default as styles } from './Navigation.module.scss';
+import { default as styles } from './Navigation.module.scss';
 
 const navStyles: Partial<INavStyles> = {
     root: {
@@ -21,11 +21,13 @@ const groups: INavLinkGroup[] = [
     {
         links: [
             {
+                key: '',
                 name: 'Home',
                 url: '',
                 route: '/'
             },
             {
+                key: 'applications',
                 name: 'Applications',
                 url: 'applications',
                 route: '/applications'
@@ -34,22 +36,30 @@ const groups: INavLinkGroup[] = [
     }
 ];
 
+const getSelectedNav = () => {
+    const segments = document.location.pathname.split('/').filter(_ => _.length > 0);
+    if( segments.length > 0 )
+    {
+        return segments[0];
+    }
 
+    return '';
+};
 
 export const Navigation = () => {
-    const [selectedNav, setSelectedNav] = useState('');
-    const history = useNavigate();
+    const [selectedNav, setSelectedNav] = useState(getSelectedNav());
+    const navigate = useNavigate();
 
     const navItemClicked = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
         if (item) {
             setSelectedNav(item.key!);
-            history(item.route);
+            navigate(item.route);
         }
     };
+
     return (
         <div className={styles.navigationContainer}>
             <Nav
-
                 groups={groups}
                 styles={navStyles}
                 onLinkClick={navItemClicked}

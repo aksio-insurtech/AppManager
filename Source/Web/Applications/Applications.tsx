@@ -11,6 +11,7 @@ import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { CreateApplication } from 'API/Applications/CreateApplication';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { AllApplications } from 'API/Applications/AllApplications';
+import { Application as ApplicationModel } from 'API/Applications/Application';
 import { Application } from './Application';
 
 
@@ -26,6 +27,7 @@ const navStyles: Partial<INavStyles> = {
 
 export const Applications = () => {
     const [selectedNav, setSelectedNav] = useState('');
+    const [selectedApplication, setSelectedApplication] = useState<ApplicationModel>();
     const [showCreateApplicationDialog] = useModal(
         "Create application",
         ModalButtons.OkCancel,
@@ -46,6 +48,7 @@ export const Applications = () => {
         {
             links: applications.data.map(application => {
                 return {
+                    key: application.id,
                     name: application.name,
                     url: '',
                     route: `/applications/${application.id}`
@@ -54,13 +57,25 @@ export const Applications = () => {
         }];
 
     const history = useNavigate();
+    const params = useParams();
+    const applicationId = params['*'] || '';
+
+    const setSelectedApplicationFromKey = (key: string) => {
+        setSelectedApplication(applications.data.find(_ => _.id == key));
+    }
 
     const navItemClicked = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
         if (item) {
+            setSelectedApplicationFromKey(item.key!);
             setSelectedNav(item.key!);
             history(item.route);
         }
     };
+
+    if (applications.data.length > 0 && !selectedApplication && applicationId !== '') {
+        setSelectedApplicationFromKey(applicationId);
+        setSelectedNav(applicationId);
+    }
 
     return (
 
@@ -82,7 +97,7 @@ export const Applications = () => {
             </div>
             <div>
                 <Routes>
-                    <Route path=':id' element={<Application/>}/>
+                    {selectedApplication && <Route path=':id' element={<Application application={selectedApplication} />} />}
                 </Routes>
             </div>
         </div>

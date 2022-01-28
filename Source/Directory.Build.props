@@ -1,4 +1,6 @@
 <Project>
+    <Import Project="$(MSBuildThisFileDirectory)/../Versions.props"/>
+
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <IsPackable>false</IsPackable>
@@ -13,10 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aksio.Defaults" Version="1.5.8" />
-        <PackageReference Include="Aksio.Cratis.Applications" Version="5.0.6" />
-        <PackageReference Include="Aksio.Cratis.Applications.CQRS" Version="5.0.6" />
-        <PackageReference Include="Aksio.Cratis.Applications.CQRS.MongoDB" Version="5.0.6" />
-        <PackageReference Include="Aksio.Cratis.Applications.ProxyGenerator" Version="5.0.6" />
+        <PackageReference Include="Aksio.Defaults" Version="$(AksioDefaults)" />
+        <PackageReference Include="Aksio.Cratis.Applications" Version="$(AksioCratis)" />
+        <PackageReference Include="Aksio.Cratis.Applications.CQRS" Version="$(AksioCratis)" />
+        <PackageReference Include="Aksio.Cratis.Applications.CQRS.MongoDB" Version="$(AksioCratis)" />
+        <PackageReference Include="Aksio.Cratis.Applications.ProxyGenerator" Version="$(AksioCratis)" />
     </ItemGroup>
 </Project>

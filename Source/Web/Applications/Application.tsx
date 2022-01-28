@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { ApplicationSettings } from './ApplicationSettings';
 import { MicroserviceSettings } from './MicroserviceSettings';
 import { Tenants } from './Tenants';
-
+import { Application as ApplicationModel } from 'API/Applications/Application';
 
 const columns: IColumn[] = [
     {
@@ -18,9 +18,12 @@ const columns: IColumn[] = [
     }
 ];
 
-export const Application = () => {
-    const params = useParams();
-    console.log(params);
+export interface IApplicationProps {
+    application: ApplicationModel;
+}
+
+export const Application = (props: IApplicationProps) => {
+
 
     const commandBarItems: ICommandBarItemProps[] = [
         {
@@ -41,7 +44,7 @@ export const Application = () => {
             <Stack.Item grow={1}>
                 <Pivot>
                     <PivotItem headerText='General'>
-                        <ApplicationSettings/>
+                        <ApplicationSettings application={props.application}/>
                     </PivotItem>
                     <PivotItem headerText='Tenants'>
                         <Tenants />

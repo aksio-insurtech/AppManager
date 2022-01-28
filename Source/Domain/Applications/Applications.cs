@@ -14,5 +14,8 @@ namespace Domain.Applications
 
         [HttpPost]
         public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.CloudLocation));
+
+        [HttpPost("remove")]
+        public Task Remove([FromBody] RemoveApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationRemoved());
     }
 }
