@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Nav, INavLinkGroup, INavLink, INavStyles, DefaultButton } from '@fluentui/react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 
 import { default as styles } from './Applications.module.scss';
 import { IModalProps, ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
@@ -11,6 +11,7 @@ import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { CreateApplication } from 'API/Applications/CreateApplication';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { AllApplications } from 'API/Applications/AllApplications';
+import { Application } from './Application';
 
 
 const navStyles: Partial<INavStyles> = {
@@ -24,9 +25,6 @@ const navStyles: Partial<INavStyles> = {
 };
 
 export const Applications = () => {
-    const params = useParams();
-    console.log(params);
-
     const [selectedNav, setSelectedNav] = useState('');
     const [showCreateApplicationDialog] = useModal(
         "Create application",
@@ -71,6 +69,7 @@ export const Applications = () => {
                 <div className={styles.actions}>
                     <DefaultButton
                         text="Create"
+                        title="Create application"
                         style={{ width: 135 }}
                         iconProps={{ iconName: "Add" }}
                         onClick={showCreateApplicationDialog} />
@@ -82,7 +81,9 @@ export const Applications = () => {
                     selectedKey={selectedNav} />
             </div>
             <div style={{ width: '100%' }}>
-
+                <Routes>
+                    <Route path=':id' element={<Application/>}/>
+                </Routes>
             </div>
         </div>
     );

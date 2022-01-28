@@ -9,18 +9,16 @@ import { Applications } from './Applications/Applications';
 
 export const App = () => {
     return (
-        <Router>
-            <div className={styles.appContainer}>
-                <div className={styles.navigationBar}>
-                    <Navigation />
-                </div>
-                <div style={{ width: '100%' }}>
-                    <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/applications/*" element={<Applications/>}/>
-                    </Routes>
-                </div>
+        <div className={styles.appContainer}>
+            <div className={styles.navigationBar}>
+                <Navigation />
             </div>
-        </Router>
+            <div style={{ width: '100%' }}>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/applications/*" element={<Applications />} />
+                </Routes>
+            </div>
+        </div>
     );
 };

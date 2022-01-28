@@ -9,10 +9,13 @@ import './Styles/theme';
 
 import { App } from './App';
 import { ModalProvider } from '@aksio/cratis-fluentui';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
-    <ModalProvider>
-        <App />
-    </ModalProvider>,
+    <BrowserRouter>
+        <ModalProvider>
+            <App />
+        </ModalProvider>
+    </BrowserRouter>,
     document.getElementById('root')
 );

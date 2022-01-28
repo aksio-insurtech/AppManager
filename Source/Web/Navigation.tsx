@@ -35,6 +35,7 @@ const groups: INavLinkGroup[] = [
 ];
 
 
+
 export const Navigation = () => {
     const [selectedNav, setSelectedNav] = useState('');
     const history = useNavigate();
@@ -48,6 +49,7 @@ export const Navigation = () => {
     return (
         <div className={styles.navigationContainer}>
             <Nav
+
                 groups={groups}
                 styles={navStyles}
                 onLinkClick={navItemClicked}
