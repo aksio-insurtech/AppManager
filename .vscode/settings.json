@@ -55,6 +55,7 @@
         "Cratis",
         "expando",
         "fluentui",
+        "Pulumi",
         "Templating",
         "Xunit"
     ]

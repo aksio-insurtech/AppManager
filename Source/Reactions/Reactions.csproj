@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<ProjectReference Include="../Concepts/Concepts.csproj" />
+		<ProjectReference Include="../Events/Events.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="pulumi.automation" Version="3.23.0" />
+	  <PackageReference Include="pulumi.azurenative" Version="1.54.0" />
+	</ItemGroup>
+</Project>
