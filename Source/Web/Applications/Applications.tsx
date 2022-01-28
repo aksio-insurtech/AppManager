@@ -80,7 +80,7 @@ export const Applications = () => {
                     onLinkClick={navItemClicked}
                     selectedKey={selectedNav} />
             </div>
-            <div style={{ width: '100%' }}>
+            <div>
                 <Routes>
                     <Route path=':id' element={<Application/>}/>
                 </Routes>
