@@ -14,7 +14,7 @@ namespace Read.Applications
         [HttpGet]
         public IEnumerable<CloudLocation> AllCloudLocations() => new[]
             {
-                new CloudLocation("norway east", "Norway East"),
+                new CloudLocation("norwayeast", "Norway East"),
                 new CloudLocation("westeurope", "West Europe"),
                 new CloudLocation("northeurope", "North Europe")
             };
