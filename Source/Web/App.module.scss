@@ -3,7 +3,29 @@
 
 @import "./Styles/theme-colors.scss";
 
+$bar-color: darken($ms-color-white, 5%);
+$header-height: 50px;
+
 .appContainer {
+    height: calc(100%);
+}
+
+.header {
+    background-color: $bar-color;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: $header-height;
+    width: 100%;
+    z-index: 1000;
+}
+
+.content {
+    height: 100%;
+    margin: $header-height auto;
+}
+
+.navigationContainer {
     display: flex;
     flex: 1;
     flex-direction: row;
@@ -13,5 +35,5 @@
 }
 
 .navigationBar {
-    background-color: darken($ms-color-white, 5%);
+    background-color: $bar-color;
 }

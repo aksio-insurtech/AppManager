@@ -1,13 +1,9 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-@import "./Styles/theme.scss";
+using Concepts.Organizations;
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    min-height: 100%;
-    background-color: $ms-color-white;
+namespace Domain.Organizations
+{
+    public record RegisterOrganization(OrganizationId Id, OrganizationName Name);
 }

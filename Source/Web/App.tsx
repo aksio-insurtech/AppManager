@@ -6,18 +6,26 @@ import { default as styles } from './App.module.scss';
 import { Navigation } from './Navigation';
 import { Home } from './Home';
 import { Applications } from './Applications/Applications';
+import { Header } from './Header';
 
 export const App = () => {
     return (
         <div className={styles.appContainer}>
-            <div className={styles.navigationBar}>
-                <Navigation />
+            <div className={styles.header}>
+                <Header />
             </div>
-            <div style={{ width: '100%' }}>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/applications/*" element={<Applications />} />
-                </Routes>
+            <div className={styles.content}>
+                <div className={styles.navigationContainer}>
+                    <div className={styles.navigationBar}>
+                        <Navigation />
+                    </div>
+                    <div style={{ width: '100%' }}>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/applications/*" element={<Applications />} />
+                        </Routes>
+                    </div>
+                </div>
             </div>
         </div>
     );

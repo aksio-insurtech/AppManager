@@ -8,10 +8,10 @@ import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { default as styles } from './Applications.module.scss';
 import { IModalProps, ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
-import { CreateApplication } from 'API/Applications/CreateApplication';
+import { CreateApplication } from 'API/applications/CreateApplication';
 import { Guid } from '@aksio/cratis-fundamentals';
-import { AllApplications } from 'API/Applications/AllApplications';
-import { Application as ApplicationModel } from 'API/Applications/Application';
+import { AllApplications } from 'API/applications/AllApplications';
+import { Application as ApplicationModel } from 'API/applications/Application';
 import { Application } from './Application';
 
 

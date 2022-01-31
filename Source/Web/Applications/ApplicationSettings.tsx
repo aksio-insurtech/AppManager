@@ -3,8 +3,8 @@
 
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { PrimaryButton, Stack } from '@fluentui/react';
-import { RemoveApplication } from 'API/Applications/RemoveApplication';
-import { Application as ApplicationModel } from 'API/Applications/Application';
+import { RemoveApplication } from 'API/applications/RemoveApplication';
+import { Application as ApplicationModel } from 'API/applications/Application';
 import { useNavigate } from 'react-router-dom';
 
 export interface IApplicationSettingsProps {

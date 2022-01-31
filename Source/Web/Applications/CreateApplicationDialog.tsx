@@ -4,7 +4,7 @@
 import { IModalProps } from '@aksio/cratis-fluentui';
 import { Dropdown, IDropdownOption, Stack, TextField } from '@fluentui/react';
 import React, { useState } from 'react';
-import { AllCloudLocations } from 'API/Applications/AllCloudLocations';
+import { AllCloudLocations } from 'API/cloudlocations/AllCloudLocations';
 
 export interface CreateApplicationDialogOutput {
     name: string;

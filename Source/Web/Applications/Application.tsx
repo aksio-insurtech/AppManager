@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { ApplicationSettings } from './ApplicationSettings';
 import { MicroserviceSettings } from './MicroserviceSettings';
 import { Tenants } from './Tenants';
-import { Application as ApplicationModel } from 'API/Applications/Application';
+import { Application as ApplicationModel } from 'API/applications/Application';
 
 const columns: IColumn[] = [
     {

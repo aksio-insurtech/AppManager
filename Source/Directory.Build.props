@@ -8,6 +8,7 @@
         <NoWarn>$(NoWarn);CS8019;SA1600;SA1601;CS1591;IDE0060</NoWarn>
 
         <AksioProxyOutput>$(MSBuildThisFileDirectory)/Web/API</AksioProxyOutput>
+        <AksioUseRouteAsPath>true</AksioUseRouteAsPath>
     </PropertyGroup>
 
     <ItemGroup>
