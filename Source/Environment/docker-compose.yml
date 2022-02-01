@@ -2,6 +2,8 @@ version: '3.1'
 services:
   cratis-kernel:
     image: aksioinsurtech/cratis:latest-development
+    volumes:
+      - ./storage.json:/app/storage.json:ro
     ports:
       - 27017:27017
       - 8080:80

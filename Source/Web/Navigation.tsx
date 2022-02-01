@@ -27,6 +27,12 @@ const groups: INavLinkGroup[] = [
                 route: '/'
             },
             {
+                key: 'organization',
+                name: 'Organization',
+                url: 'organization',
+                route: '/organization'
+            },
+            {
                 key: 'applications',
                 name: 'Applications',
                 url: 'applications',
@@ -52,6 +58,7 @@ export const Navigation = () => {
 
     const navItemClicked = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
         if (item) {
+            ev?.preventDefault();
             setSelectedNav(item.key!);
             navigate(item.route);
         }
