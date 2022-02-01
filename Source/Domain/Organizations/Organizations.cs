@@ -14,6 +14,6 @@ namespace Domain.Organizations
         public Organizations(IEventLog eventLog) => _eventLog = eventLog;
 
         [HttpPost]
-        public Task Register([FromBody] RegisterOrganization @command) => _eventLog.Append(@command.Id.ToString(), new OrganizationRegistered(@command.Name));
+        public Task Register([FromBody] RegisterOrganization command) => _eventLog.Append(command.Id.ToString(), new OrganizationRegistered(command.Name));
     }
 }

@@ -13,7 +13,7 @@ namespace Domain.Applications
         public Applications(IEventLog eventLog) => _eventLog = eventLog;
 
         [HttpPost]
-        public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.CloudLocation));
+        public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
 
         [HttpPost("remove")]
         public Task Remove([FromBody] RemoveApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationRemoved());

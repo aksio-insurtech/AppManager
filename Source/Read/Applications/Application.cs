@@ -3,10 +3,11 @@
 
 using Aksio.Cratis.Events.Projections;
 using Concepts.Applications;
+using Concepts.Organizations;
 using Events.Applications;
 using ApplicationId = Concepts.Applications.ApplicationId;
 
 namespace Read.Applications
 {
-    public record Application(ApplicationId Id, ApplicationName Name, CloudLocationKey CloudLocation);
+    public record Application(ApplicationId Id, ApplicationName Name, AzureSubscriptionId AzureSubscriptionId, CloudLocationKey CloudLocation);
 }

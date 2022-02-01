@@ -19,9 +19,9 @@ namespace Domain.Organizations
         }
 
         [HttpPost("subscriptions")]
-        public Task AddAzureSubscription([FromBody] AddAzureSubscription @command) => _eventLog.Append(_executionContext.TenantId.ToString(), new AzureSubscriptionAdded(@command.Id, @command.Name));
+        public Task AddAzureSubscription([FromBody] AddAzureSubscription command) => _eventLog.Append(_executionContext.TenantId.ToString(), new AzureSubscriptionAdded(command.Id, command.Name));
 
         [HttpPost("pulumi")]
-        public Task SetPulumiAccessToken([FromBody] SetPulumiAccessToken @command) => _eventLog.Append(_executionContext.TenantId.ToString(), new PulumiAccessTokenSet(@command.AccessToken));
+        public Task SetPulumiAccessToken([FromBody] SetPulumiAccessToken command) => _eventLog.Append(_executionContext.TenantId.ToString(), new PulumiAccessTokenSet(command.AccessToken));
     }
 }

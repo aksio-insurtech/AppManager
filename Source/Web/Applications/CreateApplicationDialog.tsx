@@ -5,6 +5,7 @@ import { IModalProps } from '@aksio/cratis-fluentui';
 import { Dropdown, IDropdownOption, Stack, TextField } from '@fluentui/react';
 import React, { useState } from 'react';
 import { AllCloudLocations } from 'API/cloudlocations/AllCloudLocations';
+import { AllSettings } from 'API/organization/settings/AllSettings';
 
 export interface CreateApplicationDialogOutput {
     name: string;
@@ -13,6 +14,8 @@ export interface CreateApplicationDialogOutput {
 
 export const CreateApplicationDialog = (props: IModalProps<{}, CreateApplicationDialogOutput>) => {
     const [name, setName] = useState('');
+    const [azureSubscription, setAzureSubscription] = useState('');
+    const [settings] = AllSettings.use();
     const [cloudLocation, setCloudLocation] = useState('');
     const [cloudLocations] = AllCloudLocations.use();
 
@@ -34,19 +37,28 @@ export const CreateApplicationDialog = (props: IModalProps<{}, CreateApplication
         setCloudLocation(cloudLocations.data[0].key);
     }
 
-    const onCloudLocationChange = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption) => {
-        setCloudLocation(item?.key as string || '');
-    };
+    const azureSubscriptionOptions: IDropdownOption[] = settings.data?.azureSubscriptions?.map(_ => {
+        return {
+            key: _.id,
+            text: _.name
+        };
+    });
 
     return (
         <div>
             <Stack>
                 <TextField label='Name' required defaultValue={name} onChange={(e, n) => setName(n!)} />
+                <Dropdown placeholder="Select the Azure Subscription"
+                    label="Azure Subscription"
+                    options={azureSubscriptionOptions}
+                    selectedKey={azureSubscription}
+                    onChange={(_, item) => setAzureSubscription(item?.key as string || '')} />
+
                 <Dropdown placeholder="Select a location in the cloud"
                     label="Cloud location"
                     options={cloudLocationOptions}
                     selectedKey={cloudLocation}
-                    onChange={onCloudLocationChange} />
+                    onChange={(_, item) => setCloudLocation(item?.key as string || '')} />
             </Stack>
         </div>
     );

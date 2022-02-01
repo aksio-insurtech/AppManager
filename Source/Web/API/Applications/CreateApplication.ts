@@ -9,5 +9,6 @@ export class CreateApplication extends Command {
 
     applicationId!: string;
     name!: string;
+    azureSubscriptionId!: string;
     cloudLocation!: string;
 }

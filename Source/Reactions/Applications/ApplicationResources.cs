@@ -7,6 +7,7 @@ using Aksio.Cratis.Events.Projections.Grains;
 using Aksio.Cratis.Json;
 using Aksio.Cratis.Schemas;
 using Events.Applications;
+using Events.Organizations;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Pulumi.Automation;
@@ -51,7 +52,10 @@ namespace Reactions.Applications
                 .NotRewindable()
                 .From<ApplicationCreated>(_ => _
                     .Set(m => m.Name).To(e => e.Name)
+                    .Set(m => m.AzureSubscriptionId).To(e => e.AzureSubscriptionId)
                     .Set(m => m.CloudLocation).To(e => e.CloudLocation))
+                .From<PulumiAccessTokenSet>(_ => _
+                    .Set(m => m.PulumiAccessToken).To(e => e.AccessToken))
                 .Build();
 
             var projections = _clusterClient.GetGrain<IProjections>(Guid.Empty);
@@ -110,8 +114,10 @@ namespace Reactions.Applications
             await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
                 { "azure-native:location", new ConfigValue(application.CloudLocation) },
-                { "azure-native:subscriptionId", new ConfigValue(Environment.GetEnvironmentVariable("AZURE_SUBSCRIPTION")! ) }
+                { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) }
             });
+
+            Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", application.PulumiAccessToken);
 
             if (!isDestroy)
             {
