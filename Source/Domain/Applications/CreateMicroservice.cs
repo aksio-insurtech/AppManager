@@ -2,9 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
-using ApplicationId = Concepts.Applications.ApplicationId;
+using Events.Applications;
 
 namespace Domain.Applications
 {
-    public record RemoveApplication(ApplicationId ApplicationId);
+    public record CreateMicroservice(MicroserviceId MicroserviceId, MicroserviceName Name);
 }

@@ -10,7 +10,9 @@
         "**/node_modules": true,
         "**/.git": true,
         "**/.svn": true,
-        "**/.DS_Store": true
+        "**/.DS_Store": true,
+        "**/obj": true,
+        "**/bin": true
     },
     "files.watcherExclude": {
         "**/.git": true,
@@ -53,6 +55,7 @@
         "Autofac",
         "Bson",
         "Cratis",
+        "deployables",
         "expando",
         "fluentui",
         "Pulumi",

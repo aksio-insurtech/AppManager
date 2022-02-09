@@ -5,7 +5,6 @@ using Concepts.Applications;
 using Concepts.Azure;
 using Concepts.Organizations;
 using Concepts.Pulumi;
-using ApplicationId = Concepts.Applications.ApplicationId;
 
 namespace Reactions.Applications
 {

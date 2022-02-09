@@ -9,15 +9,13 @@ namespace Read.Organizations
     public class OrganizationSettings : Controller
     {
         readonly IMongoCollection<Settings> _collection;
-        readonly ExecutionContext _executionContext;
 
-        public OrganizationSettings(IMongoCollection<Settings> collection, ExecutionContext executionContext)
+        public OrganizationSettings(IMongoCollection<Settings> collection)
         {
             _collection = collection;
-            _executionContext = executionContext;
         }
 
         [HttpGet]
-        public async Task<Settings> AllSettings() => await _collection.Find(_ => _.Id == _executionContext.TenantId.ToString()).FirstOrDefaultAsync() ?? Settings.NoSettings;
+        public async Task<Settings> AllSettings() => await _collection.Find(_ => true).FirstOrDefaultAsync() ?? Settings.NoSettings;
     }
 }

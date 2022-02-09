@@ -4,7 +4,7 @@
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { CommandBar, DetailsList, IColumn, Stack, ICommandBarItemProps, TextField, PrimaryButton } from '@fluentui/react';
 import { AddSubscriptionDialog } from './AddSubscriptionDialog';
-import { AddAzureSubscription } from 'API/organizations/AddAzureSubscription';
+import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscription';
 import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetPulumiAccessToken } from '../API/organization/settings/SetPulumiAccessToken';

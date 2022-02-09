@@ -9,12 +9,10 @@ namespace Read.Organizations
 {
     public class ApplicationSettings : IApplicationSettings
     {
-        readonly ExecutionContext _executionContext;
         readonly IMongoCollection<Settings> _settingsCollection;
 
-        public ApplicationSettings(ExecutionContext executionContext, IMongoCollection<Settings> settingsCollection)
+        public ApplicationSettings(IMongoCollection<Settings> settingsCollection)
         {
-            _executionContext = executionContext;
             _settingsCollection = settingsCollection;
         }
 
@@ -24,6 +22,6 @@ namespace Read.Organizations
             return settings.PulumiAccessToken;
         }
 
-        Task<Settings> GetSettings() => _settingsCollection.Find(_ => _.Id == _executionContext.TenantId).FirstAsync();
+        async Task<Settings> GetSettings() => await _settingsCollection.Find(_ => true).FirstOrDefaultAsync() ?? Settings.NoSettings;
     }
 }

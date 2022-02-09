@@ -4,6 +4,7 @@ interface CssExports {
   'actions': string;
   'applicationsContainer': string;
   'applicationsNavigation': string;
+  'itemActions': string;
 }
 export const cssExports: CssExports;
 export default cssExports;

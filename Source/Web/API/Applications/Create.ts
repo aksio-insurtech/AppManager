@@ -3,9 +3,18 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Command } from '@aksio/cratis-applications-frontend/commands';
+import Handlebars from 'handlebars';
 
-export class CreateApplication extends Command {
+const routeTemplate = Handlebars.compile('/api/applications');
+
+export class Create extends Command {
     readonly route: string = '/api/applications';
+    readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
+
+    get requestArguments(): string[] {
+        return [
+        ];
+    }
 
     applicationId!: string;
     name!: string;

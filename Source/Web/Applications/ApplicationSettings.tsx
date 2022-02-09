@@ -3,7 +3,7 @@
 
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { PrimaryButton, Stack } from '@fluentui/react';
-import { RemoveApplication } from 'API/applications/RemoveApplication';
+import { Remove } from 'API/applications/Remove';
 import { Application as ApplicationModel } from 'API/applications/Application';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ export interface IApplicationSettingsProps {
 }
 
 export const ApplicationSettings = (props: IApplicationSettingsProps) => {
-    const removeApplicationCommand = new RemoveApplication();
+    const removeApplicationCommand = new Remove();
     const navigate = useNavigate();
 
     const [showRemoveWarning] = useModal(

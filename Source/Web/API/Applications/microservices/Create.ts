@@ -5,16 +5,19 @@
 import { Command } from '@aksio/cratis-applications-frontend/commands';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/organization/settings/pulumi');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/microservices');
 
-export class SetPulumiAccessToken extends Command {
-    readonly route: string = '/api/organization/settings/pulumi';
+export class Create extends Command {
+    readonly route: string = '/api/applications/{{applicationId}}/microservices';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
         ];
     }
 
-    accessToken!: string;
+    applicationId!: string;
+    microserviceId!: string;
+    name!: string;
 }

@@ -1,6 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Organizations;
+using Concepts.Pulumi;
 using Events.Organizations;
 
 namespace Domain.Organizations
@@ -9,18 +11,16 @@ namespace Domain.Organizations
     public class OrganizationSettings : Controller
     {
         readonly IEventLog _eventLog;
-        readonly ExecutionContext _executionContext;
 
-        public OrganizationSettings(IEventLog eventLog, ExecutionContext executionContext)
+        public OrganizationSettings(IEventLog eventLog)
         {
             _eventLog = eventLog;
-            _executionContext = executionContext;
         }
 
         [HttpPost("subscriptions")]
-        public Task AddAzureSubscription([FromBody] AddAzureSubscription command) => _eventLog.Append(_executionContext.TenantId.ToString(), new AzureSubscriptionAdded(command.Id, command.Name));
+        public Task AddAzureSubscription([FromBody] AddAzureSubscription command) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(command.Id, command.Name));
 
         [HttpPost("pulumi")]
-        public Task SetPulumiAccessToken([FromBody] SetPulumiAccessToken command) => _eventLog.Append(_executionContext.TenantId.ToString(), new PulumiAccessTokenSet(command.AccessToken));
+        public Task SetPulumiAccessToken([FromBody] PulumiAccessToken accessToken) => _eventLog.Append(SettingsId.Global, new PulumiAccessTokenSet(accessToken));
     }
 }

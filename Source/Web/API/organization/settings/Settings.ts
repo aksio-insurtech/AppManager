@@ -5,7 +5,6 @@
 import { AzureSubscription } from './AzureSubscription';
 
 export type Settings = {
-    id: string;
     azureSubscriptions: AzureSubscription[];
     pulumiAccessToken: string;
 };

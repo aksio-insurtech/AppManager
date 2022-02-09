@@ -4,7 +4,6 @@
 using Aksio.Cratis.Events.Projections;
 using Concepts.Applications;
 using Events.Applications;
-using ApplicationId = Concepts.Applications.ApplicationId;
 
 namespace Read.Applications
 {

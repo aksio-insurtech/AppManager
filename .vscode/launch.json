@@ -21,7 +21,7 @@
             }
         },
         {
-            "name": ".NET Core Launch (Sample - not just my code)",
+            "name": ".NET Core Launch (Main - not just my code)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",

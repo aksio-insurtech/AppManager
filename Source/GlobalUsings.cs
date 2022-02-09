@@ -13,4 +13,5 @@ global using Aksio.Cratis.Integration;
 global using AutoMapper;
 global using Microsoft.AspNetCore.Mvc;
 global using MongoDB.Driver;
+global using ApplicationId = Concepts.Applications.ApplicationId;
 global using ExecutionContext = Aksio.Cratis.Execution.ExecutionContext;
