@@ -4,6 +4,6 @@
 
 
 export type AzureSubscription = {
-    id: string;
+    subscriptionId: string;
     name: string;
 };

@@ -3,9 +3,13 @@
 
 using Aksio.Cratis.Events.Projections;
 using Concepts.Organizations;
+using Concepts.Pulumi;
 using Events.Organizations;
 
 namespace Read.Organizations
 {
-    public record Settings(string Id, IEnumerable<AzureSubscription> AzureSubscriptions, string PulumiAccessToken);
+    public record Settings(string Id, IEnumerable<AzureSubscription> AzureSubscriptions, PulumiAccessToken PulumiAccessToken)
+    {
+        public static readonly Settings NoSettings = new(string.Empty, Array.Empty<AzureSubscription>(), string.Empty);
+    }
 }

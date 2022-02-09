@@ -3,6 +3,7 @@
 		<PackageReference Include="Contrib.Grpc.Core.M1" Version="2.41.0" />
 	</ItemGroup>
 	<ItemGroup>
+        <ProjectReference Include="../Common/Common.csproj" />
 		<ProjectReference Include="../Concepts/Concepts.csproj" />
 		<ProjectReference Include="../Domain/Domain.csproj" />
 		<ProjectReference Include="../Events/Events.csproj" />

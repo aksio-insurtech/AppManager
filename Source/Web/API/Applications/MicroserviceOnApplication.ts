@@ -2,12 +2,10 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { MicroserviceOnApplication } from './MicroserviceOnApplication';
+import { DeployableOnMicroservice } from './DeployableOnMicroservice';
 
-export type Application = {
-    id: string;
+export type MicroserviceOnApplication = {
+    microserviceId: string;
     name: string;
-    azureSubscriptionId: string;
-    cloudLocation: string;
-    microservices: MicroserviceOnApplication[];
+    deployables: DeployableOnMicroservice[];
 };

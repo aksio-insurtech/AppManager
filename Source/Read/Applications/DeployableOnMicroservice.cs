@@ -1,10 +1,9 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Pulumi;
-using Events.Organizations;
+using Concepts.Applications;
 
-namespace Domain.Organizations
+namespace Read.Applications
 {
-    public record SetPulumiAccessToken(PulumiAccessToken AccessToken);
+    public record DeployableOnMicroservice(DeployableId DeployableId, DeployableName Name);
 }

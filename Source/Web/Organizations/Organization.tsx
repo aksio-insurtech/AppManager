@@ -19,8 +19,8 @@ const subscriptionsColumns: IColumn[] = [
     {
         key: 'id',
         name: 'Id',
-        fieldName: 'id',
-        minWidth: 200
+        fieldName: 'subscriptionId',
+        minWidth: 250
     }
 ];
 

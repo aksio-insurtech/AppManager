@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Organizations;
-using ExecutionContext = Aksio.Cratis.Execution.ExecutionContext;
 
 namespace Read.Organizations
 {
@@ -19,6 +18,6 @@ namespace Read.Organizations
         }
 
         [HttpGet]
-        public Task<Settings> AllSettings() => _collection.Find(_ => _.Id == _executionContext.TenantId.ToString()).FirstAsync();
+        public async Task<Settings> AllSettings() => await _collection.Find(_ => _.Id == _executionContext.TenantId.ToString()).FirstOrDefaultAsync() ?? Settings.NoSettings;
     }
 }

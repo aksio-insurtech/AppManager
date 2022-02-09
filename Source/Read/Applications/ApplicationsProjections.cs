@@ -14,6 +14,16 @@ namespace Read.Applications
             .From<ApplicationCreated>(_ => _
                 .Set(m => m.Name).To(e => e.Name)
                 .Set(m => m.CloudLocation).To(e => e.CloudLocation))
+            .Children(_ => _.Microservices, _ => _
+                .IdentifiedBy(m => m.MicroserviceId)
+                .From<MicroserviceCreated>(_ => _
+                    .UsingParentKey(e => e.ApplicationId)
+                    .Set(m => m.Name).To(e => e.Name))
+                .Children(_ => _.Deployables, _ => _
+                    .IdentifiedBy(m => m.DeployableId)
+                    .From<DeployableCreated>(_ => _
+                        .UsingParentKey(e => e.MicroserviceId)
+                        .Set(m => m.Name).To(e => e.Name))))
             .RemovedWith<ApplicationRemoved>();
     }
 }

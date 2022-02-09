@@ -9,6 +9,7 @@ import { AllSettings } from 'API/organization/settings/AllSettings';
 
 export interface CreateApplicationDialogOutput {
     name: string;
+    azureSubscription: string;
     cloudLocation: string;
 }
 
@@ -22,6 +23,7 @@ export const CreateApplicationDialog = (props: IModalProps<{}, CreateApplication
     props.onClose(result => {
         return {
             name,
+            azureSubscription,
             cloudLocation
         };
     });
@@ -39,7 +41,7 @@ export const CreateApplicationDialog = (props: IModalProps<{}, CreateApplication
 
     const azureSubscriptionOptions: IDropdownOption[] = settings.data?.azureSubscriptions?.map(_ => {
         return {
-            key: _.id,
+            key: _.subscriptionId,
             text: _.name
         };
     });

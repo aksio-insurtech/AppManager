@@ -15,8 +15,9 @@ namespace Read.Organizations
             .From<PulumiAccessTokenSet>(_ => _
                 .Set(m => m.PulumiAccessToken).To(e => e.AccessToken))
             .Children(_ => _.AzureSubscriptions, _ => _
-                .IdentifiedBy(s => s.Id)
+                .IdentifiedBy(s => s.SubscriptionId)
                 .From<AzureSubscriptionAdded>(f => f
+                    .UsingKey(_ => _.Id)
                     .Set(m => m.Name).To(e => e.Name)));
     }
 }

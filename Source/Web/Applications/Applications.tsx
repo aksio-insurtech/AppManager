@@ -4,9 +4,8 @@
 import { useState } from 'react';
 import { Nav, INavLinkGroup, INavLink, INavStyles, DefaultButton } from '@fluentui/react';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
-
 import { default as styles } from './Applications.module.scss';
-import { IModalProps, ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
+import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { CreateApplication } from 'API/applications/CreateApplication';
 import { Guid } from '@aksio/cratis-fundamentals';
@@ -37,6 +36,7 @@ export const Applications = () => {
                 const command = new CreateApplication();
                 command.applicationId = Guid.create().toString();
                 command.name = output.name;
+                command.azureSubscriptionId = output.azureSubscription;
                 command.cloudLocation = output.cloudLocation;
                 await command.execute();
             }
@@ -51,7 +51,23 @@ export const Applications = () => {
                     key: application.id,
                     name: application.name,
                     url: '',
-                    route: `/applications/${application.id}`
+                    route: `/applications/${application.id}`,
+                    links: application.microservices?.map(microservice => {
+                        return {
+                            key: microservice.microserviceId,
+                            name: microservice.name,
+                            url: '',
+                            route: `/applications/${application.id}/${microservice.microserviceId}`,
+                            links: microservice.deployables?.map(deployable => {
+                                return {
+                                    key: deployable.deployableId,
+                                    name: deployable.name,
+                                    url: '',
+                                    route: `/applications/${application.id}/${microservice.microserviceId}/${deployable.deployableId}`
+                                };
+                            })
+                        };
+                    })
                 };
             })
         }];

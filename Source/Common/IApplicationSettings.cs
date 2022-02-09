@@ -1,7 +1,12 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Concepts.Organizations
+using Concepts.Pulumi;
+
+namespace Common
 {
-    public record AzureSubscriptionName(string Value) : ConceptAs<string>(Value);
+    public interface IApplicationSettings
+    {
+        Task<PulumiAccessToken> GetPulumiAccessToken();
+    }
 }
