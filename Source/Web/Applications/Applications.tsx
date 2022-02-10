@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Nav,
     INavLinkGroup,
@@ -9,18 +9,21 @@ import {
     INavStyles,
     CommandBar,
     ICommandBarItemProps,
-    FontIcon} from '@fluentui/react';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+    FontIcon
+} from '@fluentui/react';
+import { Route, Routes, useNavigate, useParams, useLocation, matchPath } from 'react-router-dom';
 import { default as styles } from './Applications.module.scss';
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { Create as CreateApplication } from 'API/applications/Create';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { AllApplications } from 'API/applications/AllApplications';
-import { Application as ApplicationModel } from 'API/applications/Application';
 import { Application } from './Application';
 import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
 import { Create as CreateMicroservice } from 'API/applications/microservices/Create';
+import { Create as CreateDeployable } from 'API/applications/microservices/deployables/Create';
+import { CreateDeployableDialog } from './CreateDeployableDialog';
+import { Microservice } from './Microservices/Microservice';
 
 
 const navStyles: Partial<INavStyles> = {
@@ -35,7 +38,31 @@ const navStyles: Partial<INavStyles> = {
 
 export const Applications = () => {
     const [selectedNav, setSelectedNav] = useState('');
-    const [selectedApplication, setSelectedApplication] = useState<ApplicationModel>();
+    const [currentApplication, setCurrentApplication] = useState<string>();
+    const [currentMicroservice, setCurrentMicroservice] = useState<string>();
+    const [currentDeployable, setCurrentDeployable] = useState<string>();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const routes: string[] = [
+        '/applications/:applicationId',
+        '/applications/:applicationId/microservices/:microserviceId',
+        '/applications/:applicationId/microservices/:microserviceId/deployables/:deployableId'
+    ];
+
+    useEffect(() => {
+        const match = routes.map(_ => matchPath({ path: _ }, location.pathname)).filter(_ => _ !== null);
+        if (match?.length == 1) {
+            const params = match[0]?.params || {};
+
+            setCurrentApplication(params.applicationId);
+            setCurrentMicroservice(params.microserviceId);
+            setCurrentDeployable(params.deployableId);
+
+            setSelectedNav(params.deployableId || params.microserviceId || params.applicationId || '');
+        }
+    }, [location.pathname]);
+
     const [showCreateApplicationDialog] = useModal(
         'Create application',
         ModalButtons.OkCancel,
@@ -58,15 +85,26 @@ export const Applications = () => {
         ModalButtons.OkCancel,
         CreateMicroserviceDialog,
         async (result, output) => {
-            if( result == ModalResult.Success && output) {
+            if (result == ModalResult.Success && output) {
                 const command = new CreateMicroservice();
-                command.applicationId = selectedApplication!.id;
+                command.applicationId = currentApplication!;
                 command.microserviceId = Guid.create().toString();
                 command.name = output.name;
                 await command.execute();
             }
         }
     );
+
+    const [showCreateDeployableDialog] = useModal(
+        'Create deployable',
+        ModalButtons.OkCancel,
+        CreateDeployableDialog,
+        async (result, output) => {
+            if (result == ModalResult.Success && output) {
+                const command = new CreateDeployable();
+            }
+        }
+    )
 
     const groups: INavLinkGroup[] = [
         {
@@ -75,6 +113,7 @@ export const Applications = () => {
                     type: 'application',
                     key: application.id,
                     name: application.name,
+                    isExpanded: true,
                     url: '',
                     route: `/applications/${application.id}`,
                     links: application.microservices?.map(microservice => {
@@ -82,15 +121,17 @@ export const Applications = () => {
                             type: 'microservice',
                             key: microservice.microserviceId,
                             name: microservice.name,
+                            isExpanded: true,
                             url: '',
-                            route: `/applications/${application.id}/${microservice.microserviceId}`,
+                            route: `/applications/${application.id}/microservices/${microservice.microserviceId}`,
                             links: microservice.deployables?.map(deployable => {
                                 return {
                                     type: 'deployable',
                                     key: deployable.deployableId,
                                     name: deployable.name,
+                                    isExpanded: true,
                                     url: '',
-                                    route: `/applications/${application.id}/${microservice.microserviceId}/${deployable.deployableId}`
+                                    route: `/applications/${application.id}/microservices/${microservice.microserviceId}/deployables/${deployable.deployableId}`
                                 };
                             })
                         };
@@ -99,26 +140,27 @@ export const Applications = () => {
             })
         }];
 
-    const history = useNavigate();
-    const params = useParams();
-    const applicationId = params['*'] || '';
-
-    const setSelectedApplicationFromKey = (key: string) => {
-        setSelectedApplication(applications.data.find(_ => _.id == key));
-    }
 
     const navItemClicked = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
         if (item) {
-            setSelectedApplicationFromKey(item.key!);
+            switch ((item as any).type) {
+                case 'application':
+                    setCurrentApplication(item.key!);
+                    break;
+
+                case 'microservice':
+                    setCurrentMicroservice(item.key!);
+                    break;
+
+                case 'deployable':
+                    setCurrentDeployable(item.key!);
+                    break;
+            }
+
             setSelectedNav(item.key!);
-            history(item.route);
+            navigate(item.route);
         }
     };
-
-    if (applications.data.length > 0 && !selectedApplication && applicationId !== '') {
-        setSelectedApplicationFromKey(applicationId);
-        setSelectedNav(applicationId);
-    }
 
     const commandBarItems: ICommandBarItemProps[] = [
         {
@@ -137,7 +179,7 @@ export const Applications = () => {
                     <div className={styles.itemActions}>
                         <FontIcon iconName='WebAppBuilderFragmentCreate' title="Start" onClick={(e) => {
                             e.preventDefault();
-                            setSelectedApplicationFromKey(link.key!);
+                            setCurrentApplication(link.key!);
                             showCreateMicroserviceDialog();
                         }} />
                     </div>
@@ -147,7 +189,8 @@ export const Applications = () => {
                     <div className={styles.itemActions}>
                         <FontIcon iconName='CloudAdd' title="Start" onClick={(e) => {
                             e.preventDefault();
-                            alert('hello');
+                            setCurrentMicroservice(link.key!);
+                            showCreateDeployableDialog();
                         }} />
                     </div>
                 );
@@ -169,7 +212,6 @@ export const Applications = () => {
         );
     };
 
-
     return (
 
         <div className={styles.applicationsContainer}>
@@ -186,7 +228,8 @@ export const Applications = () => {
             </div>
             <div>
                 <Routes>
-                    {selectedApplication && <Route path=':id' element={<Application application={selectedApplication} />} />}
+                    <Route path=':applicationId' element={<Application />} />
+                    <Route path=':applicationId/microservices/:microserviceId' element={<Microservice />} />
                 </Routes>
             </div>
         </div>
