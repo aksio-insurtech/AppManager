@@ -6,10 +6,31 @@ namespace Reactions.Applications
     [Route("/api/test")]
     public class TestController : Controller
     {
-        [HttpGet]
-        public Task Run()
+        readonly IPulumiStackDefinitions _stackDefinitions;
+        readonly IPulumiRunner _runner;
+        readonly IPassiveProjectionRepositoryFor<Application> _application;
+
+        public TestController(IPulumiStackDefinitions stackDefinitions, IPulumiRunner runner, IPassiveProjectionRepositoryFor<Application> application)
         {
-            return Task.CompletedTask;
+            _stackDefinitions = stackDefinitions;
+            _runner = runner;
+            _application = application;
+        }
+
+        [HttpGet]
+        public async Task Up()
+        {
+            var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
+            var definition = _stackDefinitions.CreateApplication(application, RuntimeEnvironment.Development);
+            _runner.Up(application, application.Name, definition, RuntimeEnvironment.Development);
+        }
+
+        [HttpGet("down")]
+        public async Task Down()
+        {
+            var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
+            var definition = _stackDefinitions.CreateApplication(application, RuntimeEnvironment.Development);
+            _runner.Up(application, application.Name, definition, RuntimeEnvironment.Development);
         }
     }
 }
