@@ -8,7 +8,6 @@ import { GetApplication } from 'API/applications/GetApplication';
 import { useParams } from 'react-router-dom';
 
 export const Application = () => {
-    const items: any[] = [];
     const { applicationId } = useParams();
     const [getApplication] = GetApplication.use({ applicationId: applicationId! });
 
@@ -21,6 +20,10 @@ export const Application = () => {
                     </PivotItem>
                     <PivotItem headerText='Tenants'>
                         <Tenants />
+                    </PivotItem>
+                    <PivotItem headerText='Environment'>
+                    </PivotItem>
+                    <PivotItem headerText='Secrets'>
                     </PivotItem>
                 </Pivot>
             </Stack.Item>

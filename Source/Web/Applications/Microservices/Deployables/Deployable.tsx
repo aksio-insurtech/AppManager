@@ -3,7 +3,7 @@
 
 import { Pivot, PivotItem, Stack } from '@fluentui/react';
 
-export const Microservice = () => {
+export const Deployable = () => {
     return (
         <Stack style={{ height: '100%' }}>
             <Stack.Item>

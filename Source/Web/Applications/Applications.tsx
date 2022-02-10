@@ -24,6 +24,7 @@ import { Create as CreateMicroservice } from 'API/applications/microservices/Cre
 import { Create as CreateDeployable } from 'API/applications/microservices/deployables/Create';
 import { CreateDeployableDialog } from './CreateDeployableDialog';
 import { Microservice } from './Microservices/Microservice';
+import { Deployable } from './Microservices/Deployables/Deployable';
 
 
 const navStyles: Partial<INavStyles> = {
@@ -181,7 +182,7 @@ export const Applications = () => {
             case 'application':
                 return (
                     <div className={styles.itemActions}>
-                        <FontIcon iconName='WebAppBuilderFragmentCreate' title="Start" onClick={(e) => {
+                        <FontIcon iconName='WebAppBuilderFragmentCreate' title="Create microservice" onClick={(e) => {
                             e.preventDefault();
                             setCurrentApplication(link.key!);
                             showCreateMicroserviceDialog();
@@ -191,7 +192,7 @@ export const Applications = () => {
             case 'microservice':
                 return (
                     <div className={styles.itemActions}>
-                        <FontIcon iconName='CloudAdd' title="Start" onClick={(e) => {
+                        <FontIcon iconName='CloudAdd' title="Create deployable" onClick={(e) => {
                             e.preventDefault();
                             setCurrentMicroservice(link.key!);
                             showCreateDeployableDialog();
@@ -234,6 +235,7 @@ export const Applications = () => {
                 <Routes>
                     <Route path=':applicationId' element={<Application />} />
                     <Route path=':applicationId/microservices/:microserviceId' element={<Microservice />} />
+                    <Route path=':applicationId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
                 </Routes>
             </div>
         </div>
