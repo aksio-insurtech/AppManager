@@ -102,9 +102,13 @@ export const Applications = () => {
         async (result, output) => {
             if (result == ModalResult.Success && output) {
                 const command = new CreateDeployable();
+                command.microserviceId = currentMicroservice!;
+                command.deployableId = Guid.create().toString();
+                command.name = output.name;
+                await command.execute();
             }
         }
-    )
+    );
 
     const groups: INavLinkGroup[] = [
         {
