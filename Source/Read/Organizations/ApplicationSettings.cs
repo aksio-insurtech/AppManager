@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Common;
+using Concepts.MongoDB;
 using Concepts.Pulumi;
 
 namespace Read.Organizations
@@ -13,6 +14,18 @@ namespace Read.Organizations
         public ApplicationSettings(IMongoCollection<Settings> settingsCollection)
         {
             _settingsCollection = settingsCollection;
+        }
+
+        public async Task<MongoDBPrivateKey> GetMongoDBPrivateKey()
+        {
+            var settings = await GetSettings();
+            return settings.MongoDBPrivateKey;
+        }
+
+        public async Task<MongoDBPublicKey> GetMongoDBPublicKey()
+        {
+            var settings = await GetSettings();
+            return settings.MongoDBPublicKey;
         }
 
         public async Task<PulumiAccessToken> GetPulumiAccessToken()

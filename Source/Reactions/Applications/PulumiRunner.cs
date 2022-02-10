@@ -16,25 +16,49 @@ namespace Reactions.Applications
         public PulumiRunner(IApplicationSettings applicationSettings) => _applicationSettings = applicationSettings;
 
         /// <inheritdoc/>
-        public void Up(WorkspaceStack stack)
+        public void Up(Application application, string name, PulumiFn definition, RuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
-                var accessToken = await _applicationSettings.GetPulumiAccessToken();
-                Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
+                var stack = await CreateStack(application, name, environment, definition);
                 await stack.UpAsync(new UpOptions { OnStandardOutput = Console.WriteLine });
             });
         }
 
         /// <inheritdoc/>
-        public void Down(WorkspaceStack stack)
+        public void Down(Application application, string name, PulumiFn definition, RuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
-                var accessToken = await _applicationSettings.GetPulumiAccessToken();
-                Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
+                var stack = await CreateStack(application, name, environment, definition);
                 await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
             });
+        }
+
+        async Task<WorkspaceStack> CreateStack(Application application, string name, RuntimeEnvironment environment, PulumiFn program)
+        {
+            var args = new InlineProgramArgs(name, "dev", program)
+            {
+                ProjectSettings = new(name, ProjectRuntimeName.Dotnet)
+            };
+            var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
+            await stack.Workspace.InstallPluginAsync("azure-native", "1.54.0");
+            await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.2.0");
+            await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
+            {
+                { "azure-native:location", new ConfigValue(application.CloudLocation) },
+                { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) }
+            });
+
+            var mongoDBPublicKey = await _applicationSettings.GetMongoDBPublicKey();
+            var mongoDBPrivateKey = await _applicationSettings.GetMongoDBPrivateKey();
+            Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
+            Environment.SetEnvironmentVariable("MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey);
+
+            var accessToken = await _applicationSettings.GetPulumiAccessToken();
+            Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
+
+            return stack;
         }
     }
 }

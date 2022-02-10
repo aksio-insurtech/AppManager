@@ -8,6 +8,7 @@ import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscrip
 import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetPulumiAccessToken } from '../API/organization/settings/SetPulumiAccessToken';
+import { SetMongoDBKeys } from '../API/organization/settings/SetMongoDBKeys';
 
 const subscriptionsColumns: IColumn[] = [
     {
@@ -27,6 +28,8 @@ const subscriptionsColumns: IColumn[] = [
 export const Organization = () => {
     const [settings] = AllSettings.use();
     const [pulumiAccessToken, setPulumiAccessToken] = useState('');
+    const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
+    const [mongoDBPrivateKey, setMongoDBPrivateKey] = useState('');
 
     const [showAddSubscription] = useModal(
         'Add subscription',
@@ -41,7 +44,6 @@ export const Organization = () => {
             }
         });
 
-
     const subscriptionsCommandBarItems: ICommandBarItemProps[] = [
         {
             key: 'add',
@@ -53,13 +55,22 @@ export const Organization = () => {
 
     useEffect(() => {
         setPulumiAccessToken(settings.data.pulumiAccessToken);
+        setMongoDBPublicKey(settings.data.mongoDBPublicKey);
+        setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
     }, [settings.data]);
 
     const savePulumiAccessToken = async () => {
         const command = new SetPulumiAccessToken();
         command.accessToken = pulumiAccessToken;
         await command.execute();
-    }
+    };
+
+    const saveMongoDBKeys = async () => {
+        const command = new SetMongoDBKeys();
+        command.publicKey = mongoDBPublicKey;
+        command.privateKey = mongoDBPrivateKey;
+        await command.execute();
+    };
 
     return (
         <div style={{ margin: '1rem' }}>
@@ -72,8 +83,15 @@ export const Organization = () => {
 
                 <Stack.Item>
                     <h2>Pulumi</h2>
-                    <TextField label="Access Token" value={pulumiAccessToken} onChange={(_, value) => setPulumiAccessToken(value!) } />
+                    <TextField label="Access Token" value={pulumiAccessToken} onChange={(_, value) => setPulumiAccessToken(value!)} />
                     <PrimaryButton text='Save' onClick={savePulumiAccessToken} />
+                </Stack.Item>
+
+                <Stack.Item>
+                    <h2>MongoDB Atlas</h2>
+                    <TextField label="Public Key" value={mongoDBPublicKey} onChange={(_, value) => setMongoDBPublicKey(value!)} />
+                    <TextField label="Private Key" value={mongoDBPrivateKey} onChange={(_, value) => setMongoDBPrivateKey(value!)} />
+                    <PrimaryButton text='Save' onClick={saveMongoDBKeys} />
                 </Stack.Item>
             </Stack>
         </div>

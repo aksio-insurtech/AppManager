@@ -13,13 +13,19 @@ namespace Reactions.Applications
         /// <summary>
         /// Up a stack.
         /// </summary>
-        /// <param name="stack">The stack to up.</param>
-        void Up(WorkspaceStack stack);
+        /// <param name="application">Application stack belongs to.</param>
+        /// <param name="name">Name of stack.</param>
+        /// <param name="definition">The configuration of a stack to up.</param>
+        /// <param name="environment">The <see cref="RuntimeEnvironment"/>.</param>
+        void Up(Application application, string name, PulumiFn definition, RuntimeEnvironment environment);
 
         /// <summary>
         /// Down a stack.
         /// </summary>
-        /// <param name="stack">The stack to down.</param>
-        void Down(WorkspaceStack stack);
+        /// <param name="application">Application stack belongs to.</param>
+        /// <param name="name">Name of stack.</param>
+        /// <param name="definition">The configuration of a stack to down.</param>
+        /// <param name="environment">The <see cref="RuntimeEnvironment"/>.</param>
+        void Down(Application application, string name, PulumiFn definition, RuntimeEnvironment environment);
     }
 }
