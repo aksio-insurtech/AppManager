@@ -3,8 +3,6 @@
 
 using Concepts.Applications;
 using Concepts.Azure;
-using Concepts.Organizations;
-using Concepts.Pulumi;
 
 namespace Reactions.Applications
 {

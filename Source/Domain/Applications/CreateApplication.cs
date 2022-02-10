@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 using Concepts.Azure;
-using Concepts.Organizations;
 
 namespace Domain.Applications
 {
