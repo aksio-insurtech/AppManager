@@ -8,7 +8,7 @@ import { Application as ApplicationModel } from 'API/applications/Application';
 import { useNavigate } from 'react-router-dom';
 
 export interface IApplicationSettingsProps {
-    application: ApplicationModel;
+    application?: ApplicationModel;
 }
 
 export const ApplicationSettings = (props: IApplicationSettingsProps) => {
@@ -18,10 +18,10 @@ export const ApplicationSettings = (props: IApplicationSettingsProps) => {
     const [showRemoveWarning] = useModal(
         'Remove application?',
         ModalButtons.YesNo,
-        `Are you sure you want to remove application '${props.application.name}'`,
+        `Are you sure you want to remove application '${props.application!.name}'`,
         async (result) => {
             if (result == ModalResult.Success) {
-                removeApplicationCommand.applicationId = props.application.id;
+                removeApplicationCommand.applicationId = props.application!.id;
                 await removeApplicationCommand.execute();
                 navigate('/applications');
             }

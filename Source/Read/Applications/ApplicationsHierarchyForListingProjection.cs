@@ -6,14 +6,13 @@ using Events.Applications;
 
 namespace Read.Applications
 {
-    public class ApplicationsProjections : IProjectionFor<Application>
+    public class ApplicationsHierarchyForListingProjection : IProjectionFor<ApplicationsHierarchyForListing>
     {
         public ProjectionId Identifier => "5a52002b-f36e-4d69-8900-cd133de4aac3";
 
-        public void Define(IProjectionBuilderFor<Application> builder) => builder
+        public void Define(IProjectionBuilderFor<ApplicationsHierarchyForListing> builder) => builder
             .From<ApplicationCreated>(_ => _
-                .Set(m => m.Name).To(e => e.Name)
-                .Set(m => m.CloudLocation).To(e => e.CloudLocation))
+                .Set(m => m.Name).To(e => e.Name))
             .Children(_ => _.Microservices, _ => _
                 .IdentifiedBy(m => m.MicroserviceId)
                 .From<MicroserviceCreated>(_ => _

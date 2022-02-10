@@ -6,15 +6,15 @@ import { ObservableQueryFor, QueryResult, useObservableQuery } from '@aksio/crat
 import { ApplicationsHierarchyForListing } from './ApplicationsHierarchyForListing';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications');
+const routeTemplate = Handlebars.compile('/api/applications/hierarchy');
 
-export class AllApplications extends ObservableQueryFor<ApplicationsHierarchyForListing[]> {
-    readonly route: string = '/api/applications';
+export class ApplicationsHierarchy extends ObservableQueryFor<ApplicationsHierarchyForListing[]> {
+    readonly route: string = '/api/applications/hierarchy';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ApplicationsHierarchyForListing[] = [];
     readonly requiresArguments: boolean = false;
 
     static use(): [QueryResult<ApplicationsHierarchyForListing[]>] {
-        return useObservableQuery<ApplicationsHierarchyForListing[], AllApplications>(AllApplications);
+        return useObservableQuery<ApplicationsHierarchyForListing[], ApplicationsHierarchy>(ApplicationsHierarchy);
     }
 }

@@ -4,21 +4,20 @@
 import { Pivot, PivotItem, Stack } from '@fluentui/react';
 import { ApplicationSettings } from './ApplicationSettings';
 import { Tenants } from './Tenants';
-import { Application as ApplicationModel } from 'API/applications/Application';
+import { GetApplication } from 'API/applications/GetApplication';
+import { useParams } from 'react-router-dom';
 
-export interface IApplicationProps {
-    application?: ApplicationModel;
-}
-
-export const Application = (props: IApplicationProps) => {
+export const Application = () => {
     const items: any[] = [];
+    const { applicationId } = useParams();
+    const [getApplication] = GetApplication.use({ applicationId: applicationId! });
 
     return (
         <Stack style={{ height: '100%' }}>
             <Stack.Item>
                 <Pivot>
                     <PivotItem headerText='General'>
-                        {/* <ApplicationSettings application={props.application}/> */}
+                        <ApplicationSettings application={getApplication.data} />
                     </PivotItem>
                     <PivotItem headerText='Tenants'>
                         <Tenants />

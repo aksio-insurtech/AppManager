@@ -17,7 +17,7 @@ import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { Create as CreateApplication } from 'API/applications/Create';
 import { Guid } from '@aksio/cratis-fundamentals';
-import { AllApplications } from 'API/applications/AllApplications';
+import { ApplicationsHierarchy } from 'API/applications/ApplicationsHierarchy';
 import { Application } from './Application';
 import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
 import { Create as CreateMicroservice } from 'API/applications/microservices/Create';
@@ -78,7 +78,7 @@ export const Applications = () => {
             }
         }
     );
-    const [applications] = AllApplications.use();
+    const [applications] = ApplicationsHierarchy.use();
 
     const [showCreateMicroserviceDialog] = useModal(
         'Create microservice',

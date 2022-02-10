@@ -4,17 +4,28 @@
 using Aksio.Cratis.Events.Projections;
 using Concepts.Applications;
 using Events.Applications;
+using MongoDB.Bson;
 
 namespace Read.Applications
 {
     [Route("/api/applications")]
     public class Applications : Controller
     {
-        readonly IMongoCollection<Application> _collection;
+        readonly IMongoCollection<Application> _applicationCollection;
+        readonly IMongoCollection<ApplicationsHierarchyForListing> _hierarchyCollection;
 
-        public Applications(IMongoCollection<Application> collection) => _collection = collection;
+        public Applications(
+            IMongoCollection<Application> applicationCollection,
+            IMongoCollection<ApplicationsHierarchyForListing> hierarchyCollection)
+        {
+            _applicationCollection = applicationCollection;
+            _hierarchyCollection = hierarchyCollection;
+        }
 
-        [HttpGet]
-        public Task<ClientObservable<IEnumerable<Application>>> AllApplications() => _collection.Observe();
+        [HttpGet("{applicationId}")]
+        public Task<Application> GetApplication([FromRoute] ApplicationId applicationId) => _applicationCollection.FindById(applicationId).FirstOrDefaultAsync();
+
+        [HttpGet("hierarchy")]
+        public Task<ClientObservable<IEnumerable<ApplicationsHierarchyForListing>>> ApplicationsHierarchy() => _hierarchyCollection.Observe();
     }
 }
