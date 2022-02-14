@@ -7,6 +7,7 @@ import { AzureSubscription } from './AzureSubscription';
 export type Settings = {
     azureSubscriptions: AzureSubscription[];
     pulumiAccessToken: string;
+    mongoDBOrganizationId: string;
     mongoDBPublicKey: string;
     mongoDBPrivateKey: string;
 };

@@ -9,6 +9,7 @@ namespace Common
     public interface IApplicationSettings
     {
         Task<PulumiAccessToken> GetPulumiAccessToken();
+        Task<MongoDBOrganizationId> GetMongoDBOrganizationId();
         Task<MongoDBPublicKey> GetMongoDBPublicKey();
         Task<MongoDBPrivateKey> GetMongoDBPrivateKey();
     }

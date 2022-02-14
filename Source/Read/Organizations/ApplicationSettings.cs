@@ -16,6 +16,12 @@ namespace Read.Organizations
             _settingsCollection = settingsCollection;
         }
 
+        public async Task<MongoDBOrganizationId> GetMongoDBOrganizationId()
+        {
+            var settings = await GetSettings();
+            return settings.MongoDBOrganizationId;
+        }
+
         public async Task<MongoDBPrivateKey> GetMongoDBPrivateKey()
         {
             var settings = await GetSettings();

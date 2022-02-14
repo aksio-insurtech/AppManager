@@ -5,5 +5,5 @@ using Concepts.MongoDB;
 
 namespace Domain.Organizations
 {
-    public record MongoDBKeys(MongoDBPublicKey PublicKey, MongoDBPrivateKey PrivateKey);
+    public record MongoDBSettings(MongoDBOrganizationId OrganizationId, MongoDBPublicKey PublicKey, MongoDBPrivateKey PrivateKey);
 }

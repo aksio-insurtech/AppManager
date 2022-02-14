@@ -12,7 +12,8 @@ namespace Read.Organizations
         public void Define(IProjectionBuilderFor<Settings> builder) => builder
             .From<PulumiAccessTokenSet>(_ => _
                 .Set(m => m.PulumiAccessToken).To(e => e.AccessToken))
-            .From<MongoDBKeysSet>(_ => _
+            .From<MongoDBSettingsSet>(_ => _
+                .Set(m => m.MongoDBOrganizationId).To(e => e.OrganizationId)
                 .Set(m => m.MongoDBPublicKey).To(e => e.PublicKey)
                 .Set(m => m.MongoDBPrivateKey).To(e => e.PrivateKey))
             .Children(_ => _.AzureSubscriptions, _ => _

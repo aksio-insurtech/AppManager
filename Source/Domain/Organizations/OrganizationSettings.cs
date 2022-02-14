@@ -24,6 +24,6 @@ namespace Domain.Organizations
         public Task SetPulumiAccessToken([FromBody] PulumiAccessToken accessToken) => _eventLog.Append(SettingsId.Global, new PulumiAccessTokenSet(accessToken));
 
         [HttpPost("mongodb")]
-        public Task SetMongoDBKeys([FromBody] MongoDBKeys keys) => _eventLog.Append(SettingsId.Global, new MongoDBKeysSet(keys.PublicKey, keys.PrivateKey));
+        public Task SetMongoDBSettings([FromBody] MongoDBSettings settings) => _eventLog.Append(SettingsId.Global, new MongoDBSettingsSet(settings.OrganizationId, settings.PublicKey, settings.PrivateKey));
     }
 }

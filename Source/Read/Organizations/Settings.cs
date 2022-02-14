@@ -6,8 +6,18 @@ using Concepts.Pulumi;
 
 namespace Read.Organizations
 {
-    public record Settings(IEnumerable<AzureSubscription> AzureSubscriptions, PulumiAccessToken PulumiAccessToken, MongoDBPublicKey MongoDBPublicKey, MongoDBPrivateKey MongoDBPrivateKey)
+    public record Settings(
+        IEnumerable<AzureSubscription> AzureSubscriptions,
+        PulumiAccessToken PulumiAccessToken,
+        MongoDBOrganizationId MongoDBOrganizationId,
+        MongoDBPublicKey MongoDBPublicKey,
+        MongoDBPrivateKey MongoDBPrivateKey)
     {
-        public static readonly Settings NoSettings = new(Array.Empty<AzureSubscription>(), string.Empty, string.Empty, string.Empty);
+        public static readonly Settings NoSettings = new(
+            Array.Empty<AzureSubscription>(),
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty);
     }
 }

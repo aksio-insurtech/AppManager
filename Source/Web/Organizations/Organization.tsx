@@ -8,7 +8,7 @@ import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscrip
 import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetPulumiAccessToken } from '../API/organization/settings/SetPulumiAccessToken';
-import { SetMongoDBKeys } from '../API/organization/settings/SetMongoDBKeys';
+import { SetMongoDBSettings } from '../API/organization/settings/SetMongoDBSettings';
 
 const subscriptionsColumns: IColumn[] = [
     {
@@ -28,6 +28,7 @@ const subscriptionsColumns: IColumn[] = [
 export const Organization = () => {
     const [settings] = AllSettings.use();
     const [pulumiAccessToken, setPulumiAccessToken] = useState('');
+    const [mongoDBOrganizationId, setMongoDBOrganizationId] = useState('');
     const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
     const [mongoDBPrivateKey, setMongoDBPrivateKey] = useState('');
 
@@ -55,6 +56,7 @@ export const Organization = () => {
 
     useEffect(() => {
         setPulumiAccessToken(settings.data.pulumiAccessToken);
+        setMongoDBOrganizationId(settings.data.mongoDBOrganizationId);
         setMongoDBPublicKey(settings.data.mongoDBPublicKey);
         setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
     }, [settings.data]);
@@ -66,7 +68,8 @@ export const Organization = () => {
     };
 
     const saveMongoDBKeys = async () => {
-        const command = new SetMongoDBKeys();
+        const command = new SetMongoDBSettings();
+        command.organizationId = mongoDBOrganizationId;
         command.publicKey = mongoDBPublicKey;
         command.privateKey = mongoDBPrivateKey;
         await command.execute();
@@ -89,6 +92,7 @@ export const Organization = () => {
 
                 <Stack.Item>
                     <h2>MongoDB Atlas</h2>
+                    <TextField label="OrganizationId" value={mongoDBOrganizationId} onChange={(_, value) => setMongoDBOrganizationId(value!)} />
                     <TextField label="Public Key" value={mongoDBPublicKey} onChange={(_, value) => setMongoDBPublicKey(value!)} />
                     <TextField label="Private Key" value={mongoDBPrivateKey} onChange={(_, value) => setMongoDBPrivateKey(value!)} />
                     <PrimaryButton text='Save' onClick={saveMongoDBKeys} />

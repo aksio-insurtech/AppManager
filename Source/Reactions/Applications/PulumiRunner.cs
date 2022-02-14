@@ -35,6 +35,16 @@ namespace Reactions.Applications
             });
         }
 
+        /// <inheritdoc/>
+        public void Remove(Application application, string name, PulumiFn definition, RuntimeEnvironment environment)
+        {
+            _ = Task.Run(async () =>
+            {
+                var stack = await CreateStack(application, name, environment, definition);
+                await stack.Workspace.RemoveStackAsync("dev");
+            });
+        }
+
         async Task<WorkspaceStack> CreateStack(Application application, string name, RuntimeEnvironment environment, PulumiFn program)
         {
             var args = new InlineProgramArgs(name, "dev", program)

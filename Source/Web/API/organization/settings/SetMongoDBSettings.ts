@@ -7,7 +7,7 @@ import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/organization/settings/mongodb');
 
-export class SetMongoDBKeys extends Command {
+export class SetMongoDBSettings extends Command {
     readonly route: string = '/api/organization/settings/mongodb';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
 
@@ -16,6 +16,7 @@ export class SetMongoDBKeys extends Command {
         ];
     }
 
+    organizationId!: string;
     publicKey!: string;
     privateKey!: string;
 }
