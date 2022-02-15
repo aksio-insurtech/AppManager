@@ -1,13 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#pragma warning disable CS8019
-
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using Azure.Storage;
-using Azure.Storage.Files.Shares;
 using Common;
 using Pulumi;
 using Pulumi.Automation;
@@ -24,9 +17,9 @@ namespace Reactions.Applications
 {
     public class PulumiStackDefinitions : IPulumiStackDefinitions
     {
-        readonly IApplicationSettings _applicationSettings;
+        readonly ISettings _settings;
 
-        public PulumiStackDefinitions(IApplicationSettings applicationSettings) => _applicationSettings = applicationSettings;
+        public PulumiStackDefinitions(ISettings applicationSettings) => _settings = applicationSettings;
 
         public PulumiFn CreateApplication(Application application, RuntimeEnvironment environment) =>
 
@@ -85,7 +78,7 @@ namespace Reactions.Applications
                     ResourceGroupName = resourceGroup.Name
                 });
 
-                var mongoDBOrganizationId = _applicationSettings.MongoDBOrganizationId;
+                var mongoDBOrganizationId = _settings.MongoDBOrganizationId;
 
                 var project = new Project(application.Name, new ProjectArgs
                 {
@@ -139,43 +132,9 @@ namespace Reactions.Applications
                                 {
                                     storageAccountKeysRequest.Apply(keys =>
                                     {
-                                        var uri = new Uri(account.PrimaryEndpoints.File);
-                                        var connectionString = $"DefaultEndpointsProtocol=https;AccountName={account.Name};AccountKey={keys.Keys[0].Value};EndpointSuffix=core.windows.net";
-
-                                        Log.Info($"Storage Key : '{keys.Keys[0].Value}'");
-
-                                        var share = new ShareClient(connectionString, "kernel");
-
-                                        Log.Info("Get directory");
-                                        var directory = share.GetDirectoryClient("./");
-
-                                        Log.Info("Create file");
-                                        var file = directory.GetFileClient("storage.json");
-
-                                        var storageConfig = new Aksio.Cratis.Configuration.Storage();
-                                        var readModels = storageConfig["readModels"] = new()
-                                        {
-                                            Type = "MongoDB",
-                                        };
-                                        readModels.Tenants["3352d47d-c154-4457-b3fb-8a2efb725113"] = $"{mongoDBConnectionString}/read-models";
-
-                                        var eventStore = storageConfig["eventStore"] = new()
-                                        {
-                                            Type = "MongoDB",
-                                        };
-                                        eventStore.Tenants["3352d47d-c154-4457-b3fb-8a2efb725113"] = $"{mongoDBConnectionString}/event-store";
-
-                                        var storageConfigJson = JsonSerializer.Serialize(storageConfig, new JsonSerializerOptions()
-                                        {
-                                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                                            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                                        });
-
-                                        Log.Info("Upload file");
-                                        var stream = new MemoryStream(Encoding.UTF8.GetBytes(storageConfigJson));
-                                        file.DeleteIfExists();
-                                        file.Create(stream.Length);
-                                        file.Upload(stream);
+                                        var kernelStorage = new KernelStorage(account.Name, keys.Keys[0].Value);
+                                        kernelStorage.CreateAndUploadStorageJson(mongoDBConnectionString);
+                                        kernelStorage.CreateAndUploadAppSettings(application, _settings);
 
                                         return keys;
                                     });
@@ -192,17 +151,17 @@ namespace Reactions.Applications
 
                         Volumes = new VolumeArgs[]
                         {
-                        new()
-                        {
-                            Name = "storage-config",
-                            AzureFile = new AzureFileVolumeArgs()
+                            new()
                             {
-                                ReadOnly = true,
-                                StorageAccountKey = storageAccountKeysRequest.Apply(_ => _.Keys[0].Value),
-                                StorageAccountName = storageAccount.Name,
-                                ShareName = fileShare.Name
+                                Name = "storage-config",
+                                AzureFile = new AzureFileVolumeArgs()
+                                {
+                                    ReadOnly = true,
+                                    StorageAccountKey = storageAccountKeysRequest.Apply(_ => _.Keys[0].Value),
+                                    StorageAccountName = storageAccount.Name,
+                                    ShareName = fileShare.Name
+                                }
                             }
-                        }
                         },
                         IpAddress = new IpAddressArgs
                         {
@@ -218,7 +177,7 @@ namespace Reactions.Applications
                             new()
                             {
                                 Name = "kernel",
-                                Image = "aksioinsurtech/cratis:5.7.0",
+                                Image = "aksioinsurtech/cratis:5.7.3",
                                 Ports = new ContainerPortArgs[]
                                 {
                                     new()
