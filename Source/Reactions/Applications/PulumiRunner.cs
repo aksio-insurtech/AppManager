@@ -60,12 +60,12 @@ namespace Reactions.Applications
                 { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) }
             });
 
-            var mongoDBPublicKey = await _applicationSettings.GetMongoDBPublicKey();
-            var mongoDBPrivateKey = await _applicationSettings.GetMongoDBPrivateKey();
+            var mongoDBPublicKey = _applicationSettings.MongoDBPublicKey;
+            var mongoDBPrivateKey = _applicationSettings.MongoDBPrivateKey;
             Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
             Environment.SetEnvironmentVariable("MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey);
 
-            var accessToken = await _applicationSettings.GetPulumiAccessToken();
+            var accessToken = _applicationSettings.PulumiAccessToken;
             Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
 
             return stack;

@@ -9,6 +9,7 @@ import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetPulumiAccessToken } from '../API/organization/settings/SetPulumiAccessToken';
 import { SetMongoDBSettings } from '../API/organization/settings/SetMongoDBSettings';
+import { SetElasticSearchSettings } from '../API/organization/settings/SetElasticSearchSettings';
 
 const subscriptionsColumns: IColumn[] = [
     {
@@ -31,6 +32,17 @@ export const Organization = () => {
     const [mongoDBOrganizationId, setMongoDBOrganizationId] = useState('');
     const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
     const [mongoDBPrivateKey, setMongoDBPrivateKey] = useState('');
+    const [elasticUrl, setElasticUrl] = useState('');
+    const [elasticApiKey, setElasticApiKey] = useState('');
+
+    useEffect(() => {
+        setPulumiAccessToken(settings.data.pulumiAccessToken);
+        setMongoDBOrganizationId(settings.data.mongoDBOrganizationId);
+        setMongoDBPublicKey(settings.data.mongoDBPublicKey);
+        setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
+        setElasticUrl(settings.data.elasticUrl);
+        setElasticApiKey(settings.data.elasticApiKey);
+    }, [settings.data]);
 
     const [showAddSubscription] = useModal(
         'Add subscription',
@@ -54,24 +66,24 @@ export const Organization = () => {
         }
     ];
 
-    useEffect(() => {
-        setPulumiAccessToken(settings.data.pulumiAccessToken);
-        setMongoDBOrganizationId(settings.data.mongoDBOrganizationId);
-        setMongoDBPublicKey(settings.data.mongoDBPublicKey);
-        setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
-    }, [settings.data]);
-
     const savePulumiAccessToken = async () => {
         const command = new SetPulumiAccessToken();
         command.accessToken = pulumiAccessToken;
         await command.execute();
     };
 
-    const saveMongoDBKeys = async () => {
+    const saveMongoDBSettings = async () => {
         const command = new SetMongoDBSettings();
         command.organizationId = mongoDBOrganizationId;
         command.publicKey = mongoDBPublicKey;
         command.privateKey = mongoDBPrivateKey;
+        await command.execute();
+    };
+
+    const saveElasticSettings = async () => {
+        const command = new SetElasticSearchSettings();
+        command.url = elasticUrl;
+        command.apiKey = elasticApiKey;
         await command.execute();
     };
 
@@ -95,7 +107,14 @@ export const Organization = () => {
                     <TextField label="OrganizationId" value={mongoDBOrganizationId} onChange={(_, value) => setMongoDBOrganizationId(value!)} />
                     <TextField label="Public Key" value={mongoDBPublicKey} onChange={(_, value) => setMongoDBPublicKey(value!)} />
                     <TextField label="Private Key" value={mongoDBPrivateKey} onChange={(_, value) => setMongoDBPrivateKey(value!)} />
-                    <PrimaryButton text='Save' onClick={saveMongoDBKeys} />
+                    <PrimaryButton text='Save' onClick={saveMongoDBSettings} />
+                </Stack.Item>
+
+                <Stack.Item>
+                    <h2>Elastic Search</h2>
+                    <TextField label="Url" value={elasticUrl} onChange={(_, value) => setElasticUrl(value!)} />
+                    <TextField label="ApiKey" value={elasticApiKey} onChange={(_, value) => setElasticApiKey(value!)} />
+                    <PrimaryButton text='Save' onClick={saveElasticSettings} />
                 </Stack.Item>
             </Stack>
         </div>

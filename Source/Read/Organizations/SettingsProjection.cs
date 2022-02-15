@@ -16,6 +16,9 @@ namespace Read.Organizations
                 .Set(m => m.MongoDBOrganizationId).To(e => e.OrganizationId)
                 .Set(m => m.MongoDBPublicKey).To(e => e.PublicKey)
                 .Set(m => m.MongoDBPrivateKey).To(e => e.PrivateKey))
+            .From<ElasticSearchSettingsSet>(_ => _
+                .Set(m => m.ElasticUrl).To(e => e.Url)
+                .Set(m => m.ElasticApiKey).To(e => e.ApiKey))
             .Children(_ => _.AzureSubscriptions, _ => _
                 .IdentifiedBy(s => s.SubscriptionId)
                 .From<AzureSubscriptionAdded>(f => f

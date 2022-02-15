@@ -10,4 +10,6 @@ export type Settings = {
     mongoDBOrganizationId: string;
     mongoDBPublicKey: string;
     mongoDBPrivateKey: string;
+    elasticUrl: string;
+    elasticApiKey: string;
 };

@@ -41,7 +41,7 @@ namespace Reactions.Applications
             // - Add tag for environment for each stack
             // - Store needed output values - show on resources tab
             // - Output
-            PulumiFn.Create(async () =>
+            PulumiFn.Create(() =>
             {
                 var tags = new Dictionary<string, string>
                     {
@@ -85,7 +85,7 @@ namespace Reactions.Applications
                     ResourceGroupName = resourceGroup.Name
                 });
 
-                var mongoDBOrganizationId = await _applicationSettings.GetMongoDBOrganizationId();
+                var mongoDBOrganizationId = _applicationSettings.MongoDBOrganizationId;
 
                 var project = new Project(application.Name, new ProjectArgs
                 {
@@ -218,7 +218,7 @@ namespace Reactions.Applications
                             new()
                             {
                                 Name = "kernel",
-                                Image = "aksioinsurtech/cratis:5.6.0",
+                                Image = "aksioinsurtech/cratis:5.7.0",
                                 Ports = new ContainerPortArgs[]
                                 {
                                     new()
