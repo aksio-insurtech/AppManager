@@ -7,7 +7,7 @@
         "MinimumLevel": {
             "Default": "Verbose",
             "Override": {
-                "Cratis": "Information",
+                "Aksio": "Verbose",
                 "Microsoft": "Warning",
                 "Microsoft.AspNetCore.HttpLogging": "Information",
                 "Microsoft.Hosting.Lifetime": "Information",
@@ -31,9 +31,9 @@
             {
                 "Name": "Elasticsearch",
                 "Args": {
-                    "nodeUris": "{{elasticUrl}}",
-                    "connectionGlobalHeaders": "Authorization=ApiKey {{elasticApiKey}}",
-                    "indexFormat": "{{applicationName}}-{0:yyyy.MM}",
+                    "nodeUris": "{{ElasticUrl}}",
+                    "connectionGlobalHeaders": "Authorization=ApiKey {{ElasticApiKey}}",
+                    "indexFormat": "{{ApplicationName}}-{0:yyyy.MM}",
                     "emitEventFailure": "WriteToSelfLog"
                 }
             }
