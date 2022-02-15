@@ -106,14 +106,14 @@ export const Organization = () => {
                     <h2>MongoDB Atlas</h2>
                     <TextField label="OrganizationId" value={mongoDBOrganizationId} onChange={(_, value) => setMongoDBOrganizationId(value!)} />
                     <TextField label="Public Key" value={mongoDBPublicKey} onChange={(_, value) => setMongoDBPublicKey(value!)} />
-                    <TextField label="Private Key" value={mongoDBPrivateKey} onChange={(_, value) => setMongoDBPrivateKey(value!)} />
+                    <TextField label="Private Key" value={mongoDBPrivateKey} type="password" canRevealPassword onChange={(_, value) => setMongoDBPrivateKey(value!)} />
                     <PrimaryButton text='Save' onClick={saveMongoDBSettings} />
                 </Stack.Item>
 
                 <Stack.Item>
                     <h2>Elastic Search</h2>
                     <TextField label="Url" value={elasticUrl} onChange={(_, value) => setElasticUrl(value!)} />
-                    <TextField label="ApiKey" value={elasticApiKey} onChange={(_, value) => setElasticApiKey(value!)} />
+                    <TextField label="ApiKey" type="password" canRevealPassword value={elasticApiKey} onChange={(_, value) => setElasticApiKey(value!)} />
                     <PrimaryButton text='Save' onClick={saveElasticSettings} />
                 </Stack.Item>
             </Stack>
