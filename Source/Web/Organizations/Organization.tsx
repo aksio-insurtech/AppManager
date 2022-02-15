@@ -98,7 +98,7 @@ export const Organization = () => {
 
                 <Stack.Item>
                     <h2>Pulumi</h2>
-                    <TextField label="Access Token" value={pulumiAccessToken} onChange={(_, value) => setPulumiAccessToken(value!)} />
+                    <TextField label="Access Token" type="password" canRevealPassword value={pulumiAccessToken} onChange={(_, value) => setPulumiAccessToken(value!)} />
                     <PrimaryButton text='Save' onClick={savePulumiAccessToken} />
                 </Stack.Item>
 
