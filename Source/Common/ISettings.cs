@@ -8,7 +8,7 @@ using Concepts.Pulumi;
 
 namespace Common
 {
-    public interface IApplicationSettings
+    public interface ISettings
     {
         IEnumerable<AzureSubscription> AzureSubscriptions { get; }
         PulumiAccessToken PulumiAccessToken { get; }

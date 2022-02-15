@@ -16,7 +16,7 @@ namespace Read.Organizations
         MongoDBPublicKey MongoDBPublicKey,
         MongoDBPrivateKey MongoDBPrivateKey,
         ElasticUrl ElasticUrl,
-        ElasticApiKey ElasticApiKey) : IApplicationSettings
+        ElasticApiKey ElasticApiKey) : ISettings
     {
         public static readonly Settings NoSettings = new(
             Array.Empty<AzureSubscription>(),

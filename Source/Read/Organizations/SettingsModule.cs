@@ -14,7 +14,7 @@ namespace Read.Organizations
             {
                 var collection = context.Resolve<IMongoCollection<Settings>>();
                 return collection.Find(_ => true).FirstOrDefault() ?? Settings.NoSettings;
-            }).As<IApplicationSettings>();
+            }).As<ISettings>();
         }
     }
 }
