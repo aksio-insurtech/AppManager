@@ -39,7 +39,7 @@ namespace Reactions
         {
             var definer = projectionDefinitions.Single();
             var builder = new ProjectionBuilderFor<TModel>(definer.Identifier, eventTypes, schemaGenerator)
-                .WithName($"PassiveProjection: {nameof(TModel)}")
+                .WithName($"PassiveProjection: {typeof(TModel).FullName}")
                 .Passive()
                 .NotRewindable();
             definer.Define(builder);
