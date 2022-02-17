@@ -41,7 +41,8 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/Views",
+                "/home/runner/work/cratis/cratis": "~/Projects/Aksio/Cratis"
             }
         },
         {
