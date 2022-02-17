@@ -121,7 +121,7 @@ namespace Reactions.Applications
                     storage,
                     new[]
                     {
-                        new Deployable(Guid.Empty, "kernel", "aksioinsurtech/cratis:5.8.6")
+                        new Deployable(Guid.Empty, "kernel", "aksioinsurtech/cratis:5.8.8")
                     });
 
                 var projectIpAccessList = new ProjectIpAccessList("kernel", new()
@@ -129,6 +129,13 @@ namespace Reactions.Applications
                     ProjectId = project.Id,
                     IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
                 });
+
+                var ipAddress = await container.IpAddress.GetValue(_ => _!.Ip!);
+                if (application.Resources?.IpAddress is null ||
+                    application.Resources?.IpAddress?.Value != ipAddress)
+                {
+                    await _eventLog.Append(application.Id, new IpAddressSetForApplication(ipAddress));
+                }
             });
 
         public PulumiFn CreateDeployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
@@ -218,7 +225,7 @@ namespace Reactions.Applications
 
             var connectionString = clusterInfo.ConnectionStrings[0].StandardSrv;
             if (application.Resources?.MongoDB?.ConnectionString is null ||
-            application.Resources?.MongoDB?.ConnectionString != connectionString)
+            application.Resources?.MongoDB?.ConnectionString.Value != connectionString)
             {
                 await _eventLog.Append(application.Id, new MongoDBConnectionStringChangedForApplication(environment, connectionString));
             }
