@@ -5,6 +5,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Common;
+using Concepts;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
 
@@ -25,7 +26,7 @@ namespace Reactions.Applications
         }
 
         /// <inheritdoc/>
-        public void Up(Application application, string name, PulumiFn definition, RuntimeEnvironment environment)
+        public void Up(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
@@ -35,7 +36,7 @@ namespace Reactions.Applications
         }
 
         /// <inheritdoc/>
-        public void Down(Application application, string name, PulumiFn definition, RuntimeEnvironment environment)
+        public void Down(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
@@ -45,7 +46,7 @@ namespace Reactions.Applications
         }
 
         /// <inheritdoc/>
-        public void Remove(Application application, string name, PulumiFn definition, RuntimeEnvironment environment)
+        public void Remove(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
@@ -54,7 +55,7 @@ namespace Reactions.Applications
             });
         }
 
-        async Task<WorkspaceStack> CreateStack(Application application, string name, RuntimeEnvironment environment, PulumiFn program)
+        async Task<WorkspaceStack> CreateStack(Application application, string name, CloudRuntimeEnvironment environment, PulumiFn program)
         {
             var args = new InlineProgramArgs(name, "dev", program)
             {
@@ -95,7 +96,6 @@ namespace Reactions.Applications
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             });
-            await File.WriteAllTextAsync("newState.json", jsonString);
             stackDeployment = StackDeployment.FromJsonString(jsonString);
 
             _logger.ImportStack();

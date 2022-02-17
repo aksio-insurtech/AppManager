@@ -6,5 +6,10 @@ using Concepts.Azure;
 
 namespace Reactions.Applications
 {
-    public record Application(ApplicationId Id, ApplicationName Name, AzureSubscriptionId AzureSubscriptionId, CloudLocationKey CloudLocation);
+    public record Application(
+        ApplicationId Id,
+        ApplicationName Name,
+        AzureSubscriptionId AzureSubscriptionId,
+        CloudLocationKey CloudLocation,
+        ApplicationResources Resources);
 }

@@ -3,10 +3,5 @@
 
 namespace Reactions.Applications
 {
-    public enum RuntimeEnvironment
-    {
-        None = 0,
-        Development = 1,
-        Production = 2
-    }
+    public record ApplicationResources(MongoDBResource MongoDB);
 }

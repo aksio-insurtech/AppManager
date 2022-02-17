@@ -3,5 +3,8 @@
 
 namespace Concepts.Applications
 {
-    public record DeployableId(Guid Value) : ConceptAs<Guid>(Value);
+    public record DeployableId(Guid Value) : ConceptAs<Guid>(Value)
+    {
+        public static implicit operator DeployableId(Guid value) => new(value);
+    }
 }

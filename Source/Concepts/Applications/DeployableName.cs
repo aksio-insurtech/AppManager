@@ -3,5 +3,8 @@
 
 namespace Concepts.Applications
 {
-    public record DeployableName(string Value) : ConceptAs<string>(Value);
+    public record DeployableName(string Value) : ConceptAs<string>(Value)
+    {
+        public static implicit operator DeployableName(string name) => new(name);
+    }
 }

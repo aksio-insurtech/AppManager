@@ -3,5 +3,8 @@
 
 namespace Concepts.Applications
 {
-    public record MicroserviceName(string Value) : ConceptAs<string>(Value);
+    public record MicroserviceName(string Value) : ConceptAs<string>(Value)
+    {
+        public static implicit operator MicroserviceName(string name) => new(name);
+    }
 }

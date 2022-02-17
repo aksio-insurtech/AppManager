@@ -1,6 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts;
+
 namespace Reactions.Applications
 {
     [Route("/api/test")]
@@ -21,16 +23,16 @@ namespace Reactions.Applications
         public async Task Up()
         {
             var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
-            var definition = _stackDefinitions.CreateApplication(application, RuntimeEnvironment.Development);
-            _runner.Up(application, application.Name, definition, RuntimeEnvironment.Development);
+            var definition = _stackDefinitions.CreateApplication(application, CloudRuntimeEnvironment.Development);
+            _runner.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
         }
 
         [HttpGet("down")]
         public async Task Down()
         {
             var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
-            var definition = _stackDefinitions.CreateApplication(application, RuntimeEnvironment.Development);
-            _runner.Down(application, application.Name, definition, RuntimeEnvironment.Development);
+            var definition = _stackDefinitions.CreateApplication(application, CloudRuntimeEnvironment.Development);
+            _runner.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
         }
     }
 }

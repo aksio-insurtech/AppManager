@@ -1,7 +1,10 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Aksio.Cratis.Execution;
 using Common;
+using Concepts;
+using Events.Applications;
 using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.ContainerInstance;
@@ -18,10 +21,17 @@ namespace Reactions.Applications
     public class PulumiStackDefinitions : IPulumiStackDefinitions
     {
         readonly ISettings _settings;
+        readonly IExecutionContextManager _executionContextManager;
+        readonly IEventLog _eventLog;
 
-        public PulumiStackDefinitions(ISettings applicationSettings) => _settings = applicationSettings;
+        public PulumiStackDefinitions(ISettings applicationSettings, IExecutionContextManager executionContextManager, IEventLog eventLog)
+        {
+            _settings = applicationSettings;
+            _executionContextManager = executionContextManager;
+            _eventLog = eventLog;
+        }
 
-        public PulumiFn CreateApplication(Application application, RuntimeEnvironment environment) =>
+        public PulumiFn CreateApplication(Application application, CloudRuntimeEnvironment environment) =>
 
             // Notes:
             // - Organization settings: Atlas OrgId
@@ -34,11 +44,15 @@ namespace Reactions.Applications
             // - Add tag for environment for each stack
             // - Store needed output values - show on resources tab
             // - Output
-            PulumiFn.Create(() =>
+            PulumiFn.Create(async () =>
             {
+                // Todo: Set to actual tenant - and probably not here!
+                _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+
                 var tags = new Dictionary<string, string>
                     {
-                        { "application", application.Id.ToString() }
+                        { "application", application.Id.ToString() },
+                        { "environment", Enum.GetName(typeof(CloudRuntimeEnvironment), environment) ?? string.Empty }
                     };
 
                 var resourceGroup = ResourceGroup.Get("Einar-D-Norway-RG", $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG");
@@ -59,20 +73,7 @@ namespace Reactions.Applications
                     ResourceGroupName = resourceGroup.Name
                 });
 
-                var getFileShareResult = GetFileShare.Invoke(new()
-                {
-                    AccountName = storageAccount.Name,
-                    ResourceGroupName = resourceGroup.Name,
-                    ShareName = "kernel"
-                });
-
                 var storageAccountKeysRequest = ListStorageAccountKeys.Invoke(new ListStorageAccountKeysInvokeArgs
-                {
-                    AccountName = storageAccount.Name,
-                    ResourceGroupName = resourceGroup.Name
-                });
-
-                var storageAccountResult = GetStorageAccount.Invoke(new()
                 {
                     AccountName = storageAccount.Name,
                     ResourceGroupName = resourceGroup.Name
@@ -94,18 +95,12 @@ namespace Reactions.Applications
                     ProviderRegionName = "EUROPE_NORTH"
                 });
 
-                var getClusterResult = GetCluster.Invoke(new()
-                {
-                    Name = cluster.Name,
-                    ProjectId = cluster.ProjectId
-                });
-
-                var databasePassword = Guid.NewGuid().ToString();
+                var kernelDatabaseUserPassword = Guid.NewGuid().ToString();
                 var user = new DatabaseUser("kernel", new()
                 {
                     Username = "kernel",
                     ProjectId = cluster.ProjectId,
-                    Password = databasePassword,
+                    Password = kernelDatabaseUserPassword,
                     DatabaseName = "admin",
                     Roles = new DatabaseUserRoleArgs[]
                     {
@@ -117,103 +112,127 @@ namespace Reactions.Applications
                     }
                 });
 
-                getFileShareResult.Apply(fs =>
-                {
-                    getClusterResult.Apply(clusterInfo =>
-                        {
-                            const string scheme = "mongodb+srv://";
-                            var mongoDBConnectionString = clusterInfo.ConnectionStrings[0].StandardSrv.Insert(scheme.Length, $"kernel:{databasePassword}@");
+                var storage = new MicroserviceStorageShare(storageAccount.Name, storageAccountKeysRequest.Apply(_ => _.Keys[0].Value), fileShare.Name);
+                await HandleKernelConfiguration(application, environment, resourceGroup.Name, cluster, kernelDatabaseUserPassword, storage);
 
-                            Log.Info($"MongoDB ConnectionString : '{clusterInfo.ConnectionStrings[0].StandardSrv}'");
-                            Log.Info($"MongoDB User 'kernel' has password '{databasePassword}'");
-                            Log.Info($"MongoDB full connectionstring: '{mongoDBConnectionString}'");
-
-                            storageAccountResult.Apply(account =>
-                                {
-                                    storageAccountKeysRequest.Apply(keys =>
-                                    {
-                                        var kernelStorage = new KernelStorage(account.Name, keys.Keys[0].Value);
-                                        kernelStorage.CreateAndUploadStorageJson(mongoDBConnectionString);
-                                        kernelStorage.CreateAndUploadAppSettings(application, _settings);
-
-                                        return keys;
-                                    });
-
-                                    return account;
-                                });
-
-                            return clusterInfo;
-                        });
-
-                    var container = new ContainerGroup("kernel", new()
+                var container = MicroserviceWithDeployables(
+                    resourceGroup.Name,
+                    new(Guid.Empty, "kernel"),
+                    storage,
+                    new[]
                     {
-                        ResourceGroupName = resourceGroup.Name,
+                        new Deployable(Guid.Empty, "kernel", "aksioinsurtech/cratis:5.8.6")
+                    });
 
-                        Volumes = new VolumeArgs[]
-                        {
+                var projectIpAccessList = new ProjectIpAccessList("kernel", new()
+                {
+                    ProjectId = project.Id,
+                    IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
+                });
+            });
+
+        public PulumiFn CreateDeployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
+        public PulumiFn CreateMicroservice(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
+
+        ContainerGroup MicroserviceWithDeployables(Input<string> resourceGroupName, Microservice microservice, MicroserviceStorageShare storage, IEnumerable<Deployable> deployables)
+        {
+            return new ContainerGroup(microservice.Name, new()
+            {
+                ResourceGroupName = resourceGroupName,
+
+                Volumes = new VolumeArgs[]
+                {
                             new()
                             {
                                 Name = "storage-config",
                                 AzureFile = new AzureFileVolumeArgs()
                                 {
                                     ReadOnly = true,
-                                    StorageAccountKey = storageAccountKeysRequest.Apply(_ => _.Keys[0].Value),
-                                    StorageAccountName = storageAccount.Name,
-                                    ShareName = fileShare.Name
+                                    StorageAccountName = storage.AccountName,
+                                    StorageAccountKey = storage.AccountKey,
+                                    ShareName = storage.ShareName
                                 }
                             }
-                        },
-                        IpAddress = new IpAddressArgs
-                        {
-                            Type = ContainerGroupIpAddressType.Public,
-                            Ports = new PortArgs()
-                            {
-                                Port = 80
-                            }
-                        },
-                        OsType = "Linux",
-                        Containers = new ContainerArgs[]
+                },
+                IpAddress = new IpAddressArgs
+                {
+                    Type = ContainerGroupIpAddressType.Public,
+                    Ports = new PortArgs()
+                    {
+                        Port = 80
+                    }
+                },
+                OsType = "Linux",
+                Containers = deployables.Select(deployable => new ContainerArgs
+                {
+                    Name = deployable.Name.Value,
+                    Image = deployable.Image,
+                    Ports = new ContainerPortArgs[]
                         {
                             new()
                             {
-                                Name = "kernel",
-                                Image = "aksioinsurtech/cratis:5.7.3",
-                                Ports = new ContainerPortArgs[]
-                                {
-                                    new()
-                                    {
-                                        Port = 80,
-                                        Protocol = "TCP"
-                                    }
-                                },
-                                Resources = new ResourceRequirementsArgs()
-                                {
-                                    Requests = new ResourceRequestsArgs
-                                    {
-                                        Cpu = 1,
-                                        MemoryInGB = 1
-                                    }
-                                },
-                                VolumeMounts = new VolumeMountArgs()
-                                {
-                                    MountPath = "/app/config",
-                                    Name = "storage-config"
-                                }
+                                Port = 80,
+                                Protocol = "TCP"
                             }
-                        }
-                    });
-
-                    var projectIpAccessList = new ProjectIpAccessList("kernel", new()
+                        },
+                    Resources = new ResourceRequirementsArgs()
                     {
-                        ProjectId = project.Id,
-                        IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
-                    });
+                        Requests = new ResourceRequestsArgs
+                        {
+                            Cpu = 1,
+                            MemoryInGB = 1
+                        }
+                    },
+                    VolumeMounts = new VolumeMountArgs()
+                    {
+                        MountPath = "/app/config",
+                        Name = "storage-config"
+                    }
+                }).ToArray()
+            });
+        }
 
-                    return fs;
-                });
+        async Task HandleKernelConfiguration(Application application, CloudRuntimeEnvironment environment, Input<string> resourceGroupName, Cluster cluster, string databasePassword, MicroserviceStorageShare storage)
+        {
+            var getFileShareResult = GetFileShare.Invoke(new()
+            {
+                AccountName = storage.AccountName,
+                ResourceGroupName = resourceGroupName,
+                ShareName = storage.ShareName
             });
 
-        public PulumiFn CreateDeployable(RuntimeEnvironment environment) => throw new NotImplementedException();
-        public PulumiFn CreateMicroservice(RuntimeEnvironment environment) => throw new NotImplementedException();
+            var getClusterResult = GetCluster.Invoke(new()
+            {
+                Name = cluster.Name,
+                ProjectId = cluster.ProjectId
+            });
+
+            var getStorageAccountResult = GetStorageAccount.Invoke(new()
+            {
+                AccountName = storage.AccountName,
+                ResourceGroupName = resourceGroupName
+            });
+
+            var fileShareResult = await getFileShareResult.GetValue(_ => _);
+            var clusterInfo = await getClusterResult.GetValue(_ => _);
+
+            var connectionString = clusterInfo.ConnectionStrings[0].StandardSrv;
+            if (application.Resources?.MongoDB?.ConnectionString is null ||
+            application.Resources?.MongoDB?.ConnectionString != connectionString)
+            {
+                await _eventLog.Append(application.Id, new MongoDBConnectionStringChangedForApplication(environment, connectionString));
+            }
+
+            const string scheme = "mongodb+srv://";
+            var mongoDBConnectionString = connectionString.Insert(scheme.Length, $"kernel:{databasePassword}@");
+            await _eventLog.Append(application.Id, new MongoDBUserChanged("kernel", databasePassword));
+
+            var account = await getStorageAccountResult.GetValue();
+
+            var key = await storage.AccountKey.GetValue();
+            var kernelStorage = new KernelStorage(account.Name, key);
+            kernelStorage.CreateAndUploadStorageJson(mongoDBConnectionString);
+            kernelStorage.CreateAndUploadAppSettings(application, _settings);
+        }
     }
 }

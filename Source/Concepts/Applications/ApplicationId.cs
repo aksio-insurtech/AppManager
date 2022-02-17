@@ -3,5 +3,8 @@
 
 namespace Concepts.Applications
 {
-    public record ApplicationId(Guid Value) : ConceptAs<Guid>(Value);
+    public record ApplicationId(Guid Value) : ConceptAs<Guid>(Value)
+    {
+        public static implicit operator EventSourceId(ApplicationId applicationId) => new(applicationId.Value.ToString());
+    }
 }
