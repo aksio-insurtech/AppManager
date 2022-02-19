@@ -47,6 +47,9 @@ export const ApplicationSettings = (props: IApplicationSettingsProps) => {
                     </Stack>
                 );
             })}
+            <br/>
+            <br/>
+            <br/>
 
             <h2>Danger zone</h2>
             <PrimaryButton text="Delete" onClick={showRemoveWarning} />
