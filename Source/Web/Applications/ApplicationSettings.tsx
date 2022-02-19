@@ -41,9 +41,9 @@ export const ApplicationSettings = (props: IApplicationSettingsProps) => {
             <h3>Users</h3>
             {resources.data?.mongoDB?.users?.map(user => {
                 return (
-                    <Stack key={user.user} horizontal>
-                        <TextField label="Username"/>
-                        <TextField label="Password" readOnly disabled type="password" canRevealPassword/>
+                    <Stack key={user.userName} horizontal>
+                        <TextField label="Username" value={user.userName}/>
+                        <TextField label="Password" value={user.password} readOnly disabled type="password" canRevealPassword/>
                     </Stack>
                 );
             })}
