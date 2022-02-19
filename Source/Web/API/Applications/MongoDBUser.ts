@@ -4,6 +4,6 @@
 
 
 export type MongoDBUser = {
-    user: string;
+    userName: string;
     password: string;
 };

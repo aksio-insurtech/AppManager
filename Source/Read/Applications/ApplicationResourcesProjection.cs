@@ -13,10 +13,10 @@ namespace Read.Applications
             .From<MongoDBConnectionStringChangedForApplication>(_ => _
                 .Set(m => m.MongoDB.ConnectionString).To(e => e.ConnectionString))
             .Children(m => m.MongoDB.Users, cb => cb
-                .IdentifiedBy(m => m.User)
+                .IdentifiedBy(m => m.UserName)
                 .From<MongoDBUserChanged>(e => e
-                    .UsingKey(e => e.User)
-                    .Set(m => m.User).To(e => e.User)
+                    .UsingKey(e => e.UserName)
+                    .Set(m => m.UserName).To(e => e.UserName)
                     .Set(m => m.Password).To(e => e.Password)))
             .From<IpAddressSetForApplication>(_ => _
                 .Set(m => m.IpAddress).To(e => e.Address));

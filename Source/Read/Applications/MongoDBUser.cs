@@ -5,5 +5,5 @@ using Concepts.MongoDB;
 
 namespace Read.Applications
 {
-    public record MongoDBUser(MongoDBUserName User, MongoDBPassword Password);
+    public record MongoDBUser(MongoDBUserName UserName, MongoDBPassword Password);
 }
