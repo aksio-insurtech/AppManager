@@ -3,7 +3,7 @@
 
 using Concepts.MongoDB;
 
-namespace Reactions.Applications
+namespace Read.Applications
 {
-    public record MongoDBUserInformation(MongoDBUser User, MongoDBPassword Password);
+    public record MongoDBUser(MongoDBUserName User, MongoDBPassword Password);
 }

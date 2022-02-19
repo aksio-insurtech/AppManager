@@ -9,14 +9,14 @@ import { useParams } from 'react-router-dom';
 
 export const Application = () => {
     const { applicationId } = useParams();
-    const [getApplication] = GetApplication.use({ applicationId: applicationId! });
+    const [application] = GetApplication.use({ applicationId: applicationId! });
 
     return (
         <Stack style={{ height: '100%' }}>
             <Stack.Item>
                 <Pivot>
                     <PivotItem headerText='General'>
-                        <ApplicationSettings application={getApplication.data} />
+                        { application.data.id && <ApplicationSettings application={application.data} /> }
                     </PivotItem>
                     <PivotItem headerText='Tenants'>
                         <Tenants />

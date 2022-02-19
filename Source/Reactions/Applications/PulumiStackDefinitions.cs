@@ -121,7 +121,7 @@ namespace Reactions.Applications
                     storage,
                     new[]
                     {
-                        new Deployable(Guid.Empty, "kernel", "aksioinsurtech/cratis:5.8.8")
+                        new Deployable(Guid.Empty, "kernel", "aksioinsurtech/cratis:5.8.11")
                     });
 
                 var projectIpAccessList = new ProjectIpAccessList("kernel", new()

@@ -3,8 +3,8 @@
 
 namespace Concepts.MongoDB
 {
-    public record MongoDBUser(string Value) : ConceptAs<string>(Value)
+    public record MongoDBUserName(string Value) : ConceptAs<string>(Value)
     {
-        public static implicit operator MongoDBUser(string value) => new(value);
+        public static implicit operator MongoDBUserName(string value) => new(value);
     }
 }

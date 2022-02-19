@@ -3,7 +3,7 @@
 
 using Concepts.Infrastructure;
 
-namespace Reactions.Applications
+namespace Read.Applications
 {
     public record ApplicationResources(IpAddress IpAddress, MongoDBResource MongoDB);
 }

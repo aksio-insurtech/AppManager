@@ -3,7 +3,7 @@
 
 using Events.Applications;
 
-namespace Reactions.Applications
+namespace Read.Applications
 {
     public class ApplicationResourcesProjection : IProjectionFor<ApplicationResources>
     {
