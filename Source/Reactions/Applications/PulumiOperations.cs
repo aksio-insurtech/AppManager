@@ -1,6 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -12,14 +14,14 @@ using Pulumi.Automation;
 namespace Reactions.Applications
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IPulumiRunner"/>.
+    /// Represents an implementation of <see cref="IPulumiOperations"/>.
     /// </summary>
-    public class PulumiRunner : IPulumiRunner
+    public class PulumiOperations : IPulumiOperations
     {
-        readonly ILogger<PulumiRunner> _logger;
+        readonly ILogger<PulumiOperations> _logger;
         readonly ISettings _settings;
 
-        public PulumiRunner(ILogger<PulumiRunner> logger, ISettings applicationSettings)
+        public PulumiOperations(ILogger<PulumiOperations> logger, ISettings applicationSettings)
         {
             _logger = logger;
             _settings = applicationSettings;
@@ -51,13 +53,32 @@ namespace Reactions.Applications
             _ = Task.Run(async () =>
             {
                 var stack = await CreateStack(application, name, environment, definition);
-                await stack.Workspace.RemoveStackAsync("dev");
+                await stack.Workspace.RemoveStackAsync(environment.GetStackNameFor());
             });
+        }
+
+        /// <inheritdoc/>
+        public async Task SetTag(string projectName, string stackName, string tagName, string value)
+        {
+            var payload = new
+            {
+                name = tagName,
+                value
+            };
+
+            var url = $"https://api.pulumi.com/api/stacks/{_settings.PulumiOrganization}/{projectName}/{stackName}/tags";
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.pulumi+8"));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", _settings.PulumiAccessToken);
+            await client.PostAsJsonAsync(url, payload);
         }
 
         async Task<WorkspaceStack> CreateStack(Application application, string name, CloudRuntimeEnvironment environment, PulumiFn program)
         {
-            var args = new InlineProgramArgs(name, "dev", program)
+            var stackName = environment.GetStackNameFor();
+            var args = new InlineProgramArgs(name, stackName, program)
             {
                 ProjectSettings = new(name, ProjectRuntimeName.Dotnet)
             };
@@ -70,7 +91,6 @@ namespace Reactions.Applications
                 { "azure-native:location", new ConfigValue(application.CloudLocation) },
                 { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) }
             });
-
             var mongoDBPublicKey = _settings.MongoDBPublicKey;
             var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
             Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
@@ -78,6 +98,9 @@ namespace Reactions.Applications
 
             var accessToken = _settings.PulumiAccessToken;
             Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
+
+            await SetTag(name, stackName, "application", application.Name);
+            await SetTag(name, stackName, "environment", stackName);
 
             return stack;
         }

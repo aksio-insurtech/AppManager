@@ -11,6 +11,7 @@ namespace Read.Organizations
 {
     public record Settings(
         IEnumerable<AzureSubscription> AzureSubscriptions,
+        PulumiOrganization PulumiOrganization,
         PulumiAccessToken PulumiAccessToken,
         MongoDBOrganizationId MongoDBOrganizationId,
         MongoDBPublicKey MongoDBPublicKey,
@@ -20,6 +21,7 @@ namespace Read.Organizations
     {
         public static readonly Settings NoSettings = new(
             Array.Empty<AzureSubscription>(),
+            string.Empty,
             string.Empty,
             string.Empty,
             string.Empty,

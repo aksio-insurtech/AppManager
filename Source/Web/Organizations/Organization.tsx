@@ -7,9 +7,9 @@ import { AddSubscriptionDialog } from './AddSubscriptionDialog';
 import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscription';
 import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
-import { SetPulumiAccessToken } from '../API/organization/settings/SetPulumiAccessToken';
-import { SetMongoDBSettings } from '../API/organization/settings/SetMongoDBSettings';
-import { SetElasticSearchSettings } from '../API/organization/settings/SetElasticSearchSettings';
+import { SetMongoDBSettings } from 'API/organization/settings/SetMongoDBSettings';
+import { SetElasticSearchSettings } from 'API/organization/settings/SetElasticSearchSettings';
+import { SetPulumiSettings } from 'API/organization/settings/SetPulumiSettings';
 
 const subscriptionsColumns: IColumn[] = [
     {
@@ -34,6 +34,7 @@ const subscriptionsColumns: IColumn[] = [
 
 export const Organization = () => {
     const [settings] = AllSettings.use();
+    const [pulumiOrganization, setPulumiOrganization] = useState('');
     const [pulumiAccessToken, setPulumiAccessToken] = useState('');
     const [mongoDBOrganizationId, setMongoDBOrganizationId] = useState('');
     const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
@@ -42,6 +43,7 @@ export const Organization = () => {
     const [elasticApiKey, setElasticApiKey] = useState('');
 
     useEffect(() => {
+        setPulumiOrganization(settings.data.pulumiOrganization);
         setPulumiAccessToken(settings.data.pulumiAccessToken);
         setMongoDBOrganizationId(settings.data.mongoDBOrganizationId);
         setMongoDBPublicKey(settings.data.mongoDBPublicKey);
@@ -72,8 +74,9 @@ export const Organization = () => {
         }
     ];
 
-    const savePulumiAccessToken = async () => {
-        const command = new SetPulumiAccessToken();
+    const savePulumiSettings = async () => {
+        const command = new SetPulumiSettings();
+        command.organization = pulumiOrganization;
         command.accessToken = pulumiAccessToken;
         await command.execute();
     };
@@ -104,8 +107,9 @@ export const Organization = () => {
 
                 <Stack.Item>
                     <h2>Pulumi</h2>
+                    <TextField label="Organization" value={pulumiOrganization} onChange={(_, value) => setPulumiOrganization(value!)} />
                     <TextField label="Access Token" type="password" canRevealPassword value={pulumiAccessToken} onChange={(_, value) => setPulumiAccessToken(value!)} />
-                    <PrimaryButton text='Save' onClick={savePulumiAccessToken} />
+                    <PrimaryButton text='Save' onClick={savePulumiSettings} />
                 </Stack.Item>
 
                 <Stack.Item>

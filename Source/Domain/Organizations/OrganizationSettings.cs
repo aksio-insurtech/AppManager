@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Organizations;
-using Concepts.Pulumi;
 using Events.Organizations;
 
 namespace Domain.Organizations
@@ -18,10 +17,10 @@ namespace Domain.Organizations
         }
 
         [HttpPost("subscriptions")]
-        public Task AddAzureSubscription([FromBody] AddAzureSubscription command) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(command.Id, command.Name, command.TenantName));
+        public Task AddAzureSubscription([FromBody] AzureSubscription subscription) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(subscription.Id, subscription.Name, subscription.TenantName));
 
         [HttpPost("pulumi")]
-        public Task SetPulumiAccessToken([FromBody] PulumiAccessToken accessToken) => _eventLog.Append(SettingsId.Global, new PulumiAccessTokenSet(accessToken));
+        public Task SetPulumiSettings([FromBody] PulumiSettings settings) => _eventLog.Append(SettingsId.Global, new PulumiSettingsSet(settings.Organization, settings.AccessToken));
 
         [HttpPost("mongodb")]
         public Task SetMongoDBSettings([FromBody] MongoDBSettings settings) => _eventLog.Append(SettingsId.Global, new MongoDBSettingsSet(settings.OrganizationId, settings.PublicKey, settings.PrivateKey));

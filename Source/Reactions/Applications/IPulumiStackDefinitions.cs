@@ -9,7 +9,7 @@ namespace Reactions.Applications
     public interface IPulumiStackDefinitions
     {
         PulumiFn CreateApplication(Application application, CloudRuntimeEnvironment environment);
-        PulumiFn CreateMicroservice(CloudRuntimeEnvironment environment);
+        PulumiFn CreateMicroservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment);
         PulumiFn CreateDeployable(CloudRuntimeEnvironment environment);
     }
 }

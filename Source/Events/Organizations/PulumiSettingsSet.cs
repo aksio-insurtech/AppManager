@@ -6,5 +6,5 @@ using Concepts.Pulumi;
 namespace Events.Organizations
 {
     [EventType("f78e087a-1f10-45b8-89a6-1068bca23ae2")]
-    public record PulumiAccessTokenSet(PulumiAccessToken AccessToken);
+    public record PulumiSettingsSet(PulumiOrganization Organization, PulumiAccessToken AccessToken);
 }

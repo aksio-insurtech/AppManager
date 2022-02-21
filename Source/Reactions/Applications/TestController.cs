@@ -9,10 +9,10 @@ namespace Reactions.Applications
     public class TestController : Controller
     {
         readonly IPulumiStackDefinitions _stackDefinitions;
-        readonly IPulumiRunner _runner;
+        readonly IPulumiOperations _runner;
         readonly IPassiveProjectionRepositoryFor<Application> _application;
 
-        public TestController(IPulumiStackDefinitions stackDefinitions, IPulumiRunner runner, IPassiveProjectionRepositoryFor<Application> application)
+        public TestController(IPulumiStackDefinitions stackDefinitions, IPulumiOperations runner, IPassiveProjectionRepositoryFor<Application> application)
         {
             _stackDefinitions = stackDefinitions;
             _runner = runner;

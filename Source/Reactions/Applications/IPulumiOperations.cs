@@ -9,7 +9,7 @@ namespace Reactions.Applications
     /// <summary>
     /// Defines a system for running Pulumi jobs.
     /// </summary>
-    public interface IPulumiRunner
+    public interface IPulumiOperations
     {
         /// <summary>
         /// Up a stack.
@@ -37,5 +37,15 @@ namespace Reactions.Applications
         /// <param name="definition">The configuration of a stack to down.</param>
         /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
         void Remove(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment);
+
+        /// <summary>
+        /// Set a tag for a stack in a project.
+        /// </summary>
+        /// <param name="projectName">Name of project.</param>
+        /// <param name="stackName">Name of stack.</param>
+        /// <param name="tagName">Tag to set.</param>
+        /// <param name="value">Value of the tag.</param>
+        /// <returns>Awaitable task.</returns>
+        Task SetTag(string projectName, string stackName, string tagName, string value);
     }
 }

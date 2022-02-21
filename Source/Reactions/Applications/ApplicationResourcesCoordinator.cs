@@ -12,13 +12,13 @@ namespace Reactions.Applications
         readonly ILogger<ApplicationResources> _logger;
         readonly IPassiveProjectionRepositoryFor<Application> _application;
         readonly IPulumiStackDefinitions _stackDefinitions;
-        readonly IPulumiRunner _pulumiRunner;
+        readonly IPulumiOperations _pulumiRunner;
 
         public ApplicationResourcesCoordinator(
             ILogger<ApplicationResources> logger,
             IPassiveProjectionRepositoryFor<Application> application,
             IPulumiStackDefinitions stackDefinitions,
-            IPulumiRunner pulumiRunner)
+            IPulumiOperations pulumiRunner)
         {
             _logger = logger;
             _application = application;

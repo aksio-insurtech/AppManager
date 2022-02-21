@@ -11,6 +11,7 @@ namespace Common
     public interface ISettings
     {
         IEnumerable<AzureSubscription> AzureSubscriptions { get; }
+        PulumiOrganization PulumiOrganization { get; }
         PulumiAccessToken PulumiAccessToken { get; }
         MongoDBOrganizationId MongoDBOrganizationId { get; }
         MongoDBPublicKey MongoDBPublicKey { get; }

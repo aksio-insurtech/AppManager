@@ -10,7 +10,8 @@ namespace Read.Organizations
         public ProjectionId Identifier => "5398c7f5-2baf-494b-abac-0a35eeb5fd98";
 
         public void Define(IProjectionBuilderFor<Settings> builder) => builder
-            .From<PulumiAccessTokenSet>(_ => _
+            .From<PulumiSettingsSet>(_ => _
+                .Set(m => m.PulumiOrganization).To(e => e.Organization)
                 .Set(m => m.PulumiAccessToken).To(e => e.AccessToken))
             .From<MongoDBSettingsSet>(_ => _
                 .Set(m => m.MongoDBOrganizationId).To(e => e.OrganizationId)

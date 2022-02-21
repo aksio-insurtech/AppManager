@@ -55,8 +55,7 @@ namespace Reactions.Applications
                         { "environment", Enum.GetName(typeof(CloudRuntimeEnvironment), environment) ?? string.Empty }
                     };
 
-                var resourceGroupId = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG";
-                var resourceGroup = ResourceGroup.Get("Einar-D-Norway-RG", resourceGroupId);
+                var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
                 var storageAccount = new StorageAccount(application.Name.Value.ToLowerInvariant(), new StorageAccountArgs
                 {
                     ResourceGroupName = resourceGroup.Name,
@@ -145,7 +144,22 @@ namespace Reactions.Applications
             });
 
         public PulumiFn CreateDeployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
-        public PulumiFn CreateMicroservice(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
+        public PulumiFn CreateMicroservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
+           PulumiFn.Create(() =>
+            {
+                // Todo: Set to actual tenant - and probably not here!
+                _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+
+                var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
+                var container = MicroserviceWithDeployables(
+                    resourceGroup.Name,
+                    microservice,
+                    null!,
+                    new[]
+                    {
+                        new Deployable(Guid.Empty, "main", "nginx")
+                    });
+            });
 
         ContainerGroup MicroserviceWithDeployables(Input<string> resourceGroupName, Microservice microservice, MicroserviceStorageShare storage, IEnumerable<Deployable> deployables)
         {
@@ -246,6 +260,14 @@ namespace Reactions.Applications
             var kernelStorage = new KernelStorage(account.Name, key);
             kernelStorage.CreateAndUploadStorageJson(mongoDBConnectionString);
             kernelStorage.CreateAndUploadAppSettings(application, _settings);
+        }
+
+        (ResourceGroup ResourceGroup, string ResourceGroupId) ApplyResourceGroup(Application application)
+        {
+            var resourceGroupId = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG";
+            var resourceGroup = ResourceGroup.Get("Einar-D-Norway-RG", resourceGroupId);
+
+            return (resourceGroup, resourceGroupId);
         }
     }
 }
