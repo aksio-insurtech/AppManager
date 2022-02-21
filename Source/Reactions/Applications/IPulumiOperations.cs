@@ -42,10 +42,10 @@ namespace Reactions.Applications
         /// Set a tag for a stack in a project.
         /// </summary>
         /// <param name="projectName">Name of project.</param>
-        /// <param name="stackName">Name of stack.</param>
+        /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
         /// <param name="tagName">Tag to set.</param>
         /// <param name="value">Value of the tag.</param>
         /// <returns>Awaitable task.</returns>
-        Task SetTag(string projectName, string stackName, string tagName, string value);
+        Task SetTag(string projectName, CloudRuntimeEnvironment environment, string tagName, string value);
     }
 }

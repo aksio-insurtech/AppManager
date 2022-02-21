@@ -58,8 +58,9 @@ namespace Reactions.Applications
         }
 
         /// <inheritdoc/>
-        public async Task SetTag(string projectName, string stackName, string tagName, string value)
+        public async Task SetTag(string projectName, CloudRuntimeEnvironment environment, string tagName, string value)
         {
+            var stackName = environment.GetStackNameFor();
             var payload = new
             {
                 name = tagName,
@@ -99,8 +100,8 @@ namespace Reactions.Applications
             var accessToken = _settings.PulumiAccessToken;
             Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
 
-            await SetTag(projectName, stackName, "application", application.Name);
-            await SetTag(projectName, stackName, "environment", stackName);
+            await SetTag(projectName, environment, "application", application.Name);
+            await SetTag(projectName, environment, "environment", stackName);
 
             return stack;
         }
