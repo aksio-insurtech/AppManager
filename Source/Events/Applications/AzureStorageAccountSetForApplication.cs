@@ -3,7 +3,8 @@
 
 using Concepts.Azure;
 
-namespace Read.Applications
+namespace Events.Applications
 {
-    public record AzureResources(AzureSubscriptionId SubscriptionId, AzureResourceGroupId ResourceGroupId, AzureStorageAccountName StorageAccountName);
+    [EventType("df24d5c8-b4dd-4ff5-8636-588ec6699177")]
+    public record AzureStorageAccountSetForApplication(AzureStorageAccountName AccountName);
 }

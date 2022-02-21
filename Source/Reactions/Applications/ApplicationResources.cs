@@ -6,5 +6,9 @@ using Concepts.Infrastructure;
 
 namespace Reactions.Applications
 {
-    public record ApplicationResources(IpAddress IpAddress, AzureResourceGroupId AzureResourceGroupId, MongoDBResource MongoDB);
+    public record ApplicationResources(
+        IpAddress IpAddress,
+        AzureStorageAccountName AzureStorageAccountName,
+        AzureResourceGroupId AzureResourceGroupId,
+        MongoDBResource MongoDB);
 }

@@ -21,6 +21,8 @@ namespace Read.Applications
             .From<AzureResourceGroupCreatedForApplication>(_ => _
                 .Set(m => m.Azure.SubscriptionId).To(e => e.SubscriptionId)
                 .Set(m => m.Azure.ResourceGroupId).To(e => e.ResourceGroupId))
+            .From<AzureStorageAccountSetForApplication>(_ => _
+                .Set(m => m.Azure.StorageAccountName).To(e => e.AccountName))
             .From<IpAddressSetForApplication>(_ => _
                 .Set(m => m.IpAddress).To(e => e.Address));
     }
