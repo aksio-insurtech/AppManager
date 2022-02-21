@@ -18,4 +18,5 @@ export class AddAzureSubscription extends Command {
 
     id!: string;
     name!: string;
+    tenantName!: string;
 }

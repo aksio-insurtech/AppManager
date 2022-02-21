@@ -55,7 +55,8 @@ namespace Reactions.Applications
                         { "environment", Enum.GetName(typeof(CloudRuntimeEnvironment), environment) ?? string.Empty }
                     };
 
-                var resourceGroup = ResourceGroup.Get("Einar-D-Norway-RG", $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG");
+                var resourceGroupId = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG";
+                var resourceGroup = ResourceGroup.Get("Einar-D-Norway-RG", resourceGroupId);
                 var storageAccount = new StorageAccount(application.Name.Value.ToLowerInvariant(), new StorageAccountArgs
                 {
                     ResourceGroupName = resourceGroup.Name,
@@ -135,6 +136,11 @@ namespace Reactions.Applications
                     application.Resources?.IpAddress?.Value != ipAddress)
                 {
                     await _eventLog.Append(application.Id, new IpAddressSetForApplication(ipAddress));
+                }
+
+                if (application.Resources?.AzureResourceGroupId != resourceGroupId)
+                {
+                    await _eventLog.Append(application.Id, new AzureResourceGroupCreatedForApplication(application.AzureSubscriptionId, resourceGroupId));
                 }
             });
 

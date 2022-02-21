@@ -14,6 +14,8 @@ namespace Reactions.Applications
                 .Set(m => m.Name).To(e => e.Name)
                 .Set(m => m.AzureSubscriptionId).To(e => e.AzureSubscriptionId)
                 .Set(m => m.CloudLocation).To(e => e.CloudLocation))
+            .From<AzureResourceGroupCreatedForApplication>(_ => _
+                .Set(m => m.Resources.AzureResourceGroupId).To(e => e.ResourceGroupId))
             .From<MongoDBConnectionStringChangedForApplication>(_ => _
                 .Set(m => m.Resources.MongoDB.ConnectionString).To(e => e.ConnectionString))
             .From<IpAddressSetForApplication>(_ => _

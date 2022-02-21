@@ -5,5 +5,5 @@ using Concepts.Infrastructure;
 
 namespace Read.Applications
 {
-    public record ApplicationResources(IpAddress IpAddress, MongoDBResource MongoDB);
+    public record ApplicationResources(IpAddress IpAddress, AzureResources Azure, MongoDBResource MongoDB);
 }

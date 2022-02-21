@@ -18,6 +18,9 @@ namespace Read.Applications
                     .UsingKey(e => e.UserName)
                     .Set(m => m.UserName).To(e => e.UserName)
                     .Set(m => m.Password).To(e => e.Password)))
+            .From<AzureResourceGroupCreatedForApplication>(_ => _
+                .Set(m => m.Azure.SubscriptionId).To(e => e.SubscriptionId)
+                .Set(m => m.Azure.ResourceGroupId).To(e => e.ResourceGroupId))
             .From<IpAddressSetForApplication>(_ => _
                 .Set(m => m.IpAddress).To(e => e.Address));
     }

@@ -19,8 +19,14 @@ const subscriptionsColumns: IColumn[] = [
         minWidth: 200
     },
     {
+        key: 'tenantName',
+        name: 'Tenant Name',
+        fieldName: 'tenantName',
+        minWidth: 200
+    },
+    {
         key: 'id',
-        name: 'Id',
+        name: 'Subscription Id',
         fieldName: 'subscriptionId',
         minWidth: 250
     }

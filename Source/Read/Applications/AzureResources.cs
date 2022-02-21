@@ -3,7 +3,7 @@
 
 using Concepts.Azure;
 
-namespace Domain.Organizations
+namespace Read.Applications
 {
-    public record AddAzureSubscription(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantName TenantName);
+    public record AzureResources(AzureSubscriptionId SubscriptionId, AzureResourceGroupId ResourceGroupId);
 }

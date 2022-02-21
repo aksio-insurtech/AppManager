@@ -3,5 +3,8 @@
 
 namespace Concepts.Azure
 {
-    public record AzureSubscription(AzureSubscriptionId SubscriptionId, AzureSubscriptionName Name, AzureTenantName TenantName);
+    public record AzureResourceGroupId(string Value) : ConceptAs<string>(Value)
+    {
+        public static implicit operator AzureResourceGroupId(string id) => new(id);
+    }
 }

@@ -3,8 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 
-export type AzureSubscription = {
+export type AzureResources = {
     subscriptionId: string;
-    name: string;
-    tenantName: string;
+    resourceGroupId: string;
 };

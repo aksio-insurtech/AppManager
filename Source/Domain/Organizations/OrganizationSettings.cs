@@ -18,7 +18,7 @@ namespace Domain.Organizations
         }
 
         [HttpPost("subscriptions")]
-        public Task AddAzureSubscription([FromBody] AddAzureSubscription command) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(command.Id, command.Name));
+        public Task AddAzureSubscription([FromBody] AddAzureSubscription command) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(command.Id, command.Name, command.TenantName));
 
         [HttpPost("pulumi")]
         public Task SetPulumiAccessToken([FromBody] PulumiAccessToken accessToken) => _eventLog.Append(SettingsId.Global, new PulumiAccessTokenSet(accessToken));

@@ -6,5 +6,5 @@ using Concepts.Azure;
 namespace Events.Organizations
 {
     [EventType("a1283443-cf53-4ef9-b6d3-d30e882da887")]
-    public record AzureSubscriptionAdded(AzureSubscriptionId Id, AzureSubscriptionName Name);
+    public record AzureSubscriptionAdded(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantName TenantName);
 }

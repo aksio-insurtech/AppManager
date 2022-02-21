@@ -23,6 +23,7 @@ namespace Read.Organizations
                 .IdentifiedBy(s => s.SubscriptionId)
                 .From<AzureSubscriptionAdded>(f => f
                     .UsingKey(_ => _.Id)
-                    .Set(m => m.Name).To(e => e.Name)));
+                    .Set(m => m.Name).To(e => e.Name)
+                    .Set(m => m.TenantName).To(e => e.TenantName)));
     }
 }

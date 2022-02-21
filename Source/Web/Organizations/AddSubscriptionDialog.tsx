@@ -8,16 +8,19 @@ import React, { useState } from 'react';
 export interface AddSubscriptionDialogOutput {
     id: string;
     name: string;
+    tenantName: string;
 }
 
 export const AddSubscriptionDialog = (props: IModalProps<{}, AddSubscriptionDialogOutput>) => {
     const [name, setName] = useState('');
+    const [tenantName, setTenantName] = useState('');
     const [id, setId] = useState('');
 
     props.onClose(result => {
         return {
             id,
-            name
+            name,
+            tenantName
         };
     });
 
@@ -26,6 +29,7 @@ export const AddSubscriptionDialog = (props: IModalProps<{}, AddSubscriptionDial
             <Stack>
                 <TextField label='Id' required defaultValue={name} onChange={(e, n) => setId(n!)} />
                 <TextField label='Name' required defaultValue={name} onChange={(e, n) => setName(n!)} />
+                <TextField label='Tenant Name (Domain)' required defaultValue={name} onChange={(e, n) => setTenantName(n!)} />
             </Stack>
         </div>
     );
