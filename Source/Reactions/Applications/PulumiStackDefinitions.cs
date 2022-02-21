@@ -127,7 +127,10 @@ namespace Reactions.Applications
                 var projectIpAccessList = new ProjectIpAccessList("kernel", new()
                 {
                     ProjectId = project.Id,
-                    IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
+
+                    // Todo: Only accept IP addresses from the actual running Microservices or Vnet or something
+                    // IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
+                    IpAddress = "0.0.0.0"
                 });
 
                 var ipAddress = await container.IpAddress.GetValue(_ => _!.Ip!);
@@ -141,20 +144,46 @@ namespace Reactions.Applications
                 {
                     await _eventLog.Append(application.Id, new AzureResourceGroupCreatedForApplication(application.AzureSubscriptionId, resourceGroupId));
                 }
+                var storageAccountName = await storageAccount.Name.GetValue();
+                if (application.Resources?.AzureStorageAccountName != storageAccountName)
+                {
+                    await _eventLog.Append(application.Id, new AzureStorageAccountSetForApplication(storageAccountName));
+                }
             });
 
         public PulumiFn CreateDeployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
         public PulumiFn CreateMicroservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
-           PulumiFn.Create(() =>
+           PulumiFn.Create(async () =>
             {
                 // Todo: Set to actual tenant - and probably not here!
                 _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
 
                 var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
+                var getStorageAccountResult = GetStorageAccount.Invoke(new()
+                {
+                    AccountName = application.Resources.AzureStorageAccountName.Value,
+                    ResourceGroupName = resourceGroup.Name
+                });
+                var storageAccount = await getStorageAccountResult.GetValue();
+
+                var storageAccountKeysRequest = ListStorageAccountKeys.Invoke(new ListStorageAccountKeysInvokeArgs
+                {
+                    AccountName = storageAccount.Name,
+                    ResourceGroupName = resourceGroup.Name
+                });
+
+                var fileShare = new FileShare(microservice.Name.Value.ToLowerInvariant(), new()
+                {
+                    AccountName = storageAccount.Name,
+                    ResourceGroupName = resourceGroup.Name
+                });
+
+                var storage = new MicroserviceStorageShare(storageAccount.Name, storageAccountKeysRequest.Apply(_ => _.Keys[0].Value), fileShare.Name);
+
                 var container = MicroserviceWithDeployables(
                     resourceGroup.Name,
                     microservice,
-                    null!,
+                    storage,
                     new[]
                     {
                         new Deployable(Guid.Empty, "main", "nginx")
