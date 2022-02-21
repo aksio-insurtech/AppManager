@@ -40,7 +40,8 @@ export const ApplicationSettings = (props: IApplicationSettingsProps) => {
             <br />
 
             <h2>Azure</h2>
-            <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}`} >Resource Group</Link>
+            <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/overview`}>Resource Group</Link>
+            <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/providers/Microsoft.Storage/storageAccounts/${resources.data?.azure?.storageAccountName}/overview`}>Storage Account</Link>
             <br />
 
             <h2>MongoDB</h2>
