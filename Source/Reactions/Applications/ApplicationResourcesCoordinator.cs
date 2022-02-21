@@ -56,8 +56,7 @@ namespace Reactions.Applications
             var projectName = $"{application.Name}-{microservice.Name}";
             var definition = _stackDefinitions.CreateMicroservice(application, microservice, CloudRuntimeEnvironment.Development);
             _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
-
-            await Task.CompletedTask;
+            await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "microservice", @event.Name);
         }
     }
 }
