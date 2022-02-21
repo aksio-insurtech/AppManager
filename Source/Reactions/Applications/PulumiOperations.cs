@@ -28,31 +28,31 @@ namespace Reactions.Applications
         }
 
         /// <inheritdoc/>
-        public void Up(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment)
+        public void Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
-                var stack = await CreateStack(application, name, environment, definition);
+                var stack = await CreateStack(application, projectName, environment, definition);
                 await stack.UpAsync(new UpOptions { OnStandardOutput = Console.WriteLine });
             });
         }
 
         /// <inheritdoc/>
-        public void Down(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment)
+        public void Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
-                var stack = await CreateStack(application, name, environment, definition);
+                var stack = await CreateStack(application, projectName, environment, definition);
                 await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
             });
         }
 
         /// <inheritdoc/>
-        public void Remove(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment)
+        public void Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
         {
             _ = Task.Run(async () =>
             {
-                var stack = await CreateStack(application, name, environment, definition);
+                var stack = await CreateStack(application, projectName, environment, definition);
                 await stack.Workspace.RemoveStackAsync(environment.GetStackNameFor());
             });
         }
@@ -75,12 +75,12 @@ namespace Reactions.Applications
             await client.PostAsJsonAsync(url, payload);
         }
 
-        async Task<WorkspaceStack> CreateStack(Application application, string name, CloudRuntimeEnvironment environment, PulumiFn program)
+        async Task<WorkspaceStack> CreateStack(Application application, string projectName, CloudRuntimeEnvironment environment, PulumiFn program)
         {
             var stackName = environment.GetStackNameFor();
-            var args = new InlineProgramArgs(name, stackName, program)
+            var args = new InlineProgramArgs(projectName, stackName, program)
             {
-                ProjectSettings = new(name, ProjectRuntimeName.Dotnet)
+                ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet)
             };
             var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
             await RemovePendingOperations(stack);
@@ -99,8 +99,8 @@ namespace Reactions.Applications
             var accessToken = _settings.PulumiAccessToken;
             Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
 
-            await SetTag(name, stackName, "application", application.Name);
-            await SetTag(name, stackName, "environment", stackName);
+            await SetTag(projectName, stackName, "application", application.Name);
+            await SetTag(projectName, stackName, "environment", stackName);
 
             return stack;
         }

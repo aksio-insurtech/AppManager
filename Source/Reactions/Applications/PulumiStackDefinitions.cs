@@ -86,7 +86,7 @@ namespace Reactions.Applications
                     OrgId = mongoDBOrganizationId.Value
                 });
 
-                var cluster = new Cluster("dev", new ClusterArgs
+                var cluster = new Cluster(environment.GetStackNameFor(), new ClusterArgs
                 {
                     ProjectId = project.Id,
                     ProviderName = "TENANT",

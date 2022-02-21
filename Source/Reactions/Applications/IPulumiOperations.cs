@@ -15,28 +15,28 @@ namespace Reactions.Applications
         /// Up a stack.
         /// </summary>
         /// <param name="application">Application stack belongs to.</param>
-        /// <param name="name">Name of stack.</param>
+        /// <param name="projectName">Name of project.</param>
         /// <param name="definition">The configuration of a stack to up.</param>
         /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
-        void Up(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment);
+        void Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment);
 
         /// <summary>
         /// Down a stack.
         /// </summary>
         /// <param name="application">Application stack belongs to.</param>
-        /// <param name="name">Name of stack.</param>
+        /// <param name="projectName">Name of project.</param>
         /// <param name="definition">The configuration of a stack to down.</param>
         /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
-        void Down(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment);
+        void Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment);
 
         /// <summary>
         /// Completely remove a stack and its history.
         /// </summary>
         /// <param name="application">Application stack belongs to.</param>
-        /// <param name="name">Name of stack.</param>
+        /// <param name="projectName">Name of project.</param>
         /// <param name="definition">The configuration of a stack to down.</param>
         /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
-        void Remove(Application application, string name, PulumiFn definition, CloudRuntimeEnvironment environment);
+        void Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment);
 
         /// <summary>
         /// Set a tag for a stack in a project.
