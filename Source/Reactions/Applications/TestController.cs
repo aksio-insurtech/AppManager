@@ -9,14 +9,20 @@ namespace Reactions.Applications
     public class TestController : Controller
     {
         readonly IPulumiStackDefinitions _stackDefinitions;
-        readonly IPulumiOperations _runner;
+        readonly IPulumiOperations _pulumiOperations;
         readonly IPassiveProjectionRepositoryFor<Application> _application;
+        readonly IPassiveProjectionRepositoryFor<Microservice> _microservice;
 
-        public TestController(IPulumiStackDefinitions stackDefinitions, IPulumiOperations runner, IPassiveProjectionRepositoryFor<Application> application)
+        public TestController(
+            IPulumiStackDefinitions stackDefinitions,
+            IPulumiOperations runner,
+            IPassiveProjectionRepositoryFor<Application> application,
+            IPassiveProjectionRepositoryFor<Microservice> microservice)
         {
             _stackDefinitions = stackDefinitions;
-            _runner = runner;
+            _pulumiOperations = runner;
             _application = application;
+            _microservice = microservice;
         }
 
         [HttpGet]
@@ -24,7 +30,7 @@ namespace Reactions.Applications
         {
             var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
             var definition = _stackDefinitions.CreateApplication(application, CloudRuntimeEnvironment.Development);
-            _runner.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+            _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
         }
 
         [HttpGet("down")]
@@ -32,7 +38,17 @@ namespace Reactions.Applications
         {
             var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
             var definition = _stackDefinitions.CreateApplication(application, CloudRuntimeEnvironment.Development);
-            _runner.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+            _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        }
+
+        [HttpGet("microservice")]
+        public async Task MicroserviceUp()
+        {
+            var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
+            var microservice = await _microservice.GetById("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
+            var projectName = $"{application.Name}-{microservice.Name}";
+            var definition = _stackDefinitions.CreateMicroservice(application, microservice, CloudRuntimeEnvironment.Development);
+            _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
         }
     }
 }
