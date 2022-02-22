@@ -1,12 +1,11 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Concepts
+namespace Concepts;
+
+public enum CloudRuntimeEnvironment
 {
-    public enum CloudRuntimeEnvironment
-    {
-        None = 0,
-        Development = 1,
-        Production = 2
-    }
+    None = 0,
+    Development = 1,
+    Production = 2
 }

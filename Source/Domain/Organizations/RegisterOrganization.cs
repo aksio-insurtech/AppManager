@@ -3,7 +3,6 @@
 
 using Concepts.Organizations;
 
-namespace Domain.Organizations
-{
-    public record RegisterOrganization(OrganizationId Id, OrganizationName Name);
-}
+namespace Domain.Organizations;
+
+public record RegisterOrganization(OrganizationId Id, OrganizationName Name);

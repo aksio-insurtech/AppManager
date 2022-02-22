@@ -3,7 +3,6 @@
 
 using Concepts.ElasticSearch;
 
-namespace Domain.Organizations
-{
-    public record ElasticSearchSettings(ElasticUrl Url, ElasticApiKey ApiKey);
-}
+namespace Domain.Organizations;
+
+public record ElasticSearchSettings(ElasticUrl Url, ElasticApiKey ApiKey);

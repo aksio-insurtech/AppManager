@@ -4,8 +4,7 @@
 using Concepts;
 using Concepts.MongoDB;
 
-namespace Events.Applications
-{
-    [EventType("1ce9b7fb-f65b-456d-ac9e-c20c86e2b9d8")]
-    public record MongoDBConnectionStringChangedForApplication(CloudRuntimeEnvironment Environment, MongoDBConnectionString ConnectionString);
-}
+namespace Events.Applications;
+
+[EventType("1ce9b7fb-f65b-456d-ac9e-c20c86e2b9d8")]
+public record MongoDBConnectionStringChangedForApplication(CloudRuntimeEnvironment Environment, MongoDBConnectionString ConnectionString);

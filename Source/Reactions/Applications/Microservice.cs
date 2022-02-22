@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Reactions.Applications
-{
-    public record Microservice(MicroserviceId Id, ApplicationId ApplicationId, MicroserviceName Name);
-}
+namespace Reactions.Applications;
+
+public record Microservice(MicroserviceId Id, ApplicationId ApplicationId, MicroserviceName Name);

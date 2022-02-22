@@ -3,7 +3,6 @@
 
 using Concepts.MongoDB;
 
-namespace Domain.Organizations
-{
-    public record MongoDBSettings(MongoDBOrganizationId OrganizationId, MongoDBPublicKey PublicKey, MongoDBPrivateKey PrivateKey);
-}
+namespace Domain.Organizations;
+
+public record MongoDBSettings(MongoDBOrganizationId OrganizationId, MongoDBPublicKey PublicKey, MongoDBPrivateKey PrivateKey);

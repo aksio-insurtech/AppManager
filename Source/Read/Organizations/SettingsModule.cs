@@ -4,17 +4,16 @@
 using Autofac;
 using Common;
 
-namespace Read.Organizations
+namespace Read.Organizations;
+
+public class SettingsModule : Module
 {
-    public class SettingsModule : Module
+    protected override void Load(ContainerBuilder builder)
     {
-        protected override void Load(ContainerBuilder builder)
+        builder.Register(context =>
         {
-            builder.Register(context =>
-            {
-                var collection = context.Resolve<IMongoCollection<Settings>>();
-                return collection.Find(_ => true).FirstOrDefault() ?? Settings.NoSettings;
-            }).As<ISettings>();
-        }
+            var collection = context.Resolve<IMongoCollection<Settings>>();
+            return collection.Find(_ => true).FirstOrDefault() ?? Settings.NoSettings;
+        }).As<ISettings>();
     }
 }

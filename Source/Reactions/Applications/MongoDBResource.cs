@@ -3,7 +3,6 @@
 
 using Concepts.MongoDB;
 
-namespace Reactions.Applications
-{
-    public record MongoDBResource(MongoDBConnectionString ConnectionString);
-}
+namespace Reactions.Applications;
+
+public record MongoDBResource(MongoDBConnectionString ConnectionString);

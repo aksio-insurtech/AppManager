@@ -3,7 +3,6 @@
 
 using Concepts.MongoDB;
 
-namespace Read.Applications
-{
-    public record MongoDBResource(MongoDBConnectionString ConnectionString, IEnumerable<MongoDBUser> Users);
-}
+namespace Read.Applications;
+
+public record MongoDBResource(MongoDBConnectionString ConnectionString, IEnumerable<MongoDBUser> Users);

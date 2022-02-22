@@ -4,11 +4,10 @@
 using Concepts.Azure;
 using Concepts.Infrastructure;
 
-namespace Reactions.Applications
-{
-    public record ApplicationResources(
-        IpAddress IpAddress,
-        AzureStorageAccountName AzureStorageAccountName,
-        AzureResourceGroupId AzureResourceGroupId,
-        MongoDBResource MongoDB);
-}
+namespace Reactions.Applications;
+
+public record ApplicationResources(
+    IpAddress IpAddress,
+    AzureStorageAccountName AzureStorageAccountName,
+    AzureResourceGroupId AzureResourceGroupId,
+    MongoDBResource MongoDB);

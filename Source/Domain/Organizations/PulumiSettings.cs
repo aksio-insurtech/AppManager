@@ -3,7 +3,6 @@
 
 using Concepts.Pulumi;
 
-namespace Domain.Organizations
-{
-    public record PulumiSettings(PulumiOrganization Organization, PulumiAccessToken AccessToken);
-}
+namespace Domain.Organizations;
+
+public record PulumiSettings(PulumiOrganization Organization, PulumiAccessToken AccessToken);

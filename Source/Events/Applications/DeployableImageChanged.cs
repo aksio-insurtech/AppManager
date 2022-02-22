@@ -3,8 +3,7 @@
 
 using Concepts.Applications;
 
-namespace Events.Applications
-{
-    [EventType("e3e55a84-ada3-4147-b048-c178caf19dea")]
-    public record DeployableImageChanged(DeployableImageName ImageName);
-}
+namespace Events.Applications;
+
+[EventType("e3e55a84-ada3-4147-b048-c178caf19dea")]
+public record DeployableImageChanged(DeployableImageName ImageName);

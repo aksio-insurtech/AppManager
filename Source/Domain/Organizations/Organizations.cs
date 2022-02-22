@@ -3,16 +3,15 @@
 
 using Events.Organizations;
 
-namespace Domain.Organizations
+namespace Domain.Organizations;
+
+[Route("/api/organizations")]
+public class Organizations : Controller
 {
-    [Route("/api/organizations")]
-    public class Organizations : Controller
-    {
-        readonly IEventLog _eventLog;
+    readonly IEventLog _eventLog;
 
-        public Organizations(IEventLog eventLog) => _eventLog = eventLog;
+    public Organizations(IEventLog eventLog) => _eventLog = eventLog;
 
-        [HttpPost]
-        public Task Register([FromBody] RegisterOrganization command) => _eventLog.Append(command.Id.ToString(), new OrganizationRegistered(command.Name));
-    }
+    [HttpPost]
+    public Task Register([FromBody] RegisterOrganization command) => _eventLog.Append(command.Id.ToString(), new OrganizationRegistered(command.Name));
 }

@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Reactions.Applications
-{
-    public record Deployable(DeployableId Id, MicroserviceId MicroserviceId, DeployableName Name, string Image);
-}
+namespace Reactions.Applications;
+
+public record Deployable(DeployableId Id, MicroserviceId MicroserviceId, DeployableName Name, string Image);

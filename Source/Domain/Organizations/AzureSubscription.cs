@@ -3,7 +3,6 @@
 
 using Concepts.Azure;
 
-namespace Domain.Organizations
-{
-    public record AzureSubscription(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantName TenantName);
-}
+namespace Domain.Organizations;
+
+public record AzureSubscription(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantName TenantName);

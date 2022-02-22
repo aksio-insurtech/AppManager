@@ -3,7 +3,6 @@
 
 using Concepts.Azure;
 
-namespace Read.Applications
-{
-    public record AzureResources(AzureSubscriptionId SubscriptionId, AzureResourceGroupId ResourceGroupId, AzureStorageAccountName StorageAccountName);
-}
+namespace Read.Applications;
+
+public record AzureResources(AzureSubscriptionId SubscriptionId, AzureResourceGroupId ResourceGroupId, AzureStorageAccountName StorageAccountName);

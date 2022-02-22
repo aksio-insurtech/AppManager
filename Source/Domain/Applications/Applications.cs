@@ -3,19 +3,18 @@
 
 using Events.Applications;
 
-namespace Domain.Applications
+namespace Domain.Applications;
+
+[Route("/api/applications")]
+public class Applications : Controller
 {
-    [Route("/api/applications")]
-    public class Applications : Controller
-    {
-        readonly IEventLog _eventLog;
+    readonly IEventLog _eventLog;
 
-        public Applications(IEventLog eventLog) => _eventLog = eventLog;
+    public Applications(IEventLog eventLog) => _eventLog = eventLog;
 
-        [HttpPost]
-        public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
+    [HttpPost]
+    public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
 
-        [HttpPost("{applicationId}/remove")]
-        public Task Remove([FromRoute] ApplicationId applicationId) => _eventLog.Append(applicationId.ToString(), new ApplicationRemoved());
-    }
+    [HttpPost("{applicationId}/remove")]
+    public Task Remove([FromRoute] ApplicationId applicationId) => _eventLog.Append(applicationId.ToString(), new ApplicationRemoved());
 }

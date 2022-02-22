@@ -3,19 +3,18 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications.Microservices
+namespace Read.Applications.Microservices;
+
+[Route("/api/applications/{applicationId}/microservices")]
+public class Microservices : Controller
 {
-    [Route("/api/applications/{applicationId}/microservices")]
-    public class Microservices : Controller
+    readonly IMongoCollection<Microservice> _microserviceCollection;
+
+    public Microservices(IMongoCollection<Microservice> microserviceCollection)
     {
-        readonly IMongoCollection<Microservice> _microserviceCollection;
-
-        public Microservices(IMongoCollection<Microservice> microserviceCollection)
-        {
-            _microserviceCollection = microserviceCollection;
-        }
-
-        [HttpGet("{microserviceId}")]
-        public Task<Microservice> GetMicroservice([FromRoute] MicroserviceId microserviceId) => _microserviceCollection.FindById(microserviceId).FirstOrDefaultAsync();
+        _microserviceCollection = microserviceCollection;
     }
+
+    [HttpGet("{microserviceId}")]
+    public Task<Microservice> GetMicroservice([FromRoute] MicroserviceId microserviceId) => _microserviceCollection.FindById(microserviceId).FirstOrDefaultAsync();
 }

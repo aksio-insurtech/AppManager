@@ -4,12 +4,11 @@
 using Concepts;
 using Pulumi.Automation;
 
-namespace Reactions.Applications
+namespace Reactions.Applications;
+
+public interface IPulumiStackDefinitions
 {
-    public interface IPulumiStackDefinitions
-    {
-        PulumiFn Application(Application application, CloudRuntimeEnvironment environment);
-        PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment);
-        PulumiFn Deployable(Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment);
-    }
+    PulumiFn Application(Application application, CloudRuntimeEnvironment environment);
+    PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment);
+    PulumiFn Deployable(Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment);
 }

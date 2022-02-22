@@ -4,7 +4,6 @@
 using Concepts.Applications;
 using Concepts.ElasticSearch;
 
-namespace Reactions.Applications
-{
-    public record AppSettingsValues(ApplicationName ApplicationName, MicroserviceName MicroserviceName, ElasticUrl ElasticUrl, ElasticApiKey ElasticApiKey);
-}
+namespace Reactions.Applications;
+
+public record AppSettingsValues(ApplicationName ApplicationName, MicroserviceName MicroserviceName, ElasticUrl ElasticUrl, ElasticApiKey ElasticApiKey);

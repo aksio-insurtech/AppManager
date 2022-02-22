@@ -3,22 +3,21 @@
 
 using Pulumi;
 
-namespace Reactions.Applications
-{
-    public static class OutputExtensionMethods
-    {
-        public static Task<T> GetValue<T>(this Output<T> output) => output.GetValue(_ => _);
+namespace Reactions.Applications;
 
-        public static Task<TResult> GetValue<T, TResult>(this Output<T> output, Func<T, TResult> valueResolver)
+public static class OutputExtensionMethods
+{
+    public static Task<T> GetValue<T>(this Output<T> output) => output.GetValue(_ => _);
+
+    public static Task<TResult> GetValue<T, TResult>(this Output<T> output, Func<T, TResult> valueResolver)
+    {
+        var tcs = new TaskCompletionSource<TResult>();
+        output.Apply(_ =>
         {
-            var tcs = new TaskCompletionSource<TResult>();
-            output.Apply(_ =>
-            {
-                var result = valueResolver(_);
-                tcs.SetResult(result);
-                return result;
-            });
-            return tcs.Task;
-        }
+            var result = valueResolver(_);
+            tcs.SetResult(result);
+            return result;
+        });
+        return tcs.Task;
     }
 }

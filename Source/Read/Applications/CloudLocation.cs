@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications
-{
-    public record CloudLocation(CloudLocationKey Key, CloudLocationDisplayName DisplayName);
-}
+namespace Read.Applications;
+
+public record CloudLocation(CloudLocationKey Key, CloudLocationDisplayName DisplayName);

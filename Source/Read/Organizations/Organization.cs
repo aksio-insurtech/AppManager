@@ -3,7 +3,6 @@
 
 using Concepts.Organizations;
 
-namespace Read.Organizations
-{
-    public record Organization(OrganizationId Id, OrganizationName Name);
-}
+namespace Read.Organizations;
+
+public record Organization(OrganizationId Id, OrganizationName Name);

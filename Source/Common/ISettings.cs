@@ -6,17 +6,16 @@ using Concepts.ElasticSearch;
 using Concepts.MongoDB;
 using Concepts.Pulumi;
 
-namespace Common
+namespace Common;
+
+public interface ISettings
 {
-    public interface ISettings
-    {
-        IEnumerable<AzureSubscription> AzureSubscriptions { get; }
-        PulumiOrganization PulumiOrganization { get; }
-        PulumiAccessToken PulumiAccessToken { get; }
-        MongoDBOrganizationId MongoDBOrganizationId { get; }
-        MongoDBPublicKey MongoDBPublicKey { get; }
-        MongoDBPrivateKey MongoDBPrivateKey { get; }
-        ElasticUrl ElasticUrl { get; }
-        ElasticApiKey ElasticApiKey { get; }
-    }
+    IEnumerable<AzureSubscription> AzureSubscriptions { get; }
+    PulumiOrganization PulumiOrganization { get; }
+    PulumiAccessToken PulumiAccessToken { get; }
+    MongoDBOrganizationId MongoDBOrganizationId { get; }
+    MongoDBPublicKey MongoDBPublicKey { get; }
+    MongoDBPrivateKey MongoDBPrivateKey { get; }
+    ElasticUrl ElasticUrl { get; }
+    ElasticApiKey ElasticApiKey { get; }
 }

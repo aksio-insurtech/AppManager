@@ -7,26 +7,25 @@ using Concepts.ElasticSearch;
 using Concepts.MongoDB;
 using Concepts.Pulumi;
 
-namespace Read.Organizations
+namespace Read.Organizations;
+
+public record Settings(
+    IEnumerable<AzureSubscription> AzureSubscriptions,
+    PulumiOrganization PulumiOrganization,
+    PulumiAccessToken PulumiAccessToken,
+    MongoDBOrganizationId MongoDBOrganizationId,
+    MongoDBPublicKey MongoDBPublicKey,
+    MongoDBPrivateKey MongoDBPrivateKey,
+    ElasticUrl ElasticUrl,
+    ElasticApiKey ElasticApiKey) : ISettings
 {
-    public record Settings(
-        IEnumerable<AzureSubscription> AzureSubscriptions,
-        PulumiOrganization PulumiOrganization,
-        PulumiAccessToken PulumiAccessToken,
-        MongoDBOrganizationId MongoDBOrganizationId,
-        MongoDBPublicKey MongoDBPublicKey,
-        MongoDBPrivateKey MongoDBPrivateKey,
-        ElasticUrl ElasticUrl,
-        ElasticApiKey ElasticApiKey) : ISettings
-    {
-        public static readonly Settings NoSettings = new(
-            Array.Empty<AzureSubscription>(),
-            string.Empty,
-            string.Empty,
-            string.Empty,
-            string.Empty,
-            string.Empty,
-            string.Empty,
-            string.Empty);
-    }
+    public static readonly Settings NoSettings = new(
+        Array.Empty<AzureSubscription>(),
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty);
 }

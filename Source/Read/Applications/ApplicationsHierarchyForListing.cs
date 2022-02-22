@@ -3,10 +3,9 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications
-{
-    public record ApplicationsHierarchyForListing(
-        ApplicationId Id,
-        ApplicationName Name,
-        IEnumerable<MicroserviceOnApplication> Microservices);
-}
+namespace Read.Applications;
+
+public record ApplicationsHierarchyForListing(
+    ApplicationId Id,
+    ApplicationName Name,
+    IEnumerable<MicroserviceOnApplication> Microservices);

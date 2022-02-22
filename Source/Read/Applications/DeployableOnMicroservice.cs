@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications
-{
-    public record DeployableOnMicroservice(DeployableId DeployableId, DeployableName Name);
-}
+namespace Read.Applications;
+
+public record DeployableOnMicroservice(DeployableId DeployableId, DeployableName Name);

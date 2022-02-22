@@ -4,19 +4,18 @@
 using Concepts.Applications;
 using Events.Applications;
 
-namespace Domain.Applications
+namespace Domain.Applications;
+
+[Route("/api/applications/{applicationId}/microservices")]
+public class Microservices : Controller
 {
-    [Route("/api/applications/{applicationId}/microservices")]
-    public class Microservices : Controller
-    {
-        readonly IEventLog _eventLog;
+    readonly IEventLog _eventLog;
 
-        public Microservices(IEventLog eventLog) => _eventLog = eventLog;
+    public Microservices(IEventLog eventLog) => _eventLog = eventLog;
 
-        [HttpPost]
-        public Task Create([FromRoute] ApplicationId applicationId, [FromBody] CreateMicroservice command) => _eventLog.Append(command.MicroserviceId.ToString(), new MicroserviceCreated(applicationId, command.Name));
+    [HttpPost]
+    public Task Create([FromRoute] ApplicationId applicationId, [FromBody] CreateMicroservice command) => _eventLog.Append(command.MicroserviceId.ToString(), new MicroserviceCreated(applicationId, command.Name));
 
-        [HttpPost("{microserviceId}/remove")]
-        public Task Remove([FromRoute] MicroserviceId microserviceId) => _eventLog.Append(microserviceId.ToString(), new MicroserviceRemoved());
-    }
+    [HttpPost("{microserviceId}/remove")]
+    public Task Remove([FromRoute] MicroserviceId microserviceId) => _eventLog.Append(microserviceId.ToString(), new MicroserviceRemoved());
 }

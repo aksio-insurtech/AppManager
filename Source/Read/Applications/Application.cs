@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications
-{
-    public record Application(ApplicationId Id, ApplicationName Name, CloudLocationKey CloudLocation);
-}
+namespace Read.Applications;
+
+public record Application(ApplicationId Id, ApplicationName Name, CloudLocationKey CloudLocation);

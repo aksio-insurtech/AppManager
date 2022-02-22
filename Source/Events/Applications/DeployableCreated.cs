@@ -3,8 +3,7 @@
 
 using Concepts.Applications;
 
-namespace Events.Applications
-{
-    [EventType("12e6d722-1e91-4802-86db-00ff3d61d798")]
-    public record DeployableCreated(MicroserviceId MicroserviceId, DeployableName Name);
-}
+namespace Events.Applications;
+
+[EventType("12e6d722-1e91-4802-86db-00ff3d61d798")]
+public record DeployableCreated(MicroserviceId MicroserviceId, DeployableName Name);

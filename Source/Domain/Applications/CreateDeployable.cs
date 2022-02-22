@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications
-{
-    public record CreateDeployable(DeployableId DeployableId, DeployableName Name);
-}
+namespace Domain.Applications;
+
+public record CreateDeployable(DeployableId DeployableId, DeployableName Name);

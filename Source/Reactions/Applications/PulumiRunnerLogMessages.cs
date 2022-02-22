@@ -3,14 +3,13 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Reactions.Applications
-{
-    public static partial class PulumiRunnerLogMessages
-    {
-        [LoggerMessage(0, LogLevel.Information, "Exporting stack to look for pending operations")]
-        public static partial void ExportStack(this ILogger logger);
+namespace Reactions.Applications;
 
-        [LoggerMessage(1, LogLevel.Information, "Importing stack after removing any pending operations")]
-        public static partial void ImportStack(this ILogger logger);
-    }
+public static partial class PulumiRunnerLogMessages
+{
+    [LoggerMessage(0, LogLevel.Information, "Exporting stack to look for pending operations")]
+    public static partial void ExportStack(this ILogger logger);
+
+    [LoggerMessage(1, LogLevel.Information, "Importing stack after removing any pending operations")]
+    public static partial void ImportStack(this ILogger logger);
 }

@@ -3,8 +3,7 @@
 
 using Concepts.Organizations;
 
-namespace Events.Organizations
-{
-    [EventType("36d9ca76-c0b2-4461-bed9-4fe1d89c7bec")]
-    public record OrganizationRegistered(OrganizationName Name);
-}
+namespace Events.Organizations;
+
+[EventType("36d9ca76-c0b2-4461-bed9-4fe1d89c7bec")]
+public record OrganizationRegistered(OrganizationName Name);
