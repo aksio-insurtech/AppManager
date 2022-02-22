@@ -5,6 +5,7 @@ using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
 using Events.Applications;
+using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.ContainerInstance;
@@ -23,12 +24,18 @@ namespace Reactions.Applications
         readonly ISettings _settings;
         readonly IExecutionContextManager _executionContextManager;
         readonly IEventLog _eventLog;
+        readonly ILogger<MicroserviceStorage> _microserviceStorageLogger;
 
-        public PulumiStackDefinitions(ISettings applicationSettings, IExecutionContextManager executionContextManager, IEventLog eventLog)
+        public PulumiStackDefinitions(
+            ISettings applicationSettings,
+            IExecutionContextManager executionContextManager,
+            IEventLog eventLog,
+            ILogger<MicroserviceStorage> microserviceStorageLogger)
         {
             _settings = applicationSettings;
             _executionContextManager = executionContextManager;
             _eventLog = eventLog;
+            _microserviceStorageLogger = microserviceStorageLogger;
         }
 
         public PulumiFn Application(Application application, CloudRuntimeEnvironment environment) =>
@@ -112,12 +119,17 @@ namespace Reactions.Applications
                     }
                 });
 
-                var storage = new MicroserviceStorageShare(storageAccount.Name, storageAccountKeysRequest.Apply(_ => _.Keys[0].Value), fileShare.Name);
+                var fileShareName = await fileShare.Name.GetValue();
+                var storageAccountName = await storageAccount.Name.GetValue();
+                var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
+
+                var microservice = new Microservice(Guid.Empty, application.Id, "kernel");
+                var storage = new MicroserviceStorage(application, microservice, storageAccountName, storageAccountKey, fileShareName, _microserviceStorageLogger);
                 await HandleKernelConfiguration(application, environment, resourceGroup.Name, cluster, kernelDatabaseUserPassword, storage);
 
                 var container = MicroserviceWithDeployables(
                     resourceGroup.Name,
-                    new(Guid.Empty, application.Id, "kernel"),
+                    microservice,
                     storage,
                     new[]
                     {
@@ -144,7 +156,7 @@ namespace Reactions.Applications
                 {
                     await _eventLog.Append(application.Id, new AzureResourceGroupCreatedForApplication(application.AzureSubscriptionId, resourceGroupId));
                 }
-                var storageAccountName = await storageAccount.Name.GetValue();
+
                 if (application.Resources?.AzureStorageAccountName != storageAccountName)
                 {
                     await _eventLog.Append(application.Id, new AzureStorageAccountSetForApplication(storageAccountName));
@@ -178,7 +190,11 @@ namespace Reactions.Applications
                     ResourceGroupName = resourceGroup.Name
                 });
 
-                var storage = new MicroserviceStorageShare(storageAccount.Name, storageAccountKeysRequest.Apply(_ => _.Keys[0].Value), fileShare.Name);
+                var fileShareName = await fileShare.Name.GetValue();
+                var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
+
+                var storage = new MicroserviceStorage(application, microservice, storageAccount.Name, storageAccountKey, fileShareName, _microserviceStorageLogger);
+                storage.CreateAndUploadAppSettings(application, _settings);
 
                 var container = MicroserviceWithDeployables(
                     resourceGroup.Name,
@@ -190,7 +206,7 @@ namespace Reactions.Applications
                     });
             });
 
-        ContainerGroup MicroserviceWithDeployables(Input<string> resourceGroupName, Microservice microservice, MicroserviceStorageShare storage, IEnumerable<Deployable> deployables)
+        ContainerGroup MicroserviceWithDeployables(Input<string> resourceGroupName, Microservice microservice, MicroserviceStorage storage, IEnumerable<Deployable> deployables)
         {
             return new ContainerGroup(microservice.Name, new()
             {
@@ -205,7 +221,7 @@ namespace Reactions.Applications
                                 {
                                     ReadOnly = true,
                                     StorageAccountName = storage.AccountName,
-                                    StorageAccountKey = storage.AccountKey,
+                                    StorageAccountKey = storage.AccessKey,
                                     ShareName = storage.ShareName
                                 }
                             }
@@ -248,15 +264,8 @@ namespace Reactions.Applications
             });
         }
 
-        async Task HandleKernelConfiguration(Application application, CloudRuntimeEnvironment environment, Input<string> resourceGroupName, Cluster cluster, string databasePassword, MicroserviceStorageShare storage)
+        async Task HandleKernelConfiguration(Application application, CloudRuntimeEnvironment environment, Input<string> resourceGroupName, Cluster cluster, string databasePassword, MicroserviceStorage storage)
         {
-            var getFileShareResult = GetFileShare.Invoke(new()
-            {
-                AccountName = storage.AccountName,
-                ResourceGroupName = resourceGroupName,
-                ShareName = storage.ShareName
-            });
-
             var getClusterResult = GetCluster.Invoke(new()
             {
                 Name = cluster.Name,
@@ -269,7 +278,6 @@ namespace Reactions.Applications
                 ResourceGroupName = resourceGroupName
             });
 
-            var fileShareResult = await getFileShareResult.GetValue(_ => _);
             var clusterInfo = await getClusterResult.GetValue(_ => _);
 
             var connectionString = clusterInfo.ConnectionStrings[0].StandardSrv;
@@ -284,11 +292,8 @@ namespace Reactions.Applications
             await _eventLog.Append(application.Id, new MongoDBUserChanged("kernel", databasePassword));
 
             var account = await getStorageAccountResult.GetValue();
-
-            var key = await storage.AccountKey.GetValue();
-            var kernelStorage = new KernelStorage(account.Name, key);
-            kernelStorage.CreateAndUploadStorageJson(mongoDBConnectionString);
-            kernelStorage.CreateAndUploadAppSettings(application, _settings);
+            storage.CreateAndUploadStorageJson(mongoDBConnectionString);
+            storage.CreateAndUploadAppSettings(application, _settings);
         }
 
         (ResourceGroup ResourceGroup, string ResourceGroupId) ApplyResourceGroup(Application application)

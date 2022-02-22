@@ -6,20 +6,40 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Azure.Storage.Files.Shares;
 using Common;
+using Microsoft.Extensions.Logging;
 using Pulumi;
 using Reactions.Applications.Templates;
 
 namespace Reactions.Applications
 {
-    public class KernelStorage
+    public class MicroserviceStorage
     {
         readonly ShareDirectoryClient _directoryClient;
+        readonly Application _application;
+        readonly Microservice _microservice;
+        readonly ILogger<MicroserviceStorage> _logger;
 
-        public KernelStorage(string accountName, string accessKey)
+        public string AccountName { get; }
+        public string AccessKey { get; }
+        public string ShareName { get; }
+
+        public MicroserviceStorage(
+            Application application,
+            Microservice microservice,
+            string accountName,
+            string accessKey,
+            string shareName,
+            ILogger<MicroserviceStorage> logger)
         {
             var connectionString = $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accessKey};EndpointSuffix=core.windows.net";
-            var share = new ShareClient(connectionString, "kernel");
-            _directoryClient = share.GetDirectoryClient("./");
+            var shareClient = new ShareClient(connectionString, shareName);
+            _directoryClient = shareClient.GetDirectoryClient("./");
+            _application = application;
+            _microservice = microservice;
+            AccountName = accountName;
+            AccessKey = accessKey;
+            ShareName = shareName;
+            _logger = logger;
         }
 
         public void Upload(string fileName, string content)
@@ -29,6 +49,8 @@ namespace Reactions.Applications
                 Log.Warn($"File '{fileName}' does not have any content - ignoring upload to kernel storage");
                 return;
             }
+
+            _logger.Uploading(_application.Name, _microservice.Name, fileName, ShareName);
 
             Log.Info($"Upload file '{fileName}'");
 
