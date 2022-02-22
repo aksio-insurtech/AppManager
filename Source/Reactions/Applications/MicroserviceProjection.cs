@@ -11,6 +11,7 @@ namespace Reactions.Applications
 
         public void Define(IProjectionBuilderFor<Microservice> builder) => builder
             .From<MicroserviceCreated>(_ => _
-                  .Set(m => m.Name).To(e => e.Name));
+                .Set(m => m.ApplicationId).To(e => e.ApplicationId)
+                .Set(m => m.Name).To(e => e.Name));
     }
 }

@@ -5,5 +5,5 @@ using Concepts.Applications;
 
 namespace Reactions.Applications
 {
-    public record Microservice(MicroserviceId Id, MicroserviceName Name);
+    public record Microservice(MicroserviceId Id, ApplicationId ApplicationId, MicroserviceName Name);
 }

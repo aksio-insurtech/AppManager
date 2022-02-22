@@ -31,7 +31,7 @@ namespace Reactions.Applications
             _eventLog = eventLog;
         }
 
-        public PulumiFn CreateApplication(Application application, CloudRuntimeEnvironment environment) =>
+        public PulumiFn Application(Application application, CloudRuntimeEnvironment environment) =>
 
             // Notes:
             // - Organization settings: Atlas OrgId
@@ -117,7 +117,7 @@ namespace Reactions.Applications
 
                 var container = MicroserviceWithDeployables(
                     resourceGroup.Name,
-                    new(Guid.Empty, "kernel"),
+                    new(Guid.Empty, application.Id, "kernel"),
                     storage,
                     new[]
                     {
@@ -151,8 +151,8 @@ namespace Reactions.Applications
                 }
             });
 
-        public PulumiFn CreateDeployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
-        public PulumiFn CreateMicroservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
+        public PulumiFn Deployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
+        public PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
            PulumiFn.Create(async () =>
             {
                 // Todo: Set to actual tenant - and probably not here!

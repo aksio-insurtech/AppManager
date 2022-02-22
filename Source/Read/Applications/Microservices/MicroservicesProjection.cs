@@ -11,6 +11,7 @@ namespace Read.Applications.Microservices
 
         public void Define(IProjectionBuilderFor<Microservice> builder) => builder
             .From<MicroserviceCreated>(_ => _
-                .Set(m => m.Name).To(e => e.Name));
+                .Set(m => m.Name).To(e => e.Name))
+            .RemovedWith<MicroserviceRemoved>();
     }
 }

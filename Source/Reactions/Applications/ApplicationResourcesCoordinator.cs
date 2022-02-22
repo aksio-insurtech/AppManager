@@ -32,9 +32,9 @@ namespace Reactions.Applications
 
         public async Task ApplicationCreated(ApplicationCreated @event, EventContext context)
         {
-            _logger.ApplicationCreated(@event.Name);
+            _logger.CreatingApplication(@event.Name);
             var application = await _application.GetById(context.EventSourceId);
-            var definition = _stackDefinitions.CreateApplication(application, CloudRuntimeEnvironment.Development);
+            var definition = _stackDefinitions.Application(application, CloudRuntimeEnvironment.Development);
             _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
             await Task.CompletedTask;
         }
@@ -42,21 +42,33 @@ namespace Reactions.Applications
         public async Task Removed(ApplicationRemoved @event, EventContext context)
         {
             var application = await _application.GetById(context.EventSourceId);
-            _logger.ApplicationRemoved(application.Name);
-            var definition = _stackDefinitions.CreateApplication(application, CloudRuntimeEnvironment.Development);
+            _logger.RemovingApplication(application.Name);
+            var definition = _stackDefinitions.Application(application, CloudRuntimeEnvironment.Development);
             _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
             await Task.CompletedTask;
         }
 
         public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
         {
-            _logger.MicroserviceCreated(@event.Name);
+            _logger.CreatingMicroservice(@event.Name);
             var application = await _application.GetById(@event.ApplicationId);
             var microservice = await _microservice.GetById(@context.EventSourceId);
-            var projectName = $"{application.Name}-{microservice.Name}";
-            var definition = _stackDefinitions.CreateMicroservice(application, microservice, CloudRuntimeEnvironment.Development);
+            var projectName = GetProjectNameFor(application, microservice);
+            var definition = _stackDefinitions.Microservice(application, microservice, CloudRuntimeEnvironment.Development);
             _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
             await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "microservice", @event.Name);
         }
+
+        public async Task MicroserviceRemoved(MicroserviceRemoved @event, EventContext context)
+        {
+            var microservice = await _microservice.GetById(@context.EventSourceId);
+            _logger.RemovingMicroservice(microservice.Name);
+            var application = await _application.GetById(microservice.ApplicationId);
+            var projectName = GetProjectNameFor(application, microservice);
+            var definition = _stackDefinitions.Microservice(application, microservice, CloudRuntimeEnvironment.Development);
+            _pulumiOperations.Down(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        }
+
+        string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";
     }
 }
