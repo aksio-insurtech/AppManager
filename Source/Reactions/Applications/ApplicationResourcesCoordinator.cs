@@ -13,6 +13,7 @@ namespace Reactions.Applications
         readonly ILogger<ApplicationResources> _logger;
         readonly IPassiveProjectionRepositoryFor<Application> _application;
         readonly IPassiveProjectionRepositoryFor<Microservice> _microservice;
+        readonly IPassiveProjectionRepositoryFor<Deployable> _deployable;
         readonly IPulumiStackDefinitions _stackDefinitions;
         readonly IPulumiOperations _pulumiOperations;
 
@@ -20,12 +21,14 @@ namespace Reactions.Applications
             ILogger<ApplicationResources> logger,
             IPassiveProjectionRepositoryFor<Application> application,
             IPassiveProjectionRepositoryFor<Microservice> microservice,
+            IPassiveProjectionRepositoryFor<Deployable> deployable,
             IPulumiStackDefinitions stackDefinitions,
             IPulumiOperations pulumiOperations)
         {
             _logger = logger;
             _application = application;
             _microservice = microservice;
+            _deployable = deployable;
             _stackDefinitions = stackDefinitions;
             _pulumiOperations = pulumiOperations;
         }
@@ -59,14 +62,15 @@ namespace Reactions.Applications
             await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "microservice", @event.Name);
         }
 
-        public async Task MicroserviceRemoved(MicroserviceRemoved @event, EventContext context)
+        public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
         {
-            var microservice = await _microservice.GetById(@context.EventSourceId);
-            _logger.RemovingMicroservice(microservice.Name);
+            var deployable = await _deployable.GetById(@context.EventSourceId);
+            var microservice = await _microservice.GetById(deployable.MicroserviceId);
             var application = await _application.GetById(microservice.ApplicationId);
+            _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
             var projectName = GetProjectNameFor(application, microservice);
-            var definition = _stackDefinitions.Microservice(application, microservice, CloudRuntimeEnvironment.Development);
-            _pulumiOperations.Down(application, projectName, definition, CloudRuntimeEnvironment.Development);
+            var definition = _stackDefinitions.Deployable(application, microservice, deployable, CloudRuntimeEnvironment.Development);
+            _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
         }
 
         string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";

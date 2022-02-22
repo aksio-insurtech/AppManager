@@ -10,6 +10,6 @@ namespace Reactions.Applications
     {
         PulumiFn Application(Application application, CloudRuntimeEnvironment environment);
         PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment);
-        PulumiFn Deployable(CloudRuntimeEnvironment environment);
+        PulumiFn Deployable(Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment);
     }
 }

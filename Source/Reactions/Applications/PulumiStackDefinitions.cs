@@ -133,7 +133,7 @@ namespace Reactions.Applications
                     storage,
                     new[]
                     {
-                        new Deployable(Guid.Empty, "kernel", "aksioinsurtech/cratis:5.8.11")
+                        new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.8.11")
                     });
 
                 var projectIpAccessList = new ProjectIpAccessList("kernel", new()
@@ -163,37 +163,14 @@ namespace Reactions.Applications
                 }
             });
 
-        public PulumiFn Deployable(CloudRuntimeEnvironment environment) => throw new NotImplementedException();
         public PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
-           PulumiFn.Create(async () =>
+            PulumiFn.Create(async () =>
             {
                 // Todo: Set to actual tenant - and probably not here!
                 _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
 
                 var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
-                var getStorageAccountResult = GetStorageAccount.Invoke(new()
-                {
-                    AccountName = application.Resources.AzureStorageAccountName.Value,
-                    ResourceGroupName = resourceGroup.Name
-                });
-                var storageAccount = await getStorageAccountResult.GetValue();
-
-                var storageAccountKeysRequest = ListStorageAccountKeys.Invoke(new ListStorageAccountKeysInvokeArgs
-                {
-                    AccountName = storageAccount.Name,
-                    ResourceGroupName = resourceGroup.Name
-                });
-
-                var fileShare = new FileShare(microservice.Name.Value.ToLowerInvariant(), new()
-                {
-                    AccountName = storageAccount.Name,
-                    ResourceGroupName = resourceGroup.Name
-                });
-
-                var fileShareName = await fileShare.Name.GetValue();
-                var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
-
-                var storage = new MicroserviceStorage(application, microservice, storageAccount.Name, storageAccountKey, fileShareName, _microserviceStorageLogger);
+                var storage = await GetMicroserviceStorageFor(application, microservice, resourceGroup);
                 storage.CreateAndUploadAppSettings(_settings);
 
                 var container = MicroserviceWithDeployables(
@@ -202,9 +179,55 @@ namespace Reactions.Applications
                     storage,
                     new[]
                     {
-                        new Deployable(Guid.Empty, "main", "nginx")
+                        new Deployable(Guid.Empty, microservice.Id, "main", "nginx")
                     });
             });
+
+        public PulumiFn Deployable(Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment) =>
+            PulumiFn.Create(async () =>
+            {
+                // Todo: Set to actual tenant - and probably not here!
+                _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+
+                var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
+                var storage = await GetMicroserviceStorageFor(application, microservice, resourceGroup);
+
+                var container = MicroserviceWithDeployables(
+                    resourceGroup.Name,
+                    microservice,
+                    storage,
+                    new[]
+                    {
+                        deployable
+                    });
+            });
+
+        async Task<MicroserviceStorage> GetMicroserviceStorageFor(Application application, Microservice microservice, ResourceGroup resourceGroup)
+        {
+            var getStorageAccountResult = GetStorageAccount.Invoke(new()
+            {
+                AccountName = application.Resources.AzureStorageAccountName.Value,
+                ResourceGroupName = resourceGroup.Name
+            });
+            var storageAccount = await getStorageAccountResult.GetValue();
+
+            var storageAccountKeysRequest = ListStorageAccountKeys.Invoke(new ListStorageAccountKeysInvokeArgs
+            {
+                AccountName = storageAccount.Name,
+                ResourceGroupName = resourceGroup.Name
+            });
+
+            var fileShare = new FileShare(microservice.Name.Value.ToLowerInvariant(), new()
+            {
+                AccountName = storageAccount.Name,
+                ResourceGroupName = resourceGroup.Name
+            });
+
+            var fileShareName = await fileShare.Name.GetValue();
+            var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
+
+            return new MicroserviceStorage(application, microservice, storageAccount.Name, storageAccountKey, fileShareName, _microserviceStorageLogger);
+        }
 
         ContainerGroup MicroserviceWithDeployables(Input<string> resourceGroupName, Microservice microservice, MicroserviceStorage storage, IEnumerable<Deployable> deployables)
         {

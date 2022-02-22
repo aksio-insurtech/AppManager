@@ -50,5 +50,16 @@ namespace Reactions.Applications
             var definition = _stackDefinitions.Microservice(application, microservice, CloudRuntimeEnvironment.Development);
             _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
         }
+
+        [HttpGet("deployable")]
+        public async Task DeployableUp()
+        {
+            var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
+            var microservice = await _microservice.GetById("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
+            var projectName = $"{application.Name}-{microservice.Name}";
+            var deployable = new Deployable(Guid.Parse("684196c5-a785-42cd-b737-9fbf2fe326b6"), new(Guid.Parse("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44")), "main", "nginx");
+            var definition = _stackDefinitions.Deployable(application, microservice, deployable, CloudRuntimeEnvironment.Development);
+            _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        }
     }
 }

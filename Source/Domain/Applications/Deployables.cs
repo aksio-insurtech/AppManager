@@ -15,5 +15,8 @@ namespace Domain.Applications
 
         [HttpPost]
         public Task Create([FromRoute] MicroserviceId microserviceId, [FromBody] CreateDeployable command) => _eventLog.Append(command.DeployableId.ToString(), new DeployableCreated(microserviceId, command.Name));
+
+        [HttpPost("{deployableId}/image")]
+        public Task SetImage([FromRoute] MicroserviceId microserviceId, [FromRoute] DeployableId deployableId, [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(deployableId.ToString(), new DeployableImageChanged(deployableImageName));
     }
 }

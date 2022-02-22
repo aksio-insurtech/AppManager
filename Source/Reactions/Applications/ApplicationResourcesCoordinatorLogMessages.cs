@@ -15,7 +15,11 @@ namespace Reactions.Applications
 
         [LoggerMessage(2, LogLevel.Information, "Creating microservice '{MicroserviceName}' using Pulumi")]
         public static partial void CreatingMicroservice(this ILogger logger, string microserviceName);
+
         [LoggerMessage(3, LogLevel.Information, "Removing microservice '{MicroserviceName}' using Pulumi")]
         public static partial void RemovingMicroservice(this ILogger logger, string microserviceName);
+
+        [LoggerMessage(4, LogLevel.Information, "Changing image on deployable '{DeployableName}' to '{ImageName}' on microservice '{MicroserviceName}' using Pulumi")]
+        public static partial void ChangingDeployableImage(this ILogger logger, string microserviceName, string deployableName, string imageName);
     }
 }

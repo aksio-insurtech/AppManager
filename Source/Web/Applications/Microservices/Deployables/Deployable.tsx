@@ -8,11 +8,11 @@ export const Deployable = () => {
         <Stack style={{ height: '100%' }}>
             <Stack.Item>
                 <Pivot>
-                    <PivotItem headerText='General'>
+                    <PivotItem headerText="General" itemIcon="Settings">
                     </PivotItem>
-                    <PivotItem headerText='Environment'>
+                    <PivotItem headerText="Environment" itemIcon="Variable">
                     </PivotItem>
-                    <PivotItem headerText='Secrets'>
+                    <PivotItem headerText="Secrets" itemIcon="Encryption">
                     </PivotItem>
                 </Pivot>
             </Stack.Item>
