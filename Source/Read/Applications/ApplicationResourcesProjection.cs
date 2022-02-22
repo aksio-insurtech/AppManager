@@ -24,6 +24,7 @@ namespace Read.Applications
             .From<AzureStorageAccountSetForApplication>(_ => _
                 .Set(m => m.Azure.StorageAccountName).To(e => e.AccountName))
             .From<IpAddressSetForApplication>(_ => _
-                .Set(m => m.IpAddress).To(e => e.Address));
+                .Set(m => m.IpAddress).To(e => e.Address))
+            .RemovedWith<ApplicationRemoved>();
     }
 }

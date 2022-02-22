@@ -9,11 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import { ResourcesForApplication } from 'API/applications/ResourcesForApplication';
 import { AllSettings } from 'API/organization/settings/AllSettings';
 
-export interface IApplicationSettingsProps {
+export interface IGeneralProps {
     application: ApplicationModel;
 }
 
-export const ApplicationSettings = (props: IApplicationSettingsProps) => {
+export const General = (props: IGeneralProps) => {
     const removeApplicationCommand = new Remove();
     const navigate = useNavigate();
     const [settings] = AllSettings.use();
@@ -35,6 +35,10 @@ export const ApplicationSettings = (props: IApplicationSettingsProps) => {
 
     return (
         <Stack>
+            <h2>Settings</h2>
+            <TextField label="Name" readOnly value={props.application.name}/>
+            <br />
+
             <h2>Kernel</h2>
             <TextField label="Public IP Address" value={resources.data?.ipAddress || ''} readOnly disabled />
             <br />

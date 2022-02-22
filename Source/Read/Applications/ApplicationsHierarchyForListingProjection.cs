@@ -17,6 +17,7 @@ namespace Read.Applications
                 .From<MicroserviceCreated>(_ => _
                     .UsingParentKey(e => e.ApplicationId)
                     .Set(m => m.Name).To(e => e.Name))
+                .RemovedWith<MicroserviceRemoved>()
                 .Children(_ => _.Deployables, _ => _
                     .IdentifiedBy(m => m.DeployableId)
                     .From<DeployableCreated>(_ => _
