@@ -87,10 +87,10 @@ namespace Reactions.Applications
             Upload("storage.json", storageJson);
         }
 
-        public void CreateAndUploadAppSettings(Application application, ISettings settings)
+        public void CreateAndUploadAppSettings(ISettings settings)
         {
             var content = TemplateTypes.AppSettings(
-                new AppSettingsValues(application.Name, settings.ElasticUrl, settings.ElasticApiKey));
+                new AppSettingsValues(_application.Name, _microservice.Name, settings.ElasticUrl, settings.ElasticApiKey));
             Upload("appsettings.json", content);
         }
     }

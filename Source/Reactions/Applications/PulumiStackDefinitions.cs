@@ -194,7 +194,7 @@ namespace Reactions.Applications
                 var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
 
                 var storage = new MicroserviceStorage(application, microservice, storageAccount.Name, storageAccountKey, fileShareName, _microserviceStorageLogger);
-                storage.CreateAndUploadAppSettings(application, _settings);
+                storage.CreateAndUploadAppSettings(_settings);
 
                 var container = MicroserviceWithDeployables(
                     resourceGroup.Name,
@@ -293,7 +293,7 @@ namespace Reactions.Applications
 
             var account = await getStorageAccountResult.GetValue();
             storage.CreateAndUploadStorageJson(mongoDBConnectionString);
-            storage.CreateAndUploadAppSettings(application, _settings);
+            storage.CreateAndUploadAppSettings(_settings);
         }
 
         (ResourceGroup ResourceGroup, string ResourceGroupId) ApplyResourceGroup(Application application)
