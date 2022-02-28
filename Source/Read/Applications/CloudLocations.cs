@@ -12,5 +12,5 @@ public class CloudLocations : Controller
                 new CloudLocation("norwayeast", "Norway East"),
                 new CloudLocation("westeurope", "West Europe"),
                 new CloudLocation("northeurope", "North Europe")
-            };
+        };
 }

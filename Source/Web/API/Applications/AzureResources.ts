@@ -7,4 +7,7 @@ export type AzureResources = {
     subscriptionId: string;
     resourceGroupId: string;
     storageAccountName: string;
+    containerRegistryLoginServer: string;
+    containerRegistryUserName: string;
+    containerRegistryPassword: string;
 };

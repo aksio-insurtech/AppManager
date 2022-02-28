@@ -5,4 +5,10 @@ using Concepts.Azure;
 
 namespace Read.Applications;
 
-public record AzureResources(AzureSubscriptionId SubscriptionId, AzureResourceGroupId ResourceGroupId, AzureStorageAccountName StorageAccountName);
+public record AzureResources(
+    AzureSubscriptionId SubscriptionId,
+    AzureResourceGroupId ResourceGroupId,
+    AzureStorageAccountName StorageAccountName,
+    AzureContainerRegistryLoginServer ContainerRegistryLoginServer,
+    AzureContainerRegistryUserName ContainerRegistryUserName,
+    AzureContainerRegistryPassword ContainerRegistryPassword);

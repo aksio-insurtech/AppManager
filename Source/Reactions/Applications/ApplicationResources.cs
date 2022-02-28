@@ -9,5 +9,8 @@ namespace Reactions.Applications;
 public record ApplicationResources(
     IpAddress IpAddress,
     AzureStorageAccountName AzureStorageAccountName,
+    AzureContainerRegistryLoginServer AzureContainerRegistryLoginServer,
+    AzureContainerRegistryUserName AzureContainerRegistryUserName,
+    AzureContainerRegistryPassword AzureContainerRegistryPassword,
     AzureResourceGroupId AzureResourceGroupId,
     MongoDBResource MongoDB);

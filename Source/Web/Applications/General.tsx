@@ -48,6 +48,12 @@ export const General = (props: IGeneralProps) => {
             <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/providers/Microsoft.Storage/storageAccounts/${resources.data?.azure?.storageAccountName}/overview`}>Storage Account</Link>
             <br />
 
+            <h3>Azure Container Registry</h3>
+            <TextField label="Login Server" value={resources.data?.azure?.containerRegistryLoginServer || ''} readOnly disabled />
+            <TextField label="UserName" value={resources.data?.azure?.containerRegistryUserName || ''} readOnly disabled />
+            <TextField label="Password" value={resources.data?.azure?.containerRegistryPassword || ''} readOnly disabled type="password" canRevealPassword/>
+            <br />
+
             <h2>MongoDB</h2>
             <TextField label="Server" value={resources.data?.mongoDB?.connectionString || ''} readOnly disabled />
 

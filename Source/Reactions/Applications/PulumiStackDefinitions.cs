@@ -10,13 +10,17 @@ using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.ContainerInstance;
 using Pulumi.AzureNative.ContainerInstance.Inputs;
+using Pulumi.AzureNative.ContainerRegistry;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Storage;
-using Pulumi.AzureNative.Storage.Inputs;
 using Pulumi.Mongodbatlas;
 using Pulumi.Mongodbatlas.Inputs;
+using ACRSkuArgs = Pulumi.AzureNative.ContainerRegistry.Inputs.SkuArgs;
+using ACRSkuName = Pulumi.AzureNative.ContainerRegistry.SkuName;
 using FileShare = Pulumi.AzureNative.Storage.FileShare;
-
+using StorageSkuArgs = Pulumi.AzureNative.Storage.Inputs.SkuArgs;
+using StorageSkuName = Pulumi.AzureNative.Storage.SkuName;
+using Task = System.Threading.Tasks.Task;
 namespace Reactions.Applications;
 
 public class PulumiStackDefinitions : IPulumiStackDefinitions
@@ -53,8 +57,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         // - Output
         PulumiFn.Create(async () =>
         {
-                // Todo: Set to actual tenant - and probably not here!
-                _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+            // Todo: Set to actual tenant - and probably not here!
+            _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
 
             var tags = new Dictionary<string, string>
                 {
@@ -67,11 +71,25 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             {
                 ResourceGroupName = resourceGroup.Name,
                 Tags = tags,
-                Sku = new SkuArgs
+                Sku = new StorageSkuArgs
                 {
-                    Name = SkuName.Standard_LRS
+                    Name = StorageSkuName.Standard_LRS
                 },
                 Kind = Kind.StorageV2
+            });
+
+            var acr = new Registry(application.Name.Value.ToLowerInvariant(), new RegistryArgs
+            {
+                ResourceGroupName = resourceGroup.Name,
+
+                // Todo: We force this, due to Norway not supporting the GetRegistryCredentials API for some reason.
+                Location = "westeurope",
+                Tags = tags,
+                Sku = new ACRSkuArgs
+                {
+                    Name = ACRSkuName.Standard
+                },
+                AdminUserEnabled = true,
             });
 
             var fileShare = new FileShare("kernel", new()
@@ -133,16 +151,16 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 storage,
                 new[]
                 {
-                        new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.8.11")
+                        new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.0")
                 });
 
             var projectIpAccessList = new ProjectIpAccessList("kernel", new()
             {
                 ProjectId = project.Id,
 
-                    // Todo: Only accept IP addresses from the actual running Microservices or Vnet or something
-                    // IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
-                    IpAddress = "0.0.0.0"
+                // Todo: Only accept IP addresses from the actual running Microservices or Vnet or something
+                // IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
+                IpAddress = "0.0.0.0"
             });
 
             var ipAddress = await container.IpAddress.GetValue(_ => _!.Ip!);
@@ -161,13 +179,33 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             {
                 await _eventLog.Append(application.Id, new AzureStorageAccountSetForApplication(storageAccountName));
             }
+
+            var registryCredentials = GetRegistryCredentials.Invoke(new()
+            {
+                ResourceGroupName = resourceGroup.Name,
+                RegistryName = acr.Name
+            });
+
+            var acrLoginServer = await acr.LoginServer.GetValue();
+            var registryCredentialsResult = await registryCredentials.GetValue();
+            var userName = registryCredentialsResult.Username ?? string.Empty;
+            var password = registryCredentialsResult.Password ?? string.Empty;
+            if (application.Resources?.AzureContainerRegistryLoginServer != acrLoginServer ||
+                application.Resources?.AzureContainerRegistryUserName != userName ||
+                application.Resources?.AzureContainerRegistryPassword != password)
+            {
+                await _eventLog.Append(application.Id, new AzureContainerRegistrySetForApplication(
+                    acrLoginServer,
+                    userName,
+                    password));
+            }
         });
 
     public PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
         PulumiFn.Create(async () =>
         {
-                // Todo: Set to actual tenant - and probably not here!
-                _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+            // Todo: Set to actual tenant - and probably not here!
+            _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
 
             var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
             var storage = await GetMicroserviceStorageFor(application, microservice, resourceGroup);
@@ -186,8 +224,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     public PulumiFn Deployable(Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment) =>
         PulumiFn.Create(async () =>
         {
-                // Todo: Set to actual tenant - and probably not here!
-                _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+            // Todo: Set to actual tenant - and probably not here!
+            _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
 
             var (resourceGroup, resourceGroupId) = ApplyResourceGroup(application);
             var storage = await GetMicroserviceStorageFor(application, microservice, resourceGroup);

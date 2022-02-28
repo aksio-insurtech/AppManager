@@ -17,7 +17,7 @@ export const General = (props: IGeneralProps) => {
     const [showRemoveWarning] = useModal(
         'Remove microservice?',
         ModalButtons.YesNo,
-        `Are you sure you want to remove microservice '${props.microservice!.name}'`,
+        `Are you sure you want to remove microservice '${props.microservice?.name || ''}'`,
         async (result) => {
             if (result == ModalResult.Success) {
                 removeMicroserviceCommand.microserviceId = props.microservice!.id;
@@ -29,7 +29,7 @@ export const General = (props: IGeneralProps) => {
     return (
         <Stack>
             <h2>Settings</h2>
-            <TextField label="Name" readOnly value={props.microservice.name} />
+            <TextField label="Name" readOnly value={props.microservice?.name || ''} />
             <br />
             <br />
             <br />
