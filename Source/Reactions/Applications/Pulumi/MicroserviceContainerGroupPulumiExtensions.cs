@@ -4,6 +4,8 @@
 using Concepts.Azure;
 using Pulumi.AzureNative.ContainerInstance;
 using Pulumi.AzureNative.ContainerInstance.Inputs;
+using Pulumi.AzureNative.Network;
+using Pulumi.AzureNative.Network.Inputs;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
@@ -13,8 +15,8 @@ public static class MicroserviceContainerGroupPulumiExtensions
     public static ContainerGroup SetupContainerGroup(
         this Microservice microservice,
         Application application,
-        AzureNetworkProfileIdentifier networkProfile,
         ResourceGroup resourceGroup,
+        AzureNetworkProfileIdentifier networkProfile,
         MicroserviceStorage storage,
         IEnumerable<Deployable> deployables,
         Tags tags)
@@ -23,8 +25,9 @@ public static class MicroserviceContainerGroupPulumiExtensions
         microserviceTags["microservice"] = microservice.Id.ToString();
         microserviceTags["microserviceName"] = microservice.Name.Value;
 
-        return new ContainerGroup(microservice.Name, new()
+        var containerGroup = new ContainerGroup(microservice.Name, new()
         {
+            Tags = tags,
             ResourceGroupName = resourceGroup.Name,
             Volumes = new VolumeArgs[]
             {
@@ -80,5 +83,23 @@ public static class MicroserviceContainerGroupPulumiExtensions
                 }
             }).ToArray()
         });
+
+        _ = new PrivateRecordSet(microservice.Name.Value, new()
+        {
+            ResourceGroupName = resourceGroup.Name,
+            Ttl = 300,
+            RelativeRecordSetName = microservice.Name.Value,
+            PrivateZoneName = application.GetPrivateZoneName(),
+            RecordType = "A",
+            ARecords =
+            {
+                new ARecordArgs
+                {
+                    Ipv4Address = containerGroup.IpAddress.Apply(_ => _!.Ip!)
+                }
+            }
+        });
+
+        return containerGroup;
     }
 }

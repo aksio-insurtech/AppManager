@@ -5,4 +5,10 @@ using Pulumi.AzureNative.Network;
 
 namespace Reactions.Applications.Pulumi;
 
-public record NetworkResult(NetworkSecurityGroup SecurityGroup, VirtualNetwork VirtualNetwork, NetworkProfile Profile);
+public record NetworkResult(
+    NetworkSecurityGroup SecurityGroup,
+    VirtualNetwork VirtualNetwork,
+    NetworkProfile Profile,
+    PrivateZone DnsZone,
+    PublicIPAddress IpAddress,
+    AzureFirewall Firewall);

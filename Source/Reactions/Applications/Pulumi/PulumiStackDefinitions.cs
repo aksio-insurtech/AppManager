@@ -48,10 +48,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             var networkProfile = await network.Profile.Id.GetValue();
 
+            application.SetupIngress(resourceGroup, networkProfile, storage, tags);
             var kernelContainer = microservice.SetupContainerGroup(
                 application,
-                networkProfile,
                 resourceGroup,
+                networkProfile,
                 kernelStorage,
                 new[]
                 {
@@ -93,8 +94,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             _ = microservice.SetupContainerGroup(
                 application,
-                application.Resources.AzureNetworkProfileIdentifier,
                 resourceGroup,
+                application.Resources.AzureNetworkProfileIdentifier,
                 storage,
                 new[]
                 {
@@ -115,8 +116,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             _ = microservice.SetupContainerGroup(
                 application,
-                application.Resources.AzureNetworkProfileIdentifier,
                 resourceGroup,
+                application.Resources.AzureNetworkProfileIdentifier,
                 storage,
                 new[]
                 {

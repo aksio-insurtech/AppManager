@@ -10,6 +10,8 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationNetworkPulumiExtensions
 {
+    public static string GetPrivateZoneName(this Application application) => $"{application.Name}.local".ToLowerInvariant();
+
     public static NetworkResult SetupNetwork(this Application application, ResourceGroup resourceGroup, Tags tags)
     {
         var securityGroup = new NetworkSecurityGroup(application.Name, new()
@@ -37,6 +39,7 @@ public static class ApplicationNetworkPulumiExtensions
                 {
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
+                        Name = "internal",
                         NetworkSecurityGroup = new NetworkSecurityGroupArgs
                         {
                             Id = securityGroup.Id
@@ -52,8 +55,7 @@ public static class ApplicationNetworkPulumiExtensions
                                 Service = "Microsoft.KeyVault"
                             }
                         },
-                        AddressPrefix = "10.0.0.0/24",
-                        Name = application.Name.Value,
+                        AddressPrefix = "10.0.1.0/24",
                         PrivateEndpointNetworkPolicies = "Enabled",
                         PrivateLinkServiceNetworkPolicies = "Enabled",
                         Delegations =
@@ -64,8 +66,39 @@ public static class ApplicationNetworkPulumiExtensions
                                 ServiceName = "Microsoft.ContainerInstance/containerGroups"
                             }
                         }
+                    },
+                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
+                    {
+                        Name = "external",
+                        NetworkSecurityGroup = new NetworkSecurityGroupArgs
+                        {
+                            Id = securityGroup.Id
+                        },
+                        AddressPrefix = "10.0.2.0/24",
                     }
                 }
+        });
+
+        var privateZoneName = application.GetPrivateZoneName();
+        var privateZone = new PrivateZone("privateZone", new()
+        {
+            Location = "Global",
+            PrivateZoneName = privateZoneName,
+            ResourceGroupName = resourceGroup.Name,
+            Tags = tags,
+        });
+
+        var virtualNetworkLink = new VirtualNetworkLink("virtualNetworkLink", new()
+        {
+            Location = "Global",
+            ResourceGroupName = resourceGroup.Name,
+            Tags = tags,
+            RegistrationEnabled = true,
+            PrivateZoneName = privateZone.Name,
+            VirtualNetwork = new SubResourceArgs
+            {
+                Id = virtualNetwork.Id
+            }
         });
 
         var profile = new NetworkProfile(application.Name, new()
@@ -93,6 +126,25 @@ public static class ApplicationNetworkPulumiExtensions
             },
         });
 
-        return new(securityGroup, virtualNetwork, profile);
+        var publicIPAddress = new PublicIPAddress(application.Name, new()
+        {
+            Location = application.CloudLocation.Value,
+            ResourceGroupName = resourceGroup.Name,
+            Tags = tags,
+            Sku = new PublicIPAddressSkuArgs
+            {
+                Name = PublicIPAddressSkuName.Standard,
+                Tier = PublicIPAddressSkuTier.Global
+            }
+        });
+
+        var firewall = new AzureFirewall(application.Name, new()
+        {
+            Location = application.CloudLocation.Value,
+            ResourceGroupName = resourceGroup.Name,
+            Tags = tags,
+        });
+
+        return new(securityGroup, virtualNetwork, profile, privateZone, publicIPAddress, firewall);
     }
 }
