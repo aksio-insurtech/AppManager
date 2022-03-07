@@ -3,16 +3,16 @@
 
 using Pulumi;
 
-namespace Reactions.Applications;
+namespace Reactions.Applications.Pulumi;
 
-public static class OutputExtensionMethods
+public static class InputExtensionMethods
 {
-    public static Task<T> GetValue<T>(this Output<T> output) => output.GetValue(_ => _);
+    public static Task<T> GetValue<T>(this Input<T> input) => input.GetValue(_ => _);
 
-    public static Task<TResult> GetValue<T, TResult>(this Output<T> output, Func<T, TResult> valueResolver)
+    public static Task<TResult> GetValue<T, TResult>(this Input<T> input, Func<T, TResult> valueResolver)
     {
         var tcs = new TaskCompletionSource<TResult>();
-        output.Apply(_ =>
+        input.Apply(_ =>
         {
             var result = valueResolver(_);
             tcs.SetResult(result);

@@ -3,7 +3,7 @@
 
 using Concepts;
 
-namespace Reactions.Applications;
+namespace Reactions.Applications.Pulumi;
 
 [Route("/api/test")]
 public class TestController : Controller

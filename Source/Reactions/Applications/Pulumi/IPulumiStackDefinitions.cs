@@ -4,7 +4,7 @@
 using Concepts;
 using Pulumi.Automation;
 
-namespace Reactions.Applications;
+namespace Reactions.Applications.Pulumi;
 
 public interface IPulumiStackDefinitions
 {

@@ -11,7 +11,7 @@ using Concepts;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
 
-namespace Reactions.Applications;
+namespace Reactions.Applications.Pulumi;
 
 /// <summary>
 /// Represents an implementation of <see cref="IPulumiOperations"/>.

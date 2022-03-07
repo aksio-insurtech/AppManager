@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Reactions.Applications;
+namespace Reactions.Applications.Pulumi;
 
 public static partial class PulumiRunnerLogMessages
 {

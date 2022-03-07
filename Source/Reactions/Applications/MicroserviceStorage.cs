@@ -93,4 +93,16 @@ public class MicroserviceStorage
             new AppSettingsValues(_application.Name, _microservice.Name, settings.ElasticUrl, settings.ElasticApiKey));
         Upload("appsettings.json", content);
     }
+
+    public void CreateAndUploadClusterClientConfig(string connectionString)
+    {
+        var content = TemplateTypes.ClusterClient(new { ConnectionString = connectionString });
+        Upload("cluster.json", content);
+    }
+
+    public void CreateAndUploadClusterKernelConfig(string advertisedIP, string connectionString)
+    {
+        var content = TemplateTypes.ClusterKernel(new { AdvertisedIP = advertisedIP, ConnectionString = connectionString });
+        Upload("cluster.json", content);
+    }
 }

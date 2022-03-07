@@ -4,6 +4,7 @@
 using Concepts;
 using Events.Applications;
 using Microsoft.Extensions.Logging;
+using Reactions.Applications.Pulumi;
 
 namespace Reactions.Applications;
 
