@@ -16,6 +16,16 @@ public static class TemplateTypes
     /// </summary>
     public static readonly HandlebarsTemplate<object, object> AppSettings = Handlebars.Compile(GetTemplate("appsettings.json"));
 
+    /// <summary>
+    /// The template for 'cluster.json' for client.
+    /// </summary>
+    public static readonly HandlebarsTemplate<object, object> ClusterClient = Handlebars.Compile(GetTemplate("cluster.client.json"));
+
+    /// <summary>
+    /// The template for 'cluster.json' for client.
+    /// </summary>
+    public static readonly HandlebarsTemplate<object, object> ClusterKernel = Handlebars.Compile(GetTemplate("cluster.kernel.json"));
+
     static TemplateTypes()
     {
         Handlebars.RegisterHelper("camelcase", (writer, _, parameters) => writer.WriteSafeString(parameters[0].ToString()!.ToCamelCase()));
