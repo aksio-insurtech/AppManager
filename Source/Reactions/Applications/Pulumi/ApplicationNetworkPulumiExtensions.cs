@@ -4,12 +4,13 @@
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
 using Pulumi.AzureNative.Resources;
+using NetworkSecurityGroupArgs = Pulumi.AzureNative.Network.Inputs.NetworkSecurityGroupArgs;
 
 namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationNetworkPulumiExtensions
 {
-    public static async Task<NetworkResult> SetupNetwork(this Application application, ResourceGroup resourceGroup, Tags tags)
+    public static NetworkResult SetupNetwork(this Application application, ResourceGroup resourceGroup, Tags tags)
     {
         var securityGroup = new NetworkSecurityGroup(application.Name, new()
         {
@@ -23,6 +24,8 @@ public static class ApplicationNetworkPulumiExtensions
             Location = application.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
+            EnableDdosProtection = false,
+            EnableVmProtection = false,
             AddressSpace = new AddressSpaceArgs
             {
                 AddressPrefixes =
@@ -34,13 +37,37 @@ public static class ApplicationNetworkPulumiExtensions
                 {
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
+                        NetworkSecurityGroup = new NetworkSecurityGroupArgs
+                        {
+                            Id = securityGroup.Id
+                        },
+                        ServiceEndpoints =
+                        {
+                            new ServiceEndpointPropertiesFormatArgs
+                            {
+                                Service = "Microsoft.Storage"
+                            },
+                            new ServiceEndpointPropertiesFormatArgs
+                            {
+                                Service = "Microsoft.KeyVault"
+                            }
+                        },
                         AddressPrefix = "10.0.0.0/24",
-                        Name = application.Name.Value
+                        Name = application.Name.Value,
+                        PrivateEndpointNetworkPolicies = "Enabled",
+                        PrivateLinkServiceNetworkPolicies = "Enabled",
+                        Delegations =
+                        {
+                            new DelegationArgs
+                            {
+                                Name = "containerGroupDelegation",
+                                ServiceName = "Microsoft.ContainerInstance/containerGroups"
+                            }
+                        }
                     }
                 }
         });
 
-        var subnets = await virtualNetwork.Subnets.GetValue();
         var profile = new NetworkProfile(application.Name, new()
         {
             Location = application.CloudLocation.Value,
@@ -58,7 +85,7 @@ public static class ApplicationNetworkPulumiExtensions
                             Name = "ipconfig1",
                             Subnet = new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                             {
-                                Id = subnets[0].Id ?? string.Empty
+                                Id = virtualNetwork.Subnets.Apply(_ => _[0].Id!)
                             }
                         }
                     }

@@ -37,6 +37,20 @@ public static class ApplicationEvents
             events.Add(new AzureStorageAccountSetForApplication(applicationResult.Storage.AccountName));
         }
 
+        var subnets = await applicationResult.Network.VirtualNetwork.Subnets.GetValue();
+        if (application.Resources?.AzureVirtualNetworkIdentifier is null ||
+            application.Resources?.AzureVirtualNetworkIdentifier != subnets[0].Id!)
+        {
+            events.Add(new AzureVirtualNetworkIdentifierSetForApplication(subnets[0].Id!));
+        }
+
+        var networkProfile = await applicationResult.Network.Profile.Id.GetValue();
+        if (application.Resources?.AzureNetworkProfileIdentifier is null ||
+            application.Resources?.AzureNetworkProfileIdentifier != networkProfile)
+        {
+            events.Add(new AzureNetworkProfileIdentifierSetForApplication(networkProfile));
+        }
+
         if (application.Resources?.AzureContainerRegistryLoginServer != applicationResult.ContainerRegistry.LoginServer ||
             application.Resources?.AzureContainerRegistryUserName != applicationResult.ContainerRegistry.UserName ||
             application.Resources?.AzureContainerRegistryPassword != applicationResult.ContainerRegistry.Password)

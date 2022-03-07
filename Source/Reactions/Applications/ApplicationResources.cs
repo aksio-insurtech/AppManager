@@ -8,6 +8,8 @@ namespace Reactions.Applications;
 
 public record ApplicationResources(
     IpAddress IpAddress,
+    AzureVirtualNetworkIdentifier AzureVirtualNetworkIdentifier,
+    AzureNetworkProfileIdentifier AzureNetworkProfileIdentifier,
     AzureStorageAccountName AzureStorageAccountName,
     AzureContainerRegistryLoginServer AzureContainerRegistryLoginServer,
     AzureContainerRegistryUserName AzureContainerRegistryUserName,

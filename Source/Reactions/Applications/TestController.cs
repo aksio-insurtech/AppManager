@@ -54,6 +54,16 @@ public class TestController : Controller
         _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
     }
 
+    [HttpGet("microservice/down")]
+    public async Task MicroserviceDown()
+    {
+        var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
+        var microservice = await _microservice.GetById("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
+        var projectName = $"{application.Name}-{microservice.Name}";
+        var definition = _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Down(application, projectName, definition, CloudRuntimeEnvironment.Development);
+    }
+
     [HttpGet("deployable")]
     public async Task DeployableUp()
     {

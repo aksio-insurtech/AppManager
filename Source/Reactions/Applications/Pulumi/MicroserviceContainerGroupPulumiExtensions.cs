@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Azure;
 using Pulumi.AzureNative.ContainerInstance;
 using Pulumi.AzureNative.ContainerInstance.Inputs;
 using Pulumi.AzureNative.Resources;
@@ -9,7 +10,14 @@ namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceContainerGroupPulumiExtensions
 {
-    public static ContainerGroup SetupContainerGroup(this Microservice microservice, Application application, ResourceGroup resourceGroup, NetworkResult network, MicroserviceStorage storage, IEnumerable<Deployable> deployables, Tags tags)
+    public static ContainerGroup SetupContainerGroup(
+        this Microservice microservice,
+        Application application,
+        AzureNetworkProfileIdentifier networkProfile,
+        ResourceGroup resourceGroup,
+        MicroserviceStorage storage,
+        IEnumerable<Deployable> deployables,
+        Tags tags)
     {
         var microserviceTags = tags.Clone();
         microserviceTags["microservice"] = microservice.Id.ToString();
@@ -42,7 +50,7 @@ public static class MicroserviceContainerGroupPulumiExtensions
             },
             NetworkProfile = new ContainerGroupNetworkProfileArgs
             {
-                Id = network.Profile.Id
+                Id = networkProfile.Value
             },
             OsType = "Linux",
             Containers = deployables.Select(deployable => new ContainerArgs

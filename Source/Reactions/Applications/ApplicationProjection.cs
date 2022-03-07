@@ -25,5 +25,9 @@ public class ApplicationProjection : IPassiveProjectionFor<Application>
         .From<MongoDBConnectionStringChangedForApplication>(_ => _
             .Set(m => m.Resources.MongoDB.ConnectionString).To(e => e.ConnectionString))
         .From<IpAddressSetForApplication>(_ => _
-            .Set(m => m.Resources.IpAddress).To(e => e.Address));
+            .Set(m => m.Resources.IpAddress).To(e => e.Address))
+        .From<AzureVirtualNetworkIdentifierSetForApplication>(_ => _
+            .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
+        .From<AzureNetworkProfileIdentifierSetForApplication>(_ => _
+            .Set(m => m.Resources.AzureNetworkProfileIdentifier).To(e => e.Identifier));
 }

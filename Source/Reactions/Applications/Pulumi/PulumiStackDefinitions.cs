@@ -5,6 +5,7 @@ using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
 using Microsoft.Extensions.Logging;
+using Pulumi;
 using Pulumi.Automation;
 
 namespace Reactions.Applications.Pulumi;
@@ -34,7 +35,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         {
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
-            var network = await application.SetupNetwork(resourceGroup, tags);
+            var network = application.SetupNetwork(resourceGroup, tags);
             var storage = await application.SetupStorage(resourceGroup, tags);
             var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
             var mongoDB = await application.SetupMongoDB(_settings, environment, tags);
@@ -45,10 +46,12 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             kernelStorage.CreateAndUploadStorageJson(mongoDB.ConnectionString);
             kernelStorage.CreateAndUploadAppSettings(_settings);
 
+            var networkProfile = await network.Profile.Id.GetValue();
+
             var kernelContainer = microservice.SetupContainerGroup(
                 application,
+                networkProfile,
                 resourceGroup,
-                network,
                 kernelStorage,
                 new[]
                 {
@@ -84,13 +87,14 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
             var storage = await microservice.GetStorage(application, resourceGroup, _microserviceStorageLogger);
-            var network = await application.SetupNetwork(resourceGroup, tags);
             storage.CreateAndUploadAppSettings(_settings);
+
+            Log.Info($"NetworkProfile : {application.Resources.AzureNetworkProfileIdentifier}");
 
             _ = microservice.SetupContainerGroup(
                 application,
+                application.Resources.AzureNetworkProfileIdentifier,
                 resourceGroup,
-                network,
                 storage,
                 new[]
                 {
@@ -108,12 +112,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
             var storage = await microservice.GetStorage(application, resourceGroup, _microserviceStorageLogger);
-            var network = await application.SetupNetwork(resourceGroup, tags);
 
             _ = microservice.SetupContainerGroup(
                 application,
+                application.Resources.AzureNetworkProfileIdentifier,
                 resourceGroup,
-                network,
                 storage,
                 new[]
                 {
