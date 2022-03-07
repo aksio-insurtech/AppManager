@@ -28,7 +28,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _microserviceStorageLogger = microserviceStorageLogger;
     }
 
-    public PulumiFn Application(Application application, CloudRuntimeEnvironment environment) =>
+    public PulumiFn Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment) =>
 
         PulumiFn.Create(async () =>
         {
@@ -67,15 +67,15 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             var events = await application.GetEventsToAppend(applicationResult);
 
-            // Todo: Set to actual tenant - and probably not here!
-            _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+            // Todo: Set to actual execution context - might not be the right place for this!
+            _executionContextManager.Set(executionContext);
             foreach (var @event in events)
             {
                 await _eventLog.Append(application.Id, @event);
             }
         });
 
-    public PulumiFn Microservice(Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
+    public PulumiFn Microservice(ExecutionContext executionContext, Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
         PulumiFn.Create(async () =>
         {
             // Todo: Set to actual tenant - and probably not here!
@@ -99,7 +99,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 tags);
         });
 
-    public PulumiFn Deployable(Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment) =>
+    public PulumiFn Deployable(ExecutionContext executionContext, Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment) =>
         PulumiFn.Create(async () =>
         {
             // Todo: Set to actual tenant - and probably not here!
