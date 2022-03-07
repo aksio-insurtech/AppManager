@@ -46,14 +46,14 @@ public static class ApplicationMongoDBPulumiExtensions
             }
         });
 
-        // _ = new ProjectIpAccessList("kernel", new()
-        // {
-        //     ProjectId = project.Id,
+        _ = new ProjectIpAccessList("kernel", new()
+        {
+            ProjectId = project.Id,
 
             // Todo: Only accept IP addresses from the actual running Microservices or Vnet or something
             // IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
-        //     IpAddress = "0.0.0.0"
-        // });
+            IpAddress = "0.0.0.0"
+        });
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
 
