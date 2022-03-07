@@ -131,6 +131,10 @@ public static class ApplicationNetworkPulumiExtensions
             Location = application.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
+            PublicIPAddressVersion = "IPv4",
+            PublicIPAllocationMethod = "Static",
+            PublicIpAddressName = "public",
+            IdleTimeoutInMinutes = 10,
             Sku = new PublicIPAddressSkuArgs
             {
                 Name = PublicIPAddressSkuName.Standard,
