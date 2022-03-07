@@ -134,11 +134,10 @@ public static class ApplicationNetworkPulumiExtensions
             PublicIPAddressVersion = "IPv4",
             PublicIPAllocationMethod = "Static",
             PublicIpAddressName = "public",
-            IdleTimeoutInMinutes = 10,
             Sku = new PublicIPAddressSkuArgs
             {
                 Name = PublicIPAddressSkuName.Standard,
-                Tier = PublicIPAddressSkuTier.Global
+                Tier = PublicIPAddressSkuTier.Regional
             }
         });
 
