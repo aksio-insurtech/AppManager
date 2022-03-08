@@ -5,4 +5,4 @@ using Concepts.MongoDB;
 
 namespace Reactions.Applications;
 
-public record MongoDBResource(MongoDBConnectionString ConnectionString, IEnumerable<MongoDBUser> Users);
+public record MongoDBUser(MongoDBUserName UserName, MongoDBPassword Password);

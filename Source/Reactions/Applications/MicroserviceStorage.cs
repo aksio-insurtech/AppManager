@@ -1,13 +1,9 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Azure.Storage.Files.Shares;
 using Common;
-using Microsoft.Extensions.Logging;
-using Pulumi;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Templates;
 
@@ -15,51 +11,19 @@ namespace Reactions.Applications;
 
 public class MicroserviceStorage
 {
-    readonly ShareDirectoryClient _directoryClient;
     readonly Application _application;
     readonly Microservice _microservice;
-    readonly ILogger<MicroserviceStorage> _logger;
 
-    public string AccountName { get; }
-    public string AccessKey { get; }
-    public string ShareName { get; }
+    public FileStorage FileStorage { get; }
 
     public MicroserviceStorage(
         Application application,
         Microservice microservice,
-        string accountName,
-        string accessKey,
-        string shareName,
-        ILogger<MicroserviceStorage> logger)
+        FileStorage fileStorage)
     {
-        var connectionString = $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accessKey};EndpointSuffix=core.windows.net";
-        var shareClient = new ShareClient(connectionString, shareName);
-        _directoryClient = shareClient.GetDirectoryClient("./");
         _application = application;
         _microservice = microservice;
-        AccountName = accountName;
-        AccessKey = accessKey;
-        ShareName = shareName;
-        _logger = logger;
-    }
-
-    public void Upload(string fileName, string content)
-    {
-        if (content.Length == 0)
-        {
-            Log.Warn($"File '{fileName}' does not have any content - ignoring upload to kernel storage");
-            return;
-        }
-
-        _logger.Uploading(_application.Name, _microservice.Name, fileName, ShareName);
-
-        Log.Info($"Upload file '{fileName}'");
-
-        var file = _directoryClient.GetFileClient(fileName);
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-        file.DeleteIfExists();
-        file.Create(stream.Length);
-        file.Upload(stream);
+        FileStorage = fileStorage;
     }
 
     public void CreateAndUploadStorageJson(MongoDBResult mongoDB)
@@ -88,25 +52,25 @@ public class MicroserviceStorage
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
 
-        Upload("storage.json", storageJson);
+        FileStorage.Upload("storage.json", storageJson);
     }
 
     public void CreateAndUploadAppSettings(ISettings settings)
     {
         var content = TemplateTypes.AppSettings(
             new AppSettingsValues(_application.Name, _microservice.Name, settings.ElasticUrl, settings.ElasticApiKey));
-        Upload("appsettings.json", content);
+        FileStorage.Upload("appsettings.json", content);
     }
 
     public void CreateAndUploadClusterClientConfig(string connectionString)
     {
         var content = TemplateTypes.ClusterClient(new { ConnectionString = connectionString });
-        Upload("cluster.json", content);
+        FileStorage.Upload("cluster.json", content);
     }
 
     public void CreateAndUploadClusterKernelConfig(string advertisedIP, string connectionString)
     {
         var content = TemplateTypes.ClusterKernel(new { AdvertisedIP = advertisedIP, ConnectionString = connectionString });
-        Upload("cluster.json", content);
+        FileStorage.Upload("cluster.json", content);
     }
 }

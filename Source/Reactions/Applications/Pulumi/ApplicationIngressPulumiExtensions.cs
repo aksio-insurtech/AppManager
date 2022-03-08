@@ -63,6 +63,7 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     Name = "nginx",
                     Image = "nginx",
+                    Command = "nginx -g daemon off;",
                     Ports = new ContainerPortArgs[]
                         {
                                 new()

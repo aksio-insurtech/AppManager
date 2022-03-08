@@ -37,9 +37,9 @@ public static class MicroserviceContainerGroupPulumiExtensions
                                 AzureFile = new AzureFileVolumeArgs()
                                 {
                                     ReadOnly = true,
-                                    StorageAccountName = storage.AccountName,
-                                    StorageAccountKey = storage.AccessKey,
-                                    ShareName = storage.ShareName
+                                    StorageAccountName = storage.FileStorage.AccountName,
+                                    StorageAccountKey = storage.FileStorage.AccessKey,
+                                    ShareName = storage.FileStorage.ShareName
                                 }
                             }
             },

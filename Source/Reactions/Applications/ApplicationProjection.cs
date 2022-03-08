@@ -24,6 +24,12 @@ public class ApplicationProjection : IPassiveProjectionFor<Application>
             .Set(m => m.Resources.AzureContainerRegistryPassword).To(e => e.Password))
         .From<MongoDBConnectionStringChangedForApplication>(_ => _
             .Set(m => m.Resources.MongoDB.ConnectionString).To(e => e.ConnectionString))
+        .Children(m => m.Resources.MongoDB.Users, cb => cb
+            .IdentifiedBy(m => m.UserName)
+            .From<MongoDBUserChanged>(e => e
+                .UsingKey(e => e.UserName)
+                .Set(m => m.UserName).To(e => e.UserName)
+                .Set(m => m.Password).To(e => e.Password)))
         .From<IpAddressSetForApplication>(_ => _
             .Set(m => m.Resources.IpAddress).To(e => e.Address))
         .From<AzureVirtualNetworkIdentifierSetForApplication>(_ => _

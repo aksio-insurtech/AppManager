@@ -10,7 +10,7 @@ namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceStoragePulumiExtensions
 {
-    public static async Task<MicroserviceStorage> GetStorage(this Microservice microservice, Application application, ResourceGroup resourceGroup, ILogger<MicroserviceStorage> microserviceStorageLogger)
+    public static async Task<MicroserviceStorage> GetStorage(this Microservice microservice, Application application, ResourceGroup resourceGroup, ILogger<FileStorage> fileStorageLogger)
     {
         var getStorageAccountResult = GetStorageAccount.Invoke(new()
         {
@@ -33,7 +33,7 @@ public static class MicroserviceStoragePulumiExtensions
 
         var fileShareName = await fileShare.Name.GetValue();
         var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
-
-        return new MicroserviceStorage(application, microservice, storageAccount.Name, storageAccountKey, fileShareName, microserviceStorageLogger);
+        var fileStorage = new FileStorage(storageAccount.Name, storageAccountKey, fileShareName, fileStorageLogger);
+        return new MicroserviceStorage(application, microservice, fileStorage);
     }
 }

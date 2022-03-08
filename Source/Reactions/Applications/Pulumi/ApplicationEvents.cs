@@ -17,7 +17,11 @@ public static class ApplicationEvents
             events.Add(new MongoDBConnectionStringChangedForApplication(applicationResult.Environment, applicationResult.MongoDB.ConnectionString));
         }
 
-        events.Add(new MongoDBUserChanged("kernel", applicationResult.MongoDB.Password));
+        if (application.Resources?.MongoDB?.Users is null ||
+            !(application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        {
+            events.Add(new MongoDBUserChanged("kernel", applicationResult.MongoDB.Password));
+        }
 
         var ipAddress = await applicationResult.KernelContainerGroup.IpAddress.GetValue(_ => _!.Ip!);
         if (application.Resources?.IpAddress is null ||

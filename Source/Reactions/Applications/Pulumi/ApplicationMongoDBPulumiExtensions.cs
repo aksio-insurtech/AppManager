@@ -30,6 +30,12 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var databasePassword = Guid.NewGuid().ToString();
+        if (application.Resources?.MongoDB?.Users is not null &&
+            (application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        {
+            databasePassword = application.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password;
+        }
+
         _ = new DatabaseUser("kernel", new()
         {
             Username = "kernel",

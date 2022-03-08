@@ -15,18 +15,18 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     readonly ISettings _settings;
     readonly IExecutionContextManager _executionContextManager;
     readonly IEventLog _eventLog;
-    readonly ILogger<MicroserviceStorage> _microserviceStorageLogger;
+    readonly ILogger<FileStorage> _fileStorageLogger;
 
     public PulumiStackDefinitions(
         ISettings applicationSettings,
         IExecutionContextManager executionContextManager,
         IEventLog eventLog,
-        ILogger<MicroserviceStorage> microserviceStorageLogger)
+        ILogger<FileStorage> fileStorageLogger)
     {
         _settings = applicationSettings;
         _executionContextManager = executionContextManager;
         _eventLog = eventLog;
-        _microserviceStorageLogger = microserviceStorageLogger;
+        _fileStorageLogger = fileStorageLogger;
     }
 
     public PulumiFn Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment) =>
@@ -40,7 +40,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var mongoDB = await application.SetupMongoDB(_settings, environment, tags);
 
             var microservice = new Microservice(Guid.Empty, application.Id, "kernel");
-            var kernelStorage = new MicroserviceStorage(application, microservice, storage.AccountName, storage.AccountKey, storage.FileShare, _microserviceStorageLogger);
+            var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
+            var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
             kernelStorage.CreateAndUploadStorageJson(mongoDB);
             kernelStorage.CreateAndUploadAppSettings(_settings);
@@ -83,7 +84,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         {
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
-            var storage = await microservice.GetStorage(application, resourceGroup, _microserviceStorageLogger);
+            var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
             storage.CreateAndUploadAppSettings(_settings);
 
             Log.Info($"NetworkProfile : {application.Resources.AzureNetworkProfileIdentifier}");
@@ -108,7 +109,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         {
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
-            var storage = await microservice.GetStorage(application, resourceGroup, _microserviceStorageLogger);
+            var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
 
             _ = microservice.SetupContainerGroup(
                 application,
