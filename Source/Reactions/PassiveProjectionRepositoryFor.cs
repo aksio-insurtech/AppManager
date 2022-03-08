@@ -16,7 +16,7 @@ namespace Reactions;
 public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionRepositoryFor<TModel>
 {
     static readonly JsonSerializerOptions _serializerOptions;
-    readonly ProjectionDefinition _projectionDefinition;
+    readonly ProjectionDefinition? _projectionDefinition;
     readonly IClusterClient _clusterClient;
 
     static PassiveProjectionRepositoryFor()
@@ -37,26 +37,34 @@ public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionReposito
         IEventTypes eventTypes,
         IJsonSchemaGenerator schemaGenerator)
     {
-        var definer = projectionDefinitions.Single();
-        var builder = new ProjectionBuilderFor<TModel>(definer.Identifier, eventTypes, schemaGenerator)
-            .WithName($"PassiveProjection: {typeof(TModel).FullName}")
-            .Passive()
-            .NotRewindable();
-        definer.Define(builder);
-        _projectionDefinition = builder.Build();
         _clusterClient = clusterClient;
+        var definer = projectionDefinitions.SingleOrDefault();
+        if (definer is not null)
+        {
+            var builder = new ProjectionBuilderFor<TModel>(definer.Identifier, eventTypes, schemaGenerator)
+                .WithName($"PassiveProjection: {typeof(TModel).FullName}")
+                .Passive()
+                .NotRewindable();
 
-        var projections = _clusterClient.GetGrain<IProjections>(Guid.Empty);
-        var pipelineDefinition = new ProjectionPipelineDefinition(
-            _projectionDefinition.Identifier,
-            "c0c0196f-57e3-4860-9e3b-9823cf45df30", // Cratis default
-            Array.Empty<ProjectionResultStoreDefinition>());
+            definer.Define(builder);
+            _projectionDefinition = builder.Build();
 
-        projections.Register(_projectionDefinition, pipelineDefinition);
+            var projections = _clusterClient.GetGrain<IProjections>(Guid.Empty);
+            var pipelineDefinition = new ProjectionPipelineDefinition(
+                _projectionDefinition.Identifier,
+                "c0c0196f-57e3-4860-9e3b-9823cf45df30", // Cratis default
+                Array.Empty<ProjectionResultStoreDefinition>());
+
+            projections.Register(_projectionDefinition, pipelineDefinition);
+        }
     }
 
     public async Task<TModel> GetById(EventSourceId eventSourceId)
     {
+        if (_projectionDefinition is null)
+        {
+            return default!;
+        }
         var projection = _clusterClient.GetGrain<IProjection>(_projectionDefinition.Identifier);
         var json = await projection.GetModelInstanceById(eventSourceId);
         json["id"] = eventSourceId.Value;
