@@ -34,7 +34,6 @@ public class TestController : Controller
         var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
         var definition = _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development);
         _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
-        Console.WriteLine(definition);
     }
 
     [HttpGet("down")]
