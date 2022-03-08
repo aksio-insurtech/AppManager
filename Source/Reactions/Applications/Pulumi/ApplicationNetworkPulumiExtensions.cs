@@ -1,10 +1,11 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Pulumi;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
 using Pulumi.AzureNative.Resources;
-using NetworkSecurityGroupArgs = Pulumi.AzureNative.Network.Inputs.NetworkSecurityGroupArgs;
+using RouteArgs = Pulumi.AzureNative.Network.Inputs.RouteArgs;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -14,13 +15,6 @@ public static class ApplicationNetworkPulumiExtensions
 
     public static NetworkResult SetupNetwork(this Application application, ResourceGroup resourceGroup, Tags tags)
     {
-        var securityGroup = new NetworkSecurityGroup(application.Name, new()
-        {
-            Location = application.CloudLocation.Value,
-            ResourceGroupName = resourceGroup.Name,
-            Tags = tags
-        });
-
         var virtualNetwork = new VirtualNetwork(application.Name, new()
         {
             Location = application.CloudLocation.Value,
@@ -40,10 +34,6 @@ public static class ApplicationNetworkPulumiExtensions
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
                         Name = "internal",
-                        NetworkSecurityGroup = new NetworkSecurityGroupArgs
-                        {
-                            Id = securityGroup.Id
-                        },
                         ServiceEndpoints =
                         {
                             new ServiceEndpointPropertiesFormatArgs
@@ -69,11 +59,7 @@ public static class ApplicationNetworkPulumiExtensions
                     },
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
-                        Name = "external",
-                        NetworkSecurityGroup = new NetworkSecurityGroupArgs
-                        {
-                            Id = securityGroup.Id
-                        },
+                        Name = "AzureFirewallSubnet",
                         AddressPrefix = "10.0.2.0/24",
                     }
                 }
@@ -146,8 +132,77 @@ public static class ApplicationNetworkPulumiExtensions
             Location = application.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
+            IpConfigurations = new AzureFirewallIPConfigurationArgs
+            {
+                Name = "public",
+                PublicIPAddress = new SubResourceArgs
+                {
+                    Id = publicIPAddress.Id
+                },
+                Subnet = new SubResourceArgs
+                {
+                    Id = virtualNetwork.Subnets.Apply(_ => _[1].Id!)
+                }
+            },
+            NatRuleCollections =
+            {
+                new AzureFirewallNatRuleCollectionArgs
+                {
+                    Action = new AzureFirewallNatRCActionArgs
+                    {
+                        Type = AzureFirewallNatRCActionType.Dnat
+                    },
+                    Name = "webnatrulecollection",
+                    Priority = 112,
+                    Rules =
+                    {
+                        new AzureFirewallNatRuleArgs
+                        {
+                            Name = "DNAT-HTTP-traffic-with-FQDN",
+                            Description = "D-NAT all inbound web traffic",
+                            DestinationAddresses =
+                            {
+                                publicIPAddress.IpAddress.Apply(_ => _!)
+                            },
+                            DestinationPorts =
+                            {
+                                "80"
+                            },
+                            Protocols =
+                            {
+                                AzureFirewallNetworkRuleProtocol.TCP
+                            },
+                            SourceAddresses =
+                            {
+                                "*"
+                            },
+                            TranslatedFqdn = $"ingress.{privateZoneName}",
+                            TranslatedPort = "80"
+                        }
+                    }
+                }
+            }
         });
 
-        return new(securityGroup, virtualNetwork, profile, privateZone, publicIPAddress, firewall);
+        var routeTable = new RouteTable(application.Name, new()
+        {
+            Location = application.CloudLocation.Value,
+            ResourceGroupName = resourceGroup.Name,
+            Tags = tags,
+            DisableBgpRoutePropagation = true,
+            RouteTableName = $"{application.Name}Routes",
+            Routes =
+            {
+                new RouteArgs
+                {
+                    Name = "firewall",
+                    AddressPrefix = "0.0.0.0/0",
+                    NextHopType = RouteNextHopType.VirtualAppliance,
+                    NextHopIpAddress = firewall.IpConfigurations.Apply(_ => _[0].PrivateIPAddress)
+                }
+            }
+        });
+
+        return new(virtualNetwork, profile, privateZone, publicIPAddress, firewall);
     }
 }

@@ -30,7 +30,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     }
 
     public PulumiFn Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment) =>
-
         PulumiFn.Create(async () =>
         {
             var tags = application.GetTags(environment);
@@ -82,9 +81,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     public PulumiFn Microservice(ExecutionContext executionContext, Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
         PulumiFn.Create(async () =>
         {
-            // Todo: Set to actual tenant - and probably not here!
-            _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
-
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
             var storage = await microservice.GetStorage(application, resourceGroup, _microserviceStorageLogger);
@@ -102,14 +98,14 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                     new Deployable(Guid.Empty, microservice.Id, "main", "nginx")
                 },
                 tags);
+
+            // Todo: Set to actual execution context - might not be the right place for this!
+            _executionContextManager.Set(executionContext);
         });
 
     public PulumiFn Deployable(ExecutionContext executionContext, Application application, Microservice microservice, Deployable deployable, CloudRuntimeEnvironment environment) =>
         PulumiFn.Create(async () =>
         {
-            // Todo: Set to actual tenant - and probably not here!
-            _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
-
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
             var storage = await microservice.GetStorage(application, resourceGroup, _microserviceStorageLogger);
@@ -124,5 +120,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                     deployable
                 },
                 tags);
+
+            // Todo: Set to actual execution context - might not be the right place for this!
+            _executionContextManager.Set(executionContext);
         });
 }

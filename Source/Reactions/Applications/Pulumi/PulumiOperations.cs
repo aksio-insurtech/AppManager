@@ -33,7 +33,11 @@ public class PulumiOperations : IPulumiOperations
         _ = Task.Run(async () =>
         {
             var stack = await CreateStack(application, projectName, environment, definition);
-            await stack.UpAsync(new UpOptions { OnStandardOutput = Console.WriteLine });
+            await stack.UpAsync(new UpOptions
+            {
+                OnStandardOutput = Console.WriteLine,
+                OnStandardError = Console.Error.WriteLine
+            });
         });
     }
 

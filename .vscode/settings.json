@@ -57,8 +57,10 @@
         "Bson",
         "Cratis",
         "deployables",
+        "Dnat",
         "expando",
         "fluentui",
+        "Fqdns",
         "Pulumi",
         "Templating",
         "Xunit"

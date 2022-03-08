@@ -38,22 +38,19 @@ public static class ApplicationMongoDBPulumiExtensions
             DatabaseName = "admin",
             Roles = new DatabaseUserRoleArgs[]
             {
-                        new ()
-                        {
-                            DatabaseName = "admin",
-                            RoleName = "readWriteAnyDatabase"
-                        }
+                new ()
+                {
+                    DatabaseName = "admin",
+                    RoleName = "readWriteAnyDatabase"
+                }
             }
         });
 
-        _ = new ProjectIpAccessList("kernel", new()
-        {
-            ProjectId = project.Id,
-
-            // Todo: Only accept IP addresses from the actual running Microservices or Vnet or something
-            // IpAddress = container.IpAddress.Apply(_ => _!.Ip!)
-            IpAddress = "0.0.0.0"
-        });
+        // _ = new ProjectIpAccessList("kernel", new()
+        // {
+        //     ProjectId = project.Id,
+        //     IpAddress = "0.0.0.0/0"
+        // });
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
 
