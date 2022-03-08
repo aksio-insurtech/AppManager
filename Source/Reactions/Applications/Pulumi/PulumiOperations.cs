@@ -88,6 +88,14 @@ public class PulumiOperations : IPulumiOperations
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet)
         };
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
+
+        // TODO: This should probably be hidden behind a user action with a big "Are you sure? This could leave things in an inconsistent state".
+        var info = await stack.GetInfoAsync();
+        if (info?.Result == UpdateState.InProgress)
+        {
+            await stack.CancelAsync();
+        }
+
         await RemovePendingOperations(stack);
         await stack.Workspace.InstallPluginAsync("azure-native", "1.54.0");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.2.0");

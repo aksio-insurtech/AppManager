@@ -71,7 +71,14 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     Name = "nginx",
                     Image = "nginx",
-                    Command = "sh -c cp /app/config/nginx.conf /etc/nginx/nginx.conf && nginx -g daemon off;",
+                    Command =
+                    {
+                        "nginx",
+                        "-c",
+                        "/app/config/nginx.conf",
+                        "-g",
+                        "daemon off;"
+                    },
                     Ports = new ContainerPortArgs[]
                         {
                                 new()

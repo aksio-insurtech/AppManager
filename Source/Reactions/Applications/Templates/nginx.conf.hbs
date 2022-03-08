@@ -7,7 +7,7 @@ http {
         root /var/www/html/;
 
         location / {
-            proxy_pass http://target-service:80;
+            proxy_pass http://10.0.1.6:80;
             proxy_set_header Host $http_host;
         }
     }
