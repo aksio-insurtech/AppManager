@@ -2,29 +2,37 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Azure;
+using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.ContainerInstance;
 using Pulumi.AzureNative.ContainerInstance.Inputs;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
 using Pulumi.AzureNative.Resources;
+using Reactions.Applications.Templates;
 using FileShare = Pulumi.AzureNative.Storage.FileShare;
 
 namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationIngressPulumiExtensions
 {
-    public static void SetupIngress(
+    public static async Task SetupIngress(
         this Application application,
         ResourceGroup resourceGroup,
         AzureNetworkProfileIdentifier networkProfile,
         StorageResult storage,
-        Tags tags)
+        Tags tags,
+        ILogger<FileStorage> fileStorageLogger)
     {
         var fileShare = new FileShare("ingress", new()
         {
             AccountName = storage.AccountName,
             ResourceGroupName = resourceGroup.Name,
         });
+
+        var fileShareName = await fileShare.Name.GetValue();
+        var content = TemplateTypes.IngressConfig(new { Something = 42 });
+        var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
+        fileStorage.Upload("nginx.conf", content);
 
         var containerGroup = new ContainerGroup("ingress", new()
         {
@@ -63,7 +71,7 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     Name = "nginx",
                     Image = "nginx",
-                    Command = "nginx -g daemon off;",
+                    Command = "sh -c cp /app/config/nginx.conf /etc/nginx/nginx.conf && nginx -g daemon off;",
                     Ports = new ContainerPortArgs[]
                         {
                                 new()

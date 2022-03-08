@@ -48,7 +48,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             var networkProfile = await network.Profile.Id.GetValue();
 
-            application.SetupIngress(resourceGroup, networkProfile, storage, tags);
+            await application.SetupIngress(resourceGroup, networkProfile, storage, tags, _fileStorageLogger);
             var kernelContainer = microservice.SetupContainerGroup(
                 application,
                 resourceGroup,
@@ -56,7 +56,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 kernelStorage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.1")
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.2")
                 },
                 tags);
 

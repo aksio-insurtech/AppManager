@@ -26,6 +26,11 @@ public static class TemplateTypes
     /// </summary>
     public static readonly HandlebarsTemplate<object, object> ClusterKernel = Handlebars.Compile(GetTemplate("cluster.kernel.json"));
 
+    /// <summary>
+    /// The template for 'nginx.conf' for the "ingress controller".
+    /// </summary>
+    public static readonly HandlebarsTemplate<object, object> IngressConfig = Handlebars.Compile(GetTemplate("nginx.conf"));
+
     static TemplateTypes()
     {
         Handlebars.RegisterHelper("camelcase", (writer, _, parameters) => writer.WriteSafeString(parameters[0].ToString()!.ToCamelCase()));
