@@ -8,6 +8,7 @@ using Azure.Storage.Files.Shares;
 using Common;
 using Microsoft.Extensions.Logging;
 using Pulumi;
+using Reactions.Applications.Pulumi;
 using Reactions.Applications.Templates;
 
 namespace Reactions.Applications;
@@ -61,8 +62,11 @@ public class MicroserviceStorage
         file.Upload(stream);
     }
 
-    public void CreateAndUploadStorageJson(string mongoDBConnectionString)
+    public void CreateAndUploadStorageJson(MongoDBResult mongoDB)
     {
+        const string scheme = "mongodb+srv://";
+        var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
+
         var storageConfig = new Aksio.Cratis.Configuration.Storage();
         var readModels = storageConfig["readModels"] = new()
         {

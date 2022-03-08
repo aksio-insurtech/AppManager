@@ -42,7 +42,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var microservice = new Microservice(Guid.Empty, application.Id, "kernel");
             var kernelStorage = new MicroserviceStorage(application, microservice, storage.AccountName, storage.AccountKey, storage.FileShare, _microserviceStorageLogger);
 
-            kernelStorage.CreateAndUploadStorageJson(mongoDB.ConnectionString);
+            kernelStorage.CreateAndUploadStorageJson(mongoDB);
             kernelStorage.CreateAndUploadAppSettings(_settings);
 
             var networkProfile = await network.Profile.Id.GetValue();

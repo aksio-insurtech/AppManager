@@ -53,10 +53,6 @@ public static class ApplicationMongoDBPulumiExtensions
         // });
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
-
-        const string scheme = "mongodb+srv://";
-        var mongoDBConnectionString = connectionString.Insert(scheme.Length, $"kernel:{databasePassword}@");
-
         return new(cluster, connectionString, databasePassword);
     }
 }
