@@ -178,6 +178,29 @@ public static class ApplicationNetworkPulumiExtensions
                             },
                             TranslatedFqdn = $"ingress.{privateZoneName}",
                             TranslatedPort = "80"
+                        },
+                        new AzureFirewallNatRuleArgs
+                        {
+                            Name = "DNAT-HTTPS-traffic-with-FQDN",
+                            Description = "D-NAT all inbound web TLS traffic",
+                            DestinationAddresses =
+                            {
+                                publicIPAddress.IpAddress.Apply(_ => _!)
+                            },
+                            DestinationPorts =
+                            {
+                                "443"
+                            },
+                            Protocols =
+                            {
+                                AzureFirewallNetworkRuleProtocol.TCP
+                            },
+                            SourceAddresses =
+                            {
+                                "*"
+                            },
+                            TranslatedFqdn = $"ingress.{privateZoneName}",
+                            TranslatedPort = "443"
                         }
                     }
                 }
