@@ -18,6 +18,9 @@ public static class MicroserviceContainerGroupPulumiExtensions
         Application application,
         ResourceGroup resourceGroup,
         AzureNetworkProfileIdentifier networkProfile,
+        string containerRegistryLoginServer,
+        string containerRegistryUserName,
+        string containerRegistryPassword,
         MicroserviceStorage storage,
         IEnumerable<Deployable> deployables,
         Tags tags)
@@ -30,6 +33,15 @@ public static class MicroserviceContainerGroupPulumiExtensions
         {
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
+            ImageRegistryCredentials =
+            {
+                new ImageRegistryCredentialArgs
+                {
+                    Server = containerRegistryLoginServer,
+                    Username = containerRegistryUserName,
+                    Password = containerRegistryPassword
+                }
+            },
             Volumes = new VolumeArgs[]
             {
                             new()

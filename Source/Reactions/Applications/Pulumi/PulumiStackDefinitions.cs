@@ -5,7 +5,6 @@ using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
 using Microsoft.Extensions.Logging;
-using Pulumi;
 using Pulumi.Automation;
 
 namespace Reactions.Applications.Pulumi;
@@ -53,6 +52,9 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 application,
                 resourceGroup,
                 networkProfile,
+                containerRegistry.LoginServer,
+                containerRegistry.UserName,
+                containerRegistry.Password,
                 kernelStorage,
                 new[]
                 {
@@ -88,17 +90,19 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var resourceGroup = application.SetupResourceGroup();
             var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
             storage.CreateAndUploadAppSettings(_settings);
+            storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
 
-            Log.Info($"NetworkProfile : {application.Resources.AzureNetworkProfileIdentifier}");
-
-            _ = microservice.SetupContainerGroup(
+            var microserviceResult = microservice.SetupContainerGroup(
                 application,
                 resourceGroup,
                 application.Resources.AzureNetworkProfileIdentifier,
+                application.Resources.AzureContainerRegistryLoginServer,
+                application.Resources.AzureContainerRegistryUserName,
+                application.Resources.AzureContainerRegistryPassword,
                 storage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "main", "nginx")
+                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/medlemmer")
                 },
                 tags);
 
@@ -117,6 +121,9 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 application,
                 resourceGroup,
                 application.Resources.AzureNetworkProfileIdentifier,
+                application.Resources.AzureContainerRegistryLoginServer,
+                application.Resources.AzureContainerRegistryUserName,
+                application.Resources.AzureContainerRegistryPassword,
                 storage,
                 new[]
                 {
