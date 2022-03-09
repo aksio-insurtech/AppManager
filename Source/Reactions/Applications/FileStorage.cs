@@ -13,6 +13,7 @@ public class FileStorage
     readonly ShareDirectoryClient _directoryClient;
     readonly ILogger<FileStorage> _logger;
 
+    public string ConnectionString { get; }
     public string AccountName { get; }
     public string AccessKey { get; }
     public string ShareName { get; }
@@ -23,8 +24,8 @@ public class FileStorage
         string shareName,
         ILogger<FileStorage> logger)
     {
-        var connectionString = $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accessKey};EndpointSuffix=core.windows.net";
-        var shareClient = new ShareClient(connectionString, shareName);
+        ConnectionString = $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accessKey};EndpointSuffix=core.windows.net";
+        var shareClient = new ShareClient(ConnectionString, shareName);
         _directoryClient = shareClient.GetDirectoryClient("./");
         AccountName = accountName;
         AccessKey = accessKey;

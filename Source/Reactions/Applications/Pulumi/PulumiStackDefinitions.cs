@@ -49,7 +49,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var networkProfile = await network.Profile.Id.GetValue();
 
             await application.SetupIngress(resourceGroup, networkProfile, storage, tags, _fileStorageLogger);
-            var kernelContainer = microservice.SetupContainerGroup(
+            var kernel = await microservice.SetupContainerGroup(
                 application,
                 resourceGroup,
                 networkProfile,
@@ -60,6 +60,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 },
                 tags);
 
+            kernelStorage.CreateAndUploadClusterKernelConfig(kernel.IpAddress, fileStorage.ConnectionString);
+
             var applicationResult = new ApplicationResult(
                 environment,
                 resourceGroup,
@@ -67,7 +69,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 storage,
                 containerRegistry,
                 mongoDB,
-                kernelContainer);
+                kernel);
 
             var events = await application.GetEventsToAppend(applicationResult);
 

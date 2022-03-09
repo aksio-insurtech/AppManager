@@ -13,7 +13,7 @@ namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceContainerGroupPulumiExtensions
 {
-    public static ContainerGroup SetupContainerGroup(
+    public static async Task<ContainerGroupResult> SetupContainerGroup(
         this Microservice microservice,
         Application application,
         ResourceGroup resourceGroup,
@@ -90,7 +90,8 @@ public static class MicroserviceContainerGroupPulumiExtensions
             ContainerGroupName = containerGroup.Name,
             ResourceGroupName = resourceGroup.Name
         });
-        var ipAddress = getContainerGroupResult.Apply(_ => _.IpAddress);
+        var ipAddress = await getContainerGroupResult.Apply(_ => _.IpAddress!).GetValue(_ => _.Ip!);
+        Log.Info($"IP address for {microservice.Name} is {ipAddress}");
 
         _ = new PrivateRecordSet(microservice.Name.Value, new()
         {
@@ -103,16 +104,11 @@ public static class MicroserviceContainerGroupPulumiExtensions
             {
                 new ARecordArgs
                 {
-                    Ipv4Address = ipAddress.Apply(_ =>
-                    {
-                        var ip = _!.Ip!;
-                        Log.Info($"IP address for {microservice.Name} is {ip}");
-                        return ip;
-                    })
+                    Ipv4Address = ipAddress
                 }
             }
         });
 
-        return containerGroup;
+        return new(containerGroup, ipAddress);
     }
 }

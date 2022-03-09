@@ -23,7 +23,7 @@ public static class ApplicationEvents
             events.Add(new MongoDBUserChanged("kernel", applicationResult.MongoDB.Password));
         }
 
-        var ipAddress = await applicationResult.KernelContainerGroup.IpAddress.GetValue(_ => _!.Ip!);
+        var ipAddress = applicationResult.Kernel.IpAddress;
         if (application.Resources?.IpAddress is null ||
             application.Resources?.IpAddress.Value != ipAddress)
         {
