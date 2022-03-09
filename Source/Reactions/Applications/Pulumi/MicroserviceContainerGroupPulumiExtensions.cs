@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Azure;
+using Pulumi;
 using Pulumi.AzureNative.ContainerInstance;
 using Pulumi.AzureNative.ContainerInstance.Inputs;
 using Pulumi.AzureNative.Network;
@@ -84,6 +85,13 @@ public static class MicroserviceContainerGroupPulumiExtensions
             }).ToArray()
         });
 
+        var getContainerGroupResult = GetContainerGroup.Invoke(new()
+        {
+            ContainerGroupName = containerGroup.Name,
+            ResourceGroupName = resourceGroup.Name
+        });
+        var ipAddress = getContainerGroupResult.Apply(_ => _.IpAddress);
+
         _ = new PrivateRecordSet(microservice.Name.Value, new()
         {
             ResourceGroupName = resourceGroup.Name,
@@ -95,7 +103,12 @@ public static class MicroserviceContainerGroupPulumiExtensions
             {
                 new ARecordArgs
                 {
-                    Ipv4Address = containerGroup.IpAddress.Apply(_ => _!.Ip!)
+                    Ipv4Address = ipAddress.Apply(_ =>
+                    {
+                        var ip = _!.Ip!;
+                        Log.Info($"IP address for {microservice.Name} is {ip}");
+                        return ip;
+                    })
                 }
             }
         });

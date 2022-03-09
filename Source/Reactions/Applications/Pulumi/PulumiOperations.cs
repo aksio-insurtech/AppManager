@@ -125,6 +125,12 @@ public class PulumiOperations : IPulumiOperations
         var stackDeployment = await stack.ExportStackAsync();
         var jsonNode = JsonNode.Parse(stackDeployment.Json.GetRawText())!.AsObject();
         var deployment = jsonNode!["deployment"]!.AsObject();
+        if (deployment["pending_operations"] is not JsonArray pendingOperations || pendingOperations.Count == 0)
+        {
+            _logger.NoPendingOperations();
+            return;
+        }
+
         deployment.Remove("pending_operations");
         deployment.Add("pending_operations", new JsonArray());
         var jsonString = jsonNode.ToJsonString(new JsonSerializerOptions()

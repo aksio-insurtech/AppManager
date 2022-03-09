@@ -12,4 +12,7 @@ public static partial class PulumiRunnerLogMessages
 
     [LoggerMessage(1, LogLevel.Information, "Importing stack after removing any pending operations")]
     public static partial void ImportStack(this ILogger logger);
+
+    [LoggerMessage(2, LogLevel.Information, "No pending operations in stack")]
+    public static partial void NoPendingOperations(this ILogger logger);
 }

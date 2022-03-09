@@ -104,6 +104,13 @@ public static class ApplicationIngressPulumiExtensions
             }
         });
 
+        var getContainerGroupResult = GetContainerGroup.Invoke(new()
+        {
+            ContainerGroupName = containerGroup.Name,
+            ResourceGroupName = resourceGroup.Name
+        });
+        var ipAddress = getContainerGroupResult.Apply(_ => _.IpAddress);
+
         _ = new PrivateRecordSet("ingress", new()
         {
             ResourceGroupName = resourceGroup.Name,
@@ -115,7 +122,7 @@ public static class ApplicationIngressPulumiExtensions
             {
                 new ARecordArgs
                 {
-                    Ipv4Address = containerGroup.IpAddress.Apply(_ => _!.Ip!)
+                    Ipv4Address = ipAddress.Apply(_ => _!.Ip!)
                 }
             }
         });
