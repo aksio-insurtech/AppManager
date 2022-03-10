@@ -85,7 +85,11 @@ public class PulumiOperations : IPulumiOperations
         var stackName = environment.GetStackNameFor();
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
-            ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet)
+            ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
+            EnvironmentVariables = new Dictionary<string, string?>
+            {
+                { "TF_LOG", "TRACE" }
+            }
         };
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
 
@@ -97,7 +101,7 @@ public class PulumiOperations : IPulumiOperations
         }
 
         await RemovePendingOperations(stack);
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.54.0");
+        await stack.Workspace.InstallPluginAsync("azure-native", "1.60.0");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.2.0");
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
