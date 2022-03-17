@@ -5,4 +5,4 @@ using Concepts.Applications;
 
 namespace Reactions.Applications;
 
-public record Deployable(DeployableId Id, MicroserviceId MicroserviceId, DeployableName Name, string Image);
+public record Deployable(DeployableId Id, MicroserviceId MicroserviceId, DeployableName Name, string Image, IEnumerable<int> Ports);

@@ -58,7 +58,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 kernelStorage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.2")
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.2", new[] { 80 })
                 },
                 tags);
 
@@ -102,7 +102,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 storage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/medlemmer")
+                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/medlemmer:1.2.5", new[] { 80 }),
+                    new Deployable(Guid.Empty, microservice.Id, "fto", $"{application.Resources.AzureContainerRegistryLoginServer}/ftoapi:1.1.3", new[] { 5003 })
                 },
                 tags);
 

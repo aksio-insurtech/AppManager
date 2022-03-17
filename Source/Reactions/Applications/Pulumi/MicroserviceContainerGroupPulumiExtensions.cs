@@ -59,10 +59,7 @@ public static class MicroserviceContainerGroupPulumiExtensions
             IpAddress = new IpAddressArgs
             {
                 Type = ContainerGroupIpAddressType.Private,
-                Ports = new PortArgs()
-                {
-                    Port = 80
-                }
+                Ports = deployables.SelectMany(deployable => deployable.Ports).Select(port => new PortArgs { Port = port }).ToArray()
             },
             NetworkProfile = new ContainerGroupNetworkProfileArgs
             {
@@ -73,20 +70,17 @@ public static class MicroserviceContainerGroupPulumiExtensions
             {
                 Name = deployable.Name.Value,
                 Image = deployable.Image,
-                Ports = new ContainerPortArgs[]
-                    {
-                            new()
-                            {
-                                Port = 80,
-                                Protocol = "TCP"
-                            }
-                    },
+                Ports = deployable.Ports.Select(port => new ContainerPortArgs
+                {
+                    Port = port,
+                    Protocol = "TCP"
+                }).ToArray(),
                 Resources = new ResourceRequirementsArgs()
                 {
                     Requests = new ResourceRequestsArgs
                     {
-                        Cpu = 1,
-                        MemoryInGB = 1
+                        Cpu = 1.0d / deployables.Count(),
+                        MemoryInGB = 1.0d / deployables.Count()
                     }
                 },
                 VolumeMounts = new VolumeMountArgs()
