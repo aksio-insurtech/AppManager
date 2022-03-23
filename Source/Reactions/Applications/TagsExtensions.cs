@@ -11,8 +11,8 @@ public static class TagsExtensions
     {
         return new Tags(new Dictionary<string, string>
                 {
-                        { "application", application.Id.ToString() },
-                        { "applicationName", application.Name.Value },
+                        { "applicationId", application.Id.ToString() },
+                        { "application", application.Name.Value },
                         { "environment", Enum.GetName(typeof(CloudRuntimeEnvironment), environment) ?? string.Empty }
                 });
     }
