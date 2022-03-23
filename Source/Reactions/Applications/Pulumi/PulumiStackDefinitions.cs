@@ -102,8 +102,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 storage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/medlemmer:1.2.5", new[] { 80 }),
-                    new Deployable(Guid.Empty, microservice.Id, "fto", $"{application.Resources.AzureContainerRegistryLoginServer}/ftoapi:1.1.3", new[] { 5003 })
+                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/medlemmer:1.2.8", new[] { 80 }),
+                    new Deployable(Guid.Empty, microservice.Id, "fto", $"{application.Resources.AzureContainerRegistryLoginServer}/ftoapi:1.1.6", new[] { 5003 })
                 },
                 tags);
 
