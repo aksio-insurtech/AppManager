@@ -59,7 +59,7 @@ public static class MicroserviceContainerGroupPulumiExtensions
             IpAddress = new IpAddressArgs
             {
                 Type = ContainerGroupIpAddressType.Private,
-                Ports = deployables.SelectMany(deployable => deployable.Ports).Select(port => new PortArgs { Port = port }).ToArray()
+                Ports = deployables.SelectMany(deployable => deployable.Ports).Select(port => new PortArgs { Port = port }).ToArray()
             },
             NetworkProfile = new ContainerGroupNetworkProfileArgs
             {
