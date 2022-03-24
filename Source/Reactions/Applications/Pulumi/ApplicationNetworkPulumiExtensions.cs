@@ -504,114 +504,13 @@ public static class ApplicationNetworkPulumiExtensions
                     },
                     SslPolicy = new ApplicationGatewaySslPolicyArgs
                     {
-                        CipherSuites =
-                        {
-                            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                        },
-                        MinProtocolVersion = ApplicationGatewaySslProtocol.TLSv1_1,
-                        PolicyType = ApplicationGatewaySslPolicyType.Predefined
+                        PolicyType = ApplicationGatewaySslPolicyType.Predefined,
+                        PolicyName = ApplicationGatewaySslPolicyName.AppGwSslPolicy20170401
                     }
                 }
             }
         });
 
-        // var firewall = new AzureFirewall(application.Name, new()
-        // {
-        //     Location = application.CloudLocation.Value,
-        //     ResourceGroupName = resourceGroup.Name,
-        //     Tags = tags,
-        //     IpConfigurations = new AzureFirewallIPConfigurationArgs
-        //     {
-        //         Name = "public",
-        //         PublicIPAddress = new SubResourceArgs
-        //         {
-        //             Id = publicIPAddress.Id
-        //         },
-        //         Subnet = new SubResourceArgs
-        //         {
-        //             Id = virtualNetwork.Subnets.Apply(_ => _[1].Id!)
-        //         }
-        //     },
-        //     NatRuleCollections =
-        //     {
-        //         new AzureFirewallNatRuleCollectionArgs
-        //         {
-        //             Action = new AzureFirewallNatRCActionArgs
-        //             {
-        //                 Type = AzureFirewallNatRCActionType.Dnat
-        //             },
-        //             Name = "webnatrulecollection",
-        //             Priority = 112,
-        //             Rules =
-        //             {
-        //                 new AzureFirewallNatRuleArgs
-        //                 {
-        //                     Name = "DNAT-HTTP-traffic-with-FQDN",
-        //                     Description = "D-NAT all inbound web traffic",
-        //                     DestinationAddresses =
-        //                     {
-        //                         publicIPAddress.IpAddress.Apply(_ => _!)
-        //                     },
-        //                     DestinationPorts =
-        //                     {
-        //                         "80"
-        //                     },
-        //                     Protocols =
-        //                     {
-        //                         AzureFirewallNetworkRuleProtocol.TCP
-        //                     },
-        //                     SourceAddresses =
-        //                     {
-        //                         "*"
-        //                     },
-        //                     TranslatedFqdn = $"ingress.{privateZoneName}",
-        //                     TranslatedPort = "80"
-        //                 },
-        //                 new AzureFirewallNatRuleArgs
-        //                 {
-        //                     Name = "DNAT-HTTPS-traffic-with-FQDN",
-        //                     Description = "D-NAT all inbound web TLS traffic",
-        //                     DestinationAddresses =
-        //                     {
-        //                         publicIPAddress.IpAddress.Apply(_ => _!)
-        //                     },
-        //                     DestinationPorts =
-        //                     {
-        //                         "443"
-        //                     },
-        //                     Protocols =
-        //                     {
-        //                         AzureFirewallNetworkRuleProtocol.TCP
-        //                     },
-        //                     SourceAddresses =
-        //                     {
-        //                         "*"
-        //                     },
-        //                     TranslatedFqdn = $"ingress.{privateZoneName}",
-        //                     TranslatedPort = "443"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // });
-        // var routeTable = new RouteTable(application.Name, new()
-        // {
-        //     Location = application.CloudLocation.Value,
-        //     ResourceGroupName = resourceGroup.Name,
-        //     Tags = tags,
-        //     DisableBgpRoutePropagation = true,
-        //     RouteTableName = $"{application.Name}Routes",
-        //     Routes =
-        //     {
-        //         new RouteArgs
-        //         {
-        //             Name = "firewall",
-        //             AddressPrefix = "0.0.0.0/0",
-        //             NextHopType = RouteNextHopType.VirtualAppliance,
-        //             NextHopIpAddress = firewall.IpConfigurations.Apply(_ => _[0].PrivateIPAddress)
-        //         }
-        //     }
-        // });
         return new(virtualNetwork, profile, privateZone, publicIPAddress, null!);
     }
 }
