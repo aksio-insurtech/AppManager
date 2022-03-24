@@ -10,4 +10,4 @@ public record NetworkResult(
     NetworkProfile Profile,
     PrivateZone DnsZone,
     PublicIPAddress IpAddress,
-    AzureFirewall Firewall);
+    ApplicationGateway ApplicationGateway);

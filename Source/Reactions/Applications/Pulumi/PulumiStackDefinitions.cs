@@ -33,7 +33,9 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         {
             var tags = application.GetTags(environment);
             var resourceGroup = application.SetupResourceGroup();
-            var network = application.SetupNetwork(resourceGroup, tags);
+            var identity = application.SetupUserAssignedIdentity(resourceGroup, tags);
+            var vault = application.SetupKeyVault(identity, resourceGroup, tags);
+            var network = await application.SetupNetwork(identity, vault, resourceGroup, tags);
             var storage = await application.SetupStorage(resourceGroup, tags);
             var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
             var mongoDB = await application.SetupMongoDB(_settings, environment, tags);
