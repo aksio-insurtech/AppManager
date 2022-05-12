@@ -101,7 +101,7 @@ public class PulumiOperations : IPulumiOperations
         }
 
         await RemovePendingOperations(stack);
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.60.0");
+        await stack.Workspace.InstallPluginAsync("azure-native", "1.61.0");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.2.0");
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
