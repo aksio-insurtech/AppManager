@@ -100,7 +100,6 @@ dotnet_diagnostic.CA1805.severity = none
 # Use pattern matching (not operator) (IDE0083)
 dotnet_diagnostic.IDE0083.severity = none
 # CA1309: Use ordinal StringComparison
-dotnet_diagnostic.CA1309.severity = none
 # CA1000: Do not declare static members on generic types
 dotnet_diagnostic.CA1000.severity = none
 # RCS1018: Add accessibility modifiers
