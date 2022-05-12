@@ -24,7 +24,7 @@ public static class ApplicationMongoDBPulumiExtensions
             ProjectId = project.Id,
             ProviderName = "TENANT",
             BackingProviderName = "AZURE",
-            ProviderInstanceSizeName = "M0",
+            ProviderInstanceSizeName = "M2",
             ProviderRegionName = "EUROPE_NORTH",
             Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
         });
