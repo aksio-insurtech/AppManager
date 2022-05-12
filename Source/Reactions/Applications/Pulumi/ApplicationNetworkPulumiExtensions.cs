@@ -178,7 +178,7 @@ public static class ApplicationNetworkPulumiExtensions
             {
                 Name = ApplicationGatewaySkuName.Standard_v2,
                 Tier = ApplicationGatewayTier.Standard_v2,
-                Capacity = 2
+                Capacity = 1
             },
             BackendAddressPools =
             {
