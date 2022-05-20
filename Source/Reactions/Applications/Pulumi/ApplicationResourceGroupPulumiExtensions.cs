@@ -9,7 +9,7 @@ public static class ApplicationResourceGroupPulumiExtensions
 {
     public static ResourceGroup SetupResourceGroup(this Application application)
     {
-        var resourceGroupId = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG";
-        return ResourceGroup.Get("Einar-D-Norway-RG", resourceGroupId);
+        var resourceGroupId = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG-2";
+        return ResourceGroup.Get("Einar-D-Norway-RG-2", resourceGroupId);
     }
 }

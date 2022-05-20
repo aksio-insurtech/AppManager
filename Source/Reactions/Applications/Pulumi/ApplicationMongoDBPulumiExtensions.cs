@@ -18,7 +18,7 @@ public static class ApplicationMongoDBPulumiExtensions
             OrgId = mongoDBOrganizationId.Value
         });
 
-        var clusterName = $"{application.Name}-{environment.GetStackNameFor()}".ToLowerInvariant();
+        var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
             ProjectId = project.Id,

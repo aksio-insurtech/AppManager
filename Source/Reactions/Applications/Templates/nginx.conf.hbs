@@ -6,45 +6,6 @@ http {
         server_name dev.opensjon.aksio.app;
         server_tokens off;
 
-        # location /.well-known/acme-challenge/ {
-        #     root /var/www/certbot;
-        # }
-
-        auth_request /validate;
-
-        location /auth {
-            auth_request off;
-            allow all;
-            proxy_pass http://ingress.myapplication.local:9090/auth;
-            proxy_set_header Host $http_host;
-        }
-
-        location /login {
-            auth_request off;
-            allow all;
-            proxy_pass http://ingress.myapplication.local:9090/login;
-            proxy_set_header Host $http_host;
-        }
-
-        location = /validate {
-            proxy_pass http://ingress.myapplication.local:9090/validate;
-            proxy_set_header Host $http_host;
-            proxy_pass_request_body off;
-            proxy_set_header Content-Length "";
-
-            auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
-
-            auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
-            auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
-            auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
-        }
-
-        error_page 401 = @error401;
-
-        location @error401 {
-            return 302 https://$http_host/login?url=$scheme://$http_host$request_uri&vouch-failcount=$auth_resp_failcount&X-Vouch-Token=$auth_resp_jwt&error=$auth_resp_err;
-        }
-
         location / {
             proxy_pass http://mymicroservice3.myapplication.local:80;
             proxy_set_header Host $http_host;

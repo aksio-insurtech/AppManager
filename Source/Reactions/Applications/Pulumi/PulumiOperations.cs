@@ -57,14 +57,14 @@ public class PulumiOperations : IPulumiOperations
         _ = Task.Run(async () =>
         {
             var stack = await CreateStack(application, projectName, environment, definition);
-            await stack.Workspace.RemoveStackAsync(environment.GetStackNameFor());
+            await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
         });
     }
 
     /// <inheritdoc/>
     public async Task SetTag(string projectName, CloudRuntimeEnvironment environment, string tagName, string value)
     {
-        var stackName = environment.GetStackNameFor();
+        var stackName = environment.ToDisplayName();
         var payload = new
         {
             name = tagName,
@@ -82,7 +82,7 @@ public class PulumiOperations : IPulumiOperations
 
     async Task<WorkspaceStack> CreateStack(Application application, string projectName, CloudRuntimeEnvironment environment, PulumiFn program)
     {
-        var stackName = environment.GetStackNameFor();
+        var stackName = environment.ToDisplayName();
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
@@ -101,7 +101,7 @@ public class PulumiOperations : IPulumiOperations
         }
 
         await RemovePendingOperations(stack);
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.61.0");
+        await stack.Workspace.InstallPluginAsync("azure-native", "1.64.1");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.2.0");
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {

@@ -36,6 +36,14 @@ public class TestController : Controller
         _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
     }
 
+    [HttpGet("containerapp")]
+    public async Task UpContainerApp()
+    {
+        var application = await _application.GetById("cd9b5601-1966-4c67-a393-039386dfba20");
+        var definition = _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+    }
+
     [HttpGet("down")]
     public async Task Down()
     {
@@ -49,6 +57,16 @@ public class TestController : Controller
     {
         var application = await _application.GetById("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
         var microservice = await _microservice.GetById("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
+        var projectName = $"{application.Name}-{microservice.Name}";
+        var definition = _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+    }
+
+    [HttpGet("microservice/containerapp")]
+    public async Task MicroserviceUpContainerApp()
+    {
+        var application = await _application.GetById("cd9b5601-1966-4c67-a393-039386dfba20");
+        var microservice = await _microservice.GetById("b2c57f22-4e45-41e8-9593-c5a3f8f8b9ca");
         var projectName = $"{application.Name}-{microservice.Name}";
         var definition = _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development);
         _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);

@@ -35,7 +35,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var resourceGroup = application.SetupResourceGroup();
             var identity = application.SetupUserAssignedIdentity(resourceGroup, tags);
             var vault = application.SetupKeyVault(identity, resourceGroup, tags);
-            var network = await application.SetupNetwork(identity, vault, resourceGroup, tags);
+            var network = application.SetupNetwork(identity, vault, resourceGroup, tags);
             var storage = await application.SetupStorage(resourceGroup, tags);
             var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
             var mongoDB = await application.SetupMongoDB(_settings, environment, tags);
@@ -49,40 +49,60 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             var networkProfile = await network.Profile.Id.GetValue();
 
-            await application.SetupIngress(resourceGroup, networkProfile, storage, tags, _fileStorageLogger);
-            var kernel = await microservice.SetupContainerGroup(
+            var applicationInsights = application.SetupApplicationInsights(resourceGroup, environment, tags);
+            var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationInsights, tags);
+
+            var kernel = await microservice.SetupContainerApp(
                 application,
                 resourceGroup,
                 networkProfile,
+                managedEnvironment,
                 containerRegistry.LoginServer,
                 containerRegistry.UserName,
                 containerRegistry.Password,
                 kernelStorage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.2", new[] { 80 })
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.13.1", new[] { 80 })
                 },
                 tags);
+            kernelStorage.CreateAndUploadClusterKernelConfig(kernel.SiloHostName, fileStorage.ConnectionString);
 
-            kernelStorage.CreateAndUploadClusterKernelConfig(kernel.IpAddress, fileStorage.ConnectionString);
+            Console.WriteLine(_eventLog);
 
-            var applicationResult = new ApplicationResult(
-                environment,
-                resourceGroup,
-                network,
-                storage,
-                containerRegistry,
-                mongoDB,
-                kernel);
-
-            var events = await application.GetEventsToAppend(applicationResult);
-
-            // Todo: Set to actual execution context - might not be the right place for this!
-            _executionContextManager.Set(executionContext);
-            foreach (var @event in events)
-            {
-                await _eventLog.Append(application.Id, @event);
-            }
+            // Setup ManagedEnvironment
+            // Setup LogAnalytics - retention as low as we can
+            // For each microservice, setup a Container App connected to the same environment
+            // await application.SetupIngress(resourceGroup, networkProfile, storage, tags, _fileStorageLogger);
+            // var kernel = await microservice.SetupContainerGroup(
+            //     application,
+            //     resourceGroup,
+            //     networkProfile,
+            //     containerRegistry.LoginServer,
+            //     containerRegistry.UserName,
+            //     containerRegistry.Password,
+            //     kernelStorage,
+            //     new[]
+            //     {
+            //         new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.11.2", new[] { 80 })
+            //     },
+            //     tags);
+            // kernelStorage.CreateAndUploadClusterKernelConfig(kernel.IpAddress, fileStorage.ConnectionString);
+            // var applicationResult = new ApplicationResult(
+            //     environment,
+            //     resourceGroup,
+            //     network,
+            //     storage,
+            //     containerRegistry,
+            //     mongoDB,
+            //     kernel);
+            // var events = await application.GetEventsToAppend(applicationResult);
+            // // Todo: Set to actual execution context - might not be the right place for this!
+            // _executionContextManager.Set(executionContext);
+            // foreach (var @event in events)
+            // {
+            //     await _eventLog.Append(application.Id, @event);
+            // }
         });
 
     public PulumiFn Microservice(ExecutionContext executionContext, Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>
@@ -104,8 +124,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 storage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/members:1.2.9", new[] { 80 }),
-                    new Deployable(Guid.Empty, microservice.Id, "fto", $"{application.Resources.AzureContainerRegistryLoginServer}/ftoapi:1.1.7", new[] { 5003 })
+                    new Deployable(Guid.Empty, microservice.Id, "main", $"{application.Resources.AzureContainerRegistryLoginServer}/members:1.2.12", new[] { 80 }),
+                    new Deployable(Guid.Empty, microservice.Id, "fto", $"{application.Resources.AzureContainerRegistryLoginServer}/ftoapi:1.1.8", new[] { 5003 })
                 },
                 tags);
 

@@ -5,7 +5,7 @@ namespace Concepts;
 
 public static class CloudRuntimeEnvironmentExtensions
 {
-    public static string GetStackNameFor(this CloudRuntimeEnvironment environment) =>
+    public static string ToDisplayName(this CloudRuntimeEnvironment environment) =>
         environment switch
         {
             CloudRuntimeEnvironment.Production => "prod",

@@ -8,11 +8,13 @@ using FileShare = Pulumi.AzureNative.Storage.FileShare;
 
 namespace Reactions.Applications.Pulumi;
 
+#pragma warning disable RCS1175
+
 public static class ApplicationStoragePulumiExtensions
 {
     public static async Task<StorageResult> SetupStorage(this Application application, ResourceGroup resourceGroup, Tags tags)
     {
-        var storageAccount = new StorageAccount(application.Name.Value.ToLowerInvariant(), new StorageAccountArgs
+        var storageAccount = new StorageAccount("storage", new StorageAccountArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,

@@ -18,7 +18,7 @@ public static class ApplicationKeyVaultExtensions
             Location = application.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
-            VaultName = $"{application.Name}-vault",
+            VaultName = $"{application.Name}",
             Properties = new VaultPropertiesArgs
             {
                 AccessPolicies =

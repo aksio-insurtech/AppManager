@@ -68,9 +68,9 @@ public class MicroserviceStorage
         FileStorage.Upload("cluster.json", content);
     }
 
-    public void CreateAndUploadClusterKernelConfig(string advertisedIP, string connectionString)
+    public void CreateAndUploadClusterKernelConfig(string siloHostName, string connectionString)
     {
-        var content = TemplateTypes.ClusterKernel(new { AdvertisedIP = advertisedIP, ConnectionString = connectionString });
+        var content = TemplateTypes.ClusterKernel(new { SiloHostName = siloHostName, ConnectionString = connectionString });
         FileStorage.Upload("cluster.json", content);
     }
 }

@@ -31,11 +31,6 @@ public static class TemplateTypes
     /// </summary>
     public static readonly HandlebarsTemplate<object, object> IngressConfig = Handlebars.Compile(GetTemplate("nginx.conf"));
 
-    /// <summary>
-    /// The template for 'vouch.yml' for the Vouch auth plugin for Nginx.
-    /// </summary>
-    public static readonly HandlebarsTemplate<object, object> VouchConfig = Handlebars.Compile(GetTemplate("vouch.yml"));
-
     static TemplateTypes()
     {
         Handlebars.RegisterHelper("camelcase", (writer, _, parameters) => writer.WriteSafeString(parameters[0].ToString()!.ToCamelCase()));

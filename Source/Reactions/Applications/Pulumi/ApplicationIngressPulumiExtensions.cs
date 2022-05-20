@@ -29,39 +29,10 @@ public static class ApplicationIngressPulumiExtensions
             ResourceGroupName = resourceGroup.Name,
         });
 
-        var vouchFileShare = new FileShare("ingress-vouch", new()
-        {
-            AccountName = storage.AccountName,
-            ResourceGroupName = resourceGroup.Name,
-        });
-
-        var certbotConfigFileShare = new FileShare("ingress-certbot-config", new()
-        {
-            AccountName = storage.AccountName,
-            ResourceGroupName = resourceGroup.Name,
-        });
-
-        var certbotWwwFileShare = new FileShare("ingress-certbot-www", new()
-        {
-            AccountName = storage.AccountName,
-            ResourceGroupName = resourceGroup.Name,
-        });
-
         var nginxFileShareName = await nginxFileShare.Name.GetValue();
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
         var nginxContent = TemplateTypes.IngressConfig(new { Something = 42 });
         nginxFileStorage.Upload("nginx.conf", nginxContent);
-
-        var vouchFileShareName = await vouchFileShare.Name.GetValue();
-        var vouchFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, vouchFileShareName, fileStorageLogger);
-        var vouchContent = TemplateTypes.VouchConfig(new { Something = 42 });
-        vouchFileStorage.Upload("config.yml", vouchContent);
-
-        var certbotConfigFileShareName = await certbotConfigFileShare.Name.GetValue();
-        var certbotConfigFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, certbotConfigFileShareName, fileStorageLogger);
-
-        var certbotWwwFileShareName = await certbotWwwFileShare.Name.GetValue();
-        var certbotWwwFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, certbotWwwFileShareName, fileStorageLogger);
 
         var containerGroup = new ContainerGroup("ingress", new()
         {
@@ -78,39 +49,6 @@ public static class ApplicationIngressPulumiExtensions
                         StorageAccountName = storage.AccountName,
                         StorageAccountKey = storage.AccountKey,
                         ShareName = nginxFileShare.Name
-                    }
-                },
-                new()
-                {
-                    Name = "vouch-config",
-                    AzureFile = new AzureFileVolumeArgs()
-                    {
-                        ReadOnly = true,
-                        StorageAccountName = storage.AccountName,
-                        StorageAccountKey = storage.AccountKey,
-                        ShareName = vouchFileShare.Name
-                    }
-                },
-                new()
-                {
-                    Name = "certbot-config",
-                    AzureFile = new AzureFileVolumeArgs()
-                    {
-                        ReadOnly = true,
-                        StorageAccountName = storage.AccountName,
-                        StorageAccountKey = storage.AccountKey,
-                        ShareName = certbotConfigFileShare.Name
-                    }
-                },
-                new()
-                {
-                    Name = "certbot-www",
-                    AzureFile = new AzureFileVolumeArgs()
-                    {
-                        ReadOnly = true,
-                        StorageAccountName = storage.AccountName,
-                        StorageAccountKey = storage.AccountKey,
-                        ShareName = certbotWwwFileShare.Name
                     }
                 }
             },
@@ -168,79 +106,9 @@ public static class ApplicationIngressPulumiExtensions
                         {
                             MountPath = "/config",
                             Name = "nginx-config"
-                        },
-                        new VolumeMountArgs
-                        {
-                            MountPath = "/etc/letsencrypt",
-                            Name = "certbot-config"
-                        },
-                        new VolumeMountArgs
-                        {
-                            MountPath = "/var/www/certbot",
-                            Name = "certbot-www"
-                        }
-                    }
-                },
-                new ContainerArgs
-                {
-                    Name = "vouch",
-                    Image = "quay.io/vouch/vouch-proxy",
-                    Ports = new ContainerPortArgs[]
-                        {
-                                new()
-                                {
-                                    Port = 9090,
-                                    Protocol = "TCP"
-                                }
-                        },
-                    Resources = new ResourceRequirementsArgs()
-                    {
-                        Requests = new ResourceRequestsArgs
-                        {
-                            Cpu = 0.5,
-                            MemoryInGB = 0.5
-                        }
-                    },
-                    VolumeMounts = new VolumeMountArgs()
-                    {
-                        MountPath = "/config",
-                        Name = "vouch-config"
-                    }
-                },
-#if false
-                new ContainerArgs
-                {
-                    Name = "certbot",
-                    Image = "certbot/certbot",
-                    Command =
-                    {
-                        "/bin/sh",
-                        "-c",
-                        "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
-                    },
-                    Resources = new ResourceRequirementsArgs()
-                    {
-                        Requests = new ResourceRequestsArgs
-                        {
-                            Cpu = 0.3,
-                            MemoryInGB = 0.3
-                        }
-                    },
-                    VolumeMounts =
-                    {
-                        new VolumeMountArgs
-                        {
-                            MountPath = "/etc/letsencrypt",
-                            Name = "certbot-config"
-                        },
-                        new VolumeMountArgs
-                        {
-                            MountPath = "/var/www/certbot",
-                            Name = "certbot-www"
                         }
                     }
                 }
-#endif
             }
         });
 

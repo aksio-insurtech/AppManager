@@ -2,24 +2,20 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Azure;
-using Pulumi;
-using Pulumi.AzureNative.OperationalInsights;
-using Pulumi.AzureNative.OperationalInsights.Inputs;
+using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.Resources;
-using Pulumi.AzureNative.Web.V20210301;
-using Pulumi.AzureNative.Web.V20210301.Inputs;
-using ConfigurationArgs = Pulumi.AzureNative.Web.V20210301.Inputs.ConfigurationArgs;
-using SecretArgs = Pulumi.AzureNative.Web.V20210301.Inputs.SecretArgs;
 
 namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceContainerAppPulumiExtensions
 {
-    public static Task<ContainerAppResult> SetupContainerApp(
+    public static async Task<ContainerAppResult> SetupContainerApp(
         this Microservice microservice,
         Application application,
         ResourceGroup resourceGroup,
         AzureNetworkProfileIdentifier networkProfile,
+        ManagedEnvironment managedEnvironment,
         string containerRegistryLoginServer,
         string containerRegistryUsername,
         string containerRegistryPassword,
@@ -31,79 +27,92 @@ public static class MicroserviceContainerAppPulumiExtensions
         microserviceTags["microserviceId"] = microservice.Id.ToString();
         microserviceTags["microservice"] = microservice.Name.Value;
 
-        var workspace = new Workspace("loganalytics", new WorkspaceArgs
-        {
-            Tags = tags,
-            ResourceGroupName = resourceGroup.Name,
-            Sku = new WorkspaceSkuArgs { Name = WorkspaceSkuNameEnum.PerGB2018 },
-            RetentionInDays = 30
-        });
+        var storageName = $"{microservice.Name}-storage";
 
-        var workspaceSharedKeys = Output.Tuple(resourceGroup.Name, workspace.Name).Apply(items =>
-            GetSharedKeys.InvokeAsync(new()
-            {
-                ResourceGroupName = items.Item1,
-                WorkspaceName = items.Item2
-            }));
-
-        var kubeEnv = new KubeEnvironment("env", new()
+        var managedEnvironmentStorage = new ManagedEnvironmentsStorage(microservice.Name, new()
         {
-            Tags = tags,
             ResourceGroupName = resourceGroup.Name,
-            Location = "westeurope",
-            EnvironmentType = "Managed",
-            AppLogsConfiguration = new AppLogsConfigurationArgs
+            EnvName = managedEnvironment.Name,
+            Name = storageName,
+            Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
-                Destination = "log-analytics",
-                LogAnalyticsConfiguration = new LogAnalyticsConfigurationArgs
+                AzureFile = new AzureFilePropertiesArgs
                 {
-                    CustomerId = workspace.CustomerId,
-                    SharedKey = workspaceSharedKeys.Apply(r => r.PrimarySharedKey!)
+                    AccessMode = "ReadOnly",
+                    AccountKey = storage.FileStorage.AccessKey,
+                    AccountName = storage.FileStorage.AccountName,
+                    ShareName = storage.FileStorage.ShareName
                 }
             }
         });
 
-        var containerApp = new ContainerApp(microservice.Name.Value.ToLowerInvariant(), new()
+        var containerApp = new ContainerApp(microservice.Name, new()
         {
+            // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
+            Location = "westeurope",
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
-            Location = "westeurope",
-            KubeEnvironmentId = kubeEnv.Id,
-            Configuration = new ConfigurationArgs()
+            ManagedEnvironmentId = managedEnvironment.Id,
+            Configuration = new ConfigurationArgs
             {
-                Ingress = new IngressArgs()
+                Ingress = new IngressArgs
                 {
                     External = true,
                     TargetPort = 80
                 },
-                Registries =
-                {
-                    new RegistryCredentialsArgs
-                    {
-                        Server = containerRegistryLoginServer,
-                        Username = containerRegistryUsername,
-                        PasswordSecretRef = "container-registry"
-                    }
-                },
                 Secrets =
                 {
-                    new SecretArgs
+                    new SecretArgs()
                     {
                         Name = "container-registry",
                         Value = containerRegistryPassword
                     }
                 },
+                Registries =
+                {
+                    new RegistryCredentialsArgs()
+                    {
+                        Server = containerRegistryLoginServer,
+                        Username = containerRegistryUsername,
+                        PasswordSecretRef = "container-registry"
+                    }
+                }
             },
             Template = new TemplateArgs
             {
+                Volumes = new VolumeArgs[]
+                {
+                    new()
+                    {
+                        Name = storageName,
+                        StorageName = storageName,
+                        StorageType = StorageType.AzureFile
+                    }
+                },
                 Containers = deployables.Select(deployable => new ContainerArgs
                 {
                     Name = deployable.Name.Value,
                     Image = deployable.Image,
-                }).ToArray()
-            }
+
+                    VolumeMounts = new VolumeMountArgs[]
+                    {
+                        new()
+                        {
+                            MountPath = "/app/config",
+                            VolumeName = storageName
+                        }
+                    }
+                }).ToArray(),
+
+                Scale = new ScaleArgs
+                {
+                    MaxReplicas = 1,
+                    MinReplicas = 1,
+                }
+            },
         });
 
-        return Task.FromResult(new ContainerAppResult(containerApp, string.Empty));
+        var configuration = await containerApp.Configuration.GetValue();
+        return new ContainerAppResult(containerApp, configuration!.Ingress!.Fqdn);
     }
 }
