@@ -44,8 +44,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
             var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
-            kernelStorage.CreateAndUploadStorageJson(mongoDB);
-            kernelStorage.CreateAndUploadAppSettings(_settings);
 
             var networkProfile = await network.Profile.Id.GetValue();
 
@@ -63,10 +61,12 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 kernelStorage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:5.13.1", new[] { 80 })
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.1.3", new[] { 80 })
                 },
                 tags);
-            kernelStorage.CreateAndUploadClusterKernelConfig(kernel.SiloHostName, fileStorage.ConnectionString);
+
+            kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString);
+            kernelStorage.CreateAndUploadAppSettings(_settings);
 
             Console.WriteLine(_eventLog);
 

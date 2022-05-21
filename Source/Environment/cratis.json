@@ -1,0 +1,61 @@
+{
+    "tenants": {
+        "3352d47d-c154-4457-b3fb-8a2efb725113": {
+            "name": "development"
+        },
+        "ad1fb1bb-1152-464b-8fdd-d622445d46b6": {
+            "name": "Aksio"
+        }
+    },
+    "microservices": {
+        "00000000-0000-0000-0000-000000000000": {
+            "name": "Management"
+        }
+    },
+    "cluster": {
+        "name": "Cratis",
+        "type": "local",
+        "advertisedIP": "127.0.0.1",
+        "siloPort": 11111,
+        "gatewayPort": 30000,
+        "options": {}
+    },
+    "storage": {
+        "cluster": {
+            "type": "MongoDB",
+            "connectionDetails": "mongodb://localhost:27017/cratis-shared"
+        },
+        "microservices": {
+            "00000000-0000-0000-0000-000000000000": {
+                "shared": {
+                    "eventStore": {
+                        "type": "MongoDB",
+                        "connectionDetails": "mongodb://localhost:27017/event-store-shared"
+                    }
+                },
+                "tenants": {
+                    "3352d47d-c154-4457-b3fb-8a2efb725113": {
+                        "readModels": {
+                            "type": "MongoDB",
+                            "connectionDetails": "mongodb://localhost:27017/development-read-models"
+                        },
+                        "eventStore": {
+                            "type": "MongoDB",
+                            "connectionDetails": "mongodb://localhost:27017/development-event-store"
+                        }
+                    },
+                    "ad1fb1bb-1152-464b-8fdd-d622445d46b6": {
+                        "readModels": {
+                            "type": "MongoDB",
+                            "connectionDetails": "mongodb://localhost:27017/aksio-read-models"
+                        },
+                        "eventStore": {
+                            "type": "MongoDB",
+                            "connectionDetails": "mongodb://localhost:27017/aksio-event-store"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

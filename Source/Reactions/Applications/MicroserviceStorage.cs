@@ -3,7 +3,10 @@
 
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using Aksio.Cratis.Configuration;
+using Aksio.Cratis.Extensions.Orleans.Configuration;
 using Common;
+using Orleans.Clustering.AzureStorage;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Templates;
 
@@ -26,33 +29,80 @@ public class MicroserviceStorage
         FileStorage = fileStorage;
     }
 
-    public void CreateAndUploadStorageJson(MongoDBResult mongoDB)
+    public void CreateAndUploadCratisJson(MongoDBResult mongoDB, string siloHostName, string storageConnectionString)
     {
         const string scheme = "mongodb+srv://";
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
 
-        var storageConfig = new Aksio.Cratis.Configuration.Storage();
-        var readModels = storageConfig["readModels"] = new()
+        var config = new KernelConfiguration()
         {
-            Type = "MongoDB",
-            Shared = null!
+            Cluster = new()
+            {
+                Name = "Cratis",
+                Type = ClusterTypes.AzureStorage,
+                SiloHostName = siloHostName,
+                SiloPort = 11111,
+                GatewayPort = 30000,
+                Options = new AzureStorageClusteringOptions()
+                {
+#pragma warning disable CS0619
+                    ConnectionString = storageConnectionString
+                }
+            },
+            Storage = new()
+            {
+                Cluster = new()
+                {
+                    Type = "MongoDB",
+                    ConnectionDetails = $"{mongoDBConnectionString}/cratis-shared"
+                }
+            }
         };
-        readModels.Tenants["3352d47d-c154-4457-b3fb-8a2efb725113"] = $"{mongoDBConnectionString}/read-models";
-
-        var eventStore = storageConfig["eventStore"] = new()
+        config.Tenants["3352d47d-c154-4457-b3fb-8a2efb725113"] = new() { Name = "Development" };
+        config.Microservices["00000000-0000-0000-0000-000000000000"] = new() { Name = "Something" };
+        config.Storage.Microservices["00000000-0000-0000-0000-000000000000"] = new()
         {
-            Type = "MongoDB",
-            Shared = $"{mongoDBConnectionString}/event-store-shared"
+            Shared = new()
+            {
+                {
+                    "eventStore", new()
+                    {
+                        Type = "MongoDB",
+                        ConnectionDetails = $"{mongoDBConnectionString}/event-store-shared"
+                    }
+                }
+            },
+            Tenants = new()
+            {
+                {
+                    "3352d47d-c154-4457-b3fb-8a2efb725113", new()
+                    {
+                        {
+                            "readModels", new()
+                            {
+                                Type = "MongoDB",
+                                ConnectionDetails = $"{mongoDBConnectionString}/development-read-models"
+                            }
+                        },
+                        {
+                            "eventStore", new()
+                            {
+                                Type = "MongoDB",
+                                ConnectionDetails = $"{mongoDBConnectionString}/development-event-store"
+                            }
+                        }
+                    }
+                }
+            }
         };
-        eventStore.Tenants["3352d47d-c154-4457-b3fb-8a2efb725113"] = $"{mongoDBConnectionString}/event-store";
 
-        var storageJson = JsonSerializer.Serialize(storageConfig, new JsonSerializerOptions()
+        var cratisJson = JsonSerializer.Serialize(config, new JsonSerializerOptions()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
 
-        FileStorage.Upload("storage.json", storageJson);
+        FileStorage.Upload("cratis.json", cratisJson);
     }
 
     public void CreateAndUploadAppSettings(ISettings settings)
@@ -65,12 +115,6 @@ public class MicroserviceStorage
     public void CreateAndUploadClusterClientConfig(string connectionString)
     {
         var content = TemplateTypes.ClusterClient(new { ConnectionString = connectionString });
-        FileStorage.Upload("cluster.json", content);
-    }
-
-    public void CreateAndUploadClusterKernelConfig(string siloHostName, string connectionString)
-    {
-        var content = TemplateTypes.ClusterKernel(new { SiloHostName = siloHostName, ConnectionString = connectionString });
         FileStorage.Upload("cluster.json", content);
     }
 }
