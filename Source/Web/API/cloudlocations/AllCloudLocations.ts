@@ -12,7 +12,11 @@ export class AllCloudLocations extends QueryFor<CloudLocation[]> {
     readonly route: string = '/api/cloudlocations';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: CloudLocation[] = [];
-    readonly requiresArguments: boolean = false;
+
+    get requestArguments(): string[] {
+        return [
+        ];
+    }
 
     static use(): [QueryResult<CloudLocation[]>, PerformQuery] {
         return useQuery<CloudLocation[], AllCloudLocations>(AllCloudLocations);

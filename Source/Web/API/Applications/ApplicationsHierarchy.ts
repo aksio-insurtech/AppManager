@@ -12,7 +12,11 @@ export class ApplicationsHierarchy extends ObservableQueryFor<ApplicationsHierar
     readonly route: string = '/api/applications/hierarchy';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ApplicationsHierarchyForListing[] = [];
-    readonly requiresArguments: boolean = false;
+
+    get requestArguments(): string[] {
+        return [
+        ];
+    }
 
     static use(): [QueryResult<ApplicationsHierarchyForListing[]>] {
         return useObservableQuery<ApplicationsHierarchyForListing[], ApplicationsHierarchy>(ApplicationsHierarchy);

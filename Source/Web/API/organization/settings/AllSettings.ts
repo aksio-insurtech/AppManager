@@ -12,7 +12,11 @@ export class AllSettings extends QueryFor<Settings> {
     readonly route: string = '/api/organization/settings';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: Settings = {} as any;
-    readonly requiresArguments: boolean = false;
+
+    get requestArguments(): string[] {
+        return [
+        ];
+    }
 
     static use(): [QueryResult<Settings>, PerformQuery] {
         return useQuery<Settings, AllSettings>(AllSettings);

@@ -15,7 +15,12 @@ export class GetApplication extends QueryFor<Application, GetApplicationArgument
     readonly route: string = '/api/applications/{{applicationId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: Application = {} as any;
-    readonly requiresArguments: boolean = true;
+
+    get requestArguments(): string[] {
+        return [
+            'applicationId',
+        ];
+    }
 
     static use(args?: GetApplicationArguments): [QueryResult<Application>, PerformQuery<GetApplicationArguments>] {
         return useQuery<Application, GetApplication, GetApplicationArguments>(GetApplication, args);

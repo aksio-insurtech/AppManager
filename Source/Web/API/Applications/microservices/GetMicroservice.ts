@@ -15,7 +15,12 @@ export class GetMicroservice extends QueryFor<Microservice, GetMicroserviceArgum
     readonly route: string = '/api/applications/{applicationId}/microservices/{{microserviceId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: Microservice = {} as any;
-    readonly requiresArguments: boolean = true;
+
+    get requestArguments(): string[] {
+        return [
+            'microserviceId',
+        ];
+    }
 
     static use(args?: GetMicroserviceArguments): [QueryResult<Microservice>, PerformQuery<GetMicroserviceArguments>] {
         return useQuery<Microservice, GetMicroservice, GetMicroserviceArguments>(GetMicroservice, args);

@@ -15,7 +15,12 @@ export class ResourcesForApplication extends QueryFor<ApplicationResources, Reso
     readonly route: string = '/api/applications/resources/{{applicationId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ApplicationResources = {} as any;
-    readonly requiresArguments: boolean = true;
+
+    get requestArguments(): string[] {
+        return [
+            'applicationId',
+        ];
+    }
 
     static use(args?: ResourcesForApplicationArguments): [QueryResult<ApplicationResources>, PerformQuery<ResourcesForApplicationArguments>] {
         return useQuery<ApplicationResources, ResourcesForApplication, ResourcesForApplicationArguments>(ResourcesForApplication, args);
