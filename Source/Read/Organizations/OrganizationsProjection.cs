@@ -7,7 +7,7 @@ namespace Read.Organizations;
 
 public class OrganizationsProjection : IProjectionFor<Organization>
 {
-    public ProjectionId Identifier => "5398c7f5-2baf-494b-abac-0a35eeb5fd98";
+    public ProjectionId Identifier => "b72421d7-d62c-4cef-9f55-62b1e096c28a";
 
     public void Define(IProjectionBuilderFor<Organization> builder) => builder
         .From<OrganizationRegistered>(_ => _
