@@ -44,7 +44,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
             var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
-
             var networkProfile = await network.Profile.Id.GetValue();
 
             var applicationInsights = application.SetupApplicationInsights(resourceGroup, environment, tags);

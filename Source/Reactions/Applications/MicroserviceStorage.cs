@@ -6,7 +6,6 @@ using System.Text.Json;
 using Aksio.Cratis.Configuration;
 using Aksio.Cratis.Extensions.Orleans.Configuration;
 using Common;
-using Orleans.Clustering.AzureStorage;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Templates;
 
@@ -43,9 +42,8 @@ public class MicroserviceStorage
                 SiloHostName = siloHostName,
                 SiloPort = 11111,
                 GatewayPort = 30000,
-                Options = new AzureStorageClusteringOptions()
+                Options = new
                 {
-#pragma warning disable CS0619
                     ConnectionString = storageConnectionString
                 }
             },
