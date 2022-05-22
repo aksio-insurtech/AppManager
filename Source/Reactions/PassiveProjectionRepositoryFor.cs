@@ -18,6 +18,7 @@ public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionReposito
     static readonly JsonSerializerOptions _serializerOptions;
     readonly ProjectionDefinition? _projectionDefinition;
     readonly IClusterClient _clusterClient;
+    readonly IExecutionContextManager _executionContextManager;
 
     static PassiveProjectionRepositoryFor()
     {
@@ -35,15 +36,16 @@ public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionReposito
         IInstancesOf<IPassiveProjectionFor<TModel>> projectionDefinitions,
         IClusterClient clusterClient,
         IEventTypes eventTypes,
-        IJsonSchemaGenerator schemaGenerator)
+        IJsonSchemaGenerator schemaGenerator,
+        IExecutionContextManager executionContextManager)
     {
         _clusterClient = clusterClient;
+        _executionContextManager = executionContextManager;
         var definer = projectionDefinitions.SingleOrDefault();
         if (definer is not null)
         {
             var builder = new ProjectionBuilderFor<TModel>(definer.Identifier, eventTypes, schemaGenerator)
                 .WithName($"PassiveProjection: {typeof(TModel).FullName}")
-                .Passive()
                 .NotRewindable();
 
             definer.Define(builder);
@@ -52,8 +54,7 @@ public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionReposito
             var projections = _clusterClient.GetGrain<IProjections>(Guid.Empty);
             var pipelineDefinition = new ProjectionPipelineDefinition(
                 _projectionDefinition.Identifier,
-                "c0c0196f-57e3-4860-9e3b-9823cf45df30", // Cratis default
-                Array.Empty<ProjectionResultStoreDefinition>());
+                Array.Empty<ProjectionSinkDefinition>());
 
             projections.Register(_projectionDefinition, pipelineDefinition);
         }
@@ -65,7 +66,10 @@ public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionReposito
         {
             return default!;
         }
-        var projection = _clusterClient.GetGrain<IProjection>(_projectionDefinition.Identifier);
+
+        var executionContext = _executionContextManager.Current;
+        var projectionKey = new ProjectionKey(executionContext.MicroserviceId, executionContext.TenantId, EventSequenceId.Log);
+        var projection = _clusterClient.GetGrain<IProjection>(_projectionDefinition.Identifier, projectionKey);
         var json = await projection.GetModelInstanceById(eventSourceId);
         json["id"] = eventSourceId.Value;
         return json.Deserialize<TModel>(_serializerOptions)!;
