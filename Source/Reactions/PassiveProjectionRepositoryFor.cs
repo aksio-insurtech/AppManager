@@ -67,8 +67,11 @@ public class PassiveProjectionRepositoryFor<TModel> : IPassiveProjectionReposito
             return default!;
         }
 
-        var executionContext = _executionContextManager.Current;
-        var projectionKey = new ProjectionKey(executionContext.MicroserviceId, executionContext.TenantId, EventSequenceId.Log);
+        // TODO: register for all tenants
+        _executionContextManager.Establish(TenantId.Development, CorrelationId.New());
+
+        // TODO: This shouldn't be a problem - we should get the parts of the key from the execution context.
+        var projectionKey = new ProjectionKey(ExecutionContextManager.GlobalMicroserviceId, TenantId.Development, EventSequenceId.Log);
         var projection = _clusterClient.GetGrain<IProjection>(_projectionDefinition.Identifier, projectionKey);
         var json = await projection.GetModelInstanceById(eventSourceId);
         json["id"] = eventSourceId.Value;
