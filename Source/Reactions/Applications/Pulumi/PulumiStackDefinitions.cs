@@ -60,7 +60,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 kernelStorage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.1.3", new[] { 80 })
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.1.10", new[] { 80 })
                 },
                 tags);
 
@@ -83,7 +83,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             //     kernelStorage,
             //     new[]
             //     {
-            //         new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.1.3", new[] { 80 })
+            //         new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.1.10", new[] { 80 })
             //     },
             //     tags);
             // kernelStorage.CreateAndUploadClusterKernelConfig(kernel.IpAddress, fileStorage.ConnectionString);

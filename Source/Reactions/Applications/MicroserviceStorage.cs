@@ -39,12 +39,13 @@ public class MicroserviceStorage
             {
                 Name = "Cratis",
                 Type = ClusterTypes.AzureStorage,
-                SiloHostName = siloHostName,
+                AdvertisedIP = string.Empty,
                 SiloPort = 11111,
                 GatewayPort = 30000,
-                Options = new
+                Options = new AzureStorageClusterOptions
                 {
-                    ConnectionString = storageConnectionString
+                    ConnectionString = storageConnectionString,
+                    TableName = "OrleansSiloInstances"
                 }
             },
             Storage = new()
