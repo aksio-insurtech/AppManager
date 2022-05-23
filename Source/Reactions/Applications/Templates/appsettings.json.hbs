@@ -27,15 +27,6 @@
                     "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
                     "outputTemplate": "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}"
                 }
-            },
-            {
-                "Name": "Elasticsearch",
-                "Args": {
-                    "nodeUris": "{{ElasticUrl}}",
-                    "connectionGlobalHeaders": "Authorization=ApiKey {{ElasticApiKey}}",
-                    "indexFormat": "{{ApplicationName}}-{{MicroserviceName}}-{0:yyyy.MM}",
-                    "emitEventFailure": "WriteToSelfLog"
-                }
             }
         ]
     },
