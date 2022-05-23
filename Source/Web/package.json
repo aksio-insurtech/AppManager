@@ -13,11 +13,11 @@
         "up": "ncu -u"
     },
     "dependencies": {
-        "@aksio/cratis-fluentui": "6.1.3",
-        "@aksio/cratis-react": "6.1.3",
-        "@aksio/cratis-fundamentals": "6.1.3",
-        "@aksio/cratis-applications-frontend": "6.1.3",
-        "@aksio/cratis-typescript": "6.1.3",
+        "@aksio/cratis-fluentui": "6.1.10",
+        "@aksio/cratis-react": "6.1.10",
+        "@aksio/cratis-fundamentals": "6.1.10",
+        "@aksio/cratis-applications-frontend": "6.1.10",
+        "@aksio/cratis-typescript": "6.1.10",
         "react": "17.0.2",
         "react-dom": "17.0.2",
         "react-router-dom": "6.2.1",
@@ -28,7 +28,7 @@
         "@fluentui/react-experiments": "8.4.23"
     },
     "devDependencies": {
-        "@aksio/cratis-webpack": "6.1.3",
+        "@aksio/cratis-webpack": "6.1.10",
         "@types/react": "17.0.38",
         "@types/react-dom": "17.0.11",
         "@types/react-router-dom": "5.3.3",
