@@ -11,4 +11,5 @@ public record Application(
     ApplicationName Name,
     AzureSubscriptionId AzureSubscriptionId,
     CloudLocationKey CloudLocation,
-    ApplicationResources Resources);
+    ApplicationResources Resources,
+    ApplicationAuthentication Authentication);

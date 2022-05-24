@@ -15,6 +15,9 @@ public class Applications : Controller
     [HttpPost]
     public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
 
+    [HttpPost("{applicationId}/authentication")]
+    public Task ConfigureAuthentication([FromRoute] ApplicationId applicationId, [FromBody] ConfigureAuthentication command) => _eventLog.Append(applicationId.ToString(), new AuthenticationConfiguredForApplication(command.ClientId, command.ClientSecret));
+
     [HttpPost("{applicationId}/remove")]
     public Task Remove([FromRoute] ApplicationId applicationId) => _eventLog.Append(applicationId.ToString(), new ApplicationRemoved());
 }

@@ -30,10 +30,11 @@ public class ApplicationProjection : IPassiveProjectionFor<Application>
                 .UsingKey(e => e.UserName)
                 .Set(m => m.UserName).To(e => e.UserName)
                 .Set(m => m.Password).To(e => e.Password)))
-        .From<IpAddressSetForApplication>(_ => _
-            .Set(m => m.Resources.IpAddress).To(e => e.Address))
         .From<AzureVirtualNetworkIdentifierSetForApplication>(_ => _
             .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
         .From<AzureNetworkProfileIdentifierSetForApplication>(_ => _
-            .Set(m => m.Resources.AzureNetworkProfileIdentifier).To(e => e.Identifier));
+            .Set(m => m.Resources.AzureNetworkProfileIdentifier).To(e => e.Identifier))
+        .From<AuthenticationConfiguredForApplication>(_ => _
+            .Set(m => m.Authentication.ClientId).To(e => e.ClientId)
+            .Set(m => m.Authentication.ClientSecret).To(e => e.ClientSecret));
 }

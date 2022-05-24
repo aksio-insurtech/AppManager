@@ -8,6 +8,7 @@
 		<PackageReference Include="handlebars.net" Version="2.1.0" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.8.0" />
 		<PackageReference Include="pulumi.automation" Version="3.26.0" />
+		<PackageReference Include="pulumi.azuread" Version="5.22.0" />
 		<PackageReference Include="pulumi.azurenative" Version="1.64.1" />
 		<PackageReference Include="Pulumi.Mongodbatlas" Version="3.2.0" />
 	</ItemGroup>

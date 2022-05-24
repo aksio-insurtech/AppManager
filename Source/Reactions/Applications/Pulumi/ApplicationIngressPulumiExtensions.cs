@@ -52,6 +52,7 @@ public static class ApplicationIngressPulumiExtensions
             }
         });
 
+        const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
         var containerApp = new ContainerApp("ingress", new()
         {
             // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
@@ -65,6 +66,11 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     External = true,
                     TargetPort = 80
+                },
+                Secrets = new SecretArgs
+                {
+                    Name = microsoftProviderAuthenticationSecret,
+                    Value = application.Authentication?.ClientSecret.Value ?? string.Empty
                 }
             },
             Template = new TemplateArgs
@@ -106,5 +112,45 @@ public static class ApplicationIngressPulumiExtensions
                 }
             },
         });
+
+        if (application.Authentication is not null)
+        {
+            var containerAppAut = new ContainerAppsAuthConfig("current", new()
+            {
+                Name = "current",
+                ResourceGroupName = resourceGroup.Name,
+                ContainerAppName = containerApp.Name,
+                GlobalValidation = new GlobalValidationArgs()
+                {
+                    UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
+                    RedirectToProvider = "Microsoft"
+                },
+                Platform = new AuthPlatformArgs
+                {
+                    Enabled = true
+                },
+                IdentityProviders = new IdentityProvidersArgs
+                {
+                    AzureActiveDirectory = new AzureActiveDirectoryArgs
+                    {
+                        Enabled = true,
+                        IsAutoProvisioned = true,
+                        Registration = new AzureActiveDirectoryRegistrationArgs
+                        {
+                            ClientId = application.Authentication.ClientId.Value,
+                            ClientSecretSettingName = microsoftProviderAuthenticationSecret,
+                            OpenIdIssuer = "https://login.microsoftonline.com/common/v2.0"
+                        },
+                        Validation = new AzureActiveDirectoryValidationArgs
+                        {
+                            AllowedAudiences =
+                        {
+                            $"api://{application.Authentication.ClientId}"
+                        }
+                        }
+                    }
+                }
+            });
+        }
     }
 }

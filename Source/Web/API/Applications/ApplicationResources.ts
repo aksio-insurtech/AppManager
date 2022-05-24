@@ -6,7 +6,6 @@ import { AzureResources } from './AzureResources';
 import { MongoDBResource } from './MongoDBResource';
 
 export type ApplicationResources = {
-    ipAddress: string;
     azure: AzureResources;
     mongoDB: MongoDBResource;
 };

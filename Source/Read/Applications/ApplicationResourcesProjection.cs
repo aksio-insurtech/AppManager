@@ -27,7 +27,5 @@ public class ApplicationResourcesProjection : IProjectionFor<ApplicationResource
             .Set(m => m.Azure.ContainerRegistryLoginServer).To(e => e.LoginServer)
             .Set(m => m.Azure.ContainerRegistryUserName).To(e => e.UserName)
             .Set(m => m.Azure.ContainerRegistryPassword).To(e => e.Password))
-        .From<IpAddressSetForApplication>(_ => _
-            .Set(m => m.IpAddress).To(e => e.Address))
         .RemovedWith<ApplicationRemoved>();
 }

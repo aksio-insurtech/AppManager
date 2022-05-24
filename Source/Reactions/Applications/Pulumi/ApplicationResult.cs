@@ -13,4 +13,4 @@ public record ApplicationResult(
     StorageResult Storage,
     ContainerRegistryResult ContainerRegistry,
     MongoDBResult MongoDB,
-    ContainerGroupResult Kernel);
+    ContainerAppResult Kernel);

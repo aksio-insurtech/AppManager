@@ -72,25 +72,24 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString);
             kernelStorage.CreateAndUploadAppSettings(_settings);
 
-            Console.WriteLine(_eventLog);
-
             await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
 
-            // var applicationResult = new ApplicationResult(
-            //     environment,
-            //     resourceGroup,
-            //     network,
-            //     storage,
-            //     containerRegistry,
-            //     mongoDB,
-            //     kernel);
-            // var events = await application.GetEventsToAppend(applicationResult);
-            // // Todo: Set to actual execution context - might not be the right place for this!
-            // _executionContextManager.Set(executionContext);
-            // foreach (var @event in events)
-            // {
-            //     await _eventLog.Append(application.Id, @event);
-            // }
+            var applicationResult = new ApplicationResult(
+                environment,
+                resourceGroup,
+                network,
+                storage,
+                containerRegistry,
+                mongoDB,
+                kernel);
+            var events = await application.GetEventsToAppend(applicationResult);
+
+            // Todo: Set to actual execution context - might not be the right place for this!
+            _executionContextManager.Set(executionContext);
+            foreach (var @event in events)
+            {
+                await _eventLog.Append(application.Id, @event);
+            }
         });
 
     public PulumiFn Microservice(ExecutionContext executionContext, Application application, Microservice microservice, CloudRuntimeEnvironment environment) =>

@@ -3,7 +3,6 @@ events { worker_connections 1024; }
 http {
     server {
         listen 80;
-        server_name ingresscad1d287.blackstone-c19df85b.westeurope.azurecontainerapps.io;
 
         location / {
             proxy_pass http://kernelf39633a1.internal.blackstone-c19df85b.westeurope.azurecontainerapps.io;

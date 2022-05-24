@@ -23,13 +23,6 @@ public static class ApplicationEvents
             events.Add(new MongoDBUserChanged("kernel", applicationResult.MongoDB.Password));
         }
 
-        var ipAddress = applicationResult.Kernel.IpAddress;
-        if (application.Resources?.IpAddress is null ||
-            application.Resources?.IpAddress.Value != ipAddress)
-        {
-            events.Add(new IpAddressSetForApplication(ipAddress));
-        }
-
         var resourceGroupId = await applicationResult.ResourceGroup.Id.GetValue();
         if (application.Resources?.AzureResourceGroupId != resourceGroupId)
         {
