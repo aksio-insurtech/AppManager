@@ -1,29 +1,30 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Azure;
 using Microsoft.Extensions.Logging;
-using Pulumi.AzureNative.ContainerInstance;
-using Pulumi.AzureNative.ContainerInstance.Inputs;
-using Pulumi.AzureNative.Network;
-using Pulumi.AzureNative.Network.Inputs;
+using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Templates;
 using FileShare = Pulumi.AzureNative.Storage.FileShare;
 
 namespace Reactions.Applications.Pulumi;
 
+#pragma warning disable RCS1175, IDE0059
+
 public static class ApplicationIngressPulumiExtensions
 {
+    const string StorageName = "ingress-storage";
+
     public static async Task SetupIngress(
         this Application application,
         ResourceGroup resourceGroup,
-        AzureNetworkProfileIdentifier networkProfile,
         StorageResult storage,
+        ManagedEnvironment managedEnvironment,
         Tags tags,
         ILogger<FileStorage> fileStorageLogger)
     {
-        var nginxFileShare = new FileShare("ingress-nginx", new()
+        var nginxFileShare = new FileShare("ingress", new()
         {
             AccountName = storage.AccountName,
             ResourceGroupName = resourceGroup.Name,
@@ -34,40 +35,50 @@ public static class ApplicationIngressPulumiExtensions
         var nginxContent = TemplateTypes.IngressConfig(new { Something = 42 });
         nginxFileStorage.Upload("nginx.conf", nginxContent);
 
-        var containerGroup = new ContainerGroup("ingress", new()
+        var managedEnvironmentStorage = new ManagedEnvironmentsStorage(StorageName, new()
         {
+            ResourceGroupName = resourceGroup.Name,
+            EnvName = managedEnvironment.Name,
+            Name = StorageName,
+            Properties = new ManagedEnvironmentStoragePropertiesArgs
+            {
+                AzureFile = new AzureFilePropertiesArgs
+                {
+                    AccessMode = "ReadOnly",
+                    AccountKey = storage.AccountKey,
+                    AccountName = storage.AccountName,
+                    ShareName = nginxFileShareName
+                }
+            }
+        });
+
+        var containerApp = new ContainerApp("ingress", new()
+        {
+            // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
+            Location = "westeurope",
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
-            Volumes = new VolumeArgs[]
+            ManagedEnvironmentId = managedEnvironment.Id,
+            Configuration = new ConfigurationArgs
             {
-                new()
+                Ingress = new IngressArgs
                 {
-                    Name = "nginx-config",
-                    AzureFile = new AzureFileVolumeArgs()
+                    External = true,
+                    TargetPort = 80
+                }
+            },
+            Template = new TemplateArgs
+            {
+                Volumes = new VolumeArgs[]
+                {
+                    new()
                     {
-                        ReadOnly = true,
-                        StorageAccountName = storage.AccountName,
-                        StorageAccountKey = storage.AccountKey,
-                        ShareName = nginxFileShare.Name
+                        Name = StorageName,
+                        StorageName = StorageName,
+                        StorageType = StorageType.AzureFile
                     }
-                }
-            },
-            IpAddress = new IpAddressArgs
-            {
-                Type = ContainerGroupIpAddressType.Private,
-                Ports = new PortArgs()
-                {
-                    Port = 80
-                }
-            },
-            NetworkProfile = new ContainerGroupNetworkProfileArgs
-            {
-                Id = networkProfile.Value
-            },
-            OsType = "Linux",
-            Containers =
-            {
-                new ContainerArgs
+                },
+                Containers = new ContainerArgs
                 {
                     Name = "nginx",
                     Image = "nginx",
@@ -79,60 +90,21 @@ public static class ApplicationIngressPulumiExtensions
                         "-g",
                         "daemon off;"
                     },
-                    Ports =
+                    VolumeMounts = new VolumeMountArgs[]
                     {
-                        new ContainerPortArgs()
-                        {
-                            Port = 80,
-                            Protocol = "TCP"
-                        },
-                        new ContainerPortArgs()
-                        {
-                            Port = 443,
-                            Protocol = "TCP"
-                        }
-                    },
-                    Resources = new ResourceRequirementsArgs()
-                    {
-                        Requests = new ResourceRequestsArgs
-                        {
-                            Cpu = 0.5,
-                            MemoryInGB = 0.5
-                        }
-                    },
-                    VolumeMounts =
-                    {
-                        new VolumeMountArgs()
+                        new()
                         {
                             MountPath = "/config",
-                            Name = "nginx-config"
+                            VolumeName = StorageName
                         }
                     }
-                }
-            }
-        });
-
-        var getContainerGroupResult = GetContainerGroup.Invoke(new()
-        {
-            ContainerGroupName = containerGroup.Name,
-            ResourceGroupName = resourceGroup.Name
-        });
-        var ipAddress = getContainerGroupResult.Apply(_ => _.IpAddress);
-
-        _ = new PrivateRecordSet("ingress", new()
-        {
-            ResourceGroupName = resourceGroup.Name,
-            Ttl = 300,
-            RelativeRecordSetName = "ingress",
-            PrivateZoneName = application.GetPrivateZoneName(),
-            RecordType = "A",
-            ARecords =
-            {
-                new ARecordArgs
+                },
+                Scale = new ScaleArgs
                 {
-                    Ipv4Address = ipAddress.Apply(_ => _!.Ip!)
+                    MaxReplicas = 1,
+                    MinReplicas = 1,
                 }
-            }
+            },
         });
     }
 }

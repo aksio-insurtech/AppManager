@@ -3,12 +3,12 @@ events { worker_connections 1024; }
 http {
     server {
         listen 80;
-        server_name dev.opensjon.aksio.app;
-        server_tokens off;
+        server_name ingresscad1d287.blackstone-c19df85b.westeurope.azurecontainerapps.io;
 
         location / {
-            proxy_pass http://mymicroservice3.myapplication.local:80;
-            proxy_set_header Host $http_host;
+            proxy_pass http://kernelf39633a1.internal.blackstone-c19df85b.westeurope.azurecontainerapps.io;
+            proxy_http_version 1.1;
+            proxy_set_header X-Real-IP $remote_addr;
         }
     }
 }

@@ -100,21 +100,6 @@ public static class ApplicationNetworkPulumiExtensions
             },
         });
 
-        var publicIPAddress = new PublicIPAddress(application.Name, new()
-        {
-            Location = application.CloudLocation.Value,
-            ResourceGroupName = resourceGroup.Name,
-            Tags = tags,
-            PublicIPAddressVersion = "IPv4",
-            PublicIPAllocationMethod = "Static",
-            PublicIpAddressName = "public",
-            Sku = new PublicIPAddressSkuArgs
-            {
-                Name = PublicIPAddressSkuName.Standard,
-                Tier = PublicIPAddressSkuTier.Regional
-            }
-        });
-
-        return new(virtualNetwork, profile, privateZone, publicIPAddress);
+        return new(virtualNetwork, profile, privateZone);
     }
 }

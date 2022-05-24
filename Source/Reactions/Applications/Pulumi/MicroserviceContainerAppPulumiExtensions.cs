@@ -15,7 +15,8 @@ public static class MicroserviceContainerAppPulumiExtensions
         Application application,
         ResourceGroup resourceGroup,
         AzureNetworkProfileIdentifier networkProfile,
-        ManagedEnvironment managedEnvironment,
+        string managedEnvironmentId,
+        string managedEnvironmentName,
         string containerRegistryLoginServer,
         string containerRegistryUsername,
         string containerRegistryPassword,
@@ -32,7 +33,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(microservice.Name, new()
         {
             ResourceGroupName = resourceGroup.Name,
-            EnvName = managedEnvironment.Name,
+            EnvName = managedEnvironmentName,
             Name = storageName,
             Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
@@ -52,13 +53,14 @@ public static class MicroserviceContainerAppPulumiExtensions
             Location = "westeurope",
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
-            ManagedEnvironmentId = managedEnvironment.Id,
+            ManagedEnvironmentId = managedEnvironmentId,
             Configuration = new ConfigurationArgs
             {
                 Ingress = new IngressArgs
                 {
-                    External = true,
-                    TargetPort = 80
+                    External = false,
+                    TargetPort = 80,
+                    AllowInsecure = true
                 },
                 Secrets =
                 {

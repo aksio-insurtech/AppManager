@@ -9,6 +9,8 @@ using Pulumi.Automation;
 
 namespace Reactions.Applications.Pulumi;
 
+#pragma warning disable RCS1175, IDE0042
+
 public class PulumiStackDefinitions : IPulumiStackDefinitions
 {
     readonly ISettings _settings;
@@ -48,12 +50,15 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             var applicationInsights = application.SetupApplicationInsights(resourceGroup, environment, tags);
             var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationInsights, tags);
+            var managedEnvironmentId = await managedEnvironment.Id.GetValue();
+            var managedEnvironmentName = await managedEnvironment.Name.GetValue();
 
             var kernel = await microservice.SetupContainerApp(
                 application,
                 resourceGroup,
                 networkProfile,
-                managedEnvironment,
+                managedEnvironmentId,
+                managedEnvironmentName,
                 containerRegistry.LoginServer,
                 containerRegistry.UserName,
                 containerRegistry.Password,
@@ -69,24 +74,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
             Console.WriteLine(_eventLog);
 
-            // Setup ManagedEnvironment
-            // Setup LogAnalytics - retention as low as we can
-            // For each microservice, setup a Container App connected to the same environment
-            // await application.SetupIngress(resourceGroup, networkProfile, storage, tags, _fileStorageLogger);
-            // var kernel = await microservice.SetupContainerGroup(
-            //     application,
-            //     resourceGroup,
-            //     networkProfile,
-            //     containerRegistry.LoginServer,
-            //     containerRegistry.UserName,
-            //     containerRegistry.Password,
-            //     kernelStorage,
-            //     new[]
-            //     {
-            //         new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.1.10", new[] { 80 })
-            //     },
-            //     tags);
-            // kernelStorage.CreateAndUploadClusterKernelConfig(kernel.IpAddress, fileStorage.ConnectionString);
+            await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
+
             // var applicationResult = new ApplicationResult(
             //     environment,
             //     resourceGroup,
@@ -113,10 +102,14 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             storage.CreateAndUploadAppSettings(_settings);
             storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
 
-            var microserviceResult = microservice.SetupContainerGroup(
+            var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
+
+            var microserviceResult = microservice.SetupContainerApp(
                 application,
                 resourceGroup,
                 application.Resources.AzureNetworkProfileIdentifier,
+                managedEnvironment.Id,
+                managedEnvironment.Name,
                 application.Resources.AzureContainerRegistryLoginServer,
                 application.Resources.AzureContainerRegistryUserName,
                 application.Resources.AzureContainerRegistryPassword,
@@ -139,10 +132,14 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var resourceGroup = application.SetupResourceGroup();
             var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
 
-            _ = microservice.SetupContainerGroup(
+            var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
+
+            _ = microservice.SetupContainerApp(
                 application,
                 resourceGroup,
                 application.Resources.AzureNetworkProfileIdentifier,
+                managedEnvironment.Id,
+                managedEnvironment.Name,
                 application.Resources.AzureContainerRegistryLoginServer,
                 application.Resources.AzureContainerRegistryUserName,
                 application.Resources.AzureContainerRegistryPassword,

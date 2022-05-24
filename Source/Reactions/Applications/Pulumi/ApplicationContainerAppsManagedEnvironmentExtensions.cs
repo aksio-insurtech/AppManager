@@ -30,7 +30,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
             Location = "westeurope",
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
-            Name = $"{application.Name}-{environment.ToDisplayName()}",
+            Name = GetName(application, environment),
             AppLogsConfiguration = new AppLogsConfigurationArgs
             {
                 Destination = "log-analytics",
@@ -45,4 +45,21 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
             ZoneRedundant = false
         });
     }
+
+    public static async Task<(string Id, string Name)> GetContainerAppManagedEnvironment(
+        this Application application,
+        ResourceGroup resourceGroup,
+        CloudRuntimeEnvironment environment)
+    {
+        var result = GetManagedEnvironment.Invoke(new()
+        {
+            ResourceGroupName = resourceGroup.Name,
+            Name = GetName(application, environment)
+        });
+
+        var getManagedEnvironmentResult = await result.GetValue();
+        return (getManagedEnvironmentResult.Id, getManagedEnvironmentResult.Name);
+    }
+
+    static string GetName(Application application, CloudRuntimeEnvironment environment) => $"{application.Name}-{environment.ToDisplayName()}";
 }
