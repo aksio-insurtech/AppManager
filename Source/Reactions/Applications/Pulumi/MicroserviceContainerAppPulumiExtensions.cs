@@ -28,7 +28,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         microserviceTags["microserviceId"] = microservice.Id.ToString();
         microserviceTags["microservice"] = microservice.Name.Value;
 
-        var storageName = $"{microservice.Name.Value.ToLowerInvariant()}-storage";
+        var storageName = $"{storage.FileStorage.ShareName}-storage";
 
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(microservice.Name, new()
         {
