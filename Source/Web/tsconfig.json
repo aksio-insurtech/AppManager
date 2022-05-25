@@ -12,13 +12,17 @@
         "strict": true,
         "allowJs": false,
         "checkJs": false,
-        "module": "CommonJS",
+        "module": "esnext",
+        "moduleResolution": "node",
         "noEmit": false,
         "pretty": true,
         "noImplicitAny": false,
         "skipLibCheck": true,
         "target": "ES2015",
-        "moduleResolution": "node",
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
         "jsx": "react-jsx",
         "esModuleInterop": true,
         "strictNullChecks": true,
@@ -43,7 +47,8 @@
         },
     },
     "exclude": [
-        "**/dist"
+        "**/dist",
+        "**/for_*/**"
     ],
     "references": []
 }
