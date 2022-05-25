@@ -39,10 +39,6 @@ export const General = (props: IGeneralProps) => {
             <TextField label="Name" readOnly value={props.application.name}/>
             <br />
 
-            <h2>Kernel</h2>
-            <TextField label="Public IP Address" value={resources.data?.ipAddress || ''} readOnly disabled />
-            <br />
-
             <h2>Azure</h2>
             <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/overview`}>Resource Group</Link>
             <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/providers/Microsoft.Storage/storageAccounts/${resources.data?.azure?.storageAccountName}/overview`}>Storage Account</Link>
