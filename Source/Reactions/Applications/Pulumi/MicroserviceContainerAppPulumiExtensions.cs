@@ -103,6 +103,12 @@ public static class MicroserviceContainerAppPulumiExtensions
                             MountPath = "/app/config",
                             VolumeName = storageName
                         }
+                    },
+
+                    Resources = new ContainerResourcesArgs
+                    {
+                        Cpu = 1,
+                        Memory = "2.0Gi"
                     }
                 }).ToArray(),
 
