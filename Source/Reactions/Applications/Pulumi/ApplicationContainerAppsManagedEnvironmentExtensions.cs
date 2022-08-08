@@ -30,7 +30,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
             Location = "westeurope",
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
-            Name = GetName(application, environment),
+            EnvironmentName = GetName(application, environment),
             AppLogsConfiguration = new AppLogsConfigurationArgs
             {
                 Destination = "log-analytics",
@@ -54,7 +54,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
         var result = GetManagedEnvironment.Invoke(new()
         {
             ResourceGroupName = resourceGroup.Name,
-            Name = GetName(application, environment)
+            EnvironmentName = GetName(application, environment)
         });
 
         var getManagedEnvironmentResult = await result.GetValue();

@@ -38,8 +38,8 @@ public static class ApplicationIngressPulumiExtensions
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(StorageName, new()
         {
             ResourceGroupName = resourceGroup.Name,
-            EnvName = managedEnvironment.Name,
-            Name = StorageName,
+            EnvironmentName = managedEnvironment.Name,
+            StorageName = StorageName,
             Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
                 AzureFile = new AzureFilePropertiesArgs
@@ -117,7 +117,7 @@ public static class ApplicationIngressPulumiExtensions
         {
             var containerAppAut = new ContainerAppsAuthConfig("current", new()
             {
-                Name = "current",
+                AuthConfigName = "current",
                 ResourceGroupName = resourceGroup.Name,
                 ContainerAppName = containerApp.Name,
                 GlobalValidation = new GlobalValidationArgs()

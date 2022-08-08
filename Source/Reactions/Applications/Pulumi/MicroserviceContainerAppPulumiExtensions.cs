@@ -33,8 +33,8 @@ public static class MicroserviceContainerAppPulumiExtensions
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(microservice.Name, new()
         {
             ResourceGroupName = resourceGroup.Name,
-            EnvName = managedEnvironmentName,
-            Name = storageName,
+            EnvironmentName = managedEnvironmentName,
+            StorageName = storageName,
             Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
                 AzureFile = new AzureFilePropertiesArgs
