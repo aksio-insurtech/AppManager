@@ -289,3 +289,5 @@ dist
 .eslintcache
 
 wwwroot
+**/out/arm64
+**/out/x64
