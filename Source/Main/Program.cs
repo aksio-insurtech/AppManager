@@ -18,5 +18,4 @@ var builder = Host.CreateDefaultBuilder()
                     .ConfigureWebHostDefaults(_ => _.UseStartup<Startup>());
 
 var app = builder.Build();
-
 app.Run();
