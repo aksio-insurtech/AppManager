@@ -1,4 +1,19 @@
-# Management
+# Aksio Cloud Management tool
+
+[![C# Build](https://github.com/aksio-insurtech/Cratis/actions/workflows/dotnet-build.yml/badge.svg)](https://github.com/aksio-insurtech/Management/actions/workflows/dotnet-build.yml)
+[![Web Build](https://github.com/aksio-insurtech/Cratis/actions/workflows/node-build.yml/badge.svg)](https://github.com/aksio-insurtech/Management/actions/workflows/web-build.yml)
+[![Publish](https://github.com/aksio-insurtech/Cratis/actions/workflows/publish.yml/badge.svg)](https://github.com/aksio-insurtech/Management/actions/workflows/publish.yml)
+[![Docker](https://img.shields.io/docker/v/aksioinsurtech/cloud-management?label=Aksio%20Cloud%20Management&logo=docker&sort=semver)](https://hub.docker.com/r/aksioinsurtech/cloud-management)
+
+## Introduction
+
+For general guidance on the core values and principles we @ Aksio use, read more [here](https://github.com/aksio-system/Home/blob/main/profile/README.md).
+
+If you want to jump into building this repository and possibly contributing, please refer to [contributing](./Documentation/contributing.md).
+
+## Opening in VSCode online
+
+If you prefer to browse the code in VSCode, you can do so by clicking [here](https://vscode.dev/github/aksio-insurtech/Cratis).
 
 ## Resources
 
