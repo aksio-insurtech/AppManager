@@ -17,7 +17,6 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
             }
         },
         {
@@ -41,10 +40,24 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views",
                 "/home/runner/work/cratis/cratis": "~/Projects/Aksio/Cratis"
             }
         },
+        {
+            "name": ".NET Core Launch (Bootstrap)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build bootstrap",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "args": ["/Users/einari/Projects/Aksio/aksio-management.json"],
+            "cwd": "${workspaceFolder}/Source/Bootstrap",
+            "stopAtEntry": false,
+            "env": {
+            },
+            "sourceFileMap": {
+            }
+        },
+
         {
             "name": ".NET Core Attach",
             "type": "coreclr",

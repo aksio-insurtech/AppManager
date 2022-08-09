@@ -34,7 +34,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         PulumiFn.Create(async () =>
         {
             var tags = application.GetTags(environment);
-            var resourceGroup = application.SetupResourceGroup();
+            var resourceGroup = application.SetupResourceGroup(environment);
             var identity = application.SetupUserAssignedIdentity(resourceGroup, tags);
             var vault = application.SetupKeyVault(identity, resourceGroup, tags);
             var network = application.SetupNetwork(identity, vault, resourceGroup, tags);
@@ -96,7 +96,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         PulumiFn.Create(async () =>
         {
             var tags = application.GetTags(environment);
-            var resourceGroup = application.SetupResourceGroup();
+            var resourceGroup = application.SetupResourceGroup(environment);
             var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
             storage.CreateAndUploadAppSettings(_settings);
             storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
@@ -128,7 +128,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         PulumiFn.Create(async () =>
         {
             var tags = application.GetTags(environment);
-            var resourceGroup = application.SetupResourceGroup();
+            var resourceGroup = application.SetupResourceGroup(environment);
             var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
 
             var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);

@@ -5,5 +5,6 @@ namespace Concepts.Applications;
 
 public record ApplicationId(Guid Value) : ConceptAs<Guid>(Value)
 {
+    public static implicit operator ApplicationId(Guid value) => new(value);
     public static implicit operator EventSourceId(ApplicationId applicationId) => new(applicationId.Value.ToString());
 }

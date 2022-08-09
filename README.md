@@ -18,6 +18,13 @@ If you want to jump into building this repository and possibly contributing, ple
 
 If you prefer to browse the code in VSCode, you can do so by clicking [here](https://vscode.dev/github/aksio-insurtech/Cratis).
 
+## Installing Pulumi plugins
+
+Pulumi plugins have 2 parts to it; the NuGet package used as the C# API and then the actual plugin.
+Within the [./Source/Reactions/Reactions.csproj](./Source/Reactions/Reactions.csproj) file you'll find the references for the NuGet
+packages. In addition to this, we programmatically tell Pulumi to install the necessary plugins at runtime, which can be found inside
+[./Source/Reactions/Applications/Pulumi/PulumiOperations.cs](./Source/Reactions/Applications/Pulumi/PulumiOperations.cs).
+
 ## Resources
 
 https://github.com/pulumi/examples/blob/master/azure-ts-static-website/index.ts

@@ -5,7 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../Reactions/Reactions.csproj"/>
+        <ProjectReference Include="../Read/Read.csproj" />
+        <ProjectReference Include="../Reactions/Reactions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     </ItemGroup>
 
 </Project>
