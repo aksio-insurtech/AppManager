@@ -13,6 +13,9 @@ WORKDIR /app
 RUN echo Configuration = ${CONFIGURATION}
 RUN echo Version = ${VERSION}
 
+# Install Pulumi
+RUN curl -fsSL https://get.pulumi.com | sh
+
 COPY Docker/copy-server-files.sh ./copy-server-files.sh
 RUN chmod +x ./copy-server-files.sh
 
