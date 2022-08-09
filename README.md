@@ -7,7 +7,10 @@
 
 ## Introduction
 
-For general guidance on the core values and principles we @ Aksio use, read more [here](https://github.com/aksio-system/Home/blob/main/profile/README.md).
+This repository holds tools and DevOps automation related to deploying and hosting solutions built on top of [Cratis](https://github.com/aksio-insurtech/Cratis).
+It is an opinionated approach to how to host microservice solutions adhering to how Cratis wants things. Its target cloud is Microsoft Azure.
+
+For general guidance on the core values and principles we @ Aksio use, read more [here](https://github.com/aksio-insurtech/Home/blob/main/profile/README.md).
 
 If you want to jump into building this repository and possibly contributing, please refer to [contributing](./Documentation/contributing.md).
 
