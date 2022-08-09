@@ -1,0 +1,104 @@
+name: Publish
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Setup node v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Yarn install
+        run: yarn
+
+      - name: Setup .Net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.201'
+
+      - name: Build .NET
+        run: dotnet build --configuration Release
+
+      - name: Build JS/TS
+        working-directory: ./Source/Web
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=4096"
+          yarn build
+
+      - name: Build x64 Kernel - self contained, ready to run
+        working-directory: ./Source/Main
+        run: dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true --self-contained -o out/x64
+
+      - name: Build arm64 Kernel - self contained, ready to run
+        working-directory: ./Source/Main
+        run: dotnet publish -c Release -r linux-arm64 -p:PublishReadyToRun=true --self-contained -o out/arm64
+
+      - name: Build Web
+        working-directory: ./Source/Web
+        run: |
+          yarn build
+
+      - name: Release
+        id: release
+        uses: cratis/release-action@v1
+        with:
+          user-name: 'Aksio Build'
+          user-email: 'build@aksio.no'
+
+      - name: Git reset (package.json files changed)
+        run: |
+          git reset --hard
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@master
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Production Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: ./Docker/Production/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            aksioinsurtech/cloud-management:${{ steps.release.outputs.version }}
+            aksioinsurtech/cloud-management:latest
+          build-args: |
+            VERSION=${{ steps.release.outputs.version }}
