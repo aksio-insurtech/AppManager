@@ -50,11 +50,11 @@ jobs:
           export NODE_OPTIONS="--max-old-space-size=4096"
           yarn build
 
-      - name: Build x64 Kernel - self contained, ready to run
+      - name: Build x64 Server - self contained, ready to run
         working-directory: ./Source/Main
         run: dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true --self-contained -o out/x64
 
-      - name: Build arm64 Kernel - self contained, ready to run
+      - name: Build arm64 Server - self contained, ready to run
         working-directory: ./Source/Main
         run: dotnet publish -c Release -r linux-arm64 -p:PublishReadyToRun=true --self-contained -o out/arm64
 
