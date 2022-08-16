@@ -5,7 +5,7 @@ using Events.Applications;
 
 namespace Reactions.Applications;
 
-public class MicroserviceProjection : IPassiveProjectionFor<Microservice>
+public class MicroserviceProjection : IImmediateProjectionFor<Microservice>
 {
     public ProjectionId Identifier => "163f84c8-ce22-4ecc-99da-84516be8e2ab";
 

@@ -5,7 +5,7 @@ using Events.Applications;
 
 namespace Reactions.Applications;
 
-public class ApplicationProjection : IPassiveProjectionFor<Application>
+public class ApplicationProjection : IImmediateProjectionFor<Application>
 {
     public ProjectionId Identifier => "c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5";
 

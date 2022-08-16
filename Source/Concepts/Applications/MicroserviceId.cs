@@ -6,6 +6,6 @@ namespace Concepts.Applications;
 public record MicroserviceId(Guid Value) : ConceptAs<Guid>(Value)
 {
     public static implicit operator EventSourceId(MicroserviceId microserviceId) => new(microserviceId.Value.ToString());
-
     public static implicit operator MicroserviceId(Guid value) => new(value);
+    public static implicit operator ModelKey(MicroserviceId microserviceId) => new(microserviceId.Value.ToString());
 }
