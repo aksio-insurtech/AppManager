@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AzureSubscription } from './AzureSubscription';
+import { AzureServicePrincipal } from './AzureServicePrincipal';
 
 export type Settings = {
     azureSubscriptions: AzureSubscription[];
@@ -11,6 +12,7 @@ export type Settings = {
     mongoDBOrganizationId: string;
     mongoDBPublicKey: string;
     mongoDBPrivateKey: string;
+    servicePrincipal: AzureServicePrincipal;
     elasticUrl: string;
     elasticApiKey: string;
 };

@@ -10,8 +10,6 @@ public static class ApplicationResourceGroupPulumiExtensions
 {
     public static ResourceGroup SetupResourceGroup(this Application application, CloudRuntimeEnvironment environment)
     {
-        var resourceGroupId = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/Einar-D-Norway-RG-2";
-
         var environmentString = () => environment switch
         {
             CloudRuntimeEnvironment.Development => "D",
@@ -27,6 +25,13 @@ public static class ApplicationResourceGroupPulumiExtensions
             _ => "NA"
         };
 
-        return ResourceGroup.Get($"{application.Name}-{environmentString}-{locationString}-RG", resourceGroupId);
+        var name = $"{application.Name}-{environmentString()}-{locationString()}-RG";
+        name = name.Replace(' ', '-');
+
+        return new ResourceGroup(name, new()
+        {
+            Location = application.CloudLocation.Value,
+            ResourceGroupName = name
+        });
     }
 }

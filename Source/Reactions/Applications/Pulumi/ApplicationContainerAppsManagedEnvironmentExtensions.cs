@@ -26,7 +26,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
 
         return new ManagedEnvironment(application.Name, new()
         {
-            // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
+            // Todo: We force this, due to Norway not supporting Container Apps until Q3 2022.
             Location = "westeurope",
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,

@@ -38,19 +38,20 @@ public static class Program
         })!;
 
         var settings = new Settings(
-            new AzureSubscription[] { config.Azure },
+            new AzureSubscription[] { config.Azure.Subscription },
             config.Pulumi.Organization,
             config.Pulumi.AccessToken,
             config.MongoDB.Organization,
             config.MongoDB.PublicKey,
             config.MongoDB.PrivateKey,
+            config.Azure.ServicePrincipal,
             config.Elasticsearch.Url,
             config.Elasticsearch.ApiKey);
 
         var application = new Application(
             Guid.NewGuid(),
             "Aksio Cloud Management",
-            config.Azure.SubscriptionId,
+            config.Azure.Subscription.SubscriptionId,
             config.CloudLocation,
             null!,
             null!);

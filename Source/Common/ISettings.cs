@@ -16,6 +16,7 @@ public interface ISettings
     MongoDBOrganizationId MongoDBOrganizationId { get; }
     MongoDBPublicKey MongoDBPublicKey { get; }
     MongoDBPrivateKey MongoDBPrivateKey { get; }
+    AzureServicePrincipal ServicePrincipal { get; }
     ElasticUrl ElasticUrl { get; }
     ElasticApiKey ElasticApiKey { get; }
 }

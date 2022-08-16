@@ -101,13 +101,16 @@ public class PulumiOperations : IPulumiOperations
         }
 
         await RemovePendingOperations(stack);
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.67.1");
+        await stack.Workspace.InstallPluginAsync("azure-native", "1.67.0");
         await stack.Workspace.InstallPluginAsync("azuread", "5.26.1");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.0");
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
                 { "azure-native:location", new ConfigValue(application.CloudLocation) },
-                { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) }
+                { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) },
+                { "azure-native:clientId", new ConfigValue(_settings.ServicePrincipal.ClientId) },
+                { "azure-native:clientSecret", new ConfigValue(_settings.ServicePrincipal.ClientSecret, true) },
+                { "azure-native:tenantId", new ConfigValue(_settings.ServicePrincipal.TenantId) }
             });
         var mongoDBPublicKey = _settings.MongoDBPublicKey;
         var mongoDBPrivateKey = _settings.MongoDBPrivateKey;

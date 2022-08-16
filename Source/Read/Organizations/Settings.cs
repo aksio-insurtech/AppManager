@@ -16,6 +16,7 @@ public record Settings(
     MongoDBOrganizationId MongoDBOrganizationId,
     MongoDBPublicKey MongoDBPublicKey,
     MongoDBPrivateKey MongoDBPrivateKey,
+    AzureServicePrincipal ServicePrincipal,
     ElasticUrl ElasticUrl,
     ElasticApiKey ElasticApiKey) : ISettings
 {
@@ -26,6 +27,7 @@ public record Settings(
         string.Empty,
         string.Empty,
         string.Empty,
+        new AzureServicePrincipal(string.Empty, string.Empty, string.Empty),
         string.Empty,
         string.Empty);
 }
