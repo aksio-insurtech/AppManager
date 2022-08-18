@@ -12,4 +12,12 @@ public static class CloudRuntimeEnvironmentExtensions
             CloudRuntimeEnvironment.Development => "dev",
             _ => "default"
         };
+
+    public static string ToShortName(this CloudRuntimeEnvironment environment) =>
+        environment switch
+        {
+            CloudRuntimeEnvironment.Development => "D",
+            CloudRuntimeEnvironment.Production => "D",
+            _ => "U"
+        };
 }
