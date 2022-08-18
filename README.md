@@ -3,7 +3,7 @@
 [![C# Build](https://github.com/aksio-insurtech/Cratis/actions/workflows/dotnet-build.yml/badge.svg)](https://github.com/aksio-insurtech/Management/actions/workflows/dotnet-build.yml)
 [![Web Build](https://github.com/aksio-insurtech/Cratis/actions/workflows/node-build.yml/badge.svg)](https://github.com/aksio-insurtech/Management/actions/workflows/web-build.yml)
 [![Publish](https://github.com/aksio-insurtech/Cratis/actions/workflows/publish.yml/badge.svg)](https://github.com/aksio-insurtech/Management/actions/workflows/publish.yml)
-[![Docker](https://img.shields.io/docker/v/aksioinsurtech/cloud-management?label=Aksio%20Cloud%20Management&logo=docker&sort=semver)](https://hub.docker.com/r/aksioinsurtech/cloud-management)
+[![Docker](https://img.shields.io/docker/v/aksioinsurtech/app-manager?label=Aksio%20Cloud%20Management&logo=docker&sort=semver)](https://hub.docker.com/r/aksioinsurtech/app-manager)
 
 ## Introduction
 

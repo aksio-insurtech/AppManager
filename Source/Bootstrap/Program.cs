@@ -14,7 +14,7 @@ namespace Bootstrap;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         if (args.Length == 0)
         {
@@ -22,11 +22,13 @@ public static class Program
             return;
         }
 
+        var appManagerVersion = await GetLatestVersionOfDockerHubImage("aksioinsurtech", "app-manager");
+
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
 
         // Setup application within cloud environment
         // Wait till its ready and then append the events that represents the actions done (through commands?)
-        var configAsJson = File.ReadAllText(args[0]);
+        var configAsJson = await File.ReadAllTextAsync(args[0]);
 
         var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, new JsonSerializerOptions
         {
@@ -77,5 +79,22 @@ public static class Program
         // new MongoDBEventSequenceStorageProvider()
         Console.WriteLine("Waiting...");
         Console.ReadLine();
+    }
+
+    static async Task<string> GetLatestVersionOfDockerHubImage(string organization, string image)
+    {
+        var client = new HttpClient();
+        var response = await client.GetStringAsync($"https://hub.docker.com/v2/repositories/{organization}/{image}/tags/?page_size=25&page=1");
+        var document = JsonDocument.Parse(response);
+        var names = document.RootElement
+            .GetProperty("results")
+            .EnumerateArray()
+            .Select(_ => _.GetProperty("name").GetString() ?? string.Empty)
+            .Where(_ => !_.StartsWith("latest") && !_.Contains('-'))
+            .OrderByDescending(_ => _)
+
+            .ToArray();
+
+        return names.FirstOrDefault() ?? string.Empty;
     }
 }
