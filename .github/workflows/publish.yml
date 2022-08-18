@@ -98,7 +98,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            aksioinsurtech/cloud-management:${{ steps.release.outputs.version }}
-            aksioinsurtech/cloud-management:latest
+            aksioinsurtech/app-manager:${{ steps.release.outputs.version }}
+            aksioinsurtech/app-manager:latest
           build-args: |
             VERSION=${{ steps.release.outputs.version }}
