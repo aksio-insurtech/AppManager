@@ -5,4 +5,4 @@ using Concepts.MongoDB;
 
 namespace Bootstrap;
 
-public record MongoDBConfig(MongoDBOrganizationId Organization, MongoDBPublicKey PublicKey, MongoDBPrivateKey PrivateKey);
+public record MongoDBConfig(MongoDBOrganizationId OrganizationId, MongoDBPublicKey PublicKey, MongoDBPrivateKey PrivateKey, MongoDBPassword Password);

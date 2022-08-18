@@ -41,7 +41,7 @@ public static class Program
             new AzureSubscription[] { config.Azure.Subscription },
             config.Pulumi.Organization,
             config.Pulumi.AccessToken,
-            config.MongoDB.Organization,
+            config.MongoDB.OrganizationId,
             config.MongoDB.PublicKey,
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal,
@@ -50,11 +50,19 @@ public static class Program
 
         var application = new Application(
             Guid.NewGuid(),
-            "Aksio Cloud Management",
+            "AppManager",
             config.Azure.Subscription.SubscriptionId,
             config.CloudLocation,
-            null!,
-            null!);
+            new(
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.Password) })),
+            new(config.Authentication.ClientId, config.Authentication.ClientSecret));
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
@@ -66,6 +74,7 @@ public static class Program
         var operations = new PulumiOperations(loggerFactory.CreateLogger<PulumiOperations>(), settings);
         operations.Up(application, config.Name, definition, Concepts.CloudRuntimeEnvironment.Development);
 
+        // new MongoDBEventSequenceStorageProvider()
         Console.WriteLine("Waiting...");
         Console.ReadLine();
     }

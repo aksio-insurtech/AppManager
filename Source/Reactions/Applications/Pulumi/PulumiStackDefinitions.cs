@@ -38,7 +38,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             var identity = application.SetupUserAssignedIdentity(resourceGroup, tags);
             var vault = application.SetupKeyVault(identity, resourceGroup, tags);
             var network = application.SetupNetwork(identity, vault, resourceGroup, tags);
-            var storage = await application.SetupStorage(resourceGroup, tags);
+            var storage = await application.SetupStorage(environment, resourceGroup, tags);
             var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
             var mongoDB = await application.SetupMongoDB(_settings, environment, tags);
 
@@ -65,7 +65,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
                 kernelStorage,
                 new[]
                 {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.7.3", new[] { 80 })
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", "aksioinsurtech/cratis:6.8.1", new[] { 80 })
                 },
                 tags);
 

@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -56,7 +57,7 @@ public static class ApplicationIngressPulumiExtensions
         var containerApp = new ContainerApp("ingress", new()
         {
             // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
-            Location = "westeurope",
+            Location = CloudLocationKey.EuropeWest,
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
             ManagedEnvironmentId = managedEnvironment.Id,

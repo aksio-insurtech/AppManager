@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts;
+using Concepts.Applications;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.OperationalInsights;
@@ -27,7 +28,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
         return new ManagedEnvironment(application.Name, new()
         {
             // Todo: We force this, due to Norway not supporting Container Apps until Q3 2022.
-            Location = "westeurope",
+            Location = CloudLocationKey.EuropeWest,
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
             EnvironmentName = GetName(application, environment),

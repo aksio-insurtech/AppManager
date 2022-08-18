@@ -3,6 +3,7 @@
 
 using Common;
 using Concepts;
+using Concepts.Applications;
 using Pulumi.Mongodbatlas;
 using Pulumi.Mongodbatlas.Inputs;
 
@@ -22,10 +23,9 @@ public static class ApplicationMongoDBPulumiExtensions
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
             ProjectId = project.Id,
-            ProviderName = "TENANT",
-            BackingProviderName = "AZURE",
-            ProviderInstanceSizeName = "M0",
-            ProviderRegionName = "EUROPE_NORTH",
+            ProviderName = "AZURE",
+            ProviderInstanceSizeName = "M10",
+            ProviderRegionName = GetRegionName(application.CloudLocation),
             Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
         });
 
@@ -55,10 +55,18 @@ public static class ApplicationMongoDBPulumiExtensions
         // _ = new ProjectIpAccessList("kernel", new()
         // {
         //     ProjectId = project.Id,
-        //     IpAddress = "0.0.0.0/0"
+        //     IpAddress = "0.0.0.0"
         // });
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
         return new(cluster, connectionString, databasePassword);
     }
+
+    static string GetRegionName(CloudLocationKey cloudLocation) => cloudLocation.Value switch
+    {
+        CloudLocationKey.NorwayEast => "NORWAY_EAST",
+        CloudLocationKey.EuropeWest => "EUROPE_WEST",
+        CloudLocationKey.EuropeNorth => "EUROPE_NORTH",
+        _ => string.Empty
+    };
 }

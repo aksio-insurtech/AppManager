@@ -25,8 +25,8 @@ public static class MicroserviceContainerAppPulumiExtensions
         Tags tags)
     {
         var microserviceTags = tags.Clone();
-        microserviceTags["microserviceId"] = microservice.Id.ToString();
-        microserviceTags["microservice"] = microservice.Name.Value;
+        microserviceTags["MicroserviceId"] = microservice.Id.ToString();
+        microserviceTags["Microservice"] = microservice.Name.Value;
 
         var storageName = $"{storage.FileStorage.ShareName}-storage";
 
@@ -50,7 +50,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         var containerApp = new ContainerApp(microservice.Name.Value.ToLowerInvariant(), new()
         {
             // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
-            Location = "westeurope",
+            Location = CloudLocationKey.EuropeWest,
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
             ManagedEnvironmentId = managedEnvironmentId,
