@@ -41,15 +41,6 @@ jobs:
         with:
           dotnet-version: '6.0.201'
 
-      - name: Build .NET
-        run: dotnet build --configuration Release
-
-      - name: Build JS/TS
-        working-directory: ./Source/Web
-        run: |
-          export NODE_OPTIONS="--max-old-space-size=4096"
-          yarn build
-
       - name: Build x64 Server - self contained, ready to run
         working-directory: ./Source/Main
         run: dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true --self-contained -o out/x64
