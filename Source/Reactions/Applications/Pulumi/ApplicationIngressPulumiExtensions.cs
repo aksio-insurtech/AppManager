@@ -56,7 +56,7 @@ public static class ApplicationIngressPulumiExtensions
         const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
         var containerApp = new ContainerApp("ingress", new()
         {
-            // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
+            // Todo: We force this, due to Norway not supporting Container Apps until Q3 2022.
             Location = CloudLocationKey.EuropeWest,
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,

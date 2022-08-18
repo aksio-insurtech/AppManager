@@ -50,7 +50,7 @@ public static class MicroserviceContainerAppPulumiExtensions
 
         var containerApp = new ContainerApp(microservice.Name.Value.ToLowerInvariant(), new()
         {
-            // Todo: We force this, due to Norway not supporting Container Apps in preview yet.
+            // Todo: We force this, due to Norway not supporting Container Apps until Q3 2022.
             Location = CloudLocationKey.EuropeWest,
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
