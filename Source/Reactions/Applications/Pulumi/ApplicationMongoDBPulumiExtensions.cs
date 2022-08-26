@@ -14,6 +14,7 @@ public static class ApplicationMongoDBPulumiExtensions
     public static async Task<MongoDBResult> SetupMongoDB(this Application application, ISettings settings, CloudRuntimeEnvironment environment, Tags tags)
     {
         var mongoDBOrganizationId = settings.MongoDBOrganizationId;
+
         var project = new Project(application.Name, new ProjectArgs
         {
             OrgId = mongoDBOrganizationId.Value
@@ -52,11 +53,11 @@ public static class ApplicationMongoDBPulumiExtensions
             }
         });
 
-        // _ = new ProjectIpAccessList("kernel", new()
-        // {
-        //     ProjectId = project.Id,
-        //     IpAddress = "0.0.0.0"
-        // });
+        _ = new ProjectIpAccessList("kernel", new()
+        {
+            ProjectId = project.Id,
+            IpAddress = "0.0.0.0"
+        });
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
         return new(cluster, connectionString, databasePassword);

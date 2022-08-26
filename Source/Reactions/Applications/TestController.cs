@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts;
+using Pulumi.Automation;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -30,7 +31,7 @@ public class TestController : Controller
     {
         var application = await _projections.GetInstanceById<Application>("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
         var definition = _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, application.Name, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 
     [HttpGet("containerapp")]
@@ -38,7 +39,7 @@ public class TestController : Controller
     {
         var application = await _projections.GetInstanceById<Application>("cd9b5601-1966-4c67-a393-039386dfba20");
         var definition = _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, application.Name, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 
     [HttpGet("down")]
@@ -46,7 +47,7 @@ public class TestController : Controller
     {
         var application = await _projections.GetInstanceById<Application>("318b19e4-5d7f-4cbc-a7bb-d2a2bf6ede88");
         var definition = _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Down(application, application.Name, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 
     [HttpGet("microservice")]
@@ -56,7 +57,7 @@ public class TestController : Controller
         var microservice = await _projections.GetInstanceById<Microservice>("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
         var projectName = $"{application.Name}-{microservice.Name}";
         var definition = _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, projectName, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 
     [HttpGet("microservice/containerapp")]
@@ -66,7 +67,7 @@ public class TestController : Controller
         var microservice = await _projections.GetInstanceById<Microservice>("b2c57f22-4e45-41e8-9593-c5a3f8f8b9ca");
         var projectName = $"{application.Name}-{microservice.Name}";
         var definition = _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, projectName, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 
     [HttpGet("microservice/down")]
@@ -76,7 +77,7 @@ public class TestController : Controller
         var microservice = await _projections.GetInstanceById<Microservice>("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
         var projectName = $"{application.Name}-{microservice.Name}";
         var definition = _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Down(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Down(application, projectName, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 
     [HttpGet("deployable")]
@@ -86,7 +87,15 @@ public class TestController : Controller
         var microservice = await _projections.GetInstanceById<Microservice>("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44");
         var projectName = $"{application.Name}-{microservice.Name}";
         var deployable = new Deployable(Guid.Parse("684196c5-a785-42cd-b737-9fbf2fe326b6"), new(Guid.Parse("1bbf301b-94d4-47d2-8775-c6e0f0e6bf44")), "main", "nginx", new[] { 80 });
-        var definition = _stackDefinitions.Deployable(_executionContext, application, microservice, deployable, CloudRuntimeEnvironment.Development);
-        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        var definition = _stackDefinitions.Deployable(
+            _executionContext,
+            application,
+            microservice,
+            new[]
+            {
+                deployable
+            },
+            CloudRuntimeEnvironment.Development);
+        _pulumiOperations.Up(application, projectName, PulumiFn.Create(() => definition), CloudRuntimeEnvironment.Development);
     }
 }

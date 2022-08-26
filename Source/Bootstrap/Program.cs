@@ -4,8 +4,10 @@
 using System.Text.Json;
 using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
+using Concepts;
 using Concepts.Azure;
 using Microsoft.Extensions.Logging;
+using Pulumi.Automation;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Read.Organizations;
@@ -21,8 +23,6 @@ public static class Program
             Console.WriteLine("Missing config file as parameter");
             return;
         }
-
-        var appManagerVersion = await GetLatestVersionOfDockerHubImage("aksioinsurtech", "app-manager");
 
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
 
@@ -51,7 +51,7 @@ public static class Program
             config.Elasticsearch.ApiKey);
 
         var application = new Application(
-            Guid.NewGuid(),
+            Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"),
             "AppManager",
             config.Azure.Subscription.SubscriptionId,
             config.CloudLocation,
@@ -63,38 +63,54 @@ public static class Program
                 null!,
                 null!,
                 null!,
-                new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.Password) })),
+                new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
             new(config.Authentication.ClientId, config.Authentication.ClientSecret));
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
         var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
 
-        var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, loggerFactory.CreateLogger<FileStorage>());
-        var definition = definitions.Application(executionContext, application, Concepts.CloudRuntimeEnvironment.Development);
+        const CloudRuntimeEnvironment cloudRuntimeEnvironment = CloudRuntimeEnvironment.Development;
 
+        var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, loggerFactory.CreateLogger<FileStorage>());
         var operations = new PulumiOperations(loggerFactory.CreateLogger<PulumiOperations>(), settings);
-        operations.Up(application, config.Name, definition, Concepts.CloudRuntimeEnvironment.Development);
+
+        operations.Up(
+            application,
+            config.Name,
+            PulumiFn.Create(async () =>
+            {
+                var applicationResult = await definitions.Application(executionContext, application, cloudRuntimeEnvironment);
+
+                var microservice = new Microservice(
+                    Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
+                    application.Id,
+                    "AppManager");
+
+                var appManagerVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "app-manager");
+
+                application = await applicationResult.MergeWithApplication(application);
+
+                await definitions.Microservice(
+                    executionContext,
+                    application,
+                    microservice,
+                    cloudRuntimeEnvironment,
+                    applicationResult.ResourceGroup,
+                    new[]
+                    {
+                        new Deployable(
+                            Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
+                            microservice.Id,
+                            "main",
+                            $"aksioinsurtech/app-manager:{appManagerVersion}",
+                            new[] { 80 })
+                    });
+            }),
+            cloudRuntimeEnvironment);
 
         // new MongoDBEventSequenceStorageProvider()
         Console.WriteLine("Waiting...");
         Console.ReadLine();
-    }
-
-    static async Task<string> GetLatestVersionOfDockerHubImage(string organization, string image)
-    {
-        var client = new HttpClient();
-        var response = await client.GetStringAsync($"https://hub.docker.com/v2/repositories/{organization}/{image}/tags/?page_size=25&page=1");
-        var document = JsonDocument.Parse(response);
-        var names = document.RootElement
-            .GetProperty("results")
-            .EnumerateArray()
-            .Select(_ => _.GetProperty("name").GetString() ?? string.Empty)
-            .Where(_ => !_.StartsWith("latest") && !_.Contains('-'))
-            .OrderByDescending(_ => _)
-
-            .ToArray();
-
-        return names.FirstOrDefault() ?? string.Empty;
     }
 }
