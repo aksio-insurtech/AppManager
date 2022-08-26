@@ -163,9 +163,9 @@ public static class ApplicationIngressPulumiExtensions
                         Validation = new AzureActiveDirectoryValidationArgs
                         {
                             AllowedAudiences =
-                        {
-                            $"api://{application.Authentication.ClientId}"
-                        }
+                            {
+                                $"api://{application.Authentication.ClientId}"
+                            }
                         }
                     }
                 }

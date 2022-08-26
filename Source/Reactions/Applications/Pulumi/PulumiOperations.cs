@@ -110,7 +110,7 @@ public class PulumiOperations : IPulumiOperations
                 { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) },
                 { "azure-native:clientId", new ConfigValue(_settings.ServicePrincipal.ClientId) },
                 { "azure-native:clientSecret", new ConfigValue(_settings.ServicePrincipal.ClientSecret, true) },
-                { "azure-native:tenantId", new ConfigValue(_settings.ServicePrincipal.TenantId) }
+                { "azure-native:tenantId", new ConfigValue(_settings.AzureSubscriptions.First().TenantId) }
             });
         var mongoDBPublicKey = _settings.MongoDBPublicKey;
         var mongoDBPrivateKey = _settings.MongoDBPrivateKey;

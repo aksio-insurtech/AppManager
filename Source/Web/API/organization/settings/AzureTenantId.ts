@@ -3,7 +3,5 @@
  *--------------------------------------------------------------------------------------------*/
 
 
-export type AzureServicePrincipal = {
-    clientId: string;
-    clientSecret: string;
+export type AzureTenantId = {
 };

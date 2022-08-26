@@ -27,7 +27,7 @@ public record Settings(
         string.Empty,
         string.Empty,
         string.Empty,
-        new AzureServicePrincipal(string.Empty, string.Empty, string.Empty),
+        new AzureServicePrincipal(string.Empty, string.Empty),
         string.Empty,
         string.Empty);
 }

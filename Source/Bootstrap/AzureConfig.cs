@@ -5,4 +5,4 @@ using Concepts.Azure;
 
 namespace Bootstrap;
 
-public record AzureConfig(AzureSubscription Subscription, AzureServicePrincipal ServicePrincipal);
+public record AzureConfig(string TenantId, AzureSubscription Subscription, AzureServicePrincipal ServicePrincipal);

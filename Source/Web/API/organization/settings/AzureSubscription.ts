@@ -7,4 +7,5 @@ export type AzureSubscription = {
     subscriptionId: string;
     name: string;
     tenantName: string;
+    tenantId: string;
 };
