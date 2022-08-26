@@ -53,11 +53,11 @@ public static class ApplicationMongoDBPulumiExtensions
             }
         });
 
-        _ = new ProjectIpAccessList("kernel", new()
-        {
-            ProjectId = project.Id,
-            IpAddress = "0.0.0.0"
-        });
+        // _ = new ProjectIpAccessList("kernel", new()
+        // {
+        //     ProjectId = project.Id,
+        //     IpAddress = "0.0.0.0"
+        // });
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
         return new(cluster, connectionString, databasePassword);

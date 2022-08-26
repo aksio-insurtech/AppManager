@@ -11,11 +11,13 @@ http {
         gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml;
         gzip_disable "MSIE [1-6]\.";
 
+{{#if HasFrontend}}
         location / {
-            proxy_pass http://members8c927844.internal.blackstone-c19df85b.westeurope.azurecontainerapps.io;
+            proxy_pass {{FrontendUrl}};
             proxy_http_version 1.1;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header accept-encoding deflate;
         }
+{{/if}}
     }
 }

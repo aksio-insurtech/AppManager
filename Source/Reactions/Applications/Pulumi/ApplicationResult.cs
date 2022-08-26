@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
@@ -13,6 +14,7 @@ public record ApplicationResult(
     StorageResult Storage,
     ContainerRegistryResult ContainerRegistry,
     MongoDBResult MongoDB,
+    ManagedEnvironment ManagedEnvironment,
     ContainerAppResult Kernel)
 {
     public async Task<Application> MergeWithApplication(Application application)

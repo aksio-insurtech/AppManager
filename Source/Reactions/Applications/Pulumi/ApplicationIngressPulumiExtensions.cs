@@ -23,7 +23,8 @@ public static class ApplicationIngressPulumiExtensions
         StorageResult storage,
         ManagedEnvironment managedEnvironment,
         Tags tags,
-        ILogger<FileStorage> fileStorageLogger)
+        ILogger<FileStorage> fileStorageLogger,
+        string? frontendMicroserviceResourceName = default)
     {
         var nginxFileShare = new FileShare("ingress", new()
         {
@@ -33,7 +34,24 @@ public static class ApplicationIngressPulumiExtensions
 
         var nginxFileShareName = await nginxFileShare.Name.GetValue();
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
-        var nginxContent = TemplateTypes.IngressConfig(new { Something = 42 });
+
+        var frontendUrl = string.Empty;
+        if (frontendMicroserviceResourceName is not null)
+        {
+            var getMicroserviceContainerApp = GetContainerApp.Invoke(new()
+            {
+                ResourceGroupName = resourceGroup.Name,
+                ContainerAppName = frontendMicroserviceResourceName
+            });
+            var microserviceContainerApp = await getMicroserviceContainerApp.GetValue();
+            frontendUrl = $"http://{microserviceContainerApp.Configuration!.Ingress!.Fqdn}";
+        }
+
+        var nginxContent = TemplateTypes.IngressConfig(new
+        {
+            HasFrontend = frontendMicroserviceResourceName is not null,
+            FrontendUrl = frontendUrl
+        });
         nginxFileStorage.Upload("nginx.conf", nginxContent);
 
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(StorageName, new()
@@ -140,7 +158,7 @@ public static class ApplicationIngressPulumiExtensions
                         {
                             ClientId = application.Authentication.ClientId.Value,
                             ClientSecretSettingName = microsoftProviderAuthenticationSecret,
-                            OpenIdIssuer = "https://login.microsoftonline.com/common/v2.0"
+                            OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
                         },
                         Validation = new AzureActiveDirectoryValidationArgs
                         {

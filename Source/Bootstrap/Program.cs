@@ -72,7 +72,8 @@ public static class Program
 
         const CloudRuntimeEnvironment cloudRuntimeEnvironment = CloudRuntimeEnvironment.Development;
 
-        var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, loggerFactory.CreateLogger<FileStorage>());
+        var logger = loggerFactory.CreateLogger<FileStorage>();
+        var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
         var operations = new PulumiOperations(loggerFactory.CreateLogger<PulumiOperations>(), settings);
 
         operations.Up(
@@ -80,7 +81,7 @@ public static class Program
             config.Name,
             PulumiFn.Create(async () =>
             {
-                var applicationResult = await definitions.Application(executionContext, application, cloudRuntimeEnvironment);
+                var applicationResult = await definitions.Application(executionContext, application, cloudRuntimeEnvironment, true);
 
                 var microservice = new Microservice(
                     Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
@@ -91,7 +92,7 @@ public static class Program
 
                 application = await applicationResult.MergeWithApplication(application);
 
-                await definitions.Microservice(
+                var microserviceResult = await definitions.Microservice(
                     executionContext,
                     application,
                     microservice,
@@ -106,6 +107,16 @@ public static class Program
                             $"aksioinsurtech/app-manager:{appManagerVersion}",
                             new[] { 80 })
                     });
+
+                var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
+
+                await application.SetupIngress(
+                    applicationResult.ResourceGroup,
+                    applicationResult.Storage,
+                    applicationResult.ManagedEnvironment,
+                    application.GetTags(cloudRuntimeEnvironment),
+                    logger,
+                    microserviceResourceName);
             }),
             cloudRuntimeEnvironment);
 
