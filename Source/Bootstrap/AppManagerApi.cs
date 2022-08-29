@@ -10,13 +10,13 @@ public class AppManagerApi : IDisposable
 {
     readonly ManagementConfig _config;
     readonly string _url;
-    readonly HttpClient _client;
+    HttpClient _client;
 
     public AppManagerApi(ManagementConfig config, string url)
     {
         _config = config;
         _url = url;
-        _client = new HttpClient();
+        _client = null!;
     }
 
     public async Task Authenticate()
@@ -29,27 +29,30 @@ public class AppManagerApi : IDisposable
             { "scope", $"api://{_config.Authentication.ClientId}/.default" }
         });
 
-        var response = await _client.PostAsync($"https://login.microsoftonline.com/{_config.Azure.TenantId}/oauth2/v2.0/token", content);
+        var client = new HttpClient();
+        var response = await client.PostAsync($"https://login.microsoftonline.com/{_config.Azure.TenantId}/oauth2/v2.0/token", content);
         var result = await response.Content.ReadAsStringAsync();
         var document = JsonDocument.Parse(result);
         var accessToken = document.RootElement.GetProperty("access_token").GetString()!;
+
+        _client = new HttpClient();
         _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        _client.BaseAddress = new Uri(_url);
     }
 
-    public Task RegisterOrganization(Guid id, string name) => Perform("/api/organization", new { id = id.ToString(), name });
+    public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
 
     public void Dispose() => _client.Dispose();
 
     async Task Perform(string route, object body)
     {
         var content = JsonContent.Create(body);
-        var url = $"{_url}/{route}";
-        var response = await _client.PostAsync(url, content);
+        var response = await _client.PostAsync(route, content);
+        var result = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadAsStringAsync();
             Console.WriteLine(result);
-            throw new ApiCallError(url);
+            throw new ApiCallError(route);
         }
     }
 }
