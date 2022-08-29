@@ -17,7 +17,7 @@ public static class ApplicationIngressPulumiExtensions
 {
     const string StorageName = "ingress-storage";
 
-    public static async Task SetupIngress(
+    public static async Task<string> SetupIngress(
         this Application application,
         ResourceGroup resourceGroup,
         StorageResult storage,
@@ -171,5 +171,8 @@ public static class ApplicationIngressPulumiExtensions
                 }
             });
         }
+
+        var ingressConfig = await containerApp.Configuration.GetValue();
+        return $"https://{ingressConfig!.Ingress!.Fqdn}";
     }
 }

@@ -110,13 +110,17 @@ public static class Program
 
                 var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
 
-                await application.SetupIngress(
+                var ingressUrl = await application.SetupIngress(
                     applicationResult.ResourceGroup,
                     applicationResult.Storage,
                     applicationResult.ManagedEnvironment,
                     application.GetTags(cloudRuntimeEnvironment),
                     logger,
                     microserviceResourceName);
+
+                var appManagerApi = new AppManagerApi(config, ingressUrl);
+                await appManagerApi.Authenticate();
+                await appManagerApi.RegisterOrganization(Guid.Parse("3352d47d-c154-4457-b3fb-8a2efb725113"), "Aksio Insurtech");
             }),
             cloudRuntimeEnvironment);
 
