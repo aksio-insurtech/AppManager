@@ -3,6 +3,7 @@
 
 using Concepts.Applications;
 using Concepts.Azure;
+using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.Resources;
@@ -23,7 +24,8 @@ public static class MicroserviceContainerAppPulumiExtensions
         string containerRegistryPassword,
         MicroserviceStorage storage,
         IEnumerable<Deployable> deployables,
-        Tags tags)
+        Tags tags,
+        bool useContainerRegistry = true)
     {
         var microserviceTags = tags.Clone();
         microserviceTags["MicroserviceId"] = microservice.Id.ToString();
@@ -71,7 +73,7 @@ public static class MicroserviceContainerAppPulumiExtensions
                         Value = containerRegistryPassword
                     }
                 },
-                Registries =
+                Registries = !useContainerRegistry ? null! : new InputList<RegistryCredentialsArgs>()
                 {
                     new RegistryCredentialsArgs()
                     {
