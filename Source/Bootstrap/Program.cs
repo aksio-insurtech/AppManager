@@ -103,7 +103,7 @@ public static class Program
                             Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
                             microservice.Id,
                             "main",
-                            $"aksioinsurtech/app-manager:{appManagerVersion}",
+                            $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
                             new[] { 80 })
                     });
 
@@ -123,7 +123,7 @@ public static class Program
                     await appManagerApi.Authenticate();
                     await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
                 }
-                catch( Exception ex )
+                catch (Exception ex)
                 {
                     Console.WriteLine($"Errors with calling API - {ex.Message}");
                 }

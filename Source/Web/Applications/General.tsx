@@ -34,48 +34,46 @@ export const General = (props: IGeneralProps) => {
             }
         });
 
-        const commandBarItems: ICommandBarItemProps[] = [
-            {
-                key: 'delete',
-                name: 'Delete',
-                title: 'Delete Application',
-                iconProps: { iconName: 'Delete' },
-                onClick: showRemoveWarning
-            }
-        ];
+    const commandBarItems: ICommandBarItemProps[] = [
+        {
+            key: 'delete',
+            name: 'Delete',
+            title: 'Delete Application',
+            iconProps: { iconName: 'Delete' },
+            onClick: showRemoveWarning
+        }
+    ];
 
 
     return (
         <Stack>
-            <CommandBar items={commandBarItems}/>
-            <CollapsibleSection title="Settings" defaultCollapsed>
-                <TextField label="Name" readOnly value={props.application.name} />
-            </CollapsibleSection>
+            <CommandBar items={commandBarItems} />
 
-            <CollapsibleSection title="Azure" defaultCollapsed>
-                <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/overview`}>Resource Group</Link>
-                <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/providers/Microsoft.Storage/storageAccounts/${resources.data?.azure?.storageAccountName}/overview`}>Storage Account</Link>
-            </CollapsibleSection>
+            <h1>General</h1>
+            <TextField label="Name" readOnly value={props.application.name} />
 
-            <CollapsibleSection title="Azure Container Registry" defaultCollapsed>
-                <TextField label="Login Server" value={resources.data?.azure?.containerRegistryLoginServer || ''} readOnly disabled />
-                <TextField label="UserName" value={resources.data?.azure?.containerRegistryUserName || ''} readOnly disabled />
-                <TextField label="Password" value={resources.data?.azure?.containerRegistryPassword || ''} readOnly disabled type="password" canRevealPassword />
-            </CollapsibleSection>
+            <h1>Azure</h1>
+            <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/overview`}>Resource Group</Link>
+            <Link target='_blank' href={`https://portal.azure.com/#@${subscription?.tenantName}/resource${resources.data?.azure?.resourceGroupId}/providers/Microsoft.Storage/storageAccounts/${resources.data?.azure?.storageAccountName}/overview`}>Storage Account</Link>
 
-            <CollapsibleSection title="MongoDB" defaultCollapsed>
-                <TextField label="Server" value={resources.data?.mongoDB?.connectionString || ''} readOnly disabled />
+            <h1>Azure Container Registry</h1>
+            <TextField label="Login Server" value={resources.data?.azure?.containerRegistryLoginServer || ''} readOnly disabled />
+            <TextField label="UserName" value={resources.data?.azure?.containerRegistryUserName || ''} readOnly disabled />
+            <TextField label="Password" value={resources.data?.azure?.containerRegistryPassword || ''} readOnly disabled type="password" canRevealPassword />
 
-                <h3>Users</h3>
-                {resources.data?.mongoDB?.users?.map(user => {
-                    return (
-                        <Stack key={user.userName} horizontal>
-                            <TextField label="Username" value={user.userName} />
-                            <TextField label="Password" value={user.password} readOnly disabled type="password" canRevealPassword />
-                        </Stack>
-                    );
-                })}
-            </CollapsibleSection>
+            <h1>MongoDB</h1>
+
+            <TextField label="Server" value={resources.data?.mongoDB?.connectionString || ''} readOnly disabled />
+
+            <h3>Users</h3>
+            {resources.data?.mongoDB?.users?.map(user => {
+                return (
+                    <Stack key={user.userName} horizontal>
+                        <TextField label="Username" value={user.userName} />
+                        <TextField label="Password" value={user.password} readOnly disabled type="password" canRevealPassword />
+                    </Stack>
+                );
+            })}
         </Stack>
 
     );
