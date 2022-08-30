@@ -68,7 +68,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             {
                     new Deployable(Guid.Empty, microservice.Id, "kernel", $"aksioinsurtech/cratis:{latestVersion}", new[] { 80 })
             },
-            tags);
+            tags,
+            false);
 
         await kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
@@ -104,6 +105,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         Microservice microservice,
         CloudRuntimeEnvironment environment,
+        bool useContainerRegistry = true,
         ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
     {
@@ -128,7 +130,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             application.Resources.AzureContainerRegistryPassword,
             storage,
             deployables,
-            tags);
+            tags,
+            useContainerRegistry);
 
         // Todo: Set to actual execution context - might not be the right place for this!
         _executionContextManager.Set(executionContext);

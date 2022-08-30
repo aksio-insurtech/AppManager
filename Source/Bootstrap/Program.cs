@@ -95,6 +95,7 @@ public static class Program
                     application,
                     microservice,
                     cloudRuntimeEnvironment,
+                    false,
                     applicationResult.ResourceGroup,
                     new[]
                     {
@@ -116,9 +117,16 @@ public static class Program
                     logger,
                     microserviceResourceName);
 
-                var appManagerApi = new AppManagerApi(config, ingressUrl);
-                await appManagerApi.Authenticate();
-                await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
+                try
+                {
+                    var appManagerApi = new AppManagerApi(config, ingressUrl);
+                    await appManagerApi.Authenticate();
+                    await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
+                }
+                catch( Exception ex )
+                {
+                    Console.WriteLine($"Errors with calling API - {ex.Message}");
+                }
             }),
             cloudRuntimeEnvironment);
 
