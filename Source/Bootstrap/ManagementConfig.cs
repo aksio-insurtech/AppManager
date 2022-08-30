@@ -13,5 +13,4 @@ public record ManagementConfig(
     AzureConfig Azure,
     PulumiConfig Pulumi,
     MongoDBConfig MongoDB,
-    AuthenticationConfig Authentication,
-    ElasticSearchConfig Elasticsearch);
+    AuthenticationConfig Authentication);

@@ -46,9 +46,7 @@ public static class Program
             config.MongoDB.OrganizationId,
             config.MongoDB.PublicKey,
             config.MongoDB.PrivateKey,
-            config.Azure.ServicePrincipal,
-            config.Elasticsearch.Url,
-            config.Elasticsearch.ApiKey);
+            config.Azure.ServicePrincipal);
 
         var application = new Application(
             Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"),

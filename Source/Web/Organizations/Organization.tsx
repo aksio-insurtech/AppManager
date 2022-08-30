@@ -8,7 +8,6 @@ import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscrip
 import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetMongoDBSettings } from 'API/organization/settings/SetMongoDBSettings';
-import { SetElasticSearchSettings } from 'API/organization/settings/SetElasticSearchSettings';
 import { SetPulumiSettings } from 'API/organization/settings/SetPulumiSettings';
 
 const subscriptionsColumns: IColumn[] = [
@@ -39,8 +38,6 @@ export const Organization = () => {
     const [mongoDBOrganizationId, setMongoDBOrganizationId] = useState('');
     const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
     const [mongoDBPrivateKey, setMongoDBPrivateKey] = useState('');
-    const [elasticUrl, setElasticUrl] = useState('');
-    const [elasticApiKey, setElasticApiKey] = useState('');
 
     useEffect(() => {
         setPulumiOrganization(settings.data.pulumiOrganization);
@@ -48,8 +45,6 @@ export const Organization = () => {
         setMongoDBOrganizationId(settings.data.mongoDBOrganizationId);
         setMongoDBPublicKey(settings.data.mongoDBPublicKey);
         setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
-        setElasticUrl(settings.data.elasticUrl);
-        setElasticApiKey(settings.data.elasticApiKey);
     }, [settings.data]);
 
     const [showAddSubscription] = useModal(
@@ -89,13 +84,6 @@ export const Organization = () => {
         await command.execute();
     };
 
-    const saveElasticSettings = async () => {
-        const command = new SetElasticSearchSettings();
-        command.url = elasticUrl;
-        command.apiKey = elasticApiKey;
-        await command.execute();
-    };
-
     return (
         <div style={{ margin: '1rem' }}>
             <Stack>
@@ -118,13 +106,6 @@ export const Organization = () => {
                     <TextField label="Public Key" value={mongoDBPublicKey} onChange={(_, value) => setMongoDBPublicKey(value!)} />
                     <TextField label="Private Key" value={mongoDBPrivateKey} type="password" canRevealPassword onChange={(_, value) => setMongoDBPrivateKey(value!)} />
                     <PrimaryButton text='Save' onClick={saveMongoDBSettings} />
-                </Stack.Item>
-
-                <Stack.Item>
-                    <h2>Elastic Search</h2>
-                    <TextField label="Url" value={elasticUrl} onChange={(_, value) => setElasticUrl(value!)} />
-                    <TextField label="ApiKey" type="password" canRevealPassword value={elasticApiKey} onChange={(_, value) => setElasticApiKey(value!)} />
-                    <PrimaryButton text='Save' onClick={saveElasticSettings} />
                 </Stack.Item>
             </Stack>
         </div>

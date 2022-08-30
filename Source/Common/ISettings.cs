@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Azure;
-using Concepts.ElasticSearch;
 using Concepts.MongoDB;
 using Concepts.Pulumi;
 
@@ -17,6 +16,4 @@ public interface ISettings
     MongoDBPublicKey MongoDBPublicKey { get; }
     MongoDBPrivateKey MongoDBPrivateKey { get; }
     AzureServicePrincipal ServicePrincipal { get; }
-    ElasticUrl ElasticUrl { get; }
-    ElasticApiKey ElasticApiKey { get; }
 }

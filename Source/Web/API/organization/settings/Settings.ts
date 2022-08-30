@@ -13,6 +13,4 @@ export type Settings = {
     mongoDBPublicKey: string;
     mongoDBPrivateKey: string;
     servicePrincipal: AzureServicePrincipal;
-    elasticUrl: string;
-    elasticApiKey: string;
 };

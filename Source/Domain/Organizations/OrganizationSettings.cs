@@ -24,7 +24,4 @@ public class OrganizationSettings : Controller
 
     [HttpPost("mongodb")]
     public Task SetMongoDBSettings([FromBody] MongoDBSettings settings) => _eventLog.Append(SettingsId.Global, new MongoDBSettingsSet(settings.OrganizationId, settings.PublicKey, settings.PrivateKey));
-
-    [HttpPost("elasticsearch")]
-    public Task SetElasticSearchSettings([FromBody] ElasticSearchSettings settings) => _eventLog.Append(SettingsId.Global, new ElasticSearchSettingsSet(settings.Url, settings.ApiKey));
 }

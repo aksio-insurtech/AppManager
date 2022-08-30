@@ -3,7 +3,6 @@
 
 using Common;
 using Concepts.Azure;
-using Concepts.ElasticSearch;
 using Concepts.MongoDB;
 using Concepts.Pulumi;
 
@@ -16,9 +15,7 @@ public record Settings(
     MongoDBOrganizationId MongoDBOrganizationId,
     MongoDBPublicKey MongoDBPublicKey,
     MongoDBPrivateKey MongoDBPrivateKey,
-    AzureServicePrincipal ServicePrincipal,
-    ElasticUrl ElasticUrl,
-    ElasticApiKey ElasticApiKey) : ISettings
+    AzureServicePrincipal ServicePrincipal) : ISettings
 {
     public static readonly Settings NoSettings = new(
         Array.Empty<AzureSubscription>(),
@@ -27,7 +24,5 @@ public record Settings(
         string.Empty,
         string.Empty,
         string.Empty,
-        new AzureServicePrincipal(string.Empty, string.Empty),
-        string.Empty,
-        string.Empty);
+        new AzureServicePrincipal(string.Empty, string.Empty));
 }

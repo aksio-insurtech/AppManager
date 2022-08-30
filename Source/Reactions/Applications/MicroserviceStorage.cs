@@ -117,7 +117,7 @@ public class MicroserviceStorage
     public void CreateAndUploadAppSettings(ISettings settings)
     {
         var content = TemplateTypes.AppSettings(
-            new AppSettingsValues(_application.Name, _microservice.Name, settings.ElasticUrl, settings.ElasticApiKey));
+            new AppSettingsValues(_application.Name, _microservice.Name));
         FileStorage.Upload("appsettings.json", content);
     }
 
