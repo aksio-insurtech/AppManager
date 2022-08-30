@@ -120,7 +120,7 @@ public static class Program
 
                 var appManagerApi = new AppManagerApi(config, ingressUrl);
                 await appManagerApi.Authenticate();
-                await appManagerApi.RegisterOrganization(Guid.Parse("3352d47d-c154-4457-b3fb-8a2efb725113"), "Aksio Insurtech");
+                await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
             }),
             cloudRuntimeEnvironment);
 

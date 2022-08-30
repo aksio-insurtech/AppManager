@@ -6,6 +6,8 @@ using Concepts.Applications;
 namespace Bootstrap;
 
 public record ManagementConfig(
+    Guid TenantId,
+    string OrganizationName,
     string Name,
     CloudLocationKey CloudLocation,
     AzureConfig Azure,
