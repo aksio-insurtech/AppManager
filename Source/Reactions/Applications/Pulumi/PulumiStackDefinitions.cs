@@ -66,7 +66,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             kernelStorage,
             new[]
             {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", $"aksioinsurtech/cratis:{latestVersion}", new[] { 80 })
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", $"docker.io/aksioinsurtech/cratis:{latestVersion}", new[] { 80 })
             },
             tags,
             false);
