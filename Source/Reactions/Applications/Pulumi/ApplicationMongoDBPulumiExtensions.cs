@@ -4,6 +4,9 @@
 using Common;
 using Concepts;
 using Concepts.Applications;
+using Pulumi;
+using Pulumi.AzureNative.Network;
+using Pulumi.AzureNative.Resources;
 using Pulumi.Mongodbatlas;
 using Pulumi.Mongodbatlas.Inputs;
 
@@ -11,7 +14,7 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationMongoDBPulumiExtensions
 {
-    public static async Task<MongoDBResult> SetupMongoDB(this Application application, ISettings settings, CloudRuntimeEnvironment environment, Tags tags)
+    public static async Task<MongoDBResult> SetupMongoDB(this Application application, ISettings settings, ResourceGroup resourceGroup, VirtualNetwork vnet, CloudRuntimeEnvironment environment, Tags tags)
     {
         var mongoDBOrganizationId = settings.MongoDBOrganizationId;
 
@@ -20,13 +23,34 @@ public static class ApplicationMongoDBPulumiExtensions
             OrgId = mongoDBOrganizationId.Value
         });
 
+        var region = GetRegionName(application.CloudLocation);
+        var networkContainer = new NetworkContainer(application.Name, new()
+        {
+            ProjectId = project.Id,
+            AtlasCidrBlock = "10.0.3.0/24",
+            ProviderName = "AZURE",
+            Region = region
+        });
+
+        _ = new NetworkPeering(application.Name, new()
+        {
+            ProjectId = project.Id,
+            ContainerId = networkContainer.Id,
+            AzureDirectoryId = settings.AzureSubscriptions.First().TenantId.Value,
+            AzureSubscriptionId = settings.AzureSubscriptions.First().SubscriptionId.Value.ToString(),
+            ResourceGroupName = resourceGroup.Name,
+            ProviderName = "AZURE",
+            RouteTableCidrBlock = "10.0.1.0/24",
+            VnetName = vnet.Name
+        });
+
         var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
             ProjectId = project.Id,
             ProviderName = "AZURE",
             ProviderInstanceSizeName = "M10",
-            ProviderRegionName = GetRegionName(application.CloudLocation),
+            ProviderRegionName = region,
             Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
         });
 

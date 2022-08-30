@@ -39,7 +39,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var network = application.SetupNetwork(identity, vault, resourceGroup, tags);
         var storage = await application.SetupStorage(environment, resourceGroup, tags);
         var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
-        var mongoDB = await application.SetupMongoDB(_settings, environment, tags);
+        var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
 
         var microservice = new Microservice(Guid.Empty, application.Id, "kernel");
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);

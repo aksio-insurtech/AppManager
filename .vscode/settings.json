@@ -71,6 +71,7 @@
         "privkey",
         "Pulumi",
         "Templating",
+        "vnet",
         "Xunit"
     ]
 }
