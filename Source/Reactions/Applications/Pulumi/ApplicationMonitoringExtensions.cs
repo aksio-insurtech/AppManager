@@ -9,9 +9,9 @@ using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
 
-public static class ApplicationInsightsExtensions
+public static class ApplicationMonitoringExtensions
 {
-    public static Workspace SetupApplicationInsights(
+    public static ApplicationMonitoringResult SetupApplicationMonitoring(
         this Application application,
         ResourceGroup resourceGroup,
         CloudRuntimeEnvironment environment,
@@ -29,7 +29,7 @@ public static class ApplicationInsightsExtensions
             }
         });
 
-        _ = new Component(application.Name, new()
+        var component = new Component(application.Name, new()
         {
             ApplicationType = "web",
             FlowType = "Bluefield",
@@ -42,6 +42,6 @@ public static class ApplicationInsightsExtensions
             WorkspaceResourceId = workspace.Id
         });
 
-        return workspace;
+        return new(workspace, component);
     }
 }

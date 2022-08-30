@@ -47,8 +47,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
         var networkProfile = await network.Profile.Id.GetValue();
 
-        var applicationInsights = application.SetupApplicationInsights(resourceGroup, environment, tags);
-        var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationInsights, tags);
+        var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
+        var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, tags);
         var managedEnvironmentId = await managedEnvironment.Id.GetValue();
         var managedEnvironmentName = await managedEnvironment.Name.GetValue();
 
@@ -70,7 +70,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             },
             tags);
 
-        kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString);
+        await kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
 
         if (!ignoreIngress)

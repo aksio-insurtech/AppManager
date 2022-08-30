@@ -28,10 +28,12 @@ public class MicroserviceStorage
         FileStorage = fileStorage;
     }
 
-    public void CreateAndUploadCratisJson(MongoDBResult mongoDB, string siloHostName, string storageConnectionString)
+    public async Task CreateAndUploadCratisJson(MongoDBResult mongoDB, string siloHostName, string storageConnectionString, ApplicationMonitoringResult monitoring)
     {
         const string scheme = "mongodb+srv://";
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
+
+        var appInsightsInstrumentationKey = await monitoring.ApplicationInsight.InstrumentationKey.GetValue();
 
         var config = new KernelConfiguration()
         {
@@ -46,6 +48,14 @@ public class MicroserviceStorage
                 {
                     ConnectionString = storageConnectionString,
                     TableName = "OrleansSiloInstances"
+                }
+            },
+            Telemetry = new()
+            {
+                Type = TelemetryTypes.AppInsights,
+                Options = new AppInsightsTelemetryOptions
+                {
+                    Key = appInsightsInstrumentationKey
                 }
             },
             Storage = new()
