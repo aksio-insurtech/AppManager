@@ -22,11 +22,6 @@ public static class TemplateTypes
     public static readonly HandlebarsTemplate<object, object> ClusterClient = Handlebars.Compile(GetTemplate("cluster.client.json"));
 
     /// <summary>
-    /// The template for 'cluster.json' for client.
-    /// </summary>
-    public static readonly HandlebarsTemplate<object, object> ClusterKernel = Handlebars.Compile(GetTemplate("cluster.kernel.json"));
-
-    /// <summary>
     /// The template for 'nginx.conf' for the "ingress controller".
     /// </summary>
     public static readonly HandlebarsTemplate<object, object> IngressConfig = Handlebars.Compile(GetTemplate("nginx.conf"));
