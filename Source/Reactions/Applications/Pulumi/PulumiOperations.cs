@@ -32,7 +32,13 @@ public class PulumiOperations : IPulumiOperations
     {
         _ = Task.Run(async () =>
         {
+            _logger.CreatingStack();
             var stack = await CreateStack(application, projectName, environment, definition);
+
+            _logger.RefreshingStack();
+            await stack.RefreshAsync();
+
+            _logger.PuttingUpStack();
             await stack.UpAsync(new UpOptions
             {
                 OnStandardOutput = Console.WriteLine,
@@ -46,7 +52,13 @@ public class PulumiOperations : IPulumiOperations
     {
         _ = Task.Run(async () =>
         {
+            _logger.CreatingStack();
             var stack = await CreateStack(application, projectName, environment, definition);
+
+            _logger.RefreshingStack();
+            await stack.RefreshAsync();
+
+            _logger.TakingDownStack();
             await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
         });
     }
@@ -56,7 +68,13 @@ public class PulumiOperations : IPulumiOperations
     {
         _ = Task.Run(async () =>
         {
+            _logger.CreatingStack();
             var stack = await CreateStack(application, projectName, environment, definition);
+
+            _logger.RefreshingStack();
+            await stack.RefreshAsync();
+
+            _logger.RemovingStack();
             await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
         });
     }

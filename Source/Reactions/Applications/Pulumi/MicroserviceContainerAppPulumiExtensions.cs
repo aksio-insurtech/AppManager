@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Applications;
 using Concepts.Azure;
 using Pulumi;
 using Pulumi.AzureNative.App;
@@ -52,8 +51,7 @@ public static class MicroserviceContainerAppPulumiExtensions
 
         var containerApp = new ContainerApp(microservice.Name.Value.ToLowerInvariant(), new()
         {
-            // Todo: We force this, due to Norway not supporting Container Apps until Q3 2022.
-            Location = CloudLocationKey.EuropeWest,
+            Location = resourceGroup.Location,
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
             ManagedEnvironmentId = managedEnvironmentId,
@@ -65,29 +63,33 @@ public static class MicroserviceContainerAppPulumiExtensions
                     TargetPort = 80,
                     AllowInsecure = true
                 },
-                Secrets =
-                {
-                    new SecretArgs()
+                Secrets = !useContainerRegistry ? new InputList<SecretArgs>()
+                    : new InputList<SecretArgs>()
                     {
-                        Name = "container-registry",
-                        Value = containerRegistryPassword
-                    }
-                },
-                Registries = !useContainerRegistry ? null! : new InputList<RegistryCredentialsArgs>()
-                {
-                    new RegistryCredentialsArgs()
+                        new SecretArgs()
+                        {
+                            Name = "container-registry",
+                            Value = containerRegistryPassword
+                        }
+                    },
+                Registries = !useContainerRegistry ?
+                    new InputList<RegistryCredentialsArgs>()
+                    :
+                    new InputList<RegistryCredentialsArgs>()
                     {
-                        Server = containerRegistryLoginServer,
-                        Username = containerRegistryUsername,
-                        PasswordSecretRef = "container-registry"
+                        new RegistryCredentialsArgs()
+                        {
+                            Server = containerRegistryLoginServer,
+                            Username = containerRegistryUsername,
+                            PasswordSecretRef = "container-registry"
+                        }
                     }
-                }
             },
             Template = new TemplateArgs
             {
                 Volumes = new VolumeArgs[]
                 {
-                    new()
+                    new ()
                     {
                         Name = storageName,
                         StorageName = storageName,

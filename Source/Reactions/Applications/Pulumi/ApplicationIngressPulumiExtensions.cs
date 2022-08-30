@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Applications;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -74,8 +73,7 @@ public static class ApplicationIngressPulumiExtensions
         const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
         var containerApp = new ContainerApp("ingress", new()
         {
-            // Todo: We force this, due to Norway not supporting Container Apps until Q3 2022.
-            Location = CloudLocationKey.EuropeWest,
+            Location = resourceGroup.Location,
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
             ManagedEnvironmentId = managedEnvironment.Id,
