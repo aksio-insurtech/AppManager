@@ -2,7 +2,6 @@
     "Serilog": {
         "Using": [
             "Serilog.Sinks.Console",
-            "Serilog.Sinks.Elasticsearch"
         ],
         "MinimumLevel": {
             "Default": "Verbose",
@@ -24,8 +23,7 @@
             {
                 "Name": "Console",
                 "Args": {
-                    "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
-                    "outputTemplate": "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}"
+                    "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog"
                 }
             }
         ]
