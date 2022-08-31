@@ -90,6 +90,13 @@ public static class Program
 
                 application = await applicationResult.MergeWithApplication(application);
 
+                var deployable = new Deployable(
+                            Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
+                            microservice.Id,
+                            "main",
+                            $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
+                            new[] { 80 });
+
                 var microserviceResult = await definitions.Microservice(
                     executionContext,
                     application,
@@ -99,12 +106,7 @@ public static class Program
                     applicationResult.ResourceGroup,
                     new[]
                     {
-                        new Deployable(
-                            Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
-                            microservice.Id,
-                            "main",
-                            $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
-                            new[] { 80 })
+                        deployable
                     });
 
                 var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
@@ -119,9 +121,17 @@ public static class Program
 
                 try
                 {
+                    Console.WriteLine("\n\nSetup AppManager as application");
                     var appManagerApi = new AppManagerApi(config, ingressUrl);
                     await appManagerApi.Authenticate();
                     await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
+                    await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
+                    await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
+                    await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
+                    await appManagerApi.ConfigureAuthenticationForApplication(application.Id, config.Authentication.ClientId, config.Authentication.ClientSecret);
+                    await appManagerApi.CreateMicroservice(application.Id, microservice.Id, microservice.Name);
+                    await appManagerApi.CreateDeployable(application.Id, microservice.Id, deployable.Id, deployable.Name);
+                    await appManagerApi.SetDeployableImage(application.Id, microservice.Id, deployable.Id, deployable.Image);
                 }
                 catch (Exception ex)
                 {
