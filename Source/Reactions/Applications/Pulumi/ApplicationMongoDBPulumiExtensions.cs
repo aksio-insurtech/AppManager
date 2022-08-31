@@ -115,6 +115,15 @@ public static class ApplicationMongoDBPulumiExtensions
             Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
         });
 
+        // TODO: We need this for the cluster:
+        // , new CustomResourceOptions
+        // {
+        //     DependsOn =
+        //     {
+        //         "mongodbatlas_network_peering.test",
+        //     },
+        // });
+        // https://www.pulumi.com/registry/packages/mongodbatlas/api-docs/networkpeering/#example-with-azure
         var databasePassword = Guid.NewGuid().ToString();
         if (application.Resources?.MongoDB?.Users is not null &&
             (application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
