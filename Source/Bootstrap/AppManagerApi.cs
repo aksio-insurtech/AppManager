@@ -41,11 +41,20 @@ public class AppManagerApi : IDisposable
     }
 
     public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
+    public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
+    public Task AddAzureSubscription(string id, string name, string tenantName) => Perform("/api/organization/settings/subscriptions", new { id, name, tenantName });
+    public Task SetMongoDBSettings(string organizationId, string publicKey, string privateKey) => Perform("/api/organization/settings/mongodb", new { organizationId, publicKey, privateKey });
+    public Task CreateApplication(Guid applicationId, string name, Guid azureSubscriptionId, string cloudLocation) => Perform("/api/applications", new { applicationId, name, azureSubscriptionId, cloudLocation });
+    public Task ConfigureAuthenticationForApplication(Guid applicationId, string clientId, string clientSecret) => Perform($"/api/applications/{applicationId}/authentication", new { clientId, clientSecret });
+    public Task CreateMicroservice(Guid applicationId, Guid microserviceId, string name) => Perform($"/api/applications/{applicationId}/microservices", new { microserviceId, name });
+    public Task CreateDeployable(Guid applicationId, Guid microserviceId, Guid deployableId, string name) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/deployables", new { deployableId, name });
+    public Task SetDeployableImage(Guid applicationId, Guid microserviceId, Guid deployableId, string deployableImageName) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/deployables/image", new { deployableImageName });
 
     public void Dispose() => _client.Dispose();
 
     async Task Perform(string route, object body)
     {
+        Console.WriteLine($"Calling : {route}");
         var content = JsonContent.Create(body);
         var response = await _client.PostAsync(route, content);
         var result = await response.Content.ReadAsStringAsync();
