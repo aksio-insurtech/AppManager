@@ -115,4 +115,4 @@ jobs:
               -X POST ${{ secrets.APPMANAGER_ENDPOINT }} \
               -H "Content-Type: application/json" \
               -H "Authorization: Bearer $token" \
-              --data '{"deployableImageName":"aksioinsurtech/app-manager:${{ steps.release.outputs.version }}"}' | jq
+              --data '"${{ steps.release.outputs.version }}"' | jq
