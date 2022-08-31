@@ -68,6 +68,7 @@
         "fullchain",
         "letsencrypt",
         "Mongodbatlas",
+        "Peerings",
         "privkey",
         "Pulumi",
         "Templating",
