@@ -63,7 +63,6 @@
         "Dnat",
         "expando",
         "failcount",
-        "fluentui",
         "Fqdns",
         "fullchain",
         "letsencrypt",

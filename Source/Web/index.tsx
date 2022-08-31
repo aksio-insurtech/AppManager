@@ -4,18 +4,20 @@
 import 'reflect-metadata';
 import ReactDOM from 'react-dom';
 
-import './index.scss';
-import './Styles/theme';
+import './theme';
 
 import { App } from './App';
-import { ModalProvider } from '@aksio/cratis-fluentui';
 import { BrowserRouter } from 'react-router-dom';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+
+import { theme } from './theme';
 
 ReactDOM.render(
     <BrowserRouter>
-        <ModalProvider>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
             <App />
-        </ModalProvider>
+        </ThemeProvider>
     </BrowserRouter>,
     document.getElementById('root')
 );
