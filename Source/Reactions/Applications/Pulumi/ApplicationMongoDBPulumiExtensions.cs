@@ -5,8 +5,6 @@ using Common;
 using Concepts;
 using Concepts.Applications;
 using Pulumi;
-using Pulumi.AzureNative.Authorization;
-using Pulumi.AzureNative.Authorization.Inputs;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Resources;
 using Pulumi.Mongodbatlas;
