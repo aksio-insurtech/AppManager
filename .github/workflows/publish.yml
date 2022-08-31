@@ -99,7 +99,7 @@ jobs:
     needs: publish
 
     steps:
-      - name: Release to Test
+      - name: Release image to Test
         run: |
           token=$( \
               curl \
