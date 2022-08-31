@@ -5,6 +5,8 @@ using Common;
 using Concepts;
 using Concepts.Applications;
 using Pulumi;
+using Pulumi.AzureNative.Authorization;
+using Pulumi.AzureNative.Authorization.Inputs;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Resources;
 using Pulumi.Mongodbatlas;
@@ -24,18 +26,78 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var region = GetRegionName(application.CloudLocation);
-        var networkContainer = new NetworkContainer(application.Name, new()
+
+        /*
+        var current = await global::Pulumi.AzureAD.GetClientConfig.InvokeAsync();
+        var peeringApplication = new global::Pulumi.AzureAD.Application(
+            "MongoDBAtlasVNETPeering",
+            new()
+            {
+                DisplayName = "example",
+                Owners = new[]
+                {
+                    current.ObjectId,
+                }
+            },
+            new()
+            {
+                Id = "e90a1407-553c-432d-9cb1-3638900a9d22"
+            });
+
+        _ = new global::Pulumi.AzureAD.ServicePrincipal("MongoDBAtlasVNETPeering", new()
         {
-            ProjectId = project.Id,
-            AtlasCidrBlock = "10.0.3.0/24",
-            ProviderName = "AZURE",
-            Region = region
+            ApplicationId = "e90a1407-553c-432d-9cb1-3638900a9d22",
+            AppRoleAssignmentRequired = false,
+            Owners = new[]
+            {
+                current.ObjectId
+            }
         });
 
+        var resourceGroupName = await resourceGroup.Name.GetValue();
+        var vnetName = await vnet.Name.GetValue();
+        var roleDefinitionName = $"AtlasPeering/{application.AzureSubscriptionId}/{resourceGroupName}/{vnetName}";
+        var scopeName = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}";
+        var roleDefinition = new RoleDefinition(roleDefinitionName, new()
+        {
+            RoleName = roleDefinitionName,
+            Description = $"Grants MongoDB access to manage peering connections on network /subscriptions/{application.AzureSubscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}",
+            Permissions =
+            {
+                new PermissionArgs()
+                {
+                    Actions =
+                    {
+                        "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
+                        "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write",
+                        "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/delete",
+                        "Microsoft.Network/virtualNetworks/peer/action"
+                    },
+                }
+            },
+            AssignableScopes =
+            {
+                scopeName
+            }
+        });
+
+        _ = new RoleAssignment("MongoDBAtlasPeering", new()
+        {
+            RoleAssignmentName = "MongoDBAtlasPeering",
+            RoleDefinitionId = roleDefinition.Id,
+            Scope = scopeName
+        });
+
+        var getNetworkContainersResult = GetNetworkContainers.Invoke(new()
+        {
+            ProjectId = project.Id,
+            ProviderName = "Azure"
+        });
+        var networkContainers = await getNetworkContainersResult.GetValue();
         _ = new NetworkPeering(application.Name, new()
         {
             ProjectId = project.Id,
-            ContainerId = networkContainer.Id,
+            ContainerId = networkContainers.Results[0].Id,
             AzureDirectoryId = settings.AzureSubscriptions.First().TenantId.Value,
             AzureSubscriptionId = settings.AzureSubscriptions.First().SubscriptionId.Value.ToString(),
             ResourceGroupName = resourceGroup.Name,
@@ -43,6 +105,7 @@ public static class ApplicationMongoDBPulumiExtensions
             RouteTableCidrBlock = "10.0.1.0/24",
             VnetName = vnet.Name
         });
+        */
 
         var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
