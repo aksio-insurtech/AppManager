@@ -1,3 +1,7 @@
+# [v0.1.2] - 2022-8-31 [PR: #46](https://github.com/aksio-insurtech/AppManager/pull/46)
+
+
+
 # [v0.1.1] - 2022-8-31 [PR: #44](https://github.com/aksio-insurtech/AppManager/pull/44)
 
 
