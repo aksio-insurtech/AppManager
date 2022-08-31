@@ -1,35 +1,13 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-fluentui';
-import { CommandBar, DetailsList, IColumn, Stack, ICommandBarItemProps, TextField, PrimaryButton } from '@fluentui/react';
 import { AddSubscriptionDialog } from './AddSubscriptionDialog';
 import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscription';
 import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetMongoDBSettings } from 'API/organization/settings/SetMongoDBSettings';
 import { SetPulumiSettings } from 'API/organization/settings/SetPulumiSettings';
-
-const subscriptionsColumns: IColumn[] = [
-    {
-        key: 'name',
-        name: 'Name',
-        fieldName: 'name',
-        minWidth: 200
-    },
-    {
-        key: 'tenantName',
-        name: 'Tenant Name',
-        fieldName: 'tenantName',
-        minWidth: 200
-    },
-    {
-        key: 'id',
-        name: 'Subscription Id',
-        fieldName: 'subscriptionId',
-        minWidth: 250
-    }
-];
+import { Button, FormControl, FormLabel, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 
 export const Organization = () => {
     const [settings] = AllSettings.use();
@@ -46,28 +24,6 @@ export const Organization = () => {
         setMongoDBPublicKey(settings.data.mongoDBPublicKey);
         setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
     }, [settings.data]);
-
-    const [showAddSubscription] = useModal(
-        'Add subscription',
-        ModalButtons.OkCancel,
-        AddSubscriptionDialog,
-        async (result, output) => {
-            if (result == ModalResult.Success && output) {
-                const command = new AddAzureSubscription();
-                command.id = output.id;
-                command.name = output.name;
-                await command.execute();
-            }
-        });
-
-    const subscriptionsCommandBarItems: ICommandBarItemProps[] = [
-        {
-            key: 'add',
-            text: 'Add subscription',
-            iconProps: { iconName: 'Add' },
-            onClick: showAddSubscription
-        }
-    ];
 
     const savePulumiSettings = async () => {
         const command = new SetPulumiSettings();
@@ -86,27 +42,42 @@ export const Organization = () => {
 
     return (
         <div style={{ margin: '1rem' }}>
-            <Stack>
-                <Stack.Item>
-                    <h2>Azure Subscriptions</h2>
-                    <CommandBar items={subscriptionsCommandBarItems} />
-                    <DetailsList columns={subscriptionsColumns} items={settings.data?.azureSubscriptions || []} />
-                </Stack.Item>
+            <Stack direction="column">
+                <h2>Azure Subscriptions</h2>
 
-                <Stack.Item>
-                    <h2>Pulumi</h2>
-                    <TextField label="Organization" value={pulumiOrganization} onChange={(_, value) => setPulumiOrganization(value!)} />
-                    <TextField label="Access Token" type="password" canRevealPassword value={pulumiAccessToken} onChange={(_, value) => setPulumiAccessToken(value!)} />
-                    <PrimaryButton text='Save' onClick={savePulumiSettings} />
-                </Stack.Item>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Tenant</TableCell>
+                                <TableCell>Subscription</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {(settings.data?.azureSubscriptions || []).map(item => (
+                                <TableRow key={item.subscriptionId}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.tenantName}</TableCell>
+                                    <TableCell>{item.subscriptionId}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
 
-                <Stack.Item>
-                    <h2>MongoDB Atlas</h2>
-                    <TextField label="OrganizationId" value={mongoDBOrganizationId} onChange={(_, value) => setMongoDBOrganizationId(value!)} />
-                    <TextField label="Public Key" value={mongoDBPublicKey} onChange={(_, value) => setMongoDBPublicKey(value!)} />
-                    <TextField label="Private Key" value={mongoDBPrivateKey} type="password" canRevealPassword onChange={(_, value) => setMongoDBPrivateKey(value!)} />
-                    <PrimaryButton text='Save' onClick={saveMongoDBSettings} />
-                </Stack.Item>
+                    </Table>
+                </TableContainer>
+
+
+                <h2>Pulumi</h2>
+                <TextField label="Organization" value={pulumiOrganization} onChange={(e) => setPulumiOrganization(e.currentTarget.value)} />
+                <TextField label="Access Token" type="password" value={pulumiAccessToken} onChange={e => setPulumiAccessToken(e.currentTarget.value)} />
+                <Button onClick={savePulumiSettings}>Save</Button>
+
+                <h2>MongoDB Atlas</h2>
+                <TextField label="OrganizationId" value={mongoDBOrganizationId} onChange={e => setMongoDBOrganizationId(e.currentTarget.value)} />
+                <TextField label="Public Key" value={mongoDBPublicKey} onChange={e => setMongoDBPublicKey(e.currentTarget.value)} />
+                <TextField label="Private Key" value={mongoDBPrivateKey} type="password" onChange={e => setMongoDBPrivateKey(e.currentTarget.value)} />
+                <Button onClick={saveMongoDBSettings}>Save</Button>
             </Stack>
         </div>
     );

@@ -1,32 +1,24 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { Dropdown, IDropdownOption } from '@fluentui/react';
-import { AllOrganizations } from 'API/organizations/AllOrganizations';
-import { useState } from 'react';
+import { AppBar, Box, Button, Link, Menu, MenuItem, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
-    const [organizations] = AllOrganizations.use();
-    const [selectedOrganization, setSelectedOrganization] = useState<string>();
-
-    const options: IDropdownOption[] = organizations.data.map(_ => {
-        return {
-            key: _.id,
-            text: _.name
-        };
-    });
-
-    if( !selectedOrganization && organizations.data.length > 0 ) {
-        setSelectedOrganization(organizations.data[0].id);
-    }
+    const navigate = useNavigate();
 
     return (
         <div>
-            <Dropdown
-                label="Organization"
-                options={options}
-                selectedKey={selectedOrganization}
-                />
-        </div>
+            <Box sx={{ flexGrow: 1 }}>
+                <AppBar position="static">
+                    <Stack spacing={2} direction="row">
+                        <Button variant="contained" onClick={() => navigate('/')} >Home</Button>
+                        <Button variant="contained" onClick={() => navigate('/applications')}> Applications</Button>
+                        <Button variant="contained" onClick={() => navigate('/organization')}>Organization settings</Button>
+                    </Stack>
+                </AppBar>
+            </Box>
+        </div >
     );
 };

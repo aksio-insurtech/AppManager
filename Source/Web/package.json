@@ -13,7 +13,6 @@
         "up": "ncu -u"
     },
     "dependencies": {
-        "@aksio/cratis-fluentui": "6.10.2",
         "@aksio/cratis-react": "6.10.2",
         "@aksio/cratis-fundamentals": "6.10.2",
         "@aksio/cratis-applications-frontend": "6.10.2",
@@ -21,11 +20,12 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-router-dom": "6.3.0",
-        "@fluentui/font-icons-mdl2": "8.4.11",
-        "@fluentui/react": "8.92.0",
-        "@fluentui/react-hooks": "8.6.10",
-        "@fluentui/react-icons": "2.0.179",
-        "@fluentui/react-experiments": "8.8.23"
+        "@emotion/react": "11.10.0",
+        "@emotion/styled": "11.10.0",
+        "@mui/icons-material": "5.10.2",
+        "@mui/lab": "5.0.0-alpha.96",
+        "@mui/material": "5.10.2",
+        "@mui/x-data-grid": "5.15.3"
     },
     "devDependencies": {
         "@aksio/cratis-webpack": "6.10.2",
