@@ -21,7 +21,7 @@ jobs:
         id: dotnet-x64-output
         with:
           path: ./Source/Main/out/x64
-          key: ${{ runner.os }}-dotnet-x64
+          key: dotnet-x64-cache
 
       - name: Build x64 Server - self contained, ready to run
         working-directory: ./Source/Main
@@ -43,7 +43,7 @@ jobs:
         id: dotnet-arm64-output
         with:
           path: ./Source/Main/out/arm64
-          key: ${{ runner.os }}-dotnet-arm64
+          key: dotnet-arm64-cache
 
       - name: Build arm64 Server - self contained, ready to run
         working-directory: ./Source/Main
@@ -80,8 +80,8 @@ jobs:
       - uses: actions/cache@v3
         id: web-output-cache
         with:
-          path: ./Source/Web/wwwroot/**/*
-          key: ${{ runner.os }}-web
+          path: ./Source/Web/wwwroot
+          key: web-cache
 
       - name: Yarn install
         run: yarn
@@ -104,19 +104,19 @@ jobs:
         id: dotnet-x64-output
         with:
           path: ./Source/Main/out/x64
-          key: ${{ runner.os }}-dotnet-x64
+          key: dotnet-x64-cache
 
       - uses: actions/cache@v3
         id: dotnet-arm64-output
         with:
           path: ./Source/Main/out/arm64
-          key: ${{ runner.os }}-dotnet-arm64
+          key: dotnet-arm64-cache
 
       - uses: actions/cache@v3
         id: web-output-cache
         with:
           path: ./Source/Web/wwwroot
-          key: ${{ runner.os }}-web
+          key:  web-cache
 
       - name: Release
         id: release
