@@ -1,3 +1,10 @@
+# [v0.1.4] - 2022-9-1 [PR: #48](https://github.com/aksio-insurtech/AppManager/pull/48)
+
+### Fixed
+
+- Adding error message to the log if failing during Pulumi Operations.
+
+
 # [v0.1.3] - 2022-9-1 [PR: #47](https://github.com/aksio-insurtech/AppManager/pull/47)
 
 ### Fixed
