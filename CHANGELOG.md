@@ -1,3 +1,10 @@
+# [v0.1.11] - 2022-9-1 [PR: #58](https://github.com/aksio-insurtech/AppManager/pull/58)
+
+### Fixed
+
+- Moving the setting of the Pulumi access token to an earlier stage.
+
+
 # [v0.1.10] - 2022-9-1 [PR: #57](https://github.com/aksio-insurtech/AppManager/pull/57)
 
 
