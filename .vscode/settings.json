@@ -65,6 +65,7 @@
         "failcount",
         "Fqdns",
         "fullchain",
+        "inheritdoc",
         "letsencrypt",
         "Mongodbatlas",
         "Peerings",
