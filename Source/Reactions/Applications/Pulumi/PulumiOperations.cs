@@ -32,18 +32,25 @@ public class PulumiOperations : IPulumiOperations
     {
         _ = Task.Run(async () =>
         {
-            _logger.CreatingStack();
-            var stack = await CreateStack(application, projectName, environment, definition);
-
-            _logger.RefreshingStack();
-            await stack.RefreshAsync();
-
-            _logger.PuttingUpStack();
-            await stack.UpAsync(new UpOptions
+            try
             {
-                OnStandardOutput = Console.WriteLine,
-                OnStandardError = Console.Error.WriteLine
-            });
+                _logger.CreatingStack();
+                var stack = await CreateStack(application, projectName, environment, definition);
+
+                _logger.RefreshingStack();
+                await stack.RefreshAsync();
+
+                _logger.PuttingUpStack();
+                await stack.UpAsync(new UpOptions
+                {
+                    OnStandardOutput = Console.WriteLine,
+                    OnStandardError = Console.Error.WriteLine
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.Errored(ex);
+            }
         });
     }
 
@@ -52,14 +59,21 @@ public class PulumiOperations : IPulumiOperations
     {
         _ = Task.Run(async () =>
         {
-            _logger.CreatingStack();
-            var stack = await CreateStack(application, projectName, environment, definition);
+            try
+            {
+                _logger.CreatingStack();
+                var stack = await CreateStack(application, projectName, environment, definition);
 
-            _logger.RefreshingStack();
-            await stack.RefreshAsync();
+                _logger.RefreshingStack();
+                await stack.RefreshAsync();
 
-            _logger.TakingDownStack();
-            await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
+                _logger.TakingDownStack();
+                await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
+            }
+            catch (Exception ex)
+            {
+                _logger.Errored(ex);
+            }
         });
     }
 
@@ -68,14 +82,21 @@ public class PulumiOperations : IPulumiOperations
     {
         _ = Task.Run(async () =>
         {
-            _logger.CreatingStack();
-            var stack = await CreateStack(application, projectName, environment, definition);
+            try
+            {
+                _logger.CreatingStack();
+                var stack = await CreateStack(application, projectName, environment, definition);
 
-            _logger.RefreshingStack();
-            await stack.RefreshAsync();
+                _logger.RefreshingStack();
+                await stack.RefreshAsync();
 
-            _logger.RemovingStack();
-            await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
+                _logger.RemovingStack();
+                await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
+            }
+            catch (Exception ex)
+            {
+                _logger.Errored(ex);
+            }
         });
     }
 

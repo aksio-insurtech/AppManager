@@ -21,4 +21,7 @@ public static partial class PulumiOperationsLogMessages
 
     [LoggerMessage(5, LogLevel.Information, "Remove the stack")]
     public static partial void RemovingStack(this ILogger logger);
+
+    [LoggerMessage(6, LogLevel.Error, "Error while performing Pulumi Operation")]
+    public static partial void Errored(this ILogger logger, Exception exception);
 }
