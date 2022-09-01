@@ -1,3 +1,10 @@
+# [v0.1.7] - 2022-9-1 [PR: #51](https://github.com/aksio-insurtech/AppManager/pull/51)
+
+### Fixed
+
+- Hopefully we get Pulumi in the path with this release.
+
+
 # [v0.1.6] - 2022-9-1 [PR: #50](https://github.com/aksio-insurtech/AppManager/pull/50)
 
 ### Fixed
