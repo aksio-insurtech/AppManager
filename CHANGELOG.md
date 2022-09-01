@@ -1,3 +1,10 @@
+# [v0.1.3] - 2022-9-1 [PR: #47](https://github.com/aksio-insurtech/AppManager/pull/47)
+
+### Fixed
+
+- Added Deployable immediate projection definition.
+
+
 # [v0.1.2] - 2022-8-31 [PR: #46](https://github.com/aksio-insurtech/AppManager/pull/46)
 
 
