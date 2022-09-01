@@ -1,3 +1,10 @@
+# [v0.1.5] - 2022-9-1 [PR: #49](https://github.com/aksio-insurtech/AppManager/pull/49)
+
+### Fixed
+
+- Adding the path to Pulumi to the PATH environment variable
+
+
 # [v0.1.4] - 2022-9-1 [PR: #48](https://github.com/aksio-insurtech/AppManager/pull/48)
 
 ### Fixed
