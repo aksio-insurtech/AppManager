@@ -1,3 +1,10 @@
+# [v0.1.6] - 2022-9-1 [PR: #50](https://github.com/aksio-insurtech/AppManager/pull/50)
+
+### Fixed
+
+- Fixing so that we actually export the path to Pulumi, not just setting PATH.
+
+
 # [v0.1.5] - 2022-9-1 [PR: #49](https://github.com/aksio-insurtech/AppManager/pull/49)
 
 ### Fixed
