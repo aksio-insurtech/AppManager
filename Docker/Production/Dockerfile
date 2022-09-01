@@ -39,6 +39,7 @@ COPY ./Source/Web/wwwroot wwwroot
 RUN echo $PWD
 RUN ./copy-server-files.sh
 
+# Expose the Web and Orleans ports
 EXPOSE 80 11111 30000
 
 ENTRYPOINT ["./Main"]
