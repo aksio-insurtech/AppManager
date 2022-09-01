@@ -28,6 +28,7 @@ RUN apt-get update \
 
 # Install Pulumi
 RUN curl -fsSL https://get.pulumi.com | sh
+RUN echo "PATH=$PATH:/root/.pulumi/bin" > /etc/environment
 
 COPY Docker/copy-server-files.sh ./copy-server-files.sh
 RUN chmod +x ./copy-server-files.sh
