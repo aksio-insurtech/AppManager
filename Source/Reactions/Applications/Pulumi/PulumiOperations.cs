@@ -122,6 +122,16 @@ public class PulumiOperations : IPulumiOperations
     async Task<WorkspaceStack> CreateStack(Application application, string projectName, CloudRuntimeEnvironment environment, PulumiFn program)
     {
         var stackName = environment.ToDisplayName();
+
+        var mongoDBPublicKey = _settings.MongoDBPublicKey;
+        var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
+        Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
+        Environment.SetEnvironmentVariable("MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey);
+
+        var accessToken = _settings.PulumiAccessToken;
+        Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
+        _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
+
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
@@ -151,14 +161,6 @@ public class PulumiOperations : IPulumiOperations
                 { "azure-native:clientSecret", new ConfigValue(_settings.ServicePrincipal.ClientSecret, true) },
                 { "azure-native:tenantId", new ConfigValue(_settings.AzureSubscriptions.First().TenantId) }
             });
-        var mongoDBPublicKey = _settings.MongoDBPublicKey;
-        var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
-        Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
-        Environment.SetEnvironmentVariable("MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey);
-
-        var accessToken = _settings.PulumiAccessToken;
-        Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
-        _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
 
         await SetTag(projectName, environment, "application", application.Name);
         await SetTag(projectName, environment, "environment", stackName);
