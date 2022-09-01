@@ -119,24 +119,24 @@ public static class Program
                     logger,
                     microserviceResourceName);
 
-                try
-                {
-                    Console.WriteLine("\n\nSetup AppManager as application");
-                    var appManagerApi = new AppManagerApi(config, ingressUrl);
-                    await appManagerApi.Authenticate();
-                    await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
-                    await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
-                    await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
-                    await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
-                    await appManagerApi.ConfigureAuthenticationForApplication(application.Id, config.Authentication.ClientId, config.Authentication.ClientSecret);
-                    await appManagerApi.CreateMicroservice(application.Id, microservice.Id, microservice.Name);
-                    await appManagerApi.CreateDeployable(application.Id, microservice.Id, deployable.Id, deployable.Name);
-                    await appManagerApi.SetDeployableImage(application.Id, microservice.Id, deployable.Id, deployable.Image);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Errors with calling API - {ex.Message}");
-                }
+                // try
+                // {
+                //     Console.WriteLine("\n\nSetup AppManager as application");
+                //     var appManagerApi = new AppManagerApi(config, ingressUrl);
+                //     await appManagerApi.Authenticate();
+                //     await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
+                //     await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
+                //     await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
+                //     await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
+                //     await appManagerApi.ConfigureAuthenticationForApplication(application.Id, config.Authentication.ClientId, config.Authentication.ClientSecret);
+                //     await appManagerApi.CreateMicroservice(application.Id, microservice.Id, microservice.Name);
+                //     await appManagerApi.CreateDeployable(application.Id, microservice.Id, deployable.Id, deployable.Name);
+                //     await appManagerApi.SetDeployableImage(application.Id, microservice.Id, deployable.Id, deployable.Image);
+                // }
+                // catch (Exception ex)
+                // {
+                //     Console.WriteLine($"Errors with calling API - {ex.Message}");
+                // }
             }),
             cloudRuntimeEnvironment);
 
