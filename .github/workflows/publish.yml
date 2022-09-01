@@ -107,7 +107,7 @@ jobs:
           key: ${{ runner.os }}-dotnet-x64
 
       - uses: actions/cache@v3
-        id: dotnet-x64-output
+        id: dotnet-arm64-output
         with:
           path: ./Source/Main/out/arm64
           key: ${{ runner.os }}-dotnet-arm64
