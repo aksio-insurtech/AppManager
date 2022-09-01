@@ -24,4 +24,7 @@ public static partial class PulumiOperationsLogMessages
 
     [LoggerMessage(6, LogLevel.Error, "Error while performing Pulumi Operation")]
     public static partial void Errored(this ILogger logger, Exception exception);
+
+    [LoggerMessage(7, LogLevel.Information, "Pulumi Access token is '{AccessToken}'")]
+    public static partial void PulumiInformation(this ILogger logger, string accessToken);
 }
