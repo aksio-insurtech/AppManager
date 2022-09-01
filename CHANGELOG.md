@@ -1,3 +1,10 @@
+# [v0.1.8] - 2022-9-1 [PR: #52](https://github.com/aksio-insurtech/AppManager/pull/52)
+
+### Fixed
+
+- 🤞🏻 Maybe we have the ENV $PATH properly set for Pulumi tooling to work.
+
+
 # [v0.1.7] - 2022-9-1 [PR: #51](https://github.com/aksio-insurtech/AppManager/pull/51)
 
 ### Fixed
