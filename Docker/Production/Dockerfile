@@ -11,7 +11,7 @@ ARG VERSION
 WORKDIR /app
 
 RUN echo Configuration = ${CONFIGURATION}
-RUN echo Version = ${VERSION}
+ENV PATH="$PATH:/root/.pulumi/bin"
 
 # Install Tools
 RUN apt-get update \
