@@ -41,7 +41,6 @@ public static class ApplicationNetworkPulumiExtensions
                         },
                         AddressPrefix = "10.0.1.0/24",
                         PrivateEndpointNetworkPolicies = "Enabled",
-                        PrivateLinkServiceNetworkPolicies = "Enabled",
                         Delegations =
                         {
                             new DelegationArgs
@@ -50,11 +49,6 @@ public static class ApplicationNetworkPulumiExtensions
                                 ServiceName = "Microsoft.ContainerInstance/containerGroups"
                             }
                         }
-                    },
-                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
-                    {
-                        Name = "ApplicationGateway",
-                        AddressPrefix = "10.0.2.0/24",
                     }
                 }
         });
@@ -68,38 +62,6 @@ public static class ApplicationNetworkPulumiExtensions
             Tags = tags,
         });
 
-        var virtualNetworkLink = new VirtualNetworkLink("virtualNetworkLink", new()
-        {
-            Location = "Global",
-            ResourceGroupName = resourceGroup.Name,
-            Tags = tags,
-            RegistrationEnabled = true,
-            PrivateZoneName = privateZone.Name,
-            VirtualNetwork = new SubResourceArgs { Id = virtualNetwork.Id }
-        });
-
-        var profile = new NetworkProfile(application.Name, new()
-        {
-            Location = application.CloudLocation.Value,
-            ResourceGroupName = resourceGroup.Name,
-            Tags = tags,
-            ContainerNetworkInterfaceConfigurations =
-            {
-                new ContainerNetworkInterfaceConfigurationArgs
-                {
-                    Name = "eth1",
-                    IpConfigurations =
-                    {
-                        new IPConfigurationProfileArgs
-                        {
-                            Name = "ipconfig1",
-                            Subnet = new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs { Id = virtualNetwork.Subnets.Apply(_ => _[0].Id!) }
-                        }
-                    }
-                }
-            },
-        });
-
-        return new(virtualNetwork, profile, privateZone);
+        return new(virtualNetwork, privateZone);
     }
 }

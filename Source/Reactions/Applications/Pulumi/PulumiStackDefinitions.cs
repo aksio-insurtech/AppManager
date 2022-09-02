@@ -45,8 +45,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
         var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
-        var networkProfile = await network.Profile.Id.GetValue();
-
         var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
         var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, tags);
         var managedEnvironmentId = await managedEnvironment.Id.GetValue();
@@ -57,7 +55,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var kernel = await microservice.SetupContainerApp(
             application,
             resourceGroup,
-            networkProfile,
             managedEnvironmentId,
             managedEnvironmentName,
             containerRegistry.LoginServer,
@@ -122,7 +119,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var microserviceResult = await microservice.SetupContainerApp(
             application,
             resourceGroup,
-            application.Resources.AzureNetworkProfileIdentifier,
             managedEnvironment.Id,
             managedEnvironment.Name,
             application.Resources.AzureContainerRegistryLoginServer,
@@ -155,7 +151,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _ = microservice.SetupContainerApp(
             application,
             resourceGroup,
-            application.Resources.AzureNetworkProfileIdentifier,
             managedEnvironment.Id,
             managedEnvironment.Name,
             application.Resources.AzureContainerRegistryLoginServer,

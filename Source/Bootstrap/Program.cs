@@ -60,7 +60,6 @@ public static class Program
                 null!,
                 null!,
                 null!,
-                null!,
                 new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
             new(config.Authentication.ClientId, config.Authentication.ClientSecret));
 

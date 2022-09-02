@@ -28,7 +28,6 @@ public record ApplicationResult(
             application.CloudLocation,
             new(
                 subnets[0].Id!,
-                await Network.Profile.Id.GetValue(),
                 Storage.AccountName,
                 ContainerRegistry.LoginServer,
                 ContainerRegistry.UserName,

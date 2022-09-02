@@ -7,7 +7,6 @@ namespace Reactions.Applications;
 
 public record ApplicationResources(
     AzureVirtualNetworkIdentifier AzureVirtualNetworkIdentifier,
-    AzureNetworkProfileIdentifier AzureNetworkProfileIdentifier,
     AzureStorageAccountName AzureStorageAccountName,
     AzureContainerRegistryLoginServer AzureContainerRegistryLoginServer,
     AzureContainerRegistryUserName AzureContainerRegistryUserName,

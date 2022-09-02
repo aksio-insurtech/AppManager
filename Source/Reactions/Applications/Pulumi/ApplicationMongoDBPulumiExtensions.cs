@@ -25,86 +25,6 @@ public static class ApplicationMongoDBPulumiExtensions
 
         var region = GetRegionName(application.CloudLocation);
 
-        /*
-        var current = await global::Pulumi.AzureAD.GetClientConfig.InvokeAsync();
-        var peeringApplication = new global::Pulumi.AzureAD.Application(
-            "MongoDBAtlasVNETPeering",
-            new()
-            {
-                DisplayName = "example",
-                Owners = new[]
-                {
-                    current.ObjectId,
-                }
-            },
-            new()
-            {
-                Id = "e90a1407-553c-432d-9cb1-3638900a9d22"
-            });
-
-        _ = new global::Pulumi.AzureAD.ServicePrincipal("MongoDBAtlasVNETPeering", new()
-        {
-            ApplicationId = "e90a1407-553c-432d-9cb1-3638900a9d22",
-            AppRoleAssignmentRequired = false,
-            Owners = new[]
-            {
-                current.ObjectId
-            }
-        });
-
-        var resourceGroupName = await resourceGroup.Name.GetValue();
-        var vnetName = await vnet.Name.GetValue();
-        var roleDefinitionName = $"AtlasPeering/{application.AzureSubscriptionId}/{resourceGroupName}/{vnetName}";
-        var scopeName = $"/subscriptions/{application.AzureSubscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}";
-        var roleDefinition = new RoleDefinition(roleDefinitionName, new()
-        {
-            RoleName = roleDefinitionName,
-            Description = $"Grants MongoDB access to manage peering connections on network /subscriptions/{application.AzureSubscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}",
-            Permissions =
-            {
-                new PermissionArgs()
-                {
-                    Actions =
-                    {
-                        "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
-                        "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write",
-                        "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/delete",
-                        "Microsoft.Network/virtualNetworks/peer/action"
-                    },
-                }
-            },
-            AssignableScopes =
-            {
-                scopeName
-            }
-        });
-
-        _ = new RoleAssignment("MongoDBAtlasPeering", new()
-        {
-            RoleAssignmentName = "MongoDBAtlasPeering",
-            RoleDefinitionId = roleDefinition.Id,
-            Scope = scopeName
-        });
-
-        var getNetworkContainersResult = GetNetworkContainers.Invoke(new()
-        {
-            ProjectId = project.Id,
-            ProviderName = "Azure"
-        });
-        var networkContainers = await getNetworkContainersResult.GetValue();
-        _ = new NetworkPeering(application.Name, new()
-        {
-            ProjectId = project.Id,
-            ContainerId = networkContainers.Results[0].Id,
-            AzureDirectoryId = settings.AzureSubscriptions.First().TenantId.Value,
-            AzureSubscriptionId = settings.AzureSubscriptions.First().SubscriptionId.Value.ToString(),
-            ResourceGroupName = resourceGroup.Name,
-            ProviderName = "AZURE",
-            RouteTableCidrBlock = "10.0.1.0/24",
-            VnetName = vnet.Name
-        });
-        */
-
         var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
@@ -115,15 +35,6 @@ public static class ApplicationMongoDBPulumiExtensions
             Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
         });
 
-        // TODO: We need this for the cluster:
-        // , new CustomResourceOptions
-        // {
-        //     DependsOn =
-        //     {
-        //         "mongodbatlas_network_peering.test",
-        //     },
-        // });
-        // https://www.pulumi.com/registry/packages/mongodbatlas/api-docs/networkpeering/#example-with-azure
         var databasePassword = Guid.NewGuid().ToString();
         if (application.Resources?.MongoDB?.Users is not null &&
             (application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))

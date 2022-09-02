@@ -7,5 +7,4 @@ namespace Reactions.Applications.Pulumi;
 
 public record NetworkResult(
     VirtualNetwork VirtualNetwork,
-    NetworkProfile Profile,
     PrivateZone DnsZone);

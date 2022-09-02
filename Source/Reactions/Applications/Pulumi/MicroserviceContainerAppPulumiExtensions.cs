@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Azure;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -15,7 +14,6 @@ public static class MicroserviceContainerAppPulumiExtensions
         this Microservice microservice,
         Application application,
         ResourceGroup resourceGroup,
-        AzureNetworkProfileIdentifier networkProfile,
         string managedEnvironmentId,
         string managedEnvironmentName,
         string containerRegistryLoginServer,
