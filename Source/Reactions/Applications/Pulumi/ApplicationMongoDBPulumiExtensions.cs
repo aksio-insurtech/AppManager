@@ -128,7 +128,7 @@ public static class ApplicationMongoDBPulumiExtensions
         if (application.Resources?.MongoDB?.Users is not null &&
             (application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
         {
-            databasePassword = application.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password;
+            databasePassword = application.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
         }
 
         _ = new DatabaseUser("kernel", new()
