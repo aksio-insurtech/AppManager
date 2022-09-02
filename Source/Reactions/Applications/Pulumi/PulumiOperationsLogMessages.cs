@@ -27,4 +27,22 @@ public static partial class PulumiOperationsLogMessages
 
     [LoggerMessage(7, LogLevel.Information, "Pulumi Access token is '{AccessToken}'")]
     public static partial void PulumiInformation(this ILogger logger, string accessToken);
+
+    [LoggerMessage(8, LogLevel.Information, "Creating or selecting stack")]
+    public static partial void CreatingOrSelectingStack(this ILogger logger);
+
+    [LoggerMessage(9, LogLevel.Information, "Removing pending operations")]
+    public static partial void RemovingPendingOperations(this ILogger logger);
+
+    [LoggerMessage(10, LogLevel.Information, "Installing plugins")]
+    public static partial void InstallingPlugins(this ILogger logger);
+
+    [LoggerMessage(11, LogLevel.Information, "`Upping` stack")]
+    public static partial void UppingStack(this ILogger logger);
+
+    [LoggerMessage(12, LogLevel.Information, "`Downing` stack")]
+    public static partial void DowningStack(this ILogger logger);
+
+    [LoggerMessage(13, LogLevel.Information, "Removing stack")]
+    public static partial void StackBeingRemoved(this ILogger logger);
 }
