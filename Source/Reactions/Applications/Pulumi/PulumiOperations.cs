@@ -125,9 +125,12 @@ public class PulumiOperations : IPulumiOperations
 
         var accessToken = _settings.PulumiAccessToken;
         _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
+        Console.WriteLine($"HELLO : {accessToken.Value.Substring(0, 4)}*****");
 
         var mongoDBPublicKey = _settings.MongoDBPublicKey;
         var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
+
+        Console.WriteLine("InlineProgram");
 
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
@@ -140,16 +143,24 @@ public class PulumiOperations : IPulumiOperations
                 { "MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey }
             }
         };
+
+        Console.WriteLine("Create or select stack");
+
+        _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
 
         // TODO: This should probably be hidden behind a user action with a big "Are you sure? This could leave things in an inconsistent state".
+        Console.WriteLine("Get info");
         var info = await stack.GetInfoAsync();
         if (info?.Result == UpdateState.InProgress)
         {
             await stack.CancelAsync();
         }
 
+        _logger.RemovingPendingOperations();
         await RemovePendingOperations(stack);
+
+        _logger.InstallingPlugins();
         await stack.Workspace.InstallPluginAsync("azure-native", "1.67.0");
         await stack.Workspace.InstallPluginAsync("azuread", "5.26.1");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.0");
