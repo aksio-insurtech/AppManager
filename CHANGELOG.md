@@ -1,3 +1,10 @@
+# [v0.1.15] - 2022-9-2 [PR: #61](https://github.com/aksio-insurtech/AppManager/pull/61)
+
+### Fixed
+
+- Moving configuration of environment variables for Pulumi into the program.
+
+
 # [v0.1.12] - 2022-9-2 [PR: #59](https://github.com/aksio-insurtech/AppManager/pull/59)
 
 ### Fixed
