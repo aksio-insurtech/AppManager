@@ -123,14 +123,14 @@ public class PulumiOperations : IPulumiOperations
     {
         var stackName = environment.ToDisplayName();
 
+        var accessToken = _settings.PulumiAccessToken;
+        Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
+        _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
+
         var mongoDBPublicKey = _settings.MongoDBPublicKey;
         var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
         Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
         Environment.SetEnvironmentVariable("MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey);
-
-        var accessToken = _settings.PulumiAccessToken;
-        Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
-        _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
 
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
