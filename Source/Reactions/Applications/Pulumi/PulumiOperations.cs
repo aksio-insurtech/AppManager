@@ -124,20 +124,20 @@ public class PulumiOperations : IPulumiOperations
         var stackName = environment.ToDisplayName();
 
         var accessToken = _settings.PulumiAccessToken;
-        Environment.SetEnvironmentVariable("PULUMI_ACCESS_TOKEN", accessToken.ToString());
         _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
 
         var mongoDBPublicKey = _settings.MongoDBPublicKey;
         var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
-        Environment.SetEnvironmentVariable("MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey);
-        Environment.SetEnvironmentVariable("MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey);
 
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
             EnvironmentVariables = new Dictionary<string, string?>
             {
-                { "TF_LOG", "TRACE" }
+                { "TF_LOG", "TRACE" },
+                { "PULUMI_ACCESS_TOKEN", accessToken.ToString() },
+                { "MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey },
+                { "MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey }
             }
         };
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
