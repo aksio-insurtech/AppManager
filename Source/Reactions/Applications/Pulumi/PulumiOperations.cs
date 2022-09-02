@@ -30,6 +30,8 @@ public class PulumiOperations : IPulumiOperations
     /// <inheritdoc/>
     public void Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
     {
+        _logger.UppingStack();
+
         _ = Task.Run(async () =>
         {
             try
@@ -57,6 +59,8 @@ public class PulumiOperations : IPulumiOperations
     /// <inheritdoc/>
     public void Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
     {
+        _logger.DowningStack();
+
         _ = Task.Run(async () =>
         {
             try
@@ -80,6 +84,8 @@ public class PulumiOperations : IPulumiOperations
     /// <inheritdoc/>
     public void Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
     {
+        _logger.StackBeingRemoved();
+
         _ = Task.Run(async () =>
         {
             try

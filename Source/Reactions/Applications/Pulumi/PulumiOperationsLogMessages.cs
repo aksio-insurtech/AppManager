@@ -36,4 +36,13 @@ public static partial class PulumiOperationsLogMessages
 
     [LoggerMessage(10, LogLevel.Information, "Installing plugins")]
     public static partial void InstallingPlugins(this ILogger logger);
+
+    [LoggerMessage(11, LogLevel.Information, "`Upping` stack")]
+    public static partial void UppingStack(this ILogger logger);
+
+    [LoggerMessage(12, LogLevel.Information, "`Downing` stack")]
+    public static partial void DowningStack(this ILogger logger);
+
+    [LoggerMessage(13, LogLevel.Information, "Removing stack")]
+    public static partial void StackBeingRemoved(this ILogger logger);
 }
