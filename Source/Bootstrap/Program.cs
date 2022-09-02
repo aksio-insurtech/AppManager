@@ -125,6 +125,8 @@ public static class Program
                     await appManagerApi.Authenticate();
 
                     // await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
+                    // await appManagerApi.SetAzureServicePrincipal(config.Azure.ServicePrincipal.ClientId, config.Azure.ServicePrincipal.ClientSecret);
+                    // await appManagerApi.AddAzureSubscription(config.Azure.Subscription.SubscriptionId.ToString(), config.Azure.Subscription.Name, config.Azure.Subscription.TenantName);
                     // await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
                     // await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
                     // await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
@@ -132,7 +134,6 @@ public static class Program
                     // await appManagerApi.CreateMicroservice(application.Id, microservice.Id, microservice.Name);
                     // await appManagerApi.CreateDeployable(application.Id, microservice.Id, deployable.Id, deployable.Name);
                     // await appManagerApi.SetDeployableImage(application.Id, microservice.Id, deployable.Id, deployable.Image);
-                    await appManagerApi.SetAzureServicePrincipal(config.Azure.ServicePrincipal.ClientId, config.Azure.ServicePrincipal.ClientSecret);
                 }
                 catch (Exception ex)
                 {

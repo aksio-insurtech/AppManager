@@ -25,6 +25,14 @@ public static class ApplicationMongoDBPulumiExtensions
 
         var region = GetRegionName(application.CloudLocation);
 
+        // var privateLinkEndpoint = new PrivateLinkEndpoint(application.Name, new()
+        // {
+        //     ProjectId = project.Id,
+        //     ProviderName = "AZURE",
+        //     Region = region
+        // });
+        // https://www.pulumi.com/registry/packages/azure-native/api-docs/network/privatelinkservice/
+        // https://www.pulumi.com/registry/packages/mongodbatlas/api-docs/privatelinkendpointservice/#create
         var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
