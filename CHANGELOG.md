@@ -1,3 +1,10 @@
+# [v0.1.17] - 2022-9-2 [PR: #62](https://github.com/aksio-insurtech/AppManager/pull/62)
+
+### Fixed
+
+- Additional logging for Pulumi operations
+
+
 # [v0.1.15] - 2022-9-2 [PR: #61](https://github.com/aksio-insurtech/AppManager/pull/61)
 
 ### Fixed
