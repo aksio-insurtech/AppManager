@@ -3,4 +3,7 @@
 
 namespace Concepts.Azure;
 
-public record AzureServicePrincipal(AzureServicePrincipalClientId ClientId, AzureServicePrincipalClientSecret ClientSecret);
+public record AzureServicePrincipalClientId(string Value) : ConceptAs<string>(Value)
+{
+    public static implicit operator AzureServicePrincipalClientId(string value) => new(value);
+}

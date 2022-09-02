@@ -42,6 +42,7 @@ public class AppManagerApi : IDisposable
 
     public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
     public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
+    public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/organization/settings/service-principal", new { clientId, clientSecret });
     public Task AddAzureSubscription(string id, string name, string tenantName) => Perform("/api/organization/settings/subscriptions", new { id, name, tenantName });
     public Task SetMongoDBSettings(string organizationId, string publicKey, string privateKey) => Perform("/api/organization/settings/mongodb", new { organizationId, publicKey, privateKey });
     public Task CreateApplication(Guid applicationId, string name, Guid azureSubscriptionId, string cloudLocation) => Perform("/api/applications", new { applicationId, name, azureSubscriptionId, cloudLocation });
