@@ -1,3 +1,10 @@
+# [v0.1.19] - 2022-9-2 [PR: #63](https://github.com/aksio-insurtech/AppManager/pull/63)
+
+### Fixed
+
+- Fixing cache keys used for sharing data between jobs so that we are actually building new things
+
+
 # [v0.1.17] - 2022-9-2 [PR: #62](https://github.com/aksio-insurtech/AppManager/pull/62)
 
 ### Fixed
