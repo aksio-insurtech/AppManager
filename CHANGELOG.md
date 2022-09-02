@@ -1,3 +1,10 @@
+# [v0.1.12] - 2022-9-2 [PR: #59](https://github.com/aksio-insurtech/AppManager/pull/59)
+
+### Fixed
+
+- Upgrading to the latest Cratis. `appsettings.json` should now also be loaded from the `config` folder.
+
+
 # [v0.1.11] - 2022-9-1 [PR: #58](https://github.com/aksio-insurtech/AppManager/pull/58)
 
 ### Fixed
