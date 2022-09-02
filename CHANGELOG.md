@@ -1,3 +1,10 @@
+# [v0.3.1] - 2022-9-2 [PR: #66](https://github.com/aksio-insurtech/AppManager/pull/66)
+
+### Fixed
+
+- For debugging purposes; adding logging of application content and settings content.
+
+
 # [v0.2.0] - 2022-9-2 [PR: #65](https://github.com/aksio-insurtech/AppManager/pull/65)
 
 ### Added
