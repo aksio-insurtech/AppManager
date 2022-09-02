@@ -7,8 +7,8 @@ namespace Reactions.Applications.Pulumi;
 
 public static partial class PulumiOperationsLogMessages
 {
-    [LoggerMessage(0, LogLevel.Information, "Creating stack")]
-    public static partial void CreatingStack(this ILogger logger);
+    [LoggerMessage(0, LogLevel.Information, "Creating stack for '{application}'")]
+    public static partial void CreatingStack(this ILogger logger, string application);
 
     [LoggerMessage(1, LogLevel.Information, "Refreshing stack from cloud provider")]
     public static partial void RefreshingStack(this ILogger logger);
@@ -45,4 +45,10 @@ public static partial class PulumiOperationsLogMessages
 
     [LoggerMessage(13, LogLevel.Information, "Removing stack")]
     public static partial void StackBeingRemoved(this ILogger logger);
+
+    [LoggerMessage(14, LogLevel.Information, "Setting all config")]
+    public static partial void SettingAllConfig(this ILogger logger);
+
+    [LoggerMessage(15, LogLevel.Information, "Setting tags")]
+    public static partial void SettingsTags(this ILogger logger);
 }
