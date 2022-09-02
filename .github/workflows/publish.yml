@@ -2,6 +2,9 @@ name: Publish
 
 env:
    DOTNET_VERSION: '6.0.400'
+   DOTNET_X64_CACHE: 'dotnet-x64-cache-${{ github.sha }}'
+   DOTNET_ARM64_CACHE: 'dotnet-arm64-cache-${{ github.sha }}'
+   WEB_CACHE: 'web-cache-${{ github.sha }}'
 
 on:
   pull_request:
@@ -24,7 +27,7 @@ jobs:
         id: dotnet-x64-output
         with:
           path: ./Source/Main/out/x64
-          key: dotnet-x64-cache
+          key: ${{ env.DOTNET_X64_CACHE }}
 
       - name: Build x64 Server - self contained, ready to run
         working-directory: ./Source/Main
@@ -46,7 +49,7 @@ jobs:
         id: dotnet-arm64-output
         with:
           path: ./Source/Main/out/arm64
-          key: dotnet-arm64-cache
+          key: ${{ env.DOTNET_ARM64_CACHE }}
 
       - name: Build arm64 Server - self contained, ready to run
         working-directory: ./Source/Main
@@ -81,10 +84,10 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - uses: actions/cache@v3
-        id: web-output-cache
+        id: web-output
         with:
           path: ./Source/Web/wwwroot
-          key: web-cache
+          key: ${{ env.WEB_CACHE }}
 
       - name: Yarn install
         run: yarn
@@ -125,19 +128,19 @@ jobs:
         id: dotnet-x64-output
         with:
           path: ./Source/Main/out/x64
-          key: dotnet-x64-cache
+          key: ${{ env.DOTNET_X64_CACHE }}
 
       - uses: actions/cache@v3
         id: dotnet-arm64-output
         with:
           path: ./Source/Main/out/arm64
-          key: dotnet-arm64-cache
+          key: ${{ env.DOTNET_ARM64_CACHE }}
 
       - uses: actions/cache@v3
-        id: web-output-cache
+        id: web-output
         with:
           path: ./Source/Web/wwwroot
-          key:  web-cache
+          key:  ${{ env.WEB_CACHE }}
 
       - name: Release
         id: release
