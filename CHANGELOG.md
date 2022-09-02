@@ -1,3 +1,10 @@
+# [v0.2.0] - 2022-9-2 [PR: #65](https://github.com/aksio-insurtech/AppManager/pull/65)
+
+### Added
+
+- Azure Service Principal is now possible to configure with the API
+
+
 # [v0.1.21] - 2022-9-2 [PR: #64](https://github.com/aksio-insurtech/AppManager/pull/64)
 
 
