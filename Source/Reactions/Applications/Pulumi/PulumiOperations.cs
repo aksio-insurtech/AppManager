@@ -36,7 +36,7 @@ public class PulumiOperations : IPulumiOperations
         {
             try
             {
-                _logger.CreatingStack();
+                _logger.CreatingStack(application.Name ?? "[N/A]");
                 var stack = await CreateStack(application, projectName, environment, definition);
 
                 _logger.RefreshingStack();
@@ -65,7 +65,7 @@ public class PulumiOperations : IPulumiOperations
         {
             try
             {
-                _logger.CreatingStack();
+                _logger.CreatingStack(application.Name ?? "[N/A]");
                 var stack = await CreateStack(application, projectName, environment, definition);
 
                 _logger.RefreshingStack();
@@ -90,7 +90,7 @@ public class PulumiOperations : IPulumiOperations
         {
             try
             {
-                _logger.CreatingStack();
+                _logger.CreatingStack(application.Name ?? "[N/A]");
                 var stack = await CreateStack(application, projectName, environment, definition);
 
                 _logger.RefreshingStack();
@@ -164,6 +164,8 @@ public class PulumiOperations : IPulumiOperations
         await stack.Workspace.InstallPluginAsync("azure-native", "1.67.0");
         await stack.Workspace.InstallPluginAsync("azuread", "5.26.1");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.0");
+
+        _logger.SettingAllConfig();
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
                 { "azure-native:location", new ConfigValue(application.CloudLocation) },
