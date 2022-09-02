@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   cratis-kernel:
-    image: aksioinsurtech/cratis:6.10.2-development
+    image: aksioinsurtech/cratis:6.10.17-development
     volumes:
       - ./cratis.json:/app/cratis.json:ro
     ports:
