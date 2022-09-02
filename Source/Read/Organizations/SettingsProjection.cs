@@ -25,5 +25,6 @@ public class SettingsProjection : IProjectionFor<Settings>
             .From<AzureSubscriptionAdded>(f => f
                 .UsingKey(_ => _.Id)
                 .Set(m => m.Name).To(e => e.Name)
+                .Set(m => m.TenantId).To(e => e.TenantId)
                 .Set(m => m.TenantName).To(e => e.TenantName)));
 }

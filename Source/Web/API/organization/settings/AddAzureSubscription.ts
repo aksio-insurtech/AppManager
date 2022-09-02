@@ -11,6 +11,7 @@ const routeTemplate = Handlebars.compile('/api/organization/settings/subscriptio
 export interface IAddAzureSubscription {
     id?: string;
     name?: string;
+    tenantId?: string;
     tenantName?: string;
 }
 
@@ -18,6 +19,7 @@ export class AddAzureSubscriptionValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         id: new Validator(),
         name: new Validator(),
+        tenantId: new Validator(),
         tenantName: new Validator(),
     };
 }
@@ -29,6 +31,7 @@ export class AddAzureSubscription extends Command<IAddAzureSubscription> impleme
 
     private _id!: string;
     private _name!: string;
+    private _tenantId!: string;
     private _tenantName!: string;
 
     get requestArguments(): string[] {
@@ -40,6 +43,7 @@ export class AddAzureSubscription extends Command<IAddAzureSubscription> impleme
         return [
             'id',
             'name',
+            'tenantId',
             'tenantName',
         ];
     }
@@ -59,6 +63,14 @@ export class AddAzureSubscription extends Command<IAddAzureSubscription> impleme
     set name(value: string) {
         this._name = value;
         this.propertyChanged('name');
+    }
+    get tenantId(): string {
+        return this._tenantId;
+    }
+
+    set tenantId(value: string) {
+        this._tenantId = value;
+        this.propertyChanged('tenantId');
     }
     get tenantName(): string {
         return this._tenantName;

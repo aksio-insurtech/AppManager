@@ -5,4 +5,4 @@ using Concepts.Azure;
 
 namespace Domain.Organizations;
 
-public record AzureSubscription(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantName TenantName);
+public record AzureSubscription(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantId TenantId, AzureTenantName TenantName);
