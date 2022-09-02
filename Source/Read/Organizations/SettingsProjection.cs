@@ -17,6 +17,9 @@ public class SettingsProjection : IProjectionFor<Settings>
             .Set(m => m.MongoDBOrganizationId).To(e => e.OrganizationId)
             .Set(m => m.MongoDBPublicKey).To(e => e.PublicKey)
             .Set(m => m.MongoDBPrivateKey).To(e => e.PrivateKey))
+        .From<AzureServicePrincipalSet>(_ => _
+            .Set(m => m.ServicePrincipal.ClientId).To(e => e.ClientId)
+            .Set(m => m.ServicePrincipal.ClientSecret).To(e => e.ClientSecret))
         .Children(_ => _.AzureSubscriptions, _ => _
             .IdentifiedBy(s => s.SubscriptionId)
             .From<AzureSubscriptionAdded>(f => f

@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Azure;
 using Concepts.Organizations;
 using Events.Organizations;
 
@@ -15,6 +16,9 @@ public class OrganizationSettings : Controller
     {
         _eventLog = eventLog;
     }
+
+    [HttpPost("service-principal")]
+    public Task SetAzureServicePrincipal([FromBody] AzureServicePrincipal principal) => _eventLog.Append(SettingsId.Global, new AzureServicePrincipalSet(principal.ClientId, principal.ClientSecret));
 
     [HttpPost("subscriptions")]
     public Task AddAzureSubscription([FromBody] AzureSubscription subscription) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(subscription.Id, subscription.Name, subscription.TenantName));
