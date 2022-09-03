@@ -1,3 +1,10 @@
+# [v0.3.7] - 2022-9-3 [PR: #69](https://github.com/aksio-insurtech/AppManager/pull/69)
+
+### Fixed
+
+- Persisting stack per application and importing it for every operation.
+
+
 # [v0.3.5] - 2022-9-3 [PR: #68](https://github.com/aksio-insurtech/AppManager/pull/68)
 
 ### Fixed
