@@ -71,7 +71,7 @@ public static class Program
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
-        var operations = new PulumiOperations(loggerFactory.CreateLogger<PulumiOperations>(), settings);
+        var operations = new PulumiOperations(loggerFactory.CreateLogger<PulumiOperations>(), settings, new NullStacks());
 
         operations.Up(
             application,
