@@ -165,7 +165,7 @@ public class PulumiOperations : IPulumiOperations
         await stack.Workspace.InstallPluginAsync("azuread", "5.26.1");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.0");
 
-        _logger.SettingAllConfig(JsonSerializer.Serialize(application), JsonSerializer.Serialize(_settings));
+        _logger.SettingAllConfig();
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
                 { "azure-native:location", new ConfigValue(application.CloudLocation) },
