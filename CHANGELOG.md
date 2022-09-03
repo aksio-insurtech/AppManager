@@ -1,3 +1,10 @@
+# [v0.3.5] - 2022-9-3 [PR: #68](https://github.com/aksio-insurtech/AppManager/pull/68)
+
+### Fixed
+
+- Wrapping all definitions in `PulumiFn.Create()`. We changed this behavior to be able to do the bootstrap, while forgetting to update the reactions.
+
+
 # [v0.3.1] - 2022-9-2 [PR: #66](https://github.com/aksio-insurtech/AppManager/pull/66)
 
 ### Fixed
