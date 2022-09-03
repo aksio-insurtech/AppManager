@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 using Common;
 using Concepts;
 using Microsoft.Extensions.Logging;
+using Pulumi;
 using Pulumi.Automation;
 
 namespace Reactions.Applications.Pulumi;
@@ -20,11 +21,13 @@ public class PulumiOperations : IPulumiOperations
 {
     readonly ILogger<PulumiOperations> _logger;
     readonly ISettings _settings;
+    readonly IStacks _stacks;
 
-    public PulumiOperations(ILogger<PulumiOperations> logger, ISettings applicationSettings)
+    public PulumiOperations(ILogger<PulumiOperations> logger, ISettings applicationSettings, IStacks stacks)
     {
         _logger = logger;
         _settings = applicationSettings;
+        _stacks = stacks;
     }
 
     /// <inheritdoc/>
@@ -48,6 +51,8 @@ public class PulumiOperations : IPulumiOperations
                     OnStandardOutput = Console.WriteLine,
                     OnStandardError = Console.Error.WriteLine
                 });
+
+                await SaveStack(application, stack);
             }
             catch (Exception ex)
             {
@@ -73,6 +78,8 @@ public class PulumiOperations : IPulumiOperations
 
                 _logger.TakingDownStack();
                 await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
+
+                await SaveStack(application, stack);
             }
             catch (Exception ex)
             {
@@ -98,6 +105,8 @@ public class PulumiOperations : IPulumiOperations
 
                 _logger.RemovingStack();
                 await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
+
+                await SaveStack(application, stack);
             }
             catch (Exception ex)
             {
@@ -149,6 +158,13 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
+        if (await _stacks.HasFor(application))
+        {
+            _logger.GettingStackDeployment(application.Name);
+
+            var deployment = await _stacks.GetFor(application);
+            await stack.ImportStackAsync(deployment);
+        }
 
         // TODO: This should probably be hidden behind a user action with a big "Are you sure? This could leave things in an inconsistent state".
         var info = await stack.GetInfoAsync();
@@ -205,5 +221,13 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.ImportStack();
         await stack.ImportStackAsync(stackDeployment);
+    }
+
+    async Task SaveStack(Application application, WorkspaceStack stack)
+    {
+        _logger.SavingStackDeployment(application.Name);
+
+        var deployment = await stack.ExportStackAsync();
+        await _stacks.Save(application, deployment);
     }
 }

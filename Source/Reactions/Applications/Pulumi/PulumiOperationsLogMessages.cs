@@ -51,4 +51,10 @@ public static partial class PulumiOperationsLogMessages
 
     [LoggerMessage(15, LogLevel.Information, "Setting tags")]
     public static partial void SettingsTags(this ILogger logger);
+
+    [LoggerMessage(16, LogLevel.Information, "Getting existing stack deployment for '{application}'")]
+    public static partial void GettingStackDeployment(this ILogger logger, string application);
+
+    [LoggerMessage(17, LogLevel.Information, "Saving stack deployment for '{application}'")]
+    public static partial void SavingStackDeployment(this ILogger logger, string application);
 }
