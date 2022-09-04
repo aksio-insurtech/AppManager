@@ -1,3 +1,10 @@
+# [v0.3.9] - 2022-9-4 [PR: #71](https://github.com/aksio-insurtech/AppManager/pull/71)
+
+### Fixed
+
+- Bootstrapper should now be able to deploy the AppManager and then hand over the stack it created to the cloud counterpart engine.
+
+
 # [v0.3.7] - 2022-9-3 [PR: #69](https://github.com/aksio-insurtech/AppManager/pull/69)
 
 ### Fixed
