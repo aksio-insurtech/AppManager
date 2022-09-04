@@ -4,7 +4,7 @@
 using MongoDB.Bson;
 using Pulumi.Automation;
 
-namespace Reactions.Applications.Pulumi;
+namespace Infrastructure;
 
 public class Stacks : IStacks
 {
@@ -15,23 +15,23 @@ public class Stacks : IStacks
         _collection = collection;
     }
 
-    public async Task<bool> HasFor(Application application)
+    public async Task<bool> HasFor(ApplicationId applicationId)
     {
-        var count = await _collection.CountDocumentsAsync(_ => _.Id == application.Id);
+        var count = await _collection.CountDocumentsAsync(_ => _.Id == applicationId);
         return count == 1;
     }
 
-    public async Task<StackDeployment> GetFor(Application application)
+    public async Task<StackDeployment> GetFor(ApplicationId applicationId)
     {
-        var result = await _collection.FindAsync(_ => _.Id == application.Id);
+        var result = await _collection.FindAsync(_ => _.Id == applicationId);
         var document = result.First();
         return StackDeployment.FromJsonString(document.Deployment.ToJson());
     }
 
-    public async Task Save(Application application, StackDeployment stackDeployment)
+    public async Task Save(ApplicationId applicationId, StackDeployment stackDeployment)
     {
         var stackDeploymentBson = BsonDocument.Parse(stackDeployment.Json.ToJson());
-        var document = new StackDeploymentForApplication(application.Id, stackDeploymentBson);
-        await _collection.ReplaceOneAsync(_ => _.Id == application.Id, document, new ReplaceOptions { IsUpsert = true });
+        var document = new StackDeploymentForApplication(applicationId, stackDeploymentBson);
+        await _collection.ReplaceOneAsync(_ => _.Id == applicationId, document, new ReplaceOptions { IsUpsert = true });
     }
 }

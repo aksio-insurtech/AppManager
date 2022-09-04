@@ -3,14 +3,11 @@
 		<ProjectReference Include="../Common/Common.csproj" />
 		<ProjectReference Include="../Concepts/Concepts.csproj" />
 		<ProjectReference Include="../Events/Events.csproj" />
+        <ProjectReference Include="../Infrastructure/Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="handlebars.net" Version="2.1.2" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.11.0" />
-		<PackageReference Include="pulumi.automation" Version="3.37.2" />
-		<PackageReference Include="pulumi.azuread" Version="5.26.1" />
-		<PackageReference Include="pulumi.azurenative" Version="1.67.0" />
-		<PackageReference Include="Pulumi.Mongodbatlas" Version="3.5.0" />
         <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
         <PackageReference Include="semver" Version="2.2.0" />
 	</ItemGroup>

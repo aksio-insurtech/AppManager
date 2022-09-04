@@ -3,6 +3,6 @@
 
 using MongoDB.Bson;
 
-namespace Reactions.Applications.Pulumi;
+namespace Infrastructure;
 
 public record StackDeploymentForApplication(ApplicationId Id, BsonDocument Deployment);
