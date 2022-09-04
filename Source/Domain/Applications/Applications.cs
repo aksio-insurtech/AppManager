@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Events.Applications;
+using Infrastructure;
+using Pulumi.Automation;
 
 namespace Domain.Applications;
 
@@ -9,8 +11,16 @@ namespace Domain.Applications;
 public class Applications : Controller
 {
     readonly IEventLog _eventLog;
+    readonly IStacks _stacks;
 
-    public Applications(IEventLog eventLog) => _eventLog = eventLog;
+    public Applications(IEventLog eventLog, IStacks stacks)
+    {
+        _eventLog = eventLog;
+        _stacks = stacks;
+    }
+
+    [HttpPost("{applicationId}/stack")]
+    public Task SetStack([FromRoute] ApplicationId applicationId, [FromBody] string json) => _stacks.Save(applicationId, StackDeployment.FromJsonString(json));
 
     [HttpPost]
     public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));

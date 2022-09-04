@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Common;
 using Concepts;
+using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.Automation;
@@ -158,11 +159,11 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
-        if (await _stacks.HasFor(application))
+        if (await _stacks.HasFor(application.Id))
         {
             _logger.GettingStackDeployment(application.Name);
 
-            var deployment = await _stacks.GetFor(application);
+            var deployment = await _stacks.GetFor(application.Id);
             await stack.ImportStackAsync(deployment);
         }
 
@@ -228,6 +229,6 @@ public class PulumiOperations : IPulumiOperations
         _logger.SavingStackDeployment(application.Name);
 
         var deployment = await stack.ExportStackAsync();
-        await _stacks.Save(application, deployment);
+        await _stacks.Save(application.Id, deployment);
     }
 }
