@@ -40,7 +40,7 @@ public class AppManagerApi : IDisposable
         _client.BaseAddress = new Uri(_url);
     }
 
-    public Task SetStack(Guid id, string json) => Perform("/api/applications/{id}/stacks", new { json });
+    public Task SetStack(Guid id, string json) => Perform($"/api/applications/{id}/stacks", new { json });
     public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
     public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
     public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/organization/settings/service-principal", new { clientId, clientSecret });
