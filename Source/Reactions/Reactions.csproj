@@ -8,7 +8,6 @@
 	<ItemGroup>
 		<PackageReference Include="handlebars.net" Version="2.1.2" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.11.0" />
-        <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
         <PackageReference Include="semver" Version="2.2.0" />
 	</ItemGroup>
 	<ItemGroup>
