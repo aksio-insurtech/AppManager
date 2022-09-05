@@ -40,8 +40,8 @@ public static class ApplicationNetworkPulumiExtensions
                             new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
                         },
                         AddressPrefix = "10.0.1.0/24",
-                        PrivateEndpointNetworkPolicies = "Enabled",
-                        PrivateLinkServiceNetworkPolicies = "Enabled",
+                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled,
                         Delegations =
                         {
                             new DelegationArgs
@@ -50,6 +50,13 @@ public static class ApplicationNetworkPulumiExtensions
                                 ServiceName = "Microsoft.ContainerInstance/containerGroups"
                             }
                         }
+                    },
+                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
+                    {
+                        Name = "mongodb",
+                        AddressPrefix = "10.0.2.0/24",
+                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     }
                 }
         });
