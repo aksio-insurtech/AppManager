@@ -38,6 +38,8 @@ public class AppManagerApi : IDisposable
         _client = new HttpClient();
         _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
         _client.BaseAddress = new Uri(_url);
+
+        Console.WriteLine($"URL for API is : '{_url}'");
     }
 
     public Task SetStack(Guid id, string json) => Perform($"/api/applications/{id}/stacks", new { json });
@@ -58,8 +60,11 @@ public class AppManagerApi : IDisposable
     {
         Console.WriteLine($"Calling : {route}");
         var content = JsonContent.Create(body);
+        Console.WriteLine("Post");
         var response = await _client.PostAsync(route, content);
+        Console.WriteLine("Done");
         var result = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("Result");
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine(result);
