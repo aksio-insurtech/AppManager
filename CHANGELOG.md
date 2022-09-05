@@ -1,3 +1,10 @@
+# [v0.3.11] - 2022-9-5 [PR: #72](https://github.com/aksio-insurtech/AppManager/pull/72)
+
+### Fixed
+
+- Adding logging messages for `Stacks` saving and getting.
+
+
 # [v0.3.9] - 2022-9-4 [PR: #71](https://github.com/aksio-insurtech/AppManager/pull/71)
 
 ### Fixed
