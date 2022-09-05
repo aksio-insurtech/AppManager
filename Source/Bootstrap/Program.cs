@@ -39,6 +39,14 @@ public static class Program
                 }
         })!;
 
+        // var appManagerApi = new AppManagerApi(config, "https://ingress832b7458.livelyglacier-aba45b93.norwayeast.azurecontainerapps.io");
+        // await appManagerApi.Authenticate();
+        // NullStacks.AppManagerApi = appManagerApi;
+        // var stack = await File.ReadAllTextAsync("/Users/einari/Projects/Aksio/stack.json");
+        // var stackAsDynamic = JsonSerializer.Deserialize<dynamic>(stack);
+        // await appManagerApi.SetStack(Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"), stack);
+        // Console.WriteLine("Wholy cow...");
+        // Console.ReadLine();
         var settings = new Settings(
             new AzureSubscription[] { config.Azure.Subscription },
             config.Pulumi.Organization,

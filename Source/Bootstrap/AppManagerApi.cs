@@ -42,7 +42,7 @@ public class AppManagerApi : IDisposable
         Console.WriteLine($"URL for API is : '{_url}'");
     }
 
-    public Task SetStack(Guid id, string json) => Perform($"/api/applications/{id}/stacks", new { json });
+    public Task SetStack(Guid id, dynamic stack) => Perform($"/api/applications/{id}/stack", stack);
     public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
     public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
     public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/organization/settings/service-principal", new { clientId, clientSecret });
@@ -60,15 +60,13 @@ public class AppManagerApi : IDisposable
     {
         Console.WriteLine($"Calling : {route}");
         var content = JsonContent.Create(body);
-        Console.WriteLine("Post");
         var response = await _client.PostAsync(route, content);
-        Console.WriteLine("Done");
         var result = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("Result");
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine(result);
             throw new ApiCallError(route);
         }
+        Console.WriteLine("API call successful");
     }
 }
