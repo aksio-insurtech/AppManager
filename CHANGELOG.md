@@ -1,3 +1,10 @@
+# [v0.3.17] - 2022-9-12 [PR: #78](https://github.com/aksio-insurtech/AppManager/pull/78)
+
+### Fixed
+
+- Build errors.
+
+
 # [v0.3.15] - 2022-9-12 [PR: #76](https://github.com/aksio-insurtech/AppManager/pull/76)
 
 ### Fixed
