@@ -33,6 +33,18 @@ public static class ApplicationNetworkPulumiExtensions
                 {
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
+                        Name = "infrastructure",
+                        ServiceEndpoints =
+                        {
+                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.Storage" },
+                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
+                        },
+                        AddressPrefix = "10.0.0.0/24",
+                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
+                    },
+                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
+                    {
                         Name = "internal",
                         ServiceEndpoints =
                         {
@@ -41,15 +53,7 @@ public static class ApplicationNetworkPulumiExtensions
                         },
                         AddressPrefix = "10.0.1.0/24",
                         PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
-                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled,
-                        Delegations =
-                        {
-                            new DelegationArgs
-                            {
-                                Name = "containerGroupDelegation",
-                                ServiceName = "Microsoft.ContainerInstance/containerGroups"
-                            }
-                        }
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     },
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {

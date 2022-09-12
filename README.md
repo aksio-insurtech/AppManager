@@ -27,8 +27,13 @@ packages. In addition to this, we programmatically tell Pulumi to install the ne
 
 ## Resources
 
-https://github.com/pulumi/examples/blob/master/azure-ts-static-website/index.ts
+Container Apps Vnet, follow this:
+https://github.com/microsoft/azure-container-apps/issues/227
 
-https://www.pulumi.com/registry/packages/azure-native/api-docs/containerinstance/containergroup/
+## Tips & Tricks
 
-https://docs.microsoft.com/en-us/azure/container-instances/container-instances-volume-azure-files
+To figure out what the public IP of something is:
+
+```shell
+curl api.ipify.org
+```
