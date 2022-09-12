@@ -6,7 +6,7 @@ using Pulumi.Automation;
 
 namespace Bootstrap;
 
-public class NullStacks : IStacks
+public class BootstrapStacks : IStacks
 {
     internal static AppManagerApi? AppManagerApi;
 
@@ -14,5 +14,13 @@ public class NullStacks : IStacks
 
     public Task<bool> HasFor(ApplicationId applicationId) => Task.FromResult(false);
 
-    public Task Save(ApplicationId applicationId, StackDeployment stackDeployment) => AppManagerApi?.SetStack(applicationId, stackDeployment.Json.ToString()) ?? Task.CompletedTask;
+    public async Task Save(ApplicationId applicationId, StackDeployment stackDeployment)
+    {
+        var stackAsJson = stackDeployment.Json.ToString();
+        await File.WriteAllTextAsync("/Users/einari/Projects/Aksio/stack.json", stackAsJson);
+        if (AppManagerApi != null)
+        {
+            await AppManagerApi.SetStack(applicationId, stackAsJson);
+        }
+    }
 }
