@@ -1,3 +1,10 @@
+# [v0.3.15] - 2022-9-12 [PR: #76](https://github.com/aksio-insurtech/AppManager/pull/76)
+
+### Fixed
+
+- Stacks object coming in on controller is a Json document - fixed so that we do `.ToString()` on it for the `StackDeployment` to be handed as a string.
+
+
 # [v0.3.11] - 2022-9-5 [PR: #72](https://github.com/aksio-insurtech/AppManager/pull/72)
 
 ### Fixed
