@@ -203,4 +203,4 @@ jobs:
               -X POST ${{ secrets.APPMANAGER_ENDPOINT }} \
               -H "Content-Type: application/json" \
               -H "Authorization: Bearer $token" \
-              --data '"${{ needs.release.outputs.version }}"' | jq
+              --data '"aksioinsurtech/app-manager:${{ needs.release.outputs.version }}"' | jq
