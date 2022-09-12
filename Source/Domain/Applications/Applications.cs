@@ -3,7 +3,6 @@
 
 using Events.Applications;
 using Infrastructure;
-using MongoDB.Bson;
 using Pulumi.Automation;
 
 namespace Domain.Applications;
