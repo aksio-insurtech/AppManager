@@ -11,6 +11,22 @@ public static class ApplicationResourceGroupPulumiExtensions
 {
     public static ResourceGroup SetupResourceGroup(this Application application, CloudRuntimeEnvironment environment)
     {
+        var name = GetResourceGroupName(application, environment);
+        return new ResourceGroup(name, new()
+        {
+            Location = application.CloudLocation.Value,
+            ResourceGroupName = name,
+            Tags = application.GetTags(environment)
+        });
+    }
+
+    public static ResourceGroup GetResourceGroup(this Application application, CloudRuntimeEnvironment environment)
+    {
+        return ResourceGroup.Get(GetResourceGroupName(application, environment), application.Resources.AzureResourceGroupId.Value);
+    }
+
+    static string GetResourceGroupName(Application application, CloudRuntimeEnvironment environment)
+    {
         var locationString = () => application.CloudLocation.Value switch
         {
             CloudLocationKey.NorwayEast => "Norway",
@@ -19,13 +35,6 @@ public static class ApplicationResourceGroupPulumiExtensions
             _ => "NA"
         };
 
-        var name = $"{application.Name}-{environment.ToShortName()}-{locationString()}-RG";
-
-        return new ResourceGroup(name, new()
-        {
-            Location = application.CloudLocation.Value,
-            ResourceGroupName = name,
-            Tags = application.GetTags(environment)
-        });
+        return $"{application.Name}-{environment.ToShortName()}-{locationString()}-RG";
     }
 }
