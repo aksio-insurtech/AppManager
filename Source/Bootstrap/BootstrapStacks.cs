@@ -14,13 +14,5 @@ public class BootstrapStacks : IStacks
 
     public Task<bool> HasFor(ApplicationId applicationId) => Task.FromResult(false);
 
-    public async Task Save(ApplicationId applicationId, StackDeployment stackDeployment)
-    {
-        var stackAsJson = stackDeployment.Json.ToString();
-        await File.WriteAllTextAsync("/Users/einari/Projects/Aksio/stack.json", stackAsJson);
-        if (AppManagerApi != null)
-        {
-            await AppManagerApi.SetStack(applicationId, stackAsJson);
-        }
-    }
+    public Task Save(ApplicationId applicationId, StackDeployment stackDeployment) => AppManagerApi?.SetStack(applicationId, stackDeployment.Json.ToString()) ?? Task.CompletedTask;
 }
