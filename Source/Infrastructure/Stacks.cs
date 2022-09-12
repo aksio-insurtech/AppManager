@@ -29,7 +29,7 @@ public class Stacks : IStacks
         _logger.Getting(applicationId);
         var result = await _collection.FindAsync(_ => _.Id == applicationId);
         var document = result.First();
-        return StackDeployment.FromJsonString(document.Deployment.ToJson());
+        return StackDeployment.FromJsonString(document.Deployment.ToString());
     }
 
     public async Task Save(ApplicationId applicationId, StackDeployment stackDeployment)
@@ -37,7 +37,7 @@ public class Stacks : IStacks
         _logger.Saving(applicationId);
         try
         {
-            var stackDeploymentBson = BsonDocument.Parse(stackDeployment.Json.ToJson());
+            var stackDeploymentBson = BsonDocument.Parse(stackDeployment.Json.ToString());
             var document = new StackDeploymentForApplication(applicationId, stackDeploymentBson);
             await _collection.ReplaceOneAsync(_ => _.Id == applicationId, document, new ReplaceOptions { IsUpsert = true });
         }
