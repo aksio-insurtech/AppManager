@@ -27,5 +27,8 @@ jobs:
         with:
           dotnet-version: "6.0.201"
 
-      - name: Build & run tests for root
-        run: dotnet test --configuration Release
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Run tests for root
+        run: dotnet test --no-build --configuration Release

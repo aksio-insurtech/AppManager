@@ -10,13 +10,11 @@ const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/st
 
 export interface ISetStack {
     applicationId?: string;
-    json?: string;
 }
 
 export class SetStackValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
-        json: new Validator(),
     };
 }
 
@@ -26,7 +24,6 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     readonly validation: CommandValidator = new SetStackValidator();
 
     private _applicationId!: string;
-    private _json!: string;
 
     get requestArguments(): string[] {
         return [
@@ -37,7 +34,6 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     get properties(): string[] {
         return [
             'applicationId',
-            'json',
         ];
     }
 
@@ -48,14 +44,6 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     set applicationId(value: string) {
         this._applicationId = value;
         this.propertyChanged('applicationId');
-    }
-    get json(): string {
-        return this._json;
-    }
-
-    set json(value: string) {
-        this._json = value;
-        this.propertyChanged('json');
     }
 
     static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>] {

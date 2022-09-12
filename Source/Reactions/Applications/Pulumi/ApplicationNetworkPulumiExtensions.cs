@@ -33,6 +33,18 @@ public static class ApplicationNetworkPulumiExtensions
                 {
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
+                        Name = "infrastructure",
+                        ServiceEndpoints =
+                        {
+                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.Storage" },
+                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
+                        },
+                        AddressPrefix = "10.0.0.0/24",
+                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
+                    },
+                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
+                    {
                         Name = "internal",
                         ServiceEndpoints =
                         {
@@ -40,16 +52,15 @@ public static class ApplicationNetworkPulumiExtensions
                             new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
                         },
                         AddressPrefix = "10.0.1.0/24",
-                        PrivateEndpointNetworkPolicies = "Enabled",
-                        PrivateLinkServiceNetworkPolicies = "Enabled",
-                        Delegations =
-                        {
-                            new DelegationArgs
-                            {
-                                Name = "containerGroupDelegation",
-                                ServiceName = "Microsoft.ContainerInstance/containerGroups"
-                            }
-                        }
+                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
+                    },
+                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
+                    {
+                        Name = "mongodb",
+                        AddressPrefix = "10.0.2.0/24",
+                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
+                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     }
                 }
         });

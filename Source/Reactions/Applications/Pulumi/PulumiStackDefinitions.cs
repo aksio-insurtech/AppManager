@@ -46,7 +46,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
         var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
-        var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, tags);
+        var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, network, tags);
         var managedEnvironmentId = await managedEnvironment.Id.GetValue();
         var managedEnvironmentName = await managedEnvironment.Name.GetValue();
 

@@ -63,6 +63,33 @@ public class ApplicationResourcesCoordinator
         await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "Microservice", @event.Name);
     }
 
+    public async Task DeployableCreated(DeployableCreated @event, EventContext context)
+    {
+        var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
+        var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
+        var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
+        _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
+        var projectName = GetProjectNameFor(application, microservice);
+
+        if (deployable.Image is null)
+        {
+            deployable = new(deployable.Id, deployable.MicroserviceId, deployable.Name, "nginx", deployable.Ports);
+        }
+
+        var definition = PulumiFn.Create(() =>
+            _stackDefinitions.Deployable(
+                _executionContext,
+                application,
+                microservice,
+                new[]
+                {
+                deployable
+                },
+                CloudRuntimeEnvironment.Development));
+
+        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+    }
+
     public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
     {
         var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);

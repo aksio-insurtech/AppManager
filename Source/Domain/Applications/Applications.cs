@@ -3,6 +3,7 @@
 
 using Events.Applications;
 using Infrastructure;
+using MongoDB.Bson;
 using Pulumi.Automation;
 
 namespace Domain.Applications;
@@ -20,7 +21,7 @@ public class Applications : Controller
     }
 
     [HttpPost("{applicationId}/stack")]
-    public Task SetStack([FromRoute] ApplicationId applicationId, [FromBody] string json) => _stacks.Save(applicationId, StackDeployment.FromJsonString(json));
+    public Task SetStack([FromRoute] ApplicationId applicationId, [FromBody] object stack) => _stacks.Save(applicationId, StackDeployment.FromJsonString(stack.ToJson()));
 
     [HttpPost]
     public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));

@@ -10,7 +10,7 @@ public static partial class PulumiOperationsLogMessages
     [LoggerMessage(0, LogLevel.Information, "Creating stack for '{application}'")]
     public static partial void CreatingStack(this ILogger logger, string application);
 
-    [LoggerMessage(1, LogLevel.Information, "Refreshing stack from cloud provider")]
+    [LoggerMessage(1, LogLevel.Information, "Refreshing stack from providers")]
     public static partial void RefreshingStack(this ILogger logger);
 
     [LoggerMessage(3, LogLevel.Information, "Up the stack")]

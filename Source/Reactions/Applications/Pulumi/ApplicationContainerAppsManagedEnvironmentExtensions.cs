@@ -16,6 +16,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
         ResourceGroup resourceGroup,
         CloudRuntimeEnvironment environment,
         Workspace applicationInsights,
+        NetworkResult network,
         Tags tags)
     {
         var sharedKeysResult = GetSharedKeys.Invoke(new()
@@ -40,6 +41,15 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
                 }
             },
 
+            // VnetConfiguration = new VnetConfigurationArgs()
+            // {
+            //     DockerBridgeCidr = "10.2.0.1/16",
+            //     PlatformReservedCidr = "10.0.0.0/16",
+            //     PlatformReservedDnsIP = "10.0.0.2",
+            //     RuntimeSubnetId = network.VirtualNetwork.Subnets.Apply(_ => _[0].Id!),
+            //     InfrastructureSubnetId = network.VirtualNetwork.Subnets.Apply(_ => _[1].Id!),
+            //     Internal = true
+            // },
             // DaprAIConnectionString = applicationInsights.,
             ZoneRedundant = false
         });
