@@ -1,3 +1,10 @@
+# [v0.3.19] - 2022-9-12 [PR: #79](https://github.com/aksio-insurtech/AppManager/pull/79)
+
+### Fixed
+
+- Getting existing resource group for application for microservice stacks, instead of creating new ones - which will conflict.
+
+
 # [v0.3.17] - 2022-9-12 [PR: #78](https://github.com/aksio-insurtech/AppManager/pull/78)
 
 ### Fixed
