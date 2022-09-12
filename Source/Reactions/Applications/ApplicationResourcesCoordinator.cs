@@ -63,7 +63,6 @@ public class ApplicationResourcesCoordinator
         await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "Microservice", @event.Name);
     }
 
-
     public async Task DeployableCreated(DeployableCreated @event, EventContext context)
     {
         var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
