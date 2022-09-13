@@ -1,3 +1,10 @@
+# [v0.3.21] - 2022-9-13 [PR: #80](https://github.com/aksio-insurtech/AppManager/pull/80)
+
+### Fixed
+
+- Adding a consolidation endpoint for making sure we get events out.
+
+
 # [v0.3.19] - 2022-9-12 [PR: #79](https://github.com/aksio-insurtech/AppManager/pull/79)
 
 ### Fixed
