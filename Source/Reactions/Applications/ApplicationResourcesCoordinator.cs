@@ -38,7 +38,6 @@ public class ApplicationResourcesCoordinator
         var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
         var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
         _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
-        await Task.CompletedTask;
     }
 
     public async Task Removed(ApplicationRemoved @event, EventContext context)
@@ -47,7 +46,6 @@ public class ApplicationResourcesCoordinator
         _logger.RemovingApplication(application.Name);
         var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
         _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
-        await Task.CompletedTask;
     }
 
     public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
