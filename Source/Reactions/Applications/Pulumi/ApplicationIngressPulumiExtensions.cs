@@ -10,28 +10,23 @@ using FileShare = Pulumi.AzureNative.Storage.FileShare;
 
 namespace Reactions.Applications.Pulumi;
 
-#pragma warning disable RCS1175, IDE0059
+#pragma warning disable RCS1175
 
 public static class ApplicationIngressPulumiExtensions
 {
+    public const string IngressFileShareName = "ingress";
+    const string IngressContainerAppName = "ingress";
     const string StorageName = "ingress-storage";
 
-    public static async Task<string> SetupIngress(
+    public static async Task ConfigureIngress(
         this Application application,
         ResourceGroup resourceGroup,
         StorageResult storage,
-        ManagedEnvironment managedEnvironment,
-        Tags tags,
+        FileShare fileShare,
         ILogger<FileStorage> fileStorageLogger,
         string? frontendMicroserviceResourceName = default)
     {
-        var nginxFileShare = new FileShare("ingress", new()
-        {
-            AccountName = storage.AccountName,
-            ResourceGroupName = resourceGroup.Name,
-        });
-
-        var nginxFileShareName = await nginxFileShare.Name.GetValue();
+        var nginxFileShareName = await fileShare.Name.GetValue();
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
 
         var frontendUrl = string.Empty;
@@ -52,8 +47,36 @@ public static class ApplicationIngressPulumiExtensions
             FrontendUrl = frontendUrl
         });
         nginxFileStorage.Upload("nginx.conf", nginxContent);
+    }
 
-        var managedEnvironmentStorage = new ManagedEnvironmentsStorage(StorageName, new()
+    public static async Task RestartIngress(
+        this Application application,
+        ResourceGroup resourceGroup,
+        string containerAppId)
+    {
+        var containerApp = ContainerApp.Get(IngressContainerAppName, containerAppId);
+        GetContainerApp.Invoke()
+    }
+)
+
+    public static async Task<IngressResult> SetupIngress(
+        this Application application,
+        ResourceGroup resourceGroup,
+        StorageResult storage,
+        ManagedEnvironment managedEnvironment,
+        Tags tags,
+        ILogger<FileStorage> fileStorageLogger,
+        string? frontendMicroserviceResourceName = default)
+    {
+        var nginxFileShare = new FileShare(IngressFileShareName, new()
+        {
+            AccountName = storage.AccountName,
+            ResourceGroupName = resourceGroup.Name,
+        });
+
+        await application.ConfigureIngress(resourceGroup, storage, nginxFileShare, fileStorageLogger, frontendMicroserviceResourceName);
+
+        _ = new ManagedEnvironmentsStorage(StorageName, new()
         {
             ResourceGroupName = resourceGroup.Name,
             EnvironmentName = managedEnvironment.Name,
@@ -65,13 +88,13 @@ public static class ApplicationIngressPulumiExtensions
                     AccessMode = "ReadOnly",
                     AccountKey = storage.AccountKey,
                     AccountName = storage.AccountName,
-                    ShareName = nginxFileShareName
+                    ShareName = nginxFileShare.Name
                 }
             }
         });
 
         const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
-        var containerApp = new ContainerApp("ingress", new()
+        var containerApp = new ContainerApp(IngressContainerAppName, new()
         {
             Location = resourceGroup.Location,
             Tags = tags,
@@ -132,7 +155,7 @@ public static class ApplicationIngressPulumiExtensions
 
         if (application.Authentication is not null)
         {
-            var containerAppAut = new ContainerAppsAuthConfig("current", new()
+            _ = new ContainerAppsAuthConfig("current", new()
             {
                 AuthConfigName = "current",
                 ResourceGroupName = resourceGroup.Name,
@@ -171,6 +194,7 @@ public static class ApplicationIngressPulumiExtensions
         }
 
         var ingressConfig = await containerApp.Configuration.GetValue();
-        return $"https://{ingressConfig!.Ingress!.Fqdn}";
+        var fileShareId = await nginxFileShare.Id.GetValue();
+        return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, containerApp);
     }
 }
