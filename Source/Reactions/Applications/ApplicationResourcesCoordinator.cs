@@ -37,7 +37,7 @@ public class ApplicationResourcesCoordinator
         _logger.CreatingApplication(@event.Name);
         var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
         var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-        _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        await _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
     }
 
     public async Task Removed(ApplicationRemoved @event, EventContext context)
@@ -45,7 +45,7 @@ public class ApplicationResourcesCoordinator
         var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
         _logger.RemovingApplication(application.Name);
         var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-        _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        await _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
     }
 
     public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
@@ -57,7 +57,7 @@ public class ApplicationResourcesCoordinator
 
         var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development));
 
-        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
         await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "Microservice", @event.Name);
     }
 
@@ -85,7 +85,7 @@ public class ApplicationResourcesCoordinator
                 },
                 CloudRuntimeEnvironment.Development));
 
-        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
     }
 
     public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
@@ -107,7 +107,7 @@ public class ApplicationResourcesCoordinator
                 },
                 CloudRuntimeEnvironment.Development));
 
-        _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
     }
 
     string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";

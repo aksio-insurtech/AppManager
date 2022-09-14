@@ -30,7 +30,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment, bool ignoreIngress = false)
+    public async Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.SetupResourceGroup(environment);
@@ -71,10 +71,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         await kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
 
-        if (!ignoreIngress)
-        {
-            await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
-        }
+        var ingressResult = await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
 
         var applicationResult = new ApplicationResult(
             environment,
@@ -84,6 +81,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             containerRegistry,
             mongoDB,
             managedEnvironment,
+            ingressResult,
             kernel);
         var events = await application.GetEventsToAppend(applicationResult);
 

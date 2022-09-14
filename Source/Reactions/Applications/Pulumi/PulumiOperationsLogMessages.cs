@@ -55,6 +55,9 @@ public static partial class PulumiOperationsLogMessages
     [LoggerMessage(16, LogLevel.Information, "Getting existing stack deployment for '{application}'")]
     public static partial void GettingStackDeployment(this ILogger logger, string application);
 
-    [LoggerMessage(17, LogLevel.Information, "Saving stack deployment for '{application}'")]
-    public static partial void SavingStackDeployment(this ILogger logger, string application);
+    [LoggerMessage(17, LogLevel.Information, "Saving stack deployment for application '{application}'")]
+    public static partial void SavingStackDeploymentForApplication(this ILogger logger, string application);
+
+    [LoggerMessage(18, LogLevel.Information, "Saving stack deployment for microservice '{microservice}'")]
+    public static partial void SavingStackDeploymentForMicroservice(this ILogger logger, string microservice);
 }

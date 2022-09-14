@@ -32,6 +32,6 @@ public class Applications : Controller
     {
         var application = await _projections.GetInstanceById<Application>(applicationId);
         var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-        _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        await _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
     }
 }
