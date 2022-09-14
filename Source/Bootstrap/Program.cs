@@ -8,7 +8,6 @@ using Concepts;
 using Concepts.Azure;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
-using Pulumi.AzureNative.App;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Read.Organizations;
