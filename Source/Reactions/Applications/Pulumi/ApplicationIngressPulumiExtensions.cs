@@ -49,7 +49,6 @@ public static class ApplicationIngressPulumiExtensions
         nginxFileStorage.Upload("nginx.conf", nginxContent);
     }
 
-
     public static async Task<IngressResult> SetupIngress(
         this Application application,
         ResourceGroup resourceGroup,
