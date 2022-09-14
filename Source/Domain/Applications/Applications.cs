@@ -14,7 +14,6 @@ public class Applications : Controller
     readonly IEventLog _eventLog;
     readonly IStacksForApplications _stacksForApplications;
 
-
     public Applications(
         IEventLog eventLog,
         IStacksForApplications stacksForApplications)
