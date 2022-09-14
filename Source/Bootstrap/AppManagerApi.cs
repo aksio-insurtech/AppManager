@@ -3,6 +3,7 @@
 
 using System.Net.Http.Json;
 using System.Text.Json;
+using Concepts;
 
 namespace Bootstrap;
 
@@ -42,7 +43,8 @@ public class AppManagerApi : IDisposable
         Console.WriteLine($"URL for API is : '{_url}'");
     }
 
-    public Task SetStack(Guid id, dynamic stack) => Perform($"/api/applications/{id}/stack", stack);
+    public Task SetStackForApplication(Guid id, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{id}/stack/{environment}", stack);
+    public Task SetStackForMicroservice(Guid applicationId, Guid microserviceId, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/stack/{environment}", stack);
     public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
     public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
     public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/organization/settings/service-principal", new { clientId, clientSecret });

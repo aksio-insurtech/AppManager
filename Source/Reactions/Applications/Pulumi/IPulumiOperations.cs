@@ -18,7 +18,9 @@ public interface IPulumiOperations
     /// <param name="projectName">Name of project.</param>
     /// <param name="definition">The configuration of a stack to up.</param>
     /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
-    void Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment);
+    /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
+    /// <returns>Awaitable task.</returns>
+    Task Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment, Microservice? microservice = default);
 
     /// <summary>
     /// Down a stack.
@@ -27,7 +29,9 @@ public interface IPulumiOperations
     /// <param name="projectName">Name of project.</param>
     /// <param name="definition">The configuration of a stack to down.</param>
     /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
-    void Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment);
+    /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
+    /// <returns>Awaitable task.</returns>
+    Task Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment, Microservice? microservice = default);
 
     /// <summary>
     /// Completely remove a stack and its history.
@@ -36,7 +40,9 @@ public interface IPulumiOperations
     /// <param name="projectName">Name of project.</param>
     /// <param name="definition">The configuration of a stack to down.</param>
     /// <param name="environment">The <see cref="CloudRuntimeEnvironment"/>.</param>
-    void Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment);
+    /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
+    /// <returns>Awaitable task.</returns>
+    Task Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment, Microservice? microservice = default);
 
     /// <summary>
     /// Set a tag for a stack in a project.

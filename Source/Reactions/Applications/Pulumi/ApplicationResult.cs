@@ -15,6 +15,7 @@ public record ApplicationResult(
     ContainerRegistryResult ContainerRegistry,
     MongoDBResult MongoDB,
     ManagedEnvironment ManagedEnvironment,
+    IngressResult Ingress,
     ContainerAppResult Kernel)
 {
     public async Task<Application> MergeWithApplication(Application application)

@@ -49,15 +49,6 @@ public static class ApplicationIngressPulumiExtensions
         nginxFileStorage.Upload("nginx.conf", nginxContent);
     }
 
-    public static async Task RestartIngress(
-        this Application application,
-        ResourceGroup resourceGroup,
-        string containerAppId)
-    {
-        var containerApp = ContainerApp.Get(IngressContainerAppName, containerAppId);
-        GetContainerApp.Invoke()
-    }
-)
 
     public static async Task<IngressResult> SetupIngress(
         this Application application,

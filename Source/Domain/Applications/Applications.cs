@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts;
 using Events.Applications;
 using Infrastructure;
 using Pulumi.Automation;
@@ -11,16 +12,19 @@ namespace Domain.Applications;
 public class Applications : Controller
 {
     readonly IEventLog _eventLog;
-    readonly IStacks _stacks;
+    readonly IStacksForApplications _stacksForApplications;
 
-    public Applications(IEventLog eventLog, IStacks stacks)
+
+    public Applications(
+        IEventLog eventLog,
+        IStacksForApplications stacksForApplications)
     {
         _eventLog = eventLog;
-        _stacks = stacks;
+        _stacksForApplications = stacksForApplications;
     }
 
-    [HttpPost("{applicationId}/stack")]
-    public Task SetStack([FromRoute] ApplicationId applicationId, [FromBody] object stack) => _stacks.Save(applicationId, StackDeployment.FromJsonString(stack.ToString()!));
+    [HttpPost("{applicationId}/stack/{environment}")]
+    public Task SetStack([FromRoute] ApplicationId applicationId, [FromRoute] CloudRuntimeEnvironment environment, [FromBody] object stack) => _stacksForApplications.Save(applicationId, environment, StackDeployment.FromJsonString(stack.ToString()!));
 
     [HttpPost]
     public Task Create([FromBody] CreateApplication command) => _eventLog.Append(command.ApplicationId.ToString(), new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));

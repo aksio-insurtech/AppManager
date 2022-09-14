@@ -22,98 +22,99 @@ public class PulumiOperations : IPulumiOperations
 {
     readonly ILogger<PulumiOperations> _logger;
     readonly ISettings _settings;
-    readonly IStacks _stacks;
+    readonly IStacksForApplications _stacksForApplications;
+    readonly IStacksForMicroservices _stacksForMicroservices;
 
-    public PulumiOperations(ILogger<PulumiOperations> logger, ISettings applicationSettings, IStacks stacks)
+    public PulumiOperations(
+        ILogger<PulumiOperations> logger,
+        ISettings applicationSettings,
+        IStacksForApplications stacksForApplications,
+        IStacksForMicroservices stacksForMicroservices)
     {
         _logger = logger;
         _settings = applicationSettings;
-        _stacks = stacks;
+        _stacksForApplications = stacksForApplications;
+        _stacksForMicroservices = stacksForMicroservices;
     }
 
     /// <inheritdoc/>
-    public void Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
+    public async Task Up(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment, Microservice? microservice = default)
     {
         _logger.UppingStack();
 
-        _ = Task.Run(async () =>
+        try
         {
-            try
+            _logger.CreatingStack(application.Name ?? "[N/A]");
+            var stack = await CreateStack(application, projectName, environment, definition);
+
+            _logger.RefreshingStack();
+            await stack.RefreshAsync();
+
+            _logger.PuttingUpStack();
+            await stack.UpAsync(new UpOptions
             {
-                _logger.CreatingStack(application.Name ?? "[N/A]");
-                var stack = await CreateStack(application, projectName, environment, definition);
+                OnStandardOutput = Console.WriteLine,
+                OnStandardError = Console.Error.WriteLine
+            });
 
-                _logger.RefreshingStack();
-                await stack.RefreshAsync();
-
-                _logger.PuttingUpStack();
-                await stack.UpAsync(new UpOptions
-                {
-                    OnStandardOutput = Console.WriteLine,
-                    OnStandardError = Console.Error.WriteLine
-                });
-
-                await SaveStack(application, stack);
-            }
-            catch (Exception ex)
-            {
-                _logger.Errored(ex);
-            }
-        });
+            await (microservice is not null ?
+                SaveStackForMicroservice(microservice, environment, stack) :
+                SaveStackForApplication(application, environment, stack));
+        }
+        catch (Exception ex)
+        {
+            _logger.Errored(ex);
+        }
     }
 
     /// <inheritdoc/>
-    public void Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
+    public async Task Down(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment, Microservice? microservice = default)
     {
-        _logger.DowningStack();
-
-        _ = Task.Run(async () =>
+        try
         {
-            try
-            {
-                _logger.CreatingStack(application.Name ?? "[N/A]");
-                var stack = await CreateStack(application, projectName, environment, definition);
+            _logger.CreatingStack(application.Name ?? "[N/A]");
+            var stack = await CreateStack(application, projectName, environment, definition);
 
-                _logger.RefreshingStack();
-                await stack.RefreshAsync();
+            _logger.RefreshingStack();
+            await stack.RefreshAsync();
 
-                _logger.TakingDownStack();
-                await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
+            _logger.TakingDownStack();
+            await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
 
-                await SaveStack(application, stack);
-            }
-            catch (Exception ex)
-            {
-                _logger.Errored(ex);
-            }
-        });
+            await (microservice is not null ?
+                SaveStackForMicroservice(microservice, environment, stack) :
+                SaveStackForApplication(application, environment, stack));
+        }
+        catch (Exception ex)
+        {
+            _logger.Errored(ex);
+        }
     }
 
     /// <inheritdoc/>
-    public void Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment)
+    public async Task Remove(Application application, string projectName, PulumiFn definition, CloudRuntimeEnvironment environment, Microservice? microservice = default)
     {
         _logger.StackBeingRemoved();
 
-        _ = Task.Run(async () =>
+        try
         {
-            try
-            {
-                _logger.CreatingStack(application.Name ?? "[N/A]");
-                var stack = await CreateStack(application, projectName, environment, definition);
+            _logger.CreatingStack(application.Name ?? "[N/A]");
+            var stack = await CreateStack(application, projectName, environment, definition);
 
-                _logger.RefreshingStack();
-                await stack.RefreshAsync();
+            _logger.RefreshingStack();
+            await stack.RefreshAsync();
 
-                _logger.RemovingStack();
-                await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
+            _logger.RemovingStack();
+            await stack.Workspace.RemoveStackAsync(environment.ToDisplayName());
 
-                await SaveStack(application, stack);
-            }
-            catch (Exception ex)
-            {
-                _logger.Errored(ex);
-            }
-        });
+            await (microservice is not null ?
+                SaveStackForMicroservice(microservice, environment, stack) :
+                SaveStackForApplication(application, environment, stack));
+        }
+        catch (Exception ex)
+        {
+            _logger.Errored(ex);
+        }
     }
 
     /// <inheritdoc/>
@@ -159,11 +160,11 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
-        if (await _stacks.HasFor(application.Id))
+        if (await _stacksForApplications.HasFor(application.Id, environment))
         {
             _logger.GettingStackDeployment(application.Name);
 
-            var deployment = await _stacks.GetFor(application.Id);
+            var deployment = await _stacksForApplications.GetFor(application.Id, environment);
             await stack.ImportStackAsync(deployment);
         }
 
@@ -224,11 +225,19 @@ public class PulumiOperations : IPulumiOperations
         await stack.ImportStackAsync(stackDeployment);
     }
 
-    async Task SaveStack(Application application, WorkspaceStack stack)
+    async Task SaveStackForApplication(Application application, CloudRuntimeEnvironment environment, WorkspaceStack stack)
     {
-        _logger.SavingStackDeployment(application.Name);
+        _logger.SavingStackDeploymentForApplication(application.Name);
 
         var deployment = await stack.ExportStackAsync();
-        await _stacks.Save(application.Id, deployment);
+        await _stacksForApplications.Save(application.Id, environment, deployment);
+    }
+
+    async Task SaveStackForMicroservice(Microservice microservice, CloudRuntimeEnvironment environment, WorkspaceStack stack)
+    {
+        _logger.SavingStackDeploymentForMicroservice(microservice.Name);
+
+        var deployment = await stack.ExportStackAsync();
+        await _stacksForMicroservices.Save(microservice.Id, environment, deployment);
     }
 }
