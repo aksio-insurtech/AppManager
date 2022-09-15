@@ -1,3 +1,17 @@
+# [v0.3.35] - 2022-9-15 [PR: #91](https://github.com/aksio-insurtech/AppManager/pull/91)
+
+### Fixed
+
+- Consistently using Microservice if it is a microservice update.
+
+
+# [v0.3.33] - 2022-9-15 [PR: #89](https://github.com/aksio-insurtech/AppManager/pull/89)
+
+### Fixed
+
+- Import the Microservice and not the Application when updating a microservice.
+
+
 # [v0.3.29] - 2022-9-15 [PR: #87](https://github.com/aksio-insurtech/AppManager/pull/87)
 
 ### Fixed

@@ -45,7 +45,7 @@ public class PulumiOperations : IPulumiOperations
         try
         {
             _logger.CreatingStack(application.Name ?? "[N/A]");
-            var stack = await CreateStack(application, projectName, environment, definition);
+            var stack = await CreateStack(application, projectName, environment, definition, microservice);
 
             _logger.RefreshingStack();
             await stack.RefreshAsync();
@@ -73,7 +73,7 @@ public class PulumiOperations : IPulumiOperations
         try
         {
             _logger.CreatingStack(application.Name ?? "[N/A]");
-            var stack = await CreateStack(application, projectName, environment, definition);
+            var stack = await CreateStack(application, projectName, environment, definition, microservice);
 
             _logger.RefreshingStack();
             await stack.RefreshAsync();
@@ -99,7 +99,7 @@ public class PulumiOperations : IPulumiOperations
         try
         {
             _logger.CreatingStack(application.Name ?? "[N/A]");
-            var stack = await CreateStack(application, projectName, environment, definition);
+            var stack = await CreateStack(application, projectName, environment, definition, microservice);
 
             _logger.RefreshingStack();
             await stack.RefreshAsync();
