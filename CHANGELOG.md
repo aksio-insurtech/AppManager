@@ -1,3 +1,10 @@
+# [v0.3.27] - 2022-9-15 [PR: #86](https://github.com/aksio-insurtech/AppManager/pull/86)
+
+### Fixed
+
+- Getting existing fileshare for Microservice, if not exists create it
+
+
 # [v0.3.25] - 2022-9-15 [PR: #85](https://github.com/aksio-insurtech/AppManager/pull/85)
 
 ### Fixed
