@@ -1,3 +1,10 @@
+# [v0.3.29] - 2022-9-15 [PR: #87](https://github.com/aksio-insurtech/AppManager/pull/87)
+
+### Fixed
+
+- Reverting on getting existing fileshare before creating. Doesn't really work.
+
+
 # [v0.3.27] - 2022-9-15 [PR: #86](https://github.com/aksio-insurtech/AppManager/pull/86)
 
 ### Fixed
