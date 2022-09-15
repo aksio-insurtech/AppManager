@@ -1,3 +1,10 @@
+# [v0.3.25] - 2022-9-15 [PR: #85](https://github.com/aksio-insurtech/AppManager/pull/85)
+
+### Fixed
+
+- Making all Pulumi operations asynchronous.
+
+
 # [v0.3.23] - 2022-9-14 [PR: #83](https://github.com/aksio-insurtech/AppManager/pull/83)
 
 ### Fixed
