@@ -90,7 +90,6 @@ public static class Program
             stacksForMicroservices);
 
         ApplicationResult? applicationResult = default;
-        ContainerAppResult? microserviceResult = default;
 
         await operations.Up(
             application,
@@ -108,9 +107,14 @@ public static class Program
             }),
             cloudRuntimeEnvironment);
 
+        var microservice = new Microservice(
+            Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
+            application.Id,
+            "Automation");
+
         await operations.Up(
             application,
-            $"{config.Name}-AppManager",
+            $"{config.Name}-{microservice.Name}",
             PulumiFn.Create(async () =>
             {
                 if (applicationResult is null)
@@ -121,11 +125,6 @@ public static class Program
                 application = await applicationResult.MergeWithApplication(application);
                 var appManagerVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "app-manager");
 
-                var microservice = new Microservice(
-                    Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
-                    application.Id,
-                    "AppManager");
-
                 var deployable = new Deployable(
                             Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
                             microservice.Id,
@@ -133,7 +132,7 @@ public static class Program
                             $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
                             new[] { 80 });
 
-                microserviceResult = await definitions.Microservice(
+                var microserviceResult = await definitions.Microservice(
                     executionContext,
                     application,
                     microservice,
@@ -147,11 +146,12 @@ public static class Program
                 var fileShare = Pulumi.AzureNative.Storage.FileShare.Get(ApplicationIngressPulumiExtensions.IngressFileShareName, applicationResult.Ingress.FileShareId);
                 var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
                 await application.ConfigureIngress(applicationResult.ResourceGroup, applicationResult.Storage, fileShare, logger, microserviceResourceName);
-
-                await stacksForApplications.SaveAllQueued();
-                await stacksForMicroservices.SaveAllQueued();
             }),
-            cloudRuntimeEnvironment);
+            cloudRuntimeEnvironment,
+            microservice);
+
+        await stacksForApplications.SaveAllQueued();
+        await stacksForMicroservices.SaveAllQueued();
 
         // try
         // {
