@@ -1,3 +1,10 @@
+# [v0.3.23] - 2022-9-14 [PR: #83](https://github.com/aksio-insurtech/AppManager/pull/83)
+
+### Fixed
+
+- Fixing so that we're consistent on what a stack is linked to. We now have a "top level" stack per application and one stack per microservice. And all of these are per environment as well.
+
+
 # [v0.3.21] - 2022-9-13 [PR: #80](https://github.com/aksio-insurtech/AppManager/pull/80)
 
 ### Fixed
