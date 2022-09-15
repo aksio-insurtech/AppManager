@@ -110,7 +110,7 @@ public static class Program
         var microservice = new Microservice(
             Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
             application.Id,
-            "Manager");
+            "Main");
 
         await operations.Up(
             application,
