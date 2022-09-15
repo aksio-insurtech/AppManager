@@ -99,7 +99,7 @@ public class ApplicationResourcesCoordinator
                     microservice,
                     new[]
                     {
-                deployable
+                        deployable
                     },
                     CloudRuntimeEnvironment.Development));
 
@@ -126,11 +126,11 @@ public class ApplicationResourcesCoordinator
                     microservice,
                     new[]
                     {
-                deployable
+                        deployable
                     },
                     CloudRuntimeEnvironment.Development));
 
-            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
         });
 
         return Task.CompletedTask;
