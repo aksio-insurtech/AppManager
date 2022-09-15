@@ -32,82 +32,108 @@ public class ApplicationResourcesCoordinator
         _pulumiOperations = pulumiOperations;
     }
 
-    public async Task ApplicationCreated(ApplicationCreated @event, EventContext context)
+    public Task ApplicationCreated(ApplicationCreated @event, EventContext context)
     {
         _logger.CreatingApplication(@event.Name);
-        var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-        var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-        await _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        _ = Task.Run(async () =>
+        {
+            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
+            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
+            await _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        });
+
+        return Task.CompletedTask;
     }
 
-    public async Task Removed(ApplicationRemoved @event, EventContext context)
+    public Task Removed(ApplicationRemoved @event, EventContext context)
     {
-        var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-        _logger.RemovingApplication(application.Name);
-        var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-        await _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        _ = Task.Run(async () =>
+        {
+            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
+            _logger.RemovingApplication(application.Name);
+            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
+            await _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+        });
+
+        return Task.CompletedTask;
     }
 
-    public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
+    public Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
     {
         _logger.CreatingMicroservice(@event.Name);
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var microservice = await _projections.GetInstanceById<Microservice>(@context.EventSourceId);
-        var projectName = GetProjectNameFor(application, microservice);
 
-        var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development));
-
-        await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
-        await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "Microservice", @event.Name);
-    }
-
-    public async Task DeployableCreated(DeployableCreated @event, EventContext context)
-    {
-        var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
-        var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
-        var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
-        _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
-        var projectName = GetProjectNameFor(application, microservice);
-
-        if (deployable.Image is null)
+        _ = Task.Run(async () =>
         {
-            deployable = new(deployable.Id, deployable.MicroserviceId, deployable.Name, "nginx", deployable.Ports);
-        }
+            var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+            var microservice = await _projections.GetInstanceById<Microservice>(@context.EventSourceId);
+            var projectName = GetProjectNameFor(application, microservice);
 
-        var definition = PulumiFn.Create(() =>
-            _stackDefinitions.Deployable(
-                _executionContext,
-                application,
-                microservice,
-                new[]
-                {
-                deployable
-                },
-                CloudRuntimeEnvironment.Development));
+            var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development));
 
-        await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
+            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
+            await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "Microservice", @event.Name);
+        });
+
+        return Task.CompletedTask;
     }
 
-    public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    public Task DeployableCreated(DeployableCreated @event, EventContext context)
     {
-        var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
-        var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
-        var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
-        _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
-        var projectName = GetProjectNameFor(application, microservice);
+        _ = Task.Run(async () =>
+        {
+            var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
+            var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
+            var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
+            var projectName = GetProjectNameFor(application, microservice);
 
-        var definition = PulumiFn.Create(() =>
-            _stackDefinitions.Deployable(
-                _executionContext,
-                application,
-                microservice,
-                new[]
-                {
+            if (deployable.Image is null)
+            {
+                deployable = new(deployable.Id, deployable.MicroserviceId, deployable.Name, "nginx", deployable.Ports);
+            }
+            _logger.DeployableCreated(microservice.Name, deployable.Name, deployable.Image);
+
+            var definition = PulumiFn.Create(() =>
+                _stackDefinitions.Deployable(
+                    _executionContext,
+                    application,
+                    microservice,
+                    new[]
+                    {
                 deployable
-                },
-                CloudRuntimeEnvironment.Development));
+                    },
+                    CloudRuntimeEnvironment.Development));
 
-        await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
+        });
+
+        return Task.CompletedTask;
+    }
+
+    public Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    {
+        _ = Task.Run(async () =>
+        {
+            var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
+            var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
+            var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
+            _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
+            var projectName = GetProjectNameFor(application, microservice);
+
+            var definition = PulumiFn.Create(() =>
+                _stackDefinitions.Deployable(
+                    _executionContext,
+                    application,
+                    microservice,
+                    new[]
+                    {
+                deployable
+                    },
+                    CloudRuntimeEnvironment.Development));
+
+            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development);
+        });
+
+        return Task.CompletedTask;
     }
 
     string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";
