@@ -19,6 +19,9 @@ public static partial class ApplicationResourcesCoordinatorLogMessages
     [LoggerMessage(3, LogLevel.Information, "Removing microservice '{MicroserviceName}' using Pulumi")]
     public static partial void RemovingMicroservice(this ILogger logger, string microserviceName);
 
-    [LoggerMessage(4, LogLevel.Information, "Changing image on deployable '{DeployableName}' to '{ImageName}' on microservice '{MicroserviceName}' using Pulumi")]
+    [LoggerMessage(4, LogLevel.Information, "Adding '{DeployableName}' to microservice '{MicroserviceName}' with image '{ImageName}' using Pulumi")]
+    public static partial void DeployableCreated(this ILogger logger, string microserviceName, string deployableName, string imageName);
+
+    [LoggerMessage(5, LogLevel.Information, "Changing image on deployable '{DeployableName}' to '{ImageName}' on microservice '{MicroserviceName}' using Pulumi")]
     public static partial void ChangingDeployableImage(this ILogger logger, string microserviceName, string deployableName, string imageName);
 }
