@@ -136,7 +136,7 @@ public class PulumiOperations : IPulumiOperations
         await client.PostAsJsonAsync(url, payload);
     }
 
-    async Task<WorkspaceStack> CreateStack(Application application, string projectName, CloudRuntimeEnvironment environment, PulumiFn program)
+    async Task<WorkspaceStack> CreateStack(Application application, string projectName, CloudRuntimeEnvironment environment, PulumiFn program, Microservice? microservice = default)
     {
         var stackName = environment.ToDisplayName();
 
@@ -160,11 +160,18 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
-        if (await _stacksForApplications.HasFor(application.Id, environment))
+
+        var hasStack = await (microservice is not null ?
+            _stacksForMicroservices.HasFor(microservice.Id, environment) :
+            _stacksForApplications.HasFor(application.Id, environment));
+
+        if (hasStack)
         {
             _logger.GettingStackDeployment(application.Name);
 
-            var deployment = await _stacksForApplications.GetFor(application.Id, environment);
+            var deployment = await (microservice is not null ?
+                _stacksForMicroservices.GetFor(microservice.Id, environment) :
+                _stacksForApplications.GetFor(application.Id, environment));
             await stack.ImportStackAsync(deployment);
         }
 
