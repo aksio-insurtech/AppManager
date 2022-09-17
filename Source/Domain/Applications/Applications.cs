@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts;
+using Concepts.Applications;
 using Events.Applications;
 using Infrastructure;
 using Pulumi.Automation;
@@ -30,6 +31,9 @@ public class Applications : Controller
 
     [HttpPost("{applicationId}/authentication")]
     public Task ConfigureAuthentication([FromRoute] ApplicationId applicationId, [FromBody] ConfigureAuthentication command) => _eventLog.Append(applicationId.ToString(), new AuthenticationConfiguredForApplication(command.ClientId, command.ClientSecret));
+
+    [HttpPost("{applicationId}/frontend/{microserviceId}/{environment}")]
+    public Task MakeFrontend([FromRoute] ApplicationId applicationId, [FromRoute] MicroserviceId microserviceId, CloudRuntimeEnvironment environment) => _eventLog.Append(applicationId, new ApplicationFrontendConfigured(microserviceId));
 
     [HttpPost("{applicationId}/remove")]
     public Task Remove([FromRoute] ApplicationId applicationId) => _eventLog.Append(applicationId.ToString(), new ApplicationRemoved());

@@ -24,4 +24,8 @@ public static partial class ApplicationResourcesCoordinatorLogMessages
 
     [LoggerMessage(5, LogLevel.Information, "Changing image on deployable '{DeployableName}' to '{ImageName}' on microservice '{MicroserviceName}' using Pulumi")]
     public static partial void ChangingDeployableImage(this ILogger logger, string microserviceName, string deployableName, string imageName);
+
+    [LoggerMessage(6, LogLevel.Information, "Configuring frontend for application '{ApplicationName}' using Pulumi")]
+    public static partial void ConfiguringFrontend(this ILogger logger, string applicationName);
+
 }

@@ -45,6 +45,20 @@ public class ApplicationResourcesCoordinator
         return Task.CompletedTask;
     }
 
+    public Task ApplicationFrontendConfigured(ApplicationFrontendConfigured @event, EventContext context)
+    {
+        _ = Task.Run(async () =>
+        {
+            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
+            var microservice = await _projections.GetInstanceById<Microservice>(@event.MicroserviceId);
+            var containerApp = await microservice.GetContainerApp(application, @event.Environment);
+            var resourceGroup = application.GetResourceGroup(@event.Environment);
+            _logger.ConfiguringFrontend(application.Name);
+        });
+
+        return Task.CompletedTask;
+    }
+
     public Task Removed(ApplicationRemoved @event, EventContext context)
     {
         _ = Task.Run(async () =>
