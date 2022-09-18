@@ -18,6 +18,10 @@ http {
     server {
         listen 80;
 
+        proxy_read_timeout 18000;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 18000;
+
         gzip on;
         gzip_vary on;
         gzip_min_length 10240;
