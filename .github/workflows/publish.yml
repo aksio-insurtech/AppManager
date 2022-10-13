@@ -72,7 +72,7 @@ jobs:
           node-version: 16.x
           registry-url: "https://registry.npmjs.org"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         id: yarn-cache
         with:
           path: |
