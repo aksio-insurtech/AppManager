@@ -42,9 +42,11 @@ Purpose: Add ingress to application
 
 ### Authentication
 
-Route: /api/applications/{applicationId}/{environment}/ingresses/{ingressId}/authentication
+Route: /api/applications/{applicationId}/{environment}/ingresses/{ingressId}/authentication/
 Method: POST
 Purpose: Configure authentication for application
+
+Notes: Could differentiate between Azure AD and OpenID connect ones.
 
 ## Microservices
 

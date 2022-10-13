@@ -6,24 +6,27 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/{{applicationId}}/stack/{{environment}}');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/ingress');
 
-export interface ISetStack {
+export interface IAddIngress {
     applicationId?: string;
+    environment?: string;
 }
 
-export class SetStackValidator extends CommandValidator {
+export class AddIngressValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
+        environment: new Validator(),
     };
 }
 
-export class SetStack extends Command<ISetStack> implements ISetStack {
-    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/{{applicationId}}/stack/{{environment}}';
+export class AddIngress extends Command<IAddIngress> implements IAddIngress {
+    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/ingress';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetStackValidator();
+    readonly validation: CommandValidator = new AddIngressValidator();
 
     private _applicationId!: string;
+    private _environment!: string;
 
     get requestArguments(): string[] {
         return [
@@ -35,6 +38,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     get properties(): string[] {
         return [
             'applicationId',
+            'environment',
         ];
     }
 
@@ -46,8 +50,16 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
         this._applicationId = value;
         this.propertyChanged('applicationId');
     }
+    get environment(): string {
+        return this._environment;
+    }
 
-    static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>] {
-        return useCommand<SetStack, ISetStack>(SetStack, initialValues);
+    set environment(value: string) {
+        this._environment = value;
+        this.propertyChanged('environment');
+    }
+
+    static use(initialValues?: IAddIngress): [AddIngress, SetCommandValues<IAddIngress>] {
+        return useCommand<AddIngress, IAddIngress>(AddIngress, initialValues);
     }
 }

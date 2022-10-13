@@ -6,24 +6,27 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/{{applicationId}}/stack/{{environment}}');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/environment-variable');
 
-export interface ISetStack {
+export interface ISetEnvironmentVariable {
     applicationId?: string;
+    environment?: string;
 }
 
-export class SetStackValidator extends CommandValidator {
+export class SetEnvironmentVariableValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
+        environment: new Validator(),
     };
 }
 
-export class SetStack extends Command<ISetStack> implements ISetStack {
-    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/{{applicationId}}/stack/{{environment}}';
+export class SetEnvironmentVariable extends Command<ISetEnvironmentVariable> implements ISetEnvironmentVariable {
+    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/environment-variable';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetStackValidator();
+    readonly validation: CommandValidator = new SetEnvironmentVariableValidator();
 
     private _applicationId!: string;
+    private _environment!: string;
 
     get requestArguments(): string[] {
         return [
@@ -35,6 +38,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     get properties(): string[] {
         return [
             'applicationId',
+            'environment',
         ];
     }
 
@@ -46,8 +50,16 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
         this._applicationId = value;
         this.propertyChanged('applicationId');
     }
+    get environment(): string {
+        return this._environment;
+    }
 
-    static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>] {
-        return useCommand<SetStack, ISetStack>(SetStack, initialValues);
+    set environment(value: string) {
+        this._environment = value;
+        this.propertyChanged('environment');
+    }
+
+    static use(initialValues?: ISetEnvironmentVariable): [SetEnvironmentVariable, SetCommandValues<ISetEnvironmentVariable>] {
+        return useCommand<SetEnvironmentVariable, ISetEnvironmentVariable>(SetEnvironmentVariable, initialValues);
     }
 }

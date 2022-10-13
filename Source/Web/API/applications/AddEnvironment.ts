@@ -6,29 +6,28 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/{{applicationId}}/stack/{{environment}}');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environment');
 
-export interface ISetStack {
+export interface IAddEnvironment {
     applicationId?: string;
 }
 
-export class SetStackValidator extends CommandValidator {
+export class AddEnvironmentValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
     };
 }
 
-export class SetStack extends Command<ISetStack> implements ISetStack {
-    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/{{applicationId}}/stack/{{environment}}';
+export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvironment {
+    readonly route: string = '/api/applications/{{applicationId}}/environment';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetStackValidator();
+    readonly validation: CommandValidator = new AddEnvironmentValidator();
 
     private _applicationId!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
-            'environment',
         ];
     }
 
@@ -47,7 +46,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
         this.propertyChanged('applicationId');
     }
 
-    static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>] {
-        return useCommand<SetStack, ISetStack>(SetStack, initialValues);
+    static use(initialValues?: IAddEnvironment): [AddEnvironment, SetCommandValues<IAddEnvironment>] {
+        return useCommand<AddEnvironment, IAddEnvironment>(AddEnvironment, initialValues);
     }
 }
