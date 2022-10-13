@@ -28,29 +28,35 @@ Route: /api/applications
 Method: POST
 Purpose: Create application
 
-### Authentication
-
-Route: /api/applications/{applicationId}/authentication
-Method: POST
-Purpose: Configure authentication for application
-
 ### Remove application
 
 Route: /api/applications/{applicationId}/remove
 Method: POST
 Purpose: Remove application
 
+### Ingresses
+
+Route: /api/applications/{applicationId}/{environment}/ingresses
+Method: POST
+Purpose: Add ingress to application
+
+### Authentication
+
+Route: /api/applications/{applicationId}/{environment}/ingresses/{ingressId}/authentication
+Method: POST
+Purpose: Configure authentication for application
+
 ## Microservices
 
 ### Microservice
 
-Route: /api/applications/{applicationId}/microservices
+Route: /api/applications/{applicationId}/{environment}/microservices
 Method: POST
 Purpose: Create microservice
 
 ### Remove microservice
 
-Route: /api/applications/{applicationId}/microservices/{microserviceId}/remove
+Route: /api/applications/{applicationId}/{environment}/microservices/{microserviceId}/remove
 Method: POST
 Purpose: Remove Microservice
 
@@ -58,12 +64,12 @@ Purpose: Remove Microservice
 
 ### Deployable
 
-Route: /api/applications/{applicationId}/microservices/{microserviceId}/deployables
+Route: /api/applications/{applicationId}/{environment}/microservices/{microserviceId}/deployables
 Method: POST
 Purpose: Create deployable
 
 ### Deployable image
 
-Route: /api/applications/{applicationId}/microservices/{microserviceId}/deployables/{deployableId}/image
+Route: /api/applications/{applicationId}/{environment}/microservices/{microserviceId}/deployables/{deployableId}/image
 Method: POST
 Purpose: Change deployable image (include SHA and version)
