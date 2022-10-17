@@ -3,10 +3,10 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications.Ingresses;
+namespace Domain.Applications.Environments.Ingresses;
 
 [Route("/api/applications/{applicationId}/{environment}/ingresses/{ingressId}")]
-public class Ingresses
+public class Ingress : Controller
 {
     [HttpPost("authentication")]
     public Task ConfigureAuthentication([FromRoute] ApplicationId applicationId, [FromBody] ConfigureAuthentication command) => Task.CompletedTask;

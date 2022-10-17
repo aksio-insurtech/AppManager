@@ -3,6 +3,6 @@
 
 using Concepts.Azure;
 
-namespace Domain.Organizations;
+namespace Domain.Applications.Environments.Ingresses;
 
-public record AzureSubscription(AzureSubscriptionId Id, AzureSubscriptionName Name, AzureTenantId TenantId, AzureTenantName TenantName);
+public record ConfigureAuthentication(ClientId ClientId, ClientSecret ClientSecret);

@@ -21,7 +21,7 @@ public class OrganizationSettings : Controller
     public Task SetAzureServicePrincipal([FromBody] AzureServicePrincipal principal) => _eventLog.Append(SettingsId.Global, new AzureServicePrincipalSet(principal.ClientId, principal.ClientSecret));
 
     [HttpPost("subscriptions")]
-    public Task AddAzureSubscription([FromBody] AzureSubscription subscription) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(subscription.Id, subscription.Name, subscription.TenantId, subscription.TenantName));
+    public Task AddAzureSubscription([FromBody] AzureSubscriptionToAdd subscription) => _eventLog.Append(SettingsId.Global, new AzureSubscriptionAdded(subscription.Id, subscription.Name, subscription.TenantId, subscription.TenantName));
 
     [HttpPost("pulumi")]
     public Task SetPulumiSettings([FromBody] PulumiSettings settings) => _eventLog.Append(SettingsId.Global, new PulumiSettingsSet(settings.Organization, settings.AccessToken));

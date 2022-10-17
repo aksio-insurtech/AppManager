@@ -9,7 +9,9 @@ using Reactions.Applications.Pulumi;
 
 namespace Reactions.Applications;
 
-[Observer("c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5")]
+/// <summary>
+/// [Observer("c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5")].
+/// </summary>
 public class ApplicationResourcesCoordinator
 {
     readonly ILogger<ApplicationResources> _logger;

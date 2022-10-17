@@ -6,9 +6,9 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{environment}');
 
-export interface IAddEnvironment {
+export interface ICreateEnvironment {
     applicationId?: string;
     environmentId?: string;
     name?: string;
@@ -16,7 +16,7 @@ export interface IAddEnvironment {
     shortName?: string;
 }
 
-export class AddEnvironmentValidator extends CommandValidator {
+export class CreateEnvironmentValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
@@ -26,10 +26,10 @@ export class AddEnvironmentValidator extends CommandValidator {
     };
 }
 
-export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvironment {
-    readonly route: string = '/api/applications/{{applicationId}}/environments';
+export class CreateEnvironment extends Command<ICreateEnvironment> implements ICreateEnvironment {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{environment}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddEnvironmentValidator();
+    readonly validation: CommandValidator = new CreateEnvironmentValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
@@ -94,7 +94,7 @@ export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvi
         this.propertyChanged('shortName');
     }
 
-    static use(initialValues?: IAddEnvironment): [AddEnvironment, SetCommandValues<IAddEnvironment>] {
-        return useCommand<AddEnvironment, IAddEnvironment>(AddEnvironment, initialValues);
+    static use(initialValues?: ICreateEnvironment): [CreateEnvironment, SetCommandValues<ICreateEnvironment>] {
+        return useCommand<CreateEnvironment, ICreateEnvironment>(CreateEnvironment, initialValues);
     }
 }

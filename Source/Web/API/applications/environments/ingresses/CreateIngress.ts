@@ -6,40 +6,38 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses');
 
-export interface IAddEnvironment {
+export interface ICreateIngress {
     applicationId?: string;
     environmentId?: string;
+    ingressId?: string;
     name?: string;
-    displayName?: string;
-    shortName?: string;
 }
 
-export class AddEnvironmentValidator extends CommandValidator {
+export class CreateIngressValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
+        ingressId: new Validator(),
         name: new Validator(),
-        displayName: new Validator(),
-        shortName: new Validator(),
     };
 }
 
-export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvironment {
-    readonly route: string = '/api/applications/{{applicationId}}/environments';
+export class CreateIngress extends Command<ICreateIngress> implements ICreateIngress {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddEnvironmentValidator();
+    readonly validation: CommandValidator = new CreateIngressValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
+    private _ingressId!: string;
     private _name!: string;
-    private _displayName!: string;
-    private _shortName!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
+            'environmentId',
         ];
     }
 
@@ -47,9 +45,8 @@ export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvi
         return [
             'applicationId',
             'environmentId',
+            'ingressId',
             'name',
-            'displayName',
-            'shortName',
         ];
     }
 
@@ -69,6 +66,14 @@ export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvi
         this._environmentId = value;
         this.propertyChanged('environmentId');
     }
+    get ingressId(): string {
+        return this._ingressId;
+    }
+
+    set ingressId(value: string) {
+        this._ingressId = value;
+        this.propertyChanged('ingressId');
+    }
     get name(): string {
         return this._name;
     }
@@ -77,24 +82,8 @@ export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvi
         this._name = value;
         this.propertyChanged('name');
     }
-    get displayName(): string {
-        return this._displayName;
-    }
 
-    set displayName(value: string) {
-        this._displayName = value;
-        this.propertyChanged('displayName');
-    }
-    get shortName(): string {
-        return this._shortName;
-    }
-
-    set shortName(value: string) {
-        this._shortName = value;
-        this.propertyChanged('shortName');
-    }
-
-    static use(initialValues?: IAddEnvironment): [AddEnvironment, SetCommandValues<IAddEnvironment>] {
-        return useCommand<AddEnvironment, IAddEnvironment>(AddEnvironment, initialValues);
+    static use(initialValues?: ICreateIngress): [CreateIngress, SetCommandValues<ICreateIngress>] {
+        return useCommand<CreateIngress, ICreateIngress>(CreateIngress, initialValues);
     }
 }

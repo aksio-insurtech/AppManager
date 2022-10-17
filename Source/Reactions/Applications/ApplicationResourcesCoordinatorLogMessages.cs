@@ -27,5 +27,4 @@ public static partial class ApplicationResourcesCoordinatorLogMessages
 
     [LoggerMessage(6, LogLevel.Information, "Configuring frontend for application '{ApplicationName}' using Pulumi")]
     public static partial void ConfiguringFrontend(this ILogger logger, string applicationName);
-
 }

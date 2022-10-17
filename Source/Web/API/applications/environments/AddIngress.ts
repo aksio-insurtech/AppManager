@@ -6,40 +6,32 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingress');
 
-export interface IAddEnvironment {
+export interface IAddIngress {
     applicationId?: string;
     environmentId?: string;
-    name?: string;
-    displayName?: string;
-    shortName?: string;
 }
 
-export class AddEnvironmentValidator extends CommandValidator {
+export class AddIngressValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
-        name: new Validator(),
-        displayName: new Validator(),
-        shortName: new Validator(),
     };
 }
 
-export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvironment {
-    readonly route: string = '/api/applications/{{applicationId}}/environments';
+export class AddIngress extends Command<IAddIngress> implements IAddIngress {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingress';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddEnvironmentValidator();
+    readonly validation: CommandValidator = new AddIngressValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
-    private _name!: string;
-    private _displayName!: string;
-    private _shortName!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
+            'environmentId',
         ];
     }
 
@@ -47,9 +39,6 @@ export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvi
         return [
             'applicationId',
             'environmentId',
-            'name',
-            'displayName',
-            'shortName',
         ];
     }
 
@@ -69,32 +58,8 @@ export class AddEnvironment extends Command<IAddEnvironment> implements IAddEnvi
         this._environmentId = value;
         this.propertyChanged('environmentId');
     }
-    get name(): string {
-        return this._name;
-    }
 
-    set name(value: string) {
-        this._name = value;
-        this.propertyChanged('name');
-    }
-    get displayName(): string {
-        return this._displayName;
-    }
-
-    set displayName(value: string) {
-        this._displayName = value;
-        this.propertyChanged('displayName');
-    }
-    get shortName(): string {
-        return this._shortName;
-    }
-
-    set shortName(value: string) {
-        this._shortName = value;
-        this.propertyChanged('shortName');
-    }
-
-    static use(initialValues?: IAddEnvironment): [AddEnvironment, SetCommandValues<IAddEnvironment>] {
-        return useCommand<AddEnvironment, IAddEnvironment>(AddEnvironment, initialValues);
+    static use(initialValues?: IAddIngress): [AddIngress, SetCommandValues<IAddIngress>] {
+        return useCommand<AddIngress, IAddIngress>(AddIngress, initialValues);
     }
 }

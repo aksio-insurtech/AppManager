@@ -3,18 +3,23 @@
 
 using Concepts;
 using Concepts.Applications;
+using Events.Applications;
 using Infrastructure;
 using Pulumi.Automation;
 
-namespace Domain.Applications;
+namespace Domain.Applications.Environments.Microservices;
 
 [Route("/api/applications/{applicationId}/{environment}/microservices/{microserviceId}")]
 public class Microservice : Controller
 {
+    readonly IEventLog _eventLog;
     readonly IStacksForMicroservices _stacksForMicroservices;
 
-    public Microservice(IStacksForMicroservices stacksForMicroservices)
+    public Microservice(
+        IEventLog eventLog,
+        IStacksForMicroservices stacksForMicroservices)
     {
+        _eventLog = eventLog;
         _stacksForMicroservices = stacksForMicroservices;
     }
 
@@ -30,9 +35,12 @@ public class Microservice : Controller
         [FromRoute] string environment,
         [FromRoute] MicroserviceId microserviceId) => Task.CompletedTask;
 
-    [HttpPost("{microserviceId}/stack/{environment}")]
+    [HttpPost("stack")]
     public Task SetStack(
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] CloudRuntimeEnvironment environment,
         [FromBody] object stack) => _stacksForMicroservices.Save(microserviceId, environment, StackDeployment.FromJsonString(stack.ToString()!));
+
+    [HttpPost("remove")]
+    public Task Remove([FromRoute] MicroserviceId microserviceId) => _eventLog.Append(microserviceId, new MicroserviceRemoved());
 }

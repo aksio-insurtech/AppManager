@@ -20,7 +20,7 @@ public static class MicroserviceContainerAppPulumiExtensions
             ContainerAppName = containerAppName,
             ResourceGroupName = resourceGroup.Name
         });
-        var containerApp = ContainerApp.Get(containerAppName, getContainerApp.Id);
+        var containerApp = ContainerApp.Get(containerAppName, getContainerApp.Apply(_ => _.Id));
         return Task.FromResult(containerApp);
     }
 
