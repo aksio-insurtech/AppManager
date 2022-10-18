@@ -83,7 +83,7 @@ public static class ApplicationIngressPulumiExtensions
             }
         });
 
-        const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
+        // const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
         var containerApp = new ContainerApp(IngressContainerAppName, new()
         {
             Location = resourceGroup.Location,
@@ -97,11 +97,12 @@ public static class ApplicationIngressPulumiExtensions
                     External = true,
                     TargetPort = 80
                 },
-                Secrets = new SecretArgs
-                {
-                    Name = microsoftProviderAuthenticationSecret,
-                    Value = application.Authentication?.ClientSecret.Value ?? string.Empty
-                }
+
+                // Secrets = new SecretArgs
+                // {
+                //     Name = microsoftProviderAuthenticationSecret,
+                //     Value = application.Authentication?.ClientSecret.Value ?? string.Empty
+                // }
             },
             Template = new TemplateArgs
             {
@@ -143,46 +144,45 @@ public static class ApplicationIngressPulumiExtensions
             },
         });
 
-        if (application.Authentication is not null)
-        {
-            _ = new ContainerAppsAuthConfig("current", new()
-            {
-                AuthConfigName = "current",
-                ResourceGroupName = resourceGroup.Name,
-                ContainerAppName = containerApp.Name,
-                GlobalValidation = new GlobalValidationArgs()
-                {
-                    UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
-                    RedirectToProvider = "Microsoft"
-                },
-                Platform = new AuthPlatformArgs
-                {
-                    Enabled = true
-                },
-                IdentityProviders = new IdentityProvidersArgs
-                {
-                    AzureActiveDirectory = new AzureActiveDirectoryArgs
-                    {
-                        Enabled = true,
-                        IsAutoProvisioned = true,
-                        Registration = new AzureActiveDirectoryRegistrationArgs
-                        {
-                            ClientId = application.Authentication.ClientId.Value,
-                            ClientSecretSettingName = microsoftProviderAuthenticationSecret,
-                            OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
-                        },
-                        Validation = new AzureActiveDirectoryValidationArgs
-                        {
-                            AllowedAudiences =
-                            {
-                                $"api://{application.Authentication.ClientId}"
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
+        // if (application.Authentication is not null)
+        // {
+        //     _ = new ContainerAppsAuthConfig("current", new()
+        //     {
+        //         AuthConfigName = "current",
+        //         ResourceGroupName = resourceGroup.Name,
+        //         ContainerAppName = containerApp.Name,
+        //         GlobalValidation = new GlobalValidationArgs()
+        //         {
+        //             UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
+        //             RedirectToProvider = "Microsoft"
+        //         },
+        //         Platform = new AuthPlatformArgs
+        //         {
+        //             Enabled = true
+        //         },
+        //         IdentityProviders = new IdentityProvidersArgs
+        //         {
+        //             AzureActiveDirectory = new AzureActiveDirectoryArgs
+        //             {
+        //                 Enabled = true,
+        //                 IsAutoProvisioned = true,
+        //                 Registration = new AzureActiveDirectoryRegistrationArgs
+        //                 {
+        //                     ClientId = application.Authentication.ClientId.Value,
+        //                     ClientSecretSettingName = microsoftProviderAuthenticationSecret,
+        //                     OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
+        //                 },
+        //                 Validation = new AzureActiveDirectoryValidationArgs
+        //                 {
+        //                     AllowedAudiences =
+        //                     {
+        //                         $"api://{application.Authentication.ClientId}"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     });
+        // }
         var ingressConfig = await containerApp.Configuration.GetValue();
         var fileShareId = await nginxFileShare.Id.GetValue();
         return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, containerApp);

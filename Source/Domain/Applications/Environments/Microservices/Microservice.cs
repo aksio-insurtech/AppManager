@@ -3,7 +3,7 @@
 
 using Concepts;
 using Concepts.Applications;
-using Events.Applications;
+using Events.Applications.Environments.Microservices;
 using Infrastructure;
 using Pulumi.Automation;
 

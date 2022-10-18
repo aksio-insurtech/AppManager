@@ -31,8 +31,5 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
                 .Set(m => m.UserName).To(e => e.UserName)
                 .Set(m => m.Password).To(e => e.Password)))
         .From<AzureVirtualNetworkIdentifierSetForApplication>(_ => _
-            .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
-        .From<AuthenticationConfiguredForApplication>(_ => _
-            .Set(m => m.Authentication.ClientId).To(e => e.ClientId)
-            .Set(m => m.Authentication.ClientSecret).To(e => e.ClientSecret));
+            .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier));
 }

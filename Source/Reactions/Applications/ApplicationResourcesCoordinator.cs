@@ -3,6 +3,8 @@
 
 using Concepts;
 using Events.Applications;
+using Events.Applications.Environments.Microservices;
+using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
 using Reactions.Applications.Pulumi;
@@ -42,20 +44,6 @@ public class ApplicationResourcesCoordinator
             var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
             var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
             await _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
-        });
-
-        return Task.CompletedTask;
-    }
-
-    public Task ApplicationFrontendConfigured(ApplicationFrontendConfigured @event, EventContext context)
-    {
-        _ = Task.Run(async () =>
-        {
-            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-            var microservice = await _projections.GetInstanceById<Microservice>(@event.MicroserviceId);
-            var containerApp = await microservice.GetContainerApp(application, @event.Environment);
-            var resourceGroup = application.GetResourceGroup(@event.Environment);
-            _logger.ConfiguringFrontend(application.Name);
         });
 
         return Task.CompletedTask;

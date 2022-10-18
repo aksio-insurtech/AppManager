@@ -4,7 +4,7 @@
 using Concepts.Applications.Environments;
 using Concepts.Applications.Ingresses;
 
-namespace Events.Applications;
+namespace Events.Applications.Environments.Ingresses;
 
 [EventType("7cc944f1-dda3-4898-8467-d35354f00d78")]
 public record IngressCreated(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, IngressName Name);

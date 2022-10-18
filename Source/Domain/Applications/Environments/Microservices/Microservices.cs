@@ -1,11 +1,12 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Events.Applications;
+using Concepts.Applications.Environments;
+using Events.Applications.Environments.Microservices;
 
 namespace Domain.Applications;
 
-[Route("/api/applications/{applicationId}/environments/{environment}/microservices")]
+[Route("/api/applications/{applicationId}/environments/{environmentId}/microservices")]
 public class Microservices : Controller
 {
     readonly IEventLog _eventLog;
@@ -18,5 +19,6 @@ public class Microservices : Controller
     [HttpPost]
     public Task Create(
         [FromRoute] ApplicationId applicationId,
-        [FromBody] CreateMicroservice command) => _eventLog.Append(command.MicroserviceId, new MicroserviceCreated(applicationId, command.Name));
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] CreateMicroservice command) => _eventLog.Append(command.MicroserviceId, new MicroserviceCreated(applicationId, environmentId, command.Name));
 }

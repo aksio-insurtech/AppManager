@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { ObservableQueryFor, QueryResult, useObservableQuery } from '@aksio/cratis-applications-frontend/queries';
+import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@aksio/cratis-applications-frontend/queries';
 import { ApplicationsHierarchyForListing } from './ApplicationsHierarchyForListing';
 import Handlebars from 'handlebars';
 
@@ -13,12 +13,16 @@ export class ApplicationsHierarchy extends ObservableQueryFor<ApplicationsHierar
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ApplicationsHierarchyForListing[] = [];
 
+    constructor() {
+        super(ApplicationsHierarchyForListing, true);
+    }
+
     get requestArguments(): string[] {
         return [
         ];
     }
 
-    static use(): [QueryResult<ApplicationsHierarchyForListing[]>] {
+    static use(): [QueryResultWithState<ApplicationsHierarchyForListing[]>] {
         return useObservableQuery<ApplicationsHierarchyForListing[], ApplicationsHierarchy>(ApplicationsHierarchy);
     }
 }

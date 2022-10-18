@@ -6,47 +6,39 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{environmentId}/ingresses/{ingressId}/{{microserviceId}}');
 
-export interface ICreate {
+export interface IMakeFrontend {
     applicationId?: string;
-    environmentId?: string;
     microserviceId?: string;
-    name?: string;
 }
 
-export class CreateValidator extends CommandValidator {
+export class MakeFrontendValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
-        environmentId: new Validator(),
         microserviceId: new Validator(),
-        name: new Validator(),
     };
 }
 
-export class Create extends Command<ICreate> implements ICreate {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices';
+export class MakeFrontend extends Command<IMakeFrontend> implements IMakeFrontend {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{environmentId}/ingresses/{ingressId}/{{microserviceId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new CreateValidator();
+    readonly validation: CommandValidator = new MakeFrontendValidator();
 
     private _applicationId!: string;
-    private _environmentId!: string;
     private _microserviceId!: string;
-    private _name!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
-            'environmentId',
+            'microserviceId',
         ];
     }
 
     get properties(): string[] {
         return [
             'applicationId',
-            'environmentId',
             'microserviceId',
-            'name',
         ];
     }
 
@@ -58,14 +50,6 @@ export class Create extends Command<ICreate> implements ICreate {
         this._applicationId = value;
         this.propertyChanged('applicationId');
     }
-    get environmentId(): string {
-        return this._environmentId;
-    }
-
-    set environmentId(value: string) {
-        this._environmentId = value;
-        this.propertyChanged('environmentId');
-    }
     get microserviceId(): string {
         return this._microserviceId;
     }
@@ -74,16 +58,8 @@ export class Create extends Command<ICreate> implements ICreate {
         this._microserviceId = value;
         this.propertyChanged('microserviceId');
     }
-    get name(): string {
-        return this._name;
-    }
 
-    set name(value: string) {
-        this._name = value;
-        this.propertyChanged('name');
-    }
-
-    static use(initialValues?: ICreate): [Create, SetCommandValues<ICreate>] {
-        return useCommand<Create, ICreate>(Create, initialValues);
+    static use(initialValues?: IMakeFrontend): [MakeFrontend, SetCommandValues<IMakeFrontend>] {
+        return useCommand<MakeFrontend, IMakeFrontend>(MakeFrontend, initialValues);
     }
 }

@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
-using Events.Applications;
+using Events.Applications.Environments.Microservices.Deployables;
 
 namespace Domain.Applications.Environments.Microservices.Deployables;
 
@@ -14,5 +14,7 @@ public class Deployables : Controller
     public Deployables(IEventLog eventLog) => _eventLog = eventLog;
 
     [HttpPost]
-    public Task Create([FromRoute] MicroserviceId microserviceId, [FromBody] CreateDeployable command) => _eventLog.Append(command.DeployableId.ToString(), new DeployableCreated(microserviceId, command.Name));
+    public Task Create(
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] CreateDeployable command) => _eventLog.Append(command.DeployableId.ToString(), new DeployableCreated(microserviceId, command.Name));
 }

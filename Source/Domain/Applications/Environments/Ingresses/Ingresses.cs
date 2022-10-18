@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications.Environments;
-using Events.Applications;
+using Events.Applications.Environments.Ingresses;
 
 namespace Domain.Applications.Environments.Ingresses;
 
