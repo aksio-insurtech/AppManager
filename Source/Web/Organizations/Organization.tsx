@@ -7,7 +7,14 @@ import { AllSettings } from 'API/organization/settings/AllSettings';
 import { useEffect, useState } from 'react';
 import { SetMongoDBSettings } from 'API/organization/settings/SetMongoDBSettings';
 import { SetPulumiSettings } from 'API/organization/settings/SetPulumiSettings';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormLabel, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormLabel, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+
+const columns: GridColDef[] = [
+    { field: 'name', headerName: 'Name', width: 250 },
+    { field: 'tenantName', headerName: 'Tenant', width: 250 },
+    { field: 'subscriptionId', headerName: 'Subscription ID', width: 250 }
+];
 
 export const Organization = () => {
     const [settings] = AllSettings.use();
@@ -53,27 +60,14 @@ export const Organization = () => {
         <div style={{ margin: '1rem' }}>
             <Stack direction="column">
                 <h2>Azure Subscriptions</h2>
-
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Tenant</TableCell>
-                                <TableCell>Subscription</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(settings.data?.azureSubscriptions || []).map(item => (
-                                <TableRow key={item.subscriptionId}>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.tenantName}</TableCell>
-                                    <TableCell>{item.subscriptionId}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <Box sx={{ height: 400, width: '100%' }}>
+                    <DataGrid
+                        hideFooterPagination={true}
+                        filterMode="client"
+                        columns={columns}
+                        sortingMode="client"
+                        rows={settings.data?.azureSubscriptions || []} />
+                </Box>
                 <Button onClick={openAddSubscriptionDialog}>Add</Button>
 
 
