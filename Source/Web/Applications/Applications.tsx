@@ -53,9 +53,14 @@ export const Applications = () => {
         'Create application',
         ModalButtons.OkCancel,
         CreateApplicationDialog,
-        (result, output) => {
+        async (result, output) => {
             if (result == ModalResult.success) {
-                debugger;
+                const command = new CreateApplication();
+                command.applicationId = Guid.create().toString();
+                command.name = output!.name;
+                command.azureSubscriptionId = output!.azureSubscription;
+                command.cloudLocation = output!.cloudLocation;
+                await command.execute();
             }
         }
     );
