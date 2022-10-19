@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import 'reflect-metadata';
-import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 
 import './theme';
@@ -18,6 +17,7 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
     <BrowserRouter>
         <ThemeProvider theme={theme}>
+            <CssBaseline/>
             <ModalProvider>
                 <CssBaseline />
                 <App />
