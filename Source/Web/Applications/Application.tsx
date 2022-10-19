@@ -11,7 +11,7 @@ export const Application = () => {
     const [application] = GetApplication.use({ applicationId: applicationId! });
 
     return (
-        <></>
+        <>Katt</>
         // <Stack style={{ height: '100%' }}>
         //     <Stack.Item>
         //         <Pivot>

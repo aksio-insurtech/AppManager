@@ -8,16 +8,15 @@ import { Create as CreateApplication } from 'API/applications/Create';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ApplicationsHierarchy } from 'API/applications/ApplicationsHierarchy';
 import { Application } from './Application';
-import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
-import { CreateMicroservice } from 'API/applications/environments/CreateMicroservice';
 
 import * as icons from '@mui/icons-material';
 import { Microservice } from './Microservices/Microservice';
 import { Deployable } from './Microservices/Deployables/Deployable';
-import { Box, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
+import { Box, Divider, Grid, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Menu, MenuItem } from '@mui/material';
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { ApplicationsNav } from './ApplicationsNav';
 import { ListItemActionButton } from './ListItemActionButton';
+import { ApplicationItem } from './ApplicationItem';
 
 
 export const Applications = () => {
@@ -64,72 +63,36 @@ export const Applications = () => {
         }
     );
 
-    const [showCreateMicroservice] = useModal(
-        'Create microservice',
-        ModalButtons.OkCancel,
-        CreateMicroserviceDialog,
-        async (result, output) => {
-            if (result == ModalResult.success) {
-                const command = new CreateMicroservice();
-                command.applicationId = output!.applicationId;
-                command.microserviceId = Guid.create().toString();
-                command.name = output!.name;
-                await command.execute();
-            }
-        }
-    );
-
     const open = true;
 
     return (
         <>
-            <Paper elevation={1} sx={{ width: 320, height: '100%' }}>
-                <ApplicationsNav>
-                    <ListItemButton component="a">
-                        <ListItemIcon><icons.Apps /></ListItemIcon>
-                        <ListItemText
-                            sx={{ my: 0 }}
-                            primaryTypographyProps={{
-                                fontSize: 20,
-                                fontWeight: 'medium',
-                                letterSpacing: 0
-                            }}>
-                            Applications
-                        </ListItemText>
-                        <ListItemActionButton title="Add Application" icon={<icons.Add />} onClick={showCreateApplication} />
-                    </ListItemButton>
+            <Grid container sx={{ height: '100%' }}>
+                <Grid item xs={2}>
+                    <Paper elevation={1} sx={{ width: '100%', height: '100%' }}>
+                        <ApplicationsNav>
+                            <ListItemButton component="a">
+                                <ListItemIcon><icons.Apps /></ListItemIcon>
+                                <ListItemText
+                                    sx={{ my: 0 }}
+                                    primaryTypographyProps={{
+                                        fontSize: 20,
+                                        fontWeight: 'medium',
+                                        letterSpacing: 0
+                                    }}>
+                                    Applications
+                                </ListItemText>
+                                <ListItemActionButton title="Add Application" icon={<icons.Add />} onClick={showCreateApplication} />
+                            </ListItemButton>
 
-                    <Divider />
+                            <Divider />
 
-                    {applicationsHierarchy.data.map(application => {
-                        return (
-                            <span key={application.id}>
-                                <ListItem component="div" disablePadding>
-                                    <ListItemButton sx={{ height: 56 }}>
-                                        <ListItemIcon>
-                                            <icons.Home color="primary" />
-                                        </ListItemIcon>
-                                        <ListItemText primaryTypographyProps={{
-                                            color: 'primary',
-                                            fontWeight: 'medium',
-                                            variant: 'body2'
-                                        }}>{application.name}</ListItemText>
-                                    </ListItemButton>
-
-                                    <ListItemActionButton title="Select environment" icon={<icons.AltRoute />} />
-                                    <ListItemActionButton title="Add Microservice" icon={<icons.Add />} onClick={() => {
-                                        showCreateMicroservice({
-                                            applicationId: application.id
-                                        });
-                                    }} />
-                                    <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
-                                </ListItem>
-
-                                <Divider />
-
-                                {application.microservices?.map(microservice => {
-                                    return (
-                                        <Box key={microservice.name}
+                            {applicationsHierarchy.data.map(application => {
+                                return (
+                                    <span key={application.id}>
+                                        <ApplicationItem application={application} />
+                                        <Divider />
+                                        <Box
                                             sx={{
                                                 bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
                                                 pb: open ? 2 : 0,
@@ -141,23 +104,47 @@ export const Applications = () => {
                                                 pb: open ? 0 : 2.5,
                                                 '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
                                             }}>
-                                                <ListItemIcon><icons.Cabin /></ListItemIcon>
-                                                <ListItemText>Members</ListItemText>
+                                                <ListItemIcon><icons.Input /></ListItemIcon>
+                                                <ListItemText>Ingress</ListItemText>
                                             </ListItemButton>
                                         </Box>
-                                    );
-                                })}
-                            </span>
-                        );
-                    })}
-                </ApplicationsNav>
-            </Paper>
 
-            <Routes>
-                <Route path=':applicationId' element={<Application />} />
-                <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
-                <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
-            </Routes>
+                                        {application.microservices?.map(microservice => {
+                                            return (
+                                                <Box key={microservice.name}
+                                                    sx={{
+                                                        bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
+                                                        pb: open ? 2 : 0,
+                                                    }}>
+
+                                                    <ListItemButton sx={{
+                                                        px: 3,
+                                                        pt: 2.5,
+                                                        pb: open ? 0 : 2.5,
+                                                        '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
+                                                    }}>
+                                                        <ListItemIcon><icons.Cabin /></ListItemIcon>
+                                                        <ListItemText>Members</ListItemText>
+                                                    </ListItemButton>
+                                                </Box>
+                                            );
+                                        })}
+                                    </span>
+                                );
+                            })}
+                        </ApplicationsNav>
+                    </Paper>
+                </Grid>
+                <Grid item xs={10}>
+                    <Paper elevation={0} sx={{ height: '100%' }}>
+                        <Routes>
+                            <Route path=':applicationId' element={<Application />} />
+                            <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
+                            <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
+                        </Routes>
+                    </Paper>
+                </Grid>
+            </Grid>
         </>
     );
 };
