@@ -3,21 +3,25 @@
 
 import 'reflect-metadata';
 import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import './theme';
 
 import { App } from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
+import { ModalProvider } from '@aksio/cratis-mui';
 
 import { theme } from './theme';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!);
+root.render(
     <BrowserRouter>
         <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <App />
+            <ModalProvider>
+                <CssBaseline />
+                <App />
+            </ModalProvider>
         </ThemeProvider>
-    </BrowserRouter>,
-    document.getElementById('root')
+    </BrowserRouter>
 );
