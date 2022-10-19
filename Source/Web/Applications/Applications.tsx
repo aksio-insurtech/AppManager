@@ -44,6 +44,10 @@ export const Applications = () => {
             setCurrentDeployable(params.deployableId);
 
             setSelectedNav(params.deployableId || params.microserviceId || params.applicationId || '');
+        } else {
+            setCurrentApplication(undefined);
+            setCurrentMicroservice(undefined);
+            setCurrentDeployable(undefined);
         }
     }, [location.pathname]);
 
@@ -71,7 +75,7 @@ export const Applications = () => {
                 <Grid item xs={2}>
                     <Paper elevation={1} sx={{ width: '100%', height: '100%' }}>
                         <ApplicationsNav>
-                            <ListItemButton component="a">
+                            <ListItemButton component="a" onClick={() => navigate('/applications')}>
                                 <ListItemIcon><icons.Apps /></ListItemIcon>
                                 <ListItemText
                                     sx={{ my: 0 }}
@@ -90,28 +94,16 @@ export const Applications = () => {
                             {applicationsHierarchy.data.map(application => {
                                 return (
                                     <span key={application.id}>
-                                        <ApplicationItem application={application} />
-                                        <Divider />
-                                        <Box
-                                            sx={{
-                                                bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
-                                                pb: open ? 2 : 0,
-                                            }}>
-
-                                            <ListItemButton sx={{
-                                                px: 3,
-                                                pt: 2.5,
-                                                pb: open ? 0 : 2.5,
-                                                '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
-                                            }}>
-                                                <ListItemIcon><icons.Input /></ListItemIcon>
-                                                <ListItemText>Ingress</ListItemText>
-                                            </ListItemButton>
-                                        </Box>
-
-                                        {application.microservices?.map(microservice => {
-                                            return (
-                                                <Box key={microservice.name}
+                                        {!currentApplication ?
+                                            <>
+                                                <ApplicationItem application={application} />
+                                                <Divider />
+                                            </>
+                                            :
+                                            <>
+                                                <ApplicationItem application={application} />
+                                                <Divider />
+                                                <Box
                                                     sx={{
                                                         bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
                                                         pb: open ? 2 : 0,
@@ -123,12 +115,39 @@ export const Applications = () => {
                                                         pb: open ? 0 : 2.5,
                                                         '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
                                                     }}>
-                                                        <ListItemIcon><icons.Cabin /></ListItemIcon>
-                                                        <ListItemText>Members</ListItemText>
+                                                        <ListItemIcon><icons.Input /></ListItemIcon>
+                                                        <ListItemText>Ingress</ListItemText>
                                                     </ListItemButton>
                                                 </Box>
-                                            );
-                                        })}
+
+                                                {application.microservices?.map(microservice => {
+                                                    return (
+                                                        <Box key={microservice.name}
+                                                            sx={{
+                                                                bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
+                                                                pb: open ? 2 : 0,
+                                                            }}>
+
+                                                            <ListItemButton sx={{
+                                                                px: 3,
+                                                                pt: 2.5,
+                                                                pb: open ? 0 : 2.5,
+                                                                '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
+                                                            }}>
+                                                                <ListItemIcon><icons.Cabin /></ListItemIcon>
+                                                                <ListItemText>Members</ListItemText>
+                                                            </ListItemButton>
+                                                        </Box>
+                                                    );
+                                                })}
+                                            </>}
+                                    </span>
+                                );
+                            })}
+
+                            {applicationsHierarchy.data.map(application => {
+                                return (
+                                    <span key={application.id}>
                                     </span>
                                 );
                             })}
