@@ -4,11 +4,13 @@
 import { AddSubscriptionDialog } from './AddSubscriptionDialog';
 import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscription';
 import { AllSettings } from 'API/organization/settings/AllSettings';
+import { AzureSubscription } from 'API/organization/settings/AzureSubscription';
 import { useEffect, useState } from 'react';
 import { SetMongoDBSettings } from 'API/organization/settings/SetMongoDBSettings';
 import { SetPulumiSettings } from 'API/organization/settings/SetPulumiSettings';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormLabel, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, Button, Stack, TextField } from '@mui/material';
+import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { useModal, ModalButtons, ModalResult } from '@aksio/cratis-mui';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -23,14 +25,29 @@ export const Organization = () => {
     const [mongoDBOrganizationId, setMongoDBOrganizationId] = useState('');
     const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
     const [mongoDBPrivateKey, setMongoDBPrivateKey] = useState('');
-    const [addSubscriptionOpen, setAddSubscriptionOpen] = useState(false);
+
+    const [showAddSubscription] = useModal(
+        'Add Azure subscription',
+        ModalButtons.OkCancel,
+        AddSubscriptionDialog,
+        async (result, output) => {
+            if (result == ModalResult.success) {
+                const command = new AddAzureSubscription();
+                command.id = output!.id;
+                command.name = output!.name;
+                command.tenantId = output!.tenantId;
+                command.tenantName = output!.tenantName;
+                await command.execute();
+            }
+        }
+    );
 
     useEffect(() => {
-        setPulumiOrganization(settings.data.pulumiOrganization);
-        setPulumiAccessToken(settings.data.pulumiAccessToken);
-        setMongoDBOrganizationId(settings.data.mongoDBOrganizationId);
-        setMongoDBPublicKey(settings.data.mongoDBPublicKey);
-        setMongoDBPrivateKey(settings.data.mongoDBPrivateKey);
+        setPulumiOrganization(settings.data.pulumiOrganization || '');
+        setPulumiAccessToken(settings.data.pulumiAccessToken || '');
+        setMongoDBOrganizationId(settings.data.mongoDBOrganizationId || '');
+        setMongoDBPublicKey(settings.data.mongoDBPublicKey || '');
+        setMongoDBPrivateKey(settings.data.mongoDBPrivateKey || '');
     }, [settings.data]);
 
     const savePulumiSettings = async () => {
@@ -48,14 +65,6 @@ export const Organization = () => {
         await command.execute();
     };
 
-    const openAddSubscriptionDialog = () => {
-        setAddSubscriptionOpen(true);
-    };
-
-    const closeAddSubscriptionDialog = () => {
-        setAddSubscriptionOpen(false);
-    };
-
     return (
         <div style={{ margin: '1rem' }}>
             <Stack direction="column">
@@ -66,10 +75,12 @@ export const Organization = () => {
                         filterMode="client"
                         columns={columns}
                         sortingMode="client"
+                        getRowId={(row: AzureSubscription) => {
+                            return row.subscriptionId;
+                        }}
                         rows={settings.data?.azureSubscriptions || []} />
                 </Box>
-                <Button onClick={openAddSubscriptionDialog}>Add</Button>
-
+                <Button onClick={showAddSubscription}>Add</Button>
 
                 <h2>Pulumi</h2>
                 <TextField label="Organization" value={pulumiOrganization} onChange={(e) => setPulumiOrganization(e.currentTarget.value)} />
@@ -82,22 +93,6 @@ export const Organization = () => {
                 <TextField label="Private Key" value={mongoDBPrivateKey} type="password" onChange={e => setMongoDBPrivateKey(e.currentTarget.value)} />
                 <Button onClick={saveMongoDBSettings}>Save</Button>
             </Stack>
-
-            <Dialog open={addSubscriptionOpen}>
-                <DialogTitle>Add Azure Subscription</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Hello there
-                    </DialogContentText>
-
-                    <DialogActions>
-                        <Button onClick={closeAddSubscriptionDialog}>Cancel</Button>
-                        <Button onClick={closeAddSubscriptionDialog}>Add</Button>
-                    </DialogActions>
-
-                </DialogContent>
-
-            </Dialog>
         </div>
     );
 };
