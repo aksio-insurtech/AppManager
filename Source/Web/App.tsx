@@ -11,7 +11,7 @@ import { Button } from '@mui/material';
 export const App = () => {
     return (
         <>
-            <Header/>
+            <Header />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/applications/*" element={<Applications />} />

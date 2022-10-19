@@ -2,23 +2,22 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { useEffect, useState } from 'react';
-import { Route, Routes, useNavigate, useParams, useLocation, matchPath } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { Create as CreateApplication } from 'API/applications/Create';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ApplicationsHierarchy } from 'API/applications/ApplicationsHierarchy';
 import { Application } from './Application';
 import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
-import { Create as CreateMicroservice } from 'API/applications/microservices/Create';
-import { Create as CreateDeployable } from 'API/applications/microservices/deployables/Create';
-import { CreateDeployableDialog } from './CreateDeployableDialog';
+import { CreateMicroservice } from 'API/applications/environments/CreateMicroservice';
 
-import { ExpandMore, ChevronRight, Add } from '@mui/icons-material';
+import * as icons from '@mui/icons-material';
 import { Microservice } from './Microservices/Microservice';
 import { Deployable } from './Microservices/Deployables/Deployable';
-import { TreeItem, TreeView } from '@mui/lab';
-import { Box, Drawer, Grid, IconButton } from '@mui/material';
+import { Box, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
+import { ApplicationsNav } from './ApplicationsNav';
+import { ListItemActionButton } from './ListItemActionButton';
 
 
 export const Applications = () => {
@@ -32,8 +31,8 @@ export const Applications = () => {
 
     const routes: string[] = [
         '/applications/:applicationId',
-        '/applications/:applicationId/microservices/:microserviceId',
-        '/applications/:applicationId/microservices/:microserviceId/deployables/:deployableId'
+        '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId',
+        '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId'
     ];
 
     useEffect(() => {
@@ -65,32 +64,99 @@ export const Applications = () => {
         }
     );
 
+    const [showCreateMicroservice] = useModal(
+        'Create microservice',
+        ModalButtons.OkCancel,
+        CreateMicroserviceDialog,
+        async (result, output) => {
+            if (result == ModalResult.success) {
+                const command = new CreateMicroservice();
+                command.applicationId = output!.applicationId;
+                command.microserviceId = Guid.create().toString();
+                command.name = output!.name;
+                await command.execute();
+            }
+        }
+    );
+
+    const open = true;
+
     return (
         <>
-            <IconButton title="Add Application" onClick={showCreateApplication}><Add /></IconButton>
-            <Grid container>
-                <Grid item xs={1}>
-                    <TreeView
-                        defaultCollapseIcon={<ExpandMore />}
-                        defaultExpandIcon={<ChevronRight />}>
-                        {applicationsHierarchy.data.map(application => {
-                            return (
-                                <TreeItem key={application.name} nodeId="1" label={application.name}/>
-                            );
-                        })}
+            <Paper elevation={1} sx={{ width: 320, height: '100%' }}>
+                <ApplicationsNav>
+                    <ListItemButton component="a">
+                        <ListItemIcon><icons.Apps /></ListItemIcon>
+                        <ListItemText
+                            sx={{ my: 0 }}
+                            primaryTypographyProps={{
+                                fontSize: 20,
+                                fontWeight: 'medium',
+                                letterSpacing: 0
+                            }}>
+                            Applications
+                        </ListItemText>
+                        <ListItemActionButton title="Add Application" icon={<icons.Add />} onClick={showCreateApplication} />
+                    </ListItemButton>
 
-                    </TreeView>
-                </Grid>
-                <Grid>
-                    Blah
-                </Grid>
+                    <Divider />
 
-            </Grid>
+                    {applicationsHierarchy.data.map(application => {
+                        return (
+                            <span key={application.id}>
+                                <ListItem component="div" disablePadding>
+                                    <ListItemButton sx={{ height: 56 }}>
+                                        <ListItemIcon>
+                                            <icons.Home color="primary" />
+                                        </ListItemIcon>
+                                        <ListItemText primaryTypographyProps={{
+                                            color: 'primary',
+                                            fontWeight: 'medium',
+                                            variant: 'body2'
+                                        }}>{application.name}</ListItemText>
+                                    </ListItemButton>
+
+                                    <ListItemActionButton title="Select environment" icon={<icons.AltRoute />} />
+                                    <ListItemActionButton title="Add Microservice" icon={<icons.Add />} onClick={() => {
+                                        showCreateMicroservice({
+                                            applicationId: application.id
+                                        });
+                                    }} />
+                                    <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
+                                </ListItem>
+
+                                <Divider />
+
+                                {application.microservices?.map(microservice => {
+                                    return (
+                                        <Box key={microservice.name}
+                                            sx={{
+                                                bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
+                                                pb: open ? 2 : 0,
+                                            }}>
+
+                                            <ListItemButton sx={{
+                                                px: 3,
+                                                pt: 2.5,
+                                                pb: open ? 0 : 2.5,
+                                                '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
+                                            }}>
+                                                <ListItemIcon><icons.Cabin /></ListItemIcon>
+                                                <ListItemText>Members</ListItemText>
+                                            </ListItemButton>
+                                        </Box>
+                                    );
+                                })}
+                            </span>
+                        );
+                    })}
+                </ApplicationsNav>
+            </Paper>
 
             <Routes>
                 <Route path=':applicationId' element={<Application />} />
-                <Route path=':applicationId/microservices/:microserviceId' element={<Microservice />} />
-                <Route path=':applicationId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
+                <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
+                <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
             </Routes>
         </>
     );
