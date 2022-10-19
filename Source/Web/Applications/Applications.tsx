@@ -12,8 +12,13 @@ import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
 import { Create as CreateMicroservice } from 'API/applications/microservices/Create';
 import { Create as CreateDeployable } from 'API/applications/microservices/deployables/Create';
 import { CreateDeployableDialog } from './CreateDeployableDialog';
+
+import { ExpandMore, ChevronRight, Add } from '@mui/icons-material';
 import { Microservice } from './Microservices/Microservice';
 import { Deployable } from './Microservices/Deployables/Deployable';
+import { TreeItem, TreeView } from '@mui/lab';
+import { Box, Drawer, Grid, IconButton } from '@mui/material';
+import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 
 
 export const Applications = () => {
@@ -23,6 +28,7 @@ export const Applications = () => {
     const [currentDeployable, setCurrentDeployable] = useState<string>();
     const navigate = useNavigate();
     const location = useLocation();
+    const [applicationsHierarchy] = ApplicationsHierarchy.use();
 
     const routes: string[] = [
         '/applications/:applicationId',
@@ -43,9 +49,39 @@ export const Applications = () => {
         }
     }, [location.pathname]);
 
+    const [showCreateApplication] = useModal(
+        'Create application',
+        ModalButtons.OkCancel,
+        CreateApplicationDialog,
+        (result, output) => {
+            if (result == ModalResult.success) {
+                debugger;
+            }
+        }
+    );
+
     return (
         <>
-        Application
+            <IconButton title="Add Application" onClick={showCreateApplication}><Add /></IconButton>
+            <Grid container>
+                <Grid item xs={1}>
+                    <TreeView
+                        defaultCollapseIcon={<ExpandMore />}
+                        defaultExpandIcon={<ChevronRight />}>
+                        {applicationsHierarchy.data.map(application => {
+                            return (
+                                <TreeItem key={application.name} nodeId="1" label={application.name}/>
+                            );
+                        })}
+
+                    </TreeView>
+                </Grid>
+                <Grid>
+                    Blah
+                </Grid>
+
+            </Grid>
+
             <Routes>
                 <Route path=':applicationId' element={<Application />} />
                 <Route path=':applicationId/microservices/:microserviceId' element={<Microservice />} />

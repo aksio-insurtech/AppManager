@@ -28,11 +28,11 @@ export const AddSubscriptionDialog = (props: IModalProps<{}, AddSubscriptionDial
     });
 
     return (
-        <Stack direction="column">
-            <TextField label='Id' required defaultValue={id} onChange={(e) => setId(e.currentTarget.value)} />
-            <TextField label='Name' required defaultValue={name} onChange={(e) => setName(e.currentTarget.value)} />
-            <TextField label='Tenant Id' required defaultValue={tenantId} onChange={(e) => setTenantId(e.currentTarget.value)} />
-            <TextField label='Tenant Name (Domain)' required defaultValue={tenantName} onChange={(e) => setTenantName(e.currentTarget.value)} />
+        <Stack direction="column" width={400} spacing={1}>
+            <TextField label='Id' fullWidth required defaultValue={id} onChange={(e) => setId(e.currentTarget.value)} />
+            <TextField label='Name' fullWidth required defaultValue={name} onChange={(e) => setName(e.currentTarget.value)} />
+            <TextField label='Tenant Id' fullWidth required defaultValue={tenantId} onChange={(e) => setTenantId(e.currentTarget.value)} />
+            <TextField label='Tenant Name (Domain)' fullWidth required defaultValue={tenantName} onChange={(e) => setTenantName(e.currentTarget.value)} />
         </Stack>
     );
 };

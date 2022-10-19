@@ -4,7 +4,8 @@
 import React, { useState } from 'react';
 import { AllCloudLocations } from 'API/cloudlocations/AllCloudLocations';
 import { AllSettings } from 'API/organization/settings/AllSettings';
-import { MenuItem, Select, TextField } from '@mui/material';
+import { MenuItem, Select, TextField, Stack, FormControl, InputLabel } from '@mui/material';
+import { IModalProps } from '@aksio/cratis-mui';
 
 export interface CreateApplicationDialogOutput {
     name: string;
@@ -12,29 +13,50 @@ export interface CreateApplicationDialogOutput {
     cloudLocation: string;
 }
 
-export const CreateApplicationDialog = (props: CreateApplicationDialogOutput) => {
+export const CreateApplicationDialog = (props: IModalProps<{}, CreateApplicationDialogOutput>) => {
     const [name, setName] = useState('');
     const [azureSubscription, setAzureSubscription] = useState('');
     const [settings] = AllSettings.use();
     const [cloudLocation, setCloudLocation] = useState('');
     const [cloudLocations] = AllCloudLocations.use();
 
+    props.onClose(() => {
+        return {
+            name,
+            azureSubscription,
+            cloudLocation
+        };
+    });
+
     return (
-        <div>
-            <TextField label='Name' required defaultValue={name} onChange={e => setName(e.currentTarget.value)} />
-            {/* <Select placeholder="Select the Azure Subscription"
-                label="Azure Subscription">
-                {azureSubscriptionOptions.map(_ => (
-                    <MenuItem key={_.key}>{_.name}</MenuItem>
+        <Stack direction="column" width={400} spacing={1}>
+            <TextField label='Name' fullWidth required defaultValue={name} onChange={e => setName(e.currentTarget.value)} />
+
+            <InputLabel>Azure Subscription</InputLabel>
+            <Select
+                label="Azure Subscription"
+                placeholder="Select the Azure Subscription"
+                value={azureSubscription}
+                onChange={(ev) => {
+                    setAzureSubscription(ev.target.value);
+                }}>
+                {settings.data.azureSubscriptions?.map(_ => (
+                    <MenuItem key={_.subscriptionId} value={_.subscriptionId}>{_.name}</MenuItem>
                 ))}
             </Select>
 
-            <Select placeholder="Select a location in the cloud"
-                label="Azure Subscription">
-                {cloudLocationOptions.map(_ => (
-                    <MenuItem key={_.key}>{_.name}</MenuItem>
+            <InputLabel>Location</InputLabel>
+            <Select
+                label="Location"
+                placeholder="Select the location in the cloud"
+                value={cloudLocation}
+                onChange={(ev) => {
+                    setCloudLocation(ev.target.value);
+                }}>
+                {cloudLocations.data.map(_ => (
+                    <MenuItem key={_.key} value={_.key}>{_.displayName}</MenuItem>
                 ))}
-            </Select> */}
-        </div>
+            </Select>
+        </Stack>
     );
 };
