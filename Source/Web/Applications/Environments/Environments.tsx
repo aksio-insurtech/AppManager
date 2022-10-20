@@ -23,7 +23,7 @@ export const Environments = () => {
 
     return (
         <ValueEditorFor<AddEnvironmentDialogOutput, ApplicationEnvironment>
-            addTitle="Add tenant"
+            addTitle="Add Environment"
             columns={columns}
             data={environments.data}
             modalContent={AddEnvironmentDialog}

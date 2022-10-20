@@ -25,7 +25,7 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
     return (
         <Box sx={{ height: 400, width: '100%', padding: '24px' }}>
             <Toolbar>
-                <Button startIcon={<icons.Add />} onClick={showAddDialog}>Add Tenant</Button>
+                <Button startIcon={<icons.Add />} onClick={showAddDialog}>{props.addTitle}</Button>
             </Toolbar>
 
             <DataGrid

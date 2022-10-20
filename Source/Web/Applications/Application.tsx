@@ -7,6 +7,8 @@ import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
 import { Environments } from './Environments/Environments';
+import { Variables } from './Variables/Variables';
+import { Secrets } from './Secrets/Secrets';
 
 export const Application = () => {
     const { applicationId } = useParams();
@@ -28,8 +30,8 @@ export const Application = () => {
             <TabPanel value="0"></TabPanel>
             <TabPanel value="1"><Environments /></TabPanel>
             <TabPanel value="2"></TabPanel>
-            <TabPanel value="3"></TabPanel>
-            <TabPanel value="4"></TabPanel>
+            <TabPanel value="3"><Variables /></TabPanel>
+            <TabPanel value="4"><Secrets /></TabPanel>
         </TabContext>
     );
 };
