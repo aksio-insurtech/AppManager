@@ -22,6 +22,7 @@ import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
 
 export const Applications = () => {
     const [currentApplicationId, setCurrentApplicationId] = useState<string>();
+    const [currentEnvironment, setCurrentEnvironment] = useState<string>();
     const [currentMicroservice, setCurrentMicroservice] = useState<string>();
     const [currentDeployable, setCurrentDeployable] = useState<string>();
     const navigate = useNavigate();
@@ -30,6 +31,7 @@ export const Applications = () => {
 
     const routes: string[] = [
         '/applications/:applicationId',
+        '/applications/:applicationId/environments/:environmentId',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId'
     ];
@@ -38,12 +40,13 @@ export const Applications = () => {
         const match = routes.map(_ => matchPath({ path: _ }, location.pathname)).filter(_ => _ !== null);
         if (match?.length == 1) {
             const params = match[0]?.params || {};
-
             setCurrentApplicationId(params.applicationId);
+            setCurrentEnvironment(params.environmentId);
             setCurrentMicroservice(params.microserviceId);
             setCurrentDeployable(params.deployableId);
         } else {
             setCurrentApplicationId(undefined);
+            setCurrentEnvironment(undefined);
             setCurrentMicroservice(undefined);
             setCurrentDeployable(undefined);
         }
@@ -101,7 +104,9 @@ export const Applications = () => {
                                         </span>
                                     );
                                 })
-                                : <ApplicationItemWithArtifacts application={currentApplication} />
+                                : <ApplicationItemWithArtifacts
+                                    application={currentApplication}
+                                    environmentId={currentEnvironment} />
                             }
                         </ApplicationsNav>
                     </Paper>

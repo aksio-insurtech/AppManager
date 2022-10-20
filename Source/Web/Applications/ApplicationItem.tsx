@@ -11,10 +11,12 @@ import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ApplicationEnvironmentButton } from './ApplicationEnvironmentButton';
+import { ActionButtonWithMenu } from './ActionButtonWithMenu';
 
 export interface ApplicationItemProps {
     application: ApplicationHierarchyForListing;
-    actions?: boolean
+    environmentId?: string;
+    actions?: boolean;
 }
 
 
@@ -56,11 +58,17 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                     {props.application.environments.length > 0 &&
                         <ApplicationEnvironmentButton application={props.application} />
                     }
-                    <ListItemActionButton title="Add Microservice" icon={<icons.Add />} onClick={() => {
-                        showCreateMicroservice({
-                            applicationId: props.application.id
-                        });
-                    }} />
+
+                    {props.environmentId &&
+                        <ActionButtonWithMenu icon={<icons.Add />} title="Add">
+                            <MenuItem onClick={() => {
+                                showCreateMicroservice({
+                                    applicationId: props.application.id
+                                });
+                            }} > Add Microservice</MenuItem>
+                        </ActionButtonWithMenu>
+
+                    }
                     <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
                 </>
             }

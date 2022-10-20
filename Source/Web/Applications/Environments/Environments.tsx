@@ -18,7 +18,6 @@ const columns: GridColDef[] = [
     { field: 'shortName', headerName: 'Short Display Name', width: 150 }
 ];
 
-
 export const Environments = () => {
     const { applicationId } = useParams();
     const [environments] = EnvironmentsForApplication.use({ applicationId: applicationId! });
