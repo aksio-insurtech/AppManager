@@ -38,7 +38,12 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
             <Divider />
             {environment &&
                 <>
-                    {environment.ingresses.map(ingress => {
+                    <ApplicationArtifactListItem
+                        icon={<icons.Apartment />}
+                        title="Tenants"
+                        onClick={handleTenantsClick} />
+
+                    {environment.ingresses?.map(ingress => {
                         return (
                             <ApplicationArtifactListItem
                                 key={ingress.ingressId}
@@ -47,11 +52,6 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                                 onClick={() => handleIngressClick(ingress)} />
                         );
                     })}
-
-                    <ApplicationArtifactListItem
-                        icon={<icons.Apartment />}
-                        title="Tenants"
-                        onClick={handleTenantsClick} />
 
                     {environment.microservices?.map(microservice => {
                         return (

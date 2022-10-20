@@ -3,7 +3,6 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { TenantsForEnvironment } from 'API/applications/environments/tenants/TenantsForEnvironment';
 import { useParams } from 'react-router-dom';
 import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
@@ -16,13 +15,12 @@ const columns: GridColDef[] = [
 
 export const Variables = () => {
     const { applicationId, environmentId } = useParams();
-    const [tenants] = TenantsForEnvironment.use({ environmentId: environmentId! });
 
     return (
         <ValueEditorFor<AddVariableDialogOutput, Tenant>
             addTitle="Add Variable"
             columns={columns}
-            data={tenants.data}
+            data={[]}
             modalContent={AddVariableDialog}
             getRowId={(tenant) => tenant.id}
             modalClosed={async (result, output) => {

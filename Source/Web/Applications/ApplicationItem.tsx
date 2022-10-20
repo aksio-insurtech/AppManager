@@ -41,7 +41,11 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
     return (
         <ListItem component="div" disablePadding>
             <ListItemButton sx={{ height: 56 }} onClick={() => {
-                navigate(`/applications/${props.application.id}`);
+                let path = `/applications/${props.application.id}`;
+                if( props.environmentId ) {
+                    path += `/environments/${props.environmentId}`;
+                }
+                navigate(path);
             }}>
                 <ListItemIcon>
                     <icons.Home color="primary" />
