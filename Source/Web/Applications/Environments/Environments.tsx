@@ -9,6 +9,8 @@ import { AddEnvironmentDialog } from './AddEnvironmentDialog';
 import { EnvironmentsForApplication } from 'API/applications/environments/EnvironmentsForApplication';
 import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
 import { useParams } from 'react-router-dom';
+import { CreateEnvironment } from '../../API/applications/environments/CreateEnvironment';
+import { Guid } from '@aksio/cratis-fundamentals';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -25,10 +27,15 @@ export const Environments = () => {
         'Add environment',
         ModalButtons.OkCancel,
         AddEnvironmentDialog,
-        (result, output) => {
+        async (result, output) => {
             if (result == ModalResult.success) {
-                console.log('hello');
-
+                const command = new CreateEnvironment();
+                command.applicationId = applicationId!;
+                command.environmentId = Guid.create().toString();
+                command.name = output!.name;
+                command.displayName = output!.displayName;
+                command.shortName = output!.shortName;
+                await command.execute();
             }
         });
 

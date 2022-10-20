@@ -8,7 +8,7 @@ import { useState } from 'react';
 export type AddEnvironmentDialogOutput = {
     name: string;
     displayName: string;
-    shortDisplayName: string;
+    shortName: string;
 };
 
 export const AddEnvironmentDialog = (props: IModalProps<{}, AddEnvironmentDialogOutput>) => {
@@ -20,7 +20,7 @@ export const AddEnvironmentDialog = (props: IModalProps<{}, AddEnvironmentDialog
         return {
             name,
             displayName,
-            shortDisplayName: shortName
+            shortName
         };
     });
 
