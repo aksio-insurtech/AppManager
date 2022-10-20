@@ -14,6 +14,7 @@ import { Guid } from '@aksio/cratis-fundamentals';
 
 export interface ApplicationItemProps {
     application: ApplicationsHierarchyForListing;
+    actions?: boolean
 }
 
 
@@ -61,49 +62,53 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                 }}>{props.application.name}</ListItemText>
             </ListItemButton>
 
-            <ListItemActionButton title="Select environment" icon={<icons.AltRoute />} onClick={handleEnvironmentClick} />
-            <Menu
-                open={environmentOpen}
-                anchorEl={environmentMenuAnchorElement}
-                onClick={handleEnvironmentClose}
-                onClose={handleEnvironmentClose}
-                PaperProps={{
-                    elevation: 0,
-                    sx: {
-                        overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                        mt: 1.5,
-                        '& .MuiAvatar-root': {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1,
-                        },
-                        '&:before': {
-                            content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            top: 0,
-                            right: 14,
-                            width: 10,
-                            height: 10,
-                            bgcolor: 'background.paper',
-                            transform: 'translateY(-50%) rotate(45deg)',
-                            zIndex: 0,
-                        },
-                    }
-                }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
-                <MenuItem>Development</MenuItem>
-                <MenuItem>Production</MenuItem>
-            </Menu>
-            <ListItemActionButton title="Add Microservice" icon={<icons.Add />} onClick={() => {
-                showCreateMicroservice({
-                    applicationId: props.application.id
-                });
-            }} />
-            <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
+            {props.actions &&
+                <>
+                    <ListItemActionButton title="Select environment" icon={<icons.AltRoute />} onClick={handleEnvironmentClick} />
+                    <Menu
+                        open={environmentOpen}
+                        anchorEl={environmentMenuAnchorElement}
+                        onClick={handleEnvironmentClose}
+                        onClose={handleEnvironmentClose}
+                        PaperProps={{
+                            elevation: 0,
+                            sx: {
+                                overflow: 'visible',
+                                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                mt: 1.5,
+                                '& .MuiAvatar-root': {
+                                    width: 32,
+                                    height: 32,
+                                    ml: -0.5,
+                                    mr: 1,
+                                },
+                                '&:before': {
+                                    content: '""',
+                                    display: 'block',
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 14,
+                                    width: 10,
+                                    height: 10,
+                                    bgcolor: 'background.paper',
+                                    transform: 'translateY(-50%) rotate(45deg)',
+                                    zIndex: 0,
+                                },
+                            }
+                        }}
+                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
+                        <MenuItem>Development</MenuItem>
+                        <MenuItem>Production</MenuItem>
+                    </Menu>
+                    <ListItemActionButton title="Add Microservice" icon={<icons.Add />} onClick={() => {
+                        showCreateMicroservice({
+                            applicationId: props.application.id
+                        });
+                    }} />
+                    <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
+                </>
+            }
         </ListItem >
     );
 };

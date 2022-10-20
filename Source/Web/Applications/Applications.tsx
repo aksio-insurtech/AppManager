@@ -17,11 +17,11 @@ import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { ApplicationsNav } from './ApplicationsNav';
 import { ListItemActionButton } from './ListItemActionButton';
 import { ApplicationItem } from './ApplicationItem';
-
+import { ApplicationsHierarchyForListing } from '../API/applications/ApplicationsHierarchyForListing';
+import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
 
 export const Applications = () => {
-    const [selectedNav, setSelectedNav] = useState('');
-    const [currentApplication, setCurrentApplication] = useState<string>();
+    const [currentApplicationId, setCurrentApplicationId] = useState<string>();
     const [currentMicroservice, setCurrentMicroservice] = useState<string>();
     const [currentDeployable, setCurrentDeployable] = useState<string>();
     const navigate = useNavigate();
@@ -39,17 +39,20 @@ export const Applications = () => {
         if (match?.length == 1) {
             const params = match[0]?.params || {};
 
-            setCurrentApplication(params.applicationId);
+            setCurrentApplicationId(params.applicationId);
             setCurrentMicroservice(params.microserviceId);
             setCurrentDeployable(params.deployableId);
-
-            setSelectedNav(params.deployableId || params.microserviceId || params.applicationId || '');
         } else {
-            setCurrentApplication(undefined);
+            setCurrentApplicationId(undefined);
             setCurrentMicroservice(undefined);
             setCurrentDeployable(undefined);
         }
     }, [location.pathname]);
+
+    let currentApplication: ApplicationsHierarchyForListing | undefined;
+    if (currentApplicationId && applicationsHierarchy.data.length > 0) {
+        currentApplication = applicationsHierarchy.data.find(_ => _.id == currentApplicationId);
+    }
 
     const [showCreateApplication] = useModal(
         'Create application',
@@ -66,8 +69,6 @@ export const Applications = () => {
             }
         }
     );
-
-    const open = true;
 
     return (
         <>
@@ -91,66 +92,17 @@ export const Applications = () => {
 
                             <Divider />
 
-                            {applicationsHierarchy.data.map(application => {
-                                return (
-                                    <span key={application.id}>
-                                        {!currentApplication ?
-                                            <>
-                                                <ApplicationItem application={application} />
-                                                <Divider />
-                                            </>
-                                            :
-                                            <>
-                                                <ApplicationItem application={application} />
-                                                <Divider />
-                                                <Box
-                                                    sx={{
-                                                        bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
-                                                        pb: open ? 2 : 0,
-                                                    }}>
-
-                                                    <ListItemButton sx={{
-                                                        px: 3,
-                                                        pt: 2.5,
-                                                        pb: open ? 0 : 2.5,
-                                                        '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
-                                                    }}>
-                                                        <ListItemIcon><icons.Input /></ListItemIcon>
-                                                        <ListItemText>Ingress</ListItemText>
-                                                    </ListItemButton>
-                                                </Box>
-
-                                                {application.microservices?.map(microservice => {
-                                                    return (
-                                                        <Box key={microservice.name}
-                                                            sx={{
-                                                                bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null,
-                                                                pb: open ? 2 : 0,
-                                                            }}>
-
-                                                            <ListItemButton sx={{
-                                                                px: 3,
-                                                                pt: 2.5,
-                                                                pb: open ? 0 : 2.5,
-                                                                '&:hover, &focus': { '& svg': { opacity: open ? 1 : 0 } }
-                                                            }}>
-                                                                <ListItemIcon><icons.Cabin /></ListItemIcon>
-                                                                <ListItemText>Members</ListItemText>
-                                                            </ListItemButton>
-                                                        </Box>
-                                                    );
-                                                })}
-                                            </>}
-                                    </span>
-                                );
-                            })}
-
-                            {applicationsHierarchy.data.map(application => {
-                                return (
-                                    <span key={application.id}>
-                                    </span>
-                                );
-                            })}
+                            {!currentApplication ?
+                                applicationsHierarchy.data.map(application => {
+                                    return (
+                                        <span key={application.id}>
+                                            <ApplicationItem application={application} />
+                                            <Divider />
+                                        </span>
+                                    );
+                                })
+                                : <ApplicationItemWithArtifacts application={currentApplication} />
+                            }
                         </ApplicationsNav>
                     </Paper>
                 </Grid>
