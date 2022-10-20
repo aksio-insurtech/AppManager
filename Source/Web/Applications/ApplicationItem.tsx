@@ -12,6 +12,8 @@ import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ApplicationEnvironmentButton } from './ApplicationEnvironmentButton';
 import { ActionButtonWithMenu } from './ActionButtonWithMenu';
+import { CreateIngressDialog } from './CreateIngressDialog';
+import { CreateIngress } from 'API/applications/environments/ingresses/CreateIngress';
 
 export interface ApplicationItemProps {
     application: ApplicationHierarchyForListing;
@@ -31,7 +33,24 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
             if (result == ModalResult.success) {
                 const command = new CreateMicroservice();
                 command.applicationId = output!.applicationId;
+                command.environmentId = props.environmentId!;
                 command.microserviceId = Guid.create().toString();
+                command.name = output!.name;
+                await command.execute();
+            }
+        }
+    );
+
+    const [showCreateIngress] = useModal(
+        'Create ingress',
+        ModalButtons.OkCancel,
+        CreateIngressDialog,
+        async (result, output) => {
+            if (result == ModalResult.success) {
+                const command = new CreateIngress();
+                command.applicationId = output!.applicationId;
+                command.environmentId = props.environmentId!;
+                command.ingressId = Guid.create().toString();
                 command.name = output!.name;
                 await command.execute();
             }
@@ -66,12 +85,16 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                     {props.environmentId &&
                         <ActionButtonWithMenu icon={<icons.Add />} title="Add">
                             <MenuItem onClick={() => {
+                                showCreateIngress({
+                                    applicationId: props.application.id
+                                });
+                            }} >Add Ingress</MenuItem>
+                            <MenuItem onClick={() => {
                                 showCreateMicroservice({
                                     applicationId: props.application.id
                                 });
-                            }} > Add Microservice</MenuItem>
+                            }} >Add Microservice</MenuItem>
                         </ActionButtonWithMenu>
-
                     }
                     <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
                 </>
