@@ -3,7 +3,7 @@
 
 namespace Read.Settings;
 
-[Route("/api/organization/settings")]
+[Route("/api/settings")]
 public class SettingsQueries : Controller
 {
     readonly IMongoCollection<Settings> _collection;

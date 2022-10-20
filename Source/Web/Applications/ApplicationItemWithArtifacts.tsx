@@ -21,14 +21,14 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                 icon={<icons.Input />}
                 title="Ingress" />
 
-            {props.application.microservices?.map(microservice => {
+            {/* {props.application.microservices?.map(microservice => {
                 return (
                     <ApplicationArtifactListItem
                         key={microservice.microserviceId}
                         icon={<icons.Cabin />}
                         title={microservice.name} />
                 );
-            })}
+            })} */}
         </>
     );
 };

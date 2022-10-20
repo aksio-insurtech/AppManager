@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { AllCloudLocations } from 'API/cloudlocations/AllCloudLocations';
-import { AllSettings } from 'API/organization/settings/AllSettings';
+import { AllSettings } from 'API/settings/AllSettings';
 import { MenuItem, Select, TextField, Stack, FormControl, InputLabel } from '@mui/material';
 import { IModalProps } from '@aksio/cratis-mui';
 

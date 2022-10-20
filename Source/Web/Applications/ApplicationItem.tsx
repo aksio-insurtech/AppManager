@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { ListItemActionButton } from './ListItemActionButton';
 import * as icons from '@mui/icons-material';
 import { ApplicationsHierarchyForListing } from 'API/applications/ApplicationsHierarchyForListing';
-import { CreateMicroservice } from 'API/applications/environments/CreateMicroservice';
+import { Create as CreateMicroservice } from 'API/applications/environments/microservices/Create';
 import { useNavigate } from 'react-router-dom';
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';

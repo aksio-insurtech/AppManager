@@ -2,14 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { AddSubscriptionDialog } from './AddSubscriptionDialog';
-import { AddAzureSubscription } from 'API/organization/settings/AddAzureSubscription';
-import { AllSettings } from 'API/organization/settings/AllSettings';
-import { AzureSubscription } from 'API/organization/settings/AzureSubscription';
+import { AddAzureSubscription } from 'API/settings/AddAzureSubscription';
+import { AllSettings } from 'API/settings/AllSettings';
+import { AzureSubscription } from 'API/settings/AzureSubscription';
 import { useEffect, useState } from 'react';
-import { SetMongoDBSettings } from 'API/organization/settings/SetMongoDBSettings';
-import { SetPulumiSettings } from 'API/organization/settings/SetPulumiSettings';
+import { SetMongoDBSettings } from 'API/settings/SetMongoDBSettings';
+import { SetPulumiSettings } from 'API/settings/SetPulumiSettings';
 import { Box, Button, Stack, TextField } from '@mui/material';
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useModal, ModalButtons, ModalResult } from '@aksio/cratis-mui';
 
 const columns: GridColDef[] = [
