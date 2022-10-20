@@ -46,7 +46,6 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
         }
     );
 
-
     return (
         <ListItem component="div" disablePadding>
             <ListItemButton sx={{ height: 56 }} onClick={() => {
