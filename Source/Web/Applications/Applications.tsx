@@ -70,8 +70,6 @@ export const Applications = () => {
         }
     );
 
-    console.log(applicationsHierarchy.data);
-
     return (
         <>
             <Grid container sx={{ height: '100%' }}>

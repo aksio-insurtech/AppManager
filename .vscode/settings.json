@@ -69,6 +69,7 @@
         "inheritdoc",
         "letsencrypt",
         "Mongodbatlas",
+        "notnull",
         "Peerings",
         "privkey",
         "Pulumi",

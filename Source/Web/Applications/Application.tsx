@@ -24,7 +24,7 @@ export const Application = () => {
                         <Tab label="Variables" value="2" />
                     </TabList>
                 </Box>
-                <TabPanel value="0"><Environments/></TabPanel>
+                <TabPanel value="0"><Environments /></TabPanel>
                 <TabPanel value="1"></TabPanel>
                 <TabPanel value="2"></TabPanel>
             </TabContext>
