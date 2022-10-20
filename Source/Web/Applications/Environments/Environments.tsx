@@ -39,23 +39,21 @@ export const Environments = () => {
         });
 
     return (
-        <>
-            <Box sx={{ height: 400, width: '100%' }}>
-                <Toolbar>
-                    <Button startIcon={<icons.Add />} onClick={showAddEnvironmentDialog}>Add Environment</Button>
-                </Toolbar>
+        <Box sx={{ height: 400, width: '100%' }}>
+            <Toolbar>
+                <Button startIcon={<icons.Add />} onClick={showAddEnvironmentDialog}>Add Environment</Button>
+            </Toolbar>
 
-                <DataGrid
-                    hideFooterPagination={true}
-                    filterMode="client"
-                    columns={columns}
-                    sortingMode="client"
-                    getRowId={(row: ApplicationEnvironment) => {
-                        return row.id;
-                    }}
+            <DataGrid
+                hideFooterPagination={true}
+                filterMode="client"
+                columns={columns}
+                sortingMode="client"
+                getRowId={(row: ApplicationEnvironment) => {
+                    return row.id;
+                }}
 
-                    rows={environments.data} />
-            </Box>
-        </>
+                rows={environments.data} />
+        </Box>
     );
 };

@@ -19,6 +19,8 @@ import { ListItemActionButton } from './ListItemActionButton';
 import { ApplicationItem } from './ApplicationItem';
 import { ApplicationHierarchyForListing } from '../API/applications/ApplicationHierarchyForListing';
 import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
+import { Tenants } from './Tenants/Tenants';
+import { Ingresses } from './Ingresses/Ingresses';
 
 export const Applications = () => {
     const [currentApplicationId, setCurrentApplicationId] = useState<string>();
@@ -32,6 +34,8 @@ export const Applications = () => {
     const routes: string[] = [
         '/applications/:applicationId',
         '/applications/:applicationId/environments/:environmentId',
+        '/applications/:applicationId/environments/:environmentId/ingresses/:ingressId',
+        '/applications/:applicationId/environments/:environmentId/tenants',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId'
     ];
@@ -115,6 +119,9 @@ export const Applications = () => {
                     <Paper elevation={0} sx={{ height: '100%' }}>
                         <Routes>
                             <Route path=':applicationId' element={<Application />} />
+                            <Route path=':applicationId/environments/:environmentId' element={<Application />} />
+                            <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingresses />} />
+                            <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
                         </Routes>
