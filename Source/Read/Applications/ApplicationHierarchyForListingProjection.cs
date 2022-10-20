@@ -9,11 +9,11 @@ using Events.Applications.Environments.Microservices.Deployables;
 
 namespace Read.Applications;
 
-public class ApplicationsHierarchyForListingProjection : IProjectionFor<ApplicationsHierarchyForListing>
+public class ApplicationHierarchyForListingProjection : IProjectionFor<ApplicationHierarchyForListing>
 {
     public ProjectionId Identifier => "5a52002b-f36e-4d69-8900-cd133de4aac3";
 
-    public void Define(IProjectionBuilderFor<ApplicationsHierarchyForListing> builder) => builder
+    public void Define(IProjectionBuilderFor<ApplicationHierarchyForListing> builder) => builder
         .From<ApplicationCreated>(_ => _
             .Set(m => m.Name).To(e => e.Name))
         .Children(_ => _.Environments, _ => _

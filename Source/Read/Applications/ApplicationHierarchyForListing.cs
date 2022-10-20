@@ -5,7 +5,7 @@ using Concepts.Applications;
 
 namespace Read.Applications;
 
-public record ApplicationsHierarchyForListing(
+public record ApplicationHierarchyForListing(
     ApplicationId Id,
     ApplicationName Name,
     IEnumerable<EnvironmentOnApplication> Environments);

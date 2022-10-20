@@ -17,7 +17,7 @@ import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { ApplicationsNav } from './ApplicationsNav';
 import { ListItemActionButton } from './ListItemActionButton';
 import { ApplicationItem } from './ApplicationItem';
-import { ApplicationsHierarchyForListing } from '../API/applications/ApplicationsHierarchyForListing';
+import { ApplicationHierarchyForListing } from '../API/applications/ApplicationHierarchyForListing';
 import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
 
 export const Applications = () => {
@@ -49,7 +49,7 @@ export const Applications = () => {
         }
     }, [location.pathname]);
 
-    let currentApplication: ApplicationsHierarchyForListing | undefined;
+    let currentApplication: ApplicationHierarchyForListing | undefined;
     if (currentApplicationId && applicationsHierarchy.data.length > 0) {
         currentApplication = applicationsHierarchy.data.find(_ => _.id == currentApplicationId);
     }
@@ -69,6 +69,8 @@ export const Applications = () => {
             }
         }
     );
+
+    console.log(applicationsHierarchy.data);
 
     return (
         <>

@@ -4,8 +4,8 @@
 import { AddSubscriptionDialog } from './AddSubscriptionDialog';
 import { AddAzureSubscription } from 'API/settings/AddAzureSubscription';
 import { AllSettings } from 'API/settings/AllSettings';
-import { AzureSubscription } from 'API/settings/AzureSubscription';
 import { useEffect, useState } from 'react';
+import { AzureSubscription } from 'API/settings/AzureSubscription';
 import { SetMongoDBSettings } from 'API/settings/SetMongoDBSettings';
 import { SetPulumiSettings } from 'API/settings/SetPulumiSettings';
 import { Box, Button, Stack, TextField } from '@mui/material';
@@ -18,7 +18,7 @@ const columns: GridColDef[] = [
     { field: 'subscriptionId', headerName: 'Subscription ID', width: 250 }
 ];
 
-export const Organization = () => {
+export const Settings = () => {
     const [settings] = AllSettings.use();
     const [pulumiOrganization, setPulumiOrganization] = useState('');
     const [pulumiAccessToken, setPulumiAccessToken] = useState('');

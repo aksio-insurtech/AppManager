@@ -2,14 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { Divider, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { ApplicationsHierarchyForListing } from 'API/applications/ApplicationsHierarchyForListing';
+import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
 import { ApplicationItem } from './ApplicationItem';
 import * as icons from '@mui/icons-material';
 import { ApplicationArtifactListItem } from './ApplicationArtifactListItem';
 
 
 export interface ApplicationItemWithArtifactsProps {
-    application: ApplicationsHierarchyForListing;
+    application: ApplicationHierarchyForListing;
 }
 
 export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifactsProps) => {

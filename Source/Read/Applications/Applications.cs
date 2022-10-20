@@ -8,12 +8,12 @@ public class Applications : Controller
 {
     readonly IMongoCollection<Application> _applicationCollection;
     readonly IMongoCollection<ApplicationResources> _applicationResourcesCollection;
-    readonly IMongoCollection<ApplicationsHierarchyForListing> _hierarchyCollection;
+    readonly IMongoCollection<ApplicationHierarchyForListing> _hierarchyCollection;
 
     public Applications(
         IMongoCollection<Application> applicationCollection,
         IMongoCollection<ApplicationResources> applicationResourcesCollection,
-        IMongoCollection<ApplicationsHierarchyForListing> hierarchyCollection)
+        IMongoCollection<ApplicationHierarchyForListing> hierarchyCollection)
     {
         _applicationCollection = applicationCollection;
         _applicationResourcesCollection = applicationResourcesCollection;
@@ -27,5 +27,5 @@ public class Applications : Controller
     public Task<ApplicationResources> ResourcesForApplication([FromRoute] ApplicationId applicationId) => _applicationResourcesCollection.FindById(applicationId).FirstOrDefaultAsync();
 
     [HttpGet("hierarchy")]
-    public Task<ClientObservable<IEnumerable<ApplicationsHierarchyForListing>>> ApplicationsHierarchy() => _hierarchyCollection.Observe();
+    public Task<ClientObservable<IEnumerable<ApplicationHierarchyForListing>>> ApplicationsHierarchy() => _hierarchyCollection.Observe();
 }

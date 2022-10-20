@@ -15,7 +15,7 @@ type page = {
 const pages: page[] = [
     { name: 'Home', route: '/' },
     { name: 'Applications', route: '/applications' },
-    { name: 'Organization', route: '/organization' }];
+    { name: 'Settings', route: '/settings' }];
 
 export const Header = () => {
     const navigate = useNavigate();

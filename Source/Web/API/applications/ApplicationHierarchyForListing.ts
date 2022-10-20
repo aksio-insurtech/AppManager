@@ -6,7 +6,7 @@ import { field } from '@aksio/cratis-fundamentals';
 
 import { EnvironmentOnApplication } from './EnvironmentOnApplication';
 
-export class ApplicationsHierarchyForListing {
+export class ApplicationHierarchyForListing {
 
     @field(String)
     id!: string;
