@@ -5,7 +5,4 @@ using Concepts.Applications;
 
 namespace Read.Applications;
 
-public record ApplicationsHierarchyForListing(
-    ApplicationId Id,
-    ApplicationName Name,
-    IEnumerable<EnvironmentOnApplication> Environments);
+public record MicroserviceInEnvironment(MicroserviceId MicroserviceId, MicroserviceName Name, IEnumerable<DeployableOnMicroservice> Deployables);

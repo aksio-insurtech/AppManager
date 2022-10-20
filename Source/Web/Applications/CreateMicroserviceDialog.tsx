@@ -15,7 +15,6 @@ export interface CreateMicroserviceDialogOutput {
     name: string;
 }
 
-
 export const CreateMicroserviceDialog = (props: IModalProps<CreateMicroserviceDialogInput, CreateMicroserviceDialogOutput>) => {
     const [name, setName] = useState('');
 

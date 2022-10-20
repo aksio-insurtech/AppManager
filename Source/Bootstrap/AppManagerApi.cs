@@ -45,11 +45,10 @@ public class AppManagerApi : IDisposable
 
     public Task SetStackForApplication(Guid id, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{id}/stack/{environment}", stack);
     public Task SetStackForMicroservice(Guid applicationId, Guid microserviceId, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/stack/{environment}", stack);
-    public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
-    public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
-    public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/organization/settings/service-principal", new { clientId, clientSecret });
-    public Task AddAzureSubscription(string id, string name, string tenantId, string tenantName) => Perform("/api/organization/settings/subscriptions", new { id, name, tenantId, tenantName });
-    public Task SetMongoDBSettings(string organizationId, string publicKey, string privateKey) => Perform("/api/organization/settings/mongodb", new { organizationId, publicKey, privateKey });
+    public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/settings/pulumi", new { organization, accessToken });
+    public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/settings/service-principal", new { clientId, clientSecret });
+    public Task AddAzureSubscription(string id, string name, string tenantId, string tenantName) => Perform("/api/settings/subscriptions", new { id, name, tenantId, tenantName });
+    public Task SetMongoDBSettings(string organizationId, string publicKey, string privateKey) => Perform("/api/settings/mongodb", new { organizationId, publicKey, privateKey });
     public Task CreateApplication(Guid applicationId, string name, Guid azureSubscriptionId, string cloudLocation) => Perform("/api/applications", new { applicationId, name, azureSubscriptionId, cloudLocation });
     public Task ConfigureAuthenticationForApplication(Guid applicationId, string clientId, string clientSecret) => Perform($"/api/applications/{applicationId}/authentication", new { clientId, clientSecret });
     public Task CreateMicroservice(Guid applicationId, Guid microserviceId, string name) => Perform($"/api/applications/{applicationId}/microservices", new { microserviceId, name });

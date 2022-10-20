@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
-using Read.Organizations;
+using Read.Settings;
 
 namespace Bootstrap;
 

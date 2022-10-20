@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Events.Applications;
+using Events.Applications.Environments;
+using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
 using Events.Applications.Environments.Microservices.Deployables;
 
@@ -14,16 +16,31 @@ public class ApplicationsHierarchyForListingProjection : IProjectionFor<Applicat
     public void Define(IProjectionBuilderFor<ApplicationsHierarchyForListing> builder) => builder
         .From<ApplicationCreated>(_ => _
             .Set(m => m.Name).To(e => e.Name))
-        .Children(_ => _.Microservices, _ => _
-            .IdentifiedBy(m => m.MicroserviceId)
-            .From<MicroserviceCreated>(_ => _
+        .Children(_ => _.Environments, _ => _
+            .IdentifiedBy(m => m.EnvironmentId)
+            .From<EnvironmentCreated>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
                 .Set(m => m.Name).To(e => e.Name))
-            .RemovedWith<MicroserviceRemoved>()
-            .Children(_ => _.Deployables, _ => _
-                .IdentifiedBy(m => m.DeployableId)
-                .From<DeployableCreated>(_ => _
-                    .UsingParentKey(e => e.MicroserviceId)
-                    .Set(m => m.Name).To(e => e.Name))))
-        .RemovedWith<ApplicationRemoved>();
+            .Children(_ => _.Tenants, _ => _
+                .IdentifiedBy(m => m.TenantId)
+                .From<TenantAddedToApplicationEnvironment>(_ => _
+                    .UsingParentKey(e => e.EnvironmentId)
+                    .Set(m => m.Name).To(e => e.Name)))
+            .Children(_ => _.Ingresses, _ => _
+                .IdentifiedBy(m => m.IngressId)
+                .From<IngressCreated>(_ => _
+                    .UsingParentKey(e => e.EnvironmentId)
+                    .Set(m => m.Name).To(e => e.Name)))
+            .Children(_ => _.Microservices, _ => _
+                .IdentifiedBy(m => m.MicroserviceId)
+                .From<MicroserviceCreated>(_ => _
+                    .UsingParentKey(e => e.EnvironmentId)
+                    .Set(m => m.Name).To(e => e.Name))
+                .RemovedWith<MicroserviceRemoved>()
+                .Children(_ => _.Deployables, _ => _
+                    .IdentifiedBy(m => m.DeployableId)
+                    .From<DeployableCreated>(_ => _
+                        .UsingParentKey(e => e.MicroserviceId)
+                        .Set(m => m.Name).To(e => e.Name))))
+        .RemovedWith<ApplicationRemoved>());
 }

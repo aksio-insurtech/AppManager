@@ -7,4 +7,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices;
 
 [EventType("99a650d8-3027-405b-ad80-6bbc47887647")]
-public record MicroserviceCreated(ApplicationId ApplicationId, ApplicationEnvironmentId environmentId, MicroserviceName Name);
+public record MicroserviceCreated(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceName Name);

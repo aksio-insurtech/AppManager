@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Aksio.Cratis.Execution;
 using Events.Applications;
 
 namespace Domain.Applications;
@@ -17,9 +16,6 @@ public class Applications : Controller
     }
 
     [HttpPost]
-    public async Task Create([FromBody] CreateApplication command)
-    {
-        await _eventLog.Append(command.ApplicationId, new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
-        await _eventLog.Append(command.ApplicationId, new TenantAddedToApplication(TenantId.Development, "Development"));
-    }
+    public Task Create([FromBody] CreateApplication command) =>
+         _eventLog.Append(command.ApplicationId, new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
 }
