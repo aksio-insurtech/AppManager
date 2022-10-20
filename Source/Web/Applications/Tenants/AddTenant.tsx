@@ -5,11 +5,11 @@ import { IModalProps } from '@aksio/cratis-mui';
 import { Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
-export type AddTenantDialogPops = {
+export type AddTenantDialogOutput = {
     name: string;
 };
 
-export const AddTenantDialog = (props: IModalProps<{}, AddTenantDialogPops>) => {
+export const AddTenantDialog = (props: IModalProps<{}, AddTenantDialogOutput>) => {
     const [name, setName] = useState('');
 
     props.onClose(() => {
