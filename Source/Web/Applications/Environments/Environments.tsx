@@ -27,7 +27,7 @@ export const Environments = () => {
             columns={columns}
             data={environments.data}
             modalContent={AddEnvironmentDialog}
-            getRowId={(tenant) => tenant.id}
+            getRowId={(environment) => environment.id.environmentId}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
                     const command = new CreateEnvironment();

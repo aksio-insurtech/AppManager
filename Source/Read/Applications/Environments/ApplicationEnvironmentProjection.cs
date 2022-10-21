@@ -11,7 +11,9 @@ public record ApplicationEnvironmentProjection : IProjectionFor<ApplicationEnvir
 
     public void Define(IProjectionBuilderFor<ApplicationEnvironment> builder) => builder
         .From<EnvironmentCreated>(_ => _
-            .Set(m => m.ApplicationId).To(e => e.ApplicationId)
+            .UsingCompositeKey<ApplicationEnvironmentKey>(_ => _
+                .Set(k => k.ApplicationId).To(e => e.ApplicationId)
+                .Set(k => k.EnvironmentId).ToEventSourceId())
             .Set(m => m.Name).To(e => e.Name)
             .Set(m => m.DisplayName).To(e => e.DisplayName)
             .Set(m => m.ShortName).To(e => e.ShortName));

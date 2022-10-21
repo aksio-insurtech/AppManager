@@ -5,8 +5,4 @@ using Concepts.Applications.Environments;
 
 namespace Read.Applications.Environments;
 
-public record ApplicationEnvironment(
-    ApplicationEnvironmentKey Id,
-    ApplicationEnvironmentName Name,
-    ApplicationEnvironmentDisplayName DisplayName,
-    ApplicationEnvironmentShortName ShortName);
+public record ApplicationEnvironmentKey(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId);

@@ -4,19 +4,12 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { ApplicationEnvironmentKey } from './ApplicationEnvironmentKey';
 
-export class ApplicationEnvironment {
-
-    @field(ApplicationEnvironmentKey)
-    id!: ApplicationEnvironmentKey;
+export class ApplicationEnvironmentKey {
 
     @field(String)
-    name!: string;
+    applicationId!: string;
 
     @field(String)
-    displayName!: string;
-
-    @field(String)
-    shortName!: string;
+    environmentId!: string;
 }

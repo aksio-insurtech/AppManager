@@ -12,5 +12,5 @@ public class Environments : Controller
 
     [HttpGet("environments-for-application")]
     public Task<ClientObservable<IEnumerable<ApplicationEnvironment>>> EnvironmentsForApplication([FromRoute] ApplicationId applicationId) =>
-        _collection.Observe(Filters.StringFilterFor<ApplicationEnvironment>(_ => _.ApplicationId, applicationId));
+        _collection.Observe(Filters.StringFilterFor<ApplicationEnvironment>(_ => _.Id.ApplicationId, applicationId));
 }
