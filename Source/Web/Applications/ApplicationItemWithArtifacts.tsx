@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { Divider, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Divider, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material';
 import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
 import { ApplicationItem } from './ApplicationItem';
 import * as icons from '@mui/icons-material';
@@ -38,6 +38,7 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
             <Divider />
             {environment &&
                 <>
+                    <ListSubheader>{environment.name}</ListSubheader>
                     <ApplicationArtifactListItem
                         icon={<icons.Apartment />}
                         title="Tenants"
