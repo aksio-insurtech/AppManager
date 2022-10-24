@@ -16,6 +16,8 @@ import { Variables } from '../../Variables/Variables';
 import { CreateDeployable } from 'API/applications/environments/microservices/deployables/CreateDeployable';
 import { CreateDeployableWithImage } from 'API/applications/environments/microservices/deployables/CreateDeployableWithImage';
 import { Guid } from '@aksio/cratis-fundamentals';
+import { DeployablesForMicroservice } from 'API/applications/environments/microservices/deployables/DeployablesForMicroservice';
+import { Deployable } from 'API/applications/environments/microservices/deployables/Deployable';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -25,6 +27,11 @@ const columns: GridColDef[] = [
 export const Deployables = () => {
     const { applicationId, environmentId, microserviceId } = useParams();
     const [selectedTab, setSelectedTab] = useState("0");
+    const [deployables] = DeployablesForMicroservice.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!
+    });
 
     return (
 
@@ -33,12 +40,12 @@ export const Deployables = () => {
             justifyContent="flex-start"
             spacing={5}>
 
-            <ValueEditorFor<AddDeployableDialogOutput, Tenant>
+            <ValueEditorFor<AddDeployableDialogOutput, Deployable>
                 addTitle="Add deployable"
                 columns={columns}
-                data={[]}
+                data={deployables.data}
                 modalContent={AddDeployableDialog}
-                getRowId={(tenant) => tenant.id}
+                getRowId={(deployable) => deployable.id.deployableId}
                 modalClosed={async (result, output) => {
                     if (result == ModalResult.success) {
                         if (output!.image) {

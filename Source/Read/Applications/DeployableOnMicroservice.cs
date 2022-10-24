@@ -5,4 +5,4 @@ using Concepts.Applications;
 
 namespace Read.Applications;
 
-public record MicroserviceInEnvironment(MicroserviceId MicroserviceId, MicroserviceName Name, IEnumerable<DeployableOnMicroservice> Deployables);
+public record DeployableOnMicroservice(DeployableId DeployableId, DeployableName Name);

@@ -6,13 +6,15 @@ import { QueryFor, QueryResultWithState, useQuery, PerformQuery } from '@aksio/c
 import { Microservice } from './Microservice';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/microservices/{{microserviceId}}');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}');
 
 export interface GetMicroserviceArguments {
+    applicationId: string;
+    environmentId: string;
     microserviceId: string;
 }
 export class GetMicroservice extends QueryFor<Microservice, GetMicroserviceArguments> {
-    readonly route: string = '/api/applications/{applicationId}/microservices/{{microserviceId}}';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: Microservice = {} as any;
 
@@ -22,6 +24,8 @@ export class GetMicroservice extends QueryFor<Microservice, GetMicroserviceArgum
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
+            'environmentId',
             'microserviceId',
         ];
     }

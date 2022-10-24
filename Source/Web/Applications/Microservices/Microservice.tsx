@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { useParams } from 'react-router-dom';
-import { GetMicroservice } from 'API/applications/microservices/GetMicroservice';
+import { GetMicroservice } from 'API/applications/environments/microservices/GetMicroservice';
 import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
@@ -11,8 +11,12 @@ import { Secrets } from '../Secrets/Secrets';
 import { Deployables } from './Deployables/Deployables';
 
 export const Microservice = () => {
-    const { microserviceId } = useParams();
-    const [microservice, performMicroserviceQuery] = GetMicroservice.use({ microserviceId: microserviceId! });
+    const { applicationId, environmentId, microserviceId } = useParams();
+    const [microservice, performMicroserviceQuery] = GetMicroservice.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!
+    });
     const [selectedTab, setSelectedTab] = useState("0");
 
     return (
@@ -28,7 +32,7 @@ export const Microservice = () => {
                 </TabList>
             </Box>
             <TabPanel value="0"></TabPanel>
-            <TabPanel value="1"><Deployables/></TabPanel>
+            <TabPanel value="1"><Deployables /></TabPanel>
             <TabPanel value="2"></TabPanel>
             <TabPanel value="3"><Variables /></TabPanel>
             <TabPanel value="4"><Secrets /></TabPanel>

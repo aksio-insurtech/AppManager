@@ -5,4 +5,4 @@ using Concepts.Applications;
 
 namespace Read.Applications;
 
-public record Deployable(DeployableId DeployableId, DeployableName Name);
+public record Deployable(DeployableKey Id, DeployableName Name);

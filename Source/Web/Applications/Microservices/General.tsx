@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { Button, TextField } from '@mui/material';
-import { Microservice as MicroserviceModel } from 'API/applications/microservices/Microservice';
+import { Microservice as MicroserviceModel } from 'API/applications/environments/microservices/Microservice';
 import { Remove } from 'API/applications/microservices/Remove';
 import { useNavigate } from 'react-router-dom';
 export interface IGeneralProps {
