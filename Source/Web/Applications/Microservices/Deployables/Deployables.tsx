@@ -4,7 +4,6 @@
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { useParams } from 'react-router-dom';
-import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddDeployableDialog, AddDeployableDialogOutput } from './AddDeployableDialog';
 import { Box, Stack } from '@mui/system';
@@ -33,7 +32,7 @@ export const Deployables = () => {
         microserviceId: microserviceId!
     });
 
-    console.log(deployables.data);
+    const [selectedDeployable, setSelectedDeployable] = useState<Deployable | undefined>(undefined);
 
     return (
         <Stack
@@ -47,6 +46,11 @@ export const Deployables = () => {
                 data={deployables.data}
                 modalContent={AddDeployableDialog}
                 getRowId={(deployable) => deployable.id.deployableId}
+                onSelectionChanged={deployables => {
+                    if (deployables.length > 0) {
+                        setSelectedDeployable(deployables[0]);
+                    }
+                }}
                 modalClosed={async (result, output) => {
                     if (result == ModalResult.success) {
                         if (output!.image) {
@@ -70,20 +74,22 @@ export const Deployables = () => {
                     }
                 }} />
 
-            <TabContext value={selectedTab}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <TabList onChange={(e, value) => setSelectedTab(value)}>
-                        <Tab label="General" value="0" />
-                        <Tab label="Config Files" value="1" />
-                        <Tab label="Variables" value="2" />
-                        <Tab label="Secrets" value="3" />
-                    </TabList>
-                </Box>
-                <TabPanel value="0"></TabPanel>
-                <TabPanel value="1"></TabPanel>
-                <TabPanel value="2"><Variables /></TabPanel>
-                <TabPanel value="3"><Secrets /></TabPanel>
-            </TabContext>
+            {selectedDeployable &&
+                <TabContext value={selectedTab}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                        <TabList onChange={(e, value) => setSelectedTab(value)}>
+                            <Tab label="General" value="0" />
+                            <Tab label="Config Files" value="1" />
+                            <Tab label="Variables" value="2" />
+                            <Tab label="Secrets" value="3" />
+                        </TabList>
+                    </Box>
+                    <TabPanel value="0"></TabPanel>
+                    <TabPanel value="1"></TabPanel>
+                    <TabPanel value="2"><Variables /></TabPanel>
+                    <TabPanel value="3"><Secrets /></TabPanel>
+                </TabContext>
+            }
         </Stack>
     );
 };
