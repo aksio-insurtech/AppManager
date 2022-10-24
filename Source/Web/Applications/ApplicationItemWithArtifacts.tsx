@@ -24,6 +24,11 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/ingresses/${ingress.ingressId}`);
     };
 
+    const handleCratisKernelClick = () => {
+        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/cratis`);
+    };
+
+
     const handleTenantsClick = () => {
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/tenants`);
     };
@@ -39,6 +44,12 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
             {environment &&
                 <>
                     <ListSubheader>{environment.name}</ListSubheader>
+
+                    <ApplicationArtifactListItem
+                        icon={<icons.Extension />}
+                        title="Cratis"
+                        onClick={handleCratisKernelClick} />
+
                     <ApplicationArtifactListItem
                         icon={<icons.Apartment />}
                         title="Tenants"

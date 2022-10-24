@@ -21,6 +21,7 @@ import { ApplicationHierarchyForListing } from '../API/applications/ApplicationH
 import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
 import { Tenants } from './Tenants/Tenants';
 import { Ingresses } from './Ingresses/Ingresses';
+import { Cratis } from './Cratis/Cratis';
 
 export const Applications = () => {
     const [currentApplicationId, setCurrentApplicationId] = useState<string>();
@@ -35,6 +36,7 @@ export const Applications = () => {
         '/applications/:applicationId',
         '/applications/:applicationId/environments/:environmentId',
         '/applications/:applicationId/environments/:environmentId/ingresses/:ingressId',
+        '/applications/:applicationId/environments/:environmentId/cratis',
         '/applications/:applicationId/environments/:environmentId/tenants',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId'
@@ -121,6 +123,7 @@ export const Applications = () => {
                             <Route path=':applicationId' element={<Application />} />
                             <Route path=':applicationId/environments/:environmentId' element={<Application />} />
                             <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingresses />} />
+                            <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis />} />
                             <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
