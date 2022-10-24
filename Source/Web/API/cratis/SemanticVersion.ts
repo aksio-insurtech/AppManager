@@ -5,11 +5,20 @@
 import { field } from '@aksio/cratis-fundamentals';
 
 
-export class Deployable {
+export class SemanticVersion {
+
+    @field(Number)
+    major!: number;
+
+    @field(Number)
+    minor!: number;
+
+    @field(Number)
+    patch!: number;
 
     @field(String)
-    deployableId!: string;
+    preRelease!: string;
 
     @field(String)
-    name!: string;
+    metadata!: string;
 }

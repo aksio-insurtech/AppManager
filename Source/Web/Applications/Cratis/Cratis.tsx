@@ -4,6 +4,7 @@
 import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
+import { General } from './General';
 
 
 export const Cratis = () => {
@@ -16,7 +17,7 @@ export const Cratis = () => {
                     <Tab label="General" value="0" />
                 </TabList>
             </Box>
-            <TabPanel value="0"></TabPanel>
+            <TabPanel value="0"><General/></TabPanel>
         </TabContext>
     );
 };
