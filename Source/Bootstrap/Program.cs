@@ -6,6 +6,7 @@ using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
 using Concepts.Applications.Environments;
 using Concepts.Azure;
+using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
 using Reactions.Applications;

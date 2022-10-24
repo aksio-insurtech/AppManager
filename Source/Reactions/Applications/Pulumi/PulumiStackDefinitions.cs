@@ -4,6 +4,7 @@
 using Aksio.Cratis.Execution;
 using Common;
 using Concepts.Applications.Environments;
+using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.Resources;
 

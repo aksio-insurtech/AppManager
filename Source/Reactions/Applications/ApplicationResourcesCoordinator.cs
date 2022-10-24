@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Events.Applications.Environments;
+using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
 using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
@@ -46,6 +47,11 @@ public class ApplicationResourcesCoordinator
             var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, environment));
             await _pulumiOperations.Up(application, application.Name, definition, environment);
         });
+    }
+
+    public Task IngressCreated(IngressCreated @event, EventContext context)
+    {
+        return Task.CompletedTask;
     }
 
     public Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
