@@ -9,5 +9,7 @@ public record ApplicationEnvironmentId(Guid Value) : ConceptAs<Guid>(Value)
 
     public static implicit operator ApplicationEnvironmentId(Guid id) => new(id);
 
+    public static implicit operator ApplicationEnvironmentId(EventSourceId id) => Guid.Parse(id.Value);
+
     public static ApplicationEnvironmentId New() => Guid.NewGuid();
 }

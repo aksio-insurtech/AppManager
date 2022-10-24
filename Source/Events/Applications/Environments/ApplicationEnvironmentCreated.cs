@@ -6,4 +6,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments;
 
 [EventType("f98840bd-9c98-456f-821e-d9840ab846ae")]
-public record EnvironmentCreated(ApplicationId ApplicationId, ApplicationEnvironmentName Name, ApplicationEnvironmentDisplayName DisplayName, ApplicationEnvironmentShortName ShortName);
+public record ApplicationEnvironmentCreated(ApplicationId ApplicationId, ApplicationEnvironmentName Name, ApplicationEnvironmentDisplayName DisplayName, ApplicationEnvironmentShortName ShortName);

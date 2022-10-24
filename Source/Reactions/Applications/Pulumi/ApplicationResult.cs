@@ -41,7 +41,8 @@ public record ApplicationResult(
                         new("kernel", MongoDB.Password)
                     }
                 )
-            )
+            ),
+            application.Environments
         );
     }
 }

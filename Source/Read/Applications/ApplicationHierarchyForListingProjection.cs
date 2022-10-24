@@ -18,7 +18,7 @@ public class ApplicationHierarchyForListingProjection : IProjectionFor<Applicati
             .Set(m => m.Name).To(e => e.Name))
         .Children(_ => _.Environments, _ => _
             .IdentifiedBy(m => m.EnvironmentId)
-            .From<EnvironmentCreated>(_ => _
+            .From<ApplicationEnvironmentCreated>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
                 .Set(m => m.Name).To(e => e.Name))
             .Children(_ => _.Tenants, _ => _

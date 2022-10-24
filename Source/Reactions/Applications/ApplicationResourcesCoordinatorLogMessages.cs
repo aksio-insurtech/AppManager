@@ -7,8 +7,8 @@ namespace Reactions.Applications;
 
 public static partial class ApplicationResourcesCoordinatorLogMessages
 {
-    [LoggerMessage(0, LogLevel.Information, "Creating application '{ApplicationName}' using Pulumi")]
-    public static partial void CreatingApplication(this ILogger logger, string applicationName);
+    [LoggerMessage(0, LogLevel.Information, "Creating application environment '{Environment}' for '{ApplicationName}' using Pulumi")]
+    public static partial void CreatingApplicationEnvironment(this ILogger logger, string environment, string applicationName);
 
     [LoggerMessage(1, LogLevel.Information, "Removing application '{ApplicationName}' using Pulumi")]
     public static partial void RemovingApplication(this ILogger logger, string applicationName);

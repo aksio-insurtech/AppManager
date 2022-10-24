@@ -1,8 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Applications.Environments;
-using Events.Applications;
+using Events.Applications.Environments;
 using Events.Applications.Environments.Microservices;
 using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
@@ -36,30 +35,17 @@ public class ApplicationResourcesCoordinator
         _pulumiOperations = pulumiOperations;
     }
 
-    public Task ApplicationCreated(ApplicationCreated @event, EventContext context)
+    public async Task ApplicationEnvironmentCreated(ApplicationEnvironmentCreated @event, EventContext context)
     {
-        _logger.CreatingApplication(@event.Name);
+        var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
+        var environment = application.GetEnvironmentById(@context.EventSourceId);
+        _logger.CreatingApplicationEnvironment(@event.Name, application.Name);
+
         _ = Task.Run(async () =>
         {
-            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, ApplicationEnvironment.Development));
-            await _pulumiOperations.Up(application, application.Name, definition, ApplicationEnvironment.Development);
+            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, environment));
+            await _pulumiOperations.Up(application, application.Name, definition, environment);
         });
-
-        return Task.CompletedTask;
-    }
-
-    public Task Removed(ApplicationRemoved @event, EventContext context)
-    {
-        _ = Task.Run(async () =>
-        {
-            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-            _logger.RemovingApplication(application.Name);
-            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, ApplicationEnvironment.Development));
-            await _pulumiOperations.Down(application, application.Name, definition, ApplicationEnvironment.Development);
-        });
-
-        return Task.CompletedTask;
     }
 
     public Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
@@ -70,12 +56,13 @@ public class ApplicationResourcesCoordinator
         {
             var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
             var microservice = await _projections.GetInstanceById<Microservice>(@context.EventSourceId);
+            var environment = application.GetEnvironmentById(@context.EventSourceId);
             var projectName = GetProjectNameFor(application, microservice);
 
-            var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, ApplicationEnvironment.Development));
+            var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, environment));
 
-            await _pulumiOperations.Up(application, projectName, definition, ApplicationEnvironment.Development, microservice);
-            await _pulumiOperations.SetTag(projectName, ApplicationEnvironment.Development, "Microservice", @event.Name);
+            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
+            await _pulumiOperations.SetTag(projectName, environment, "Microservice", @event.Name);
         });
 
         return Task.CompletedTask;
@@ -88,6 +75,7 @@ public class ApplicationResourcesCoordinator
             var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
             var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
             var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
+            var environment = application.GetEnvironmentById(@context.EventSourceId);
             var projectName = GetProjectNameFor(application, microservice);
 
             if (deployable.Image is null)
@@ -105,9 +93,9 @@ public class ApplicationResourcesCoordinator
                     {
                         deployable
                     },
-                    ApplicationEnvironment.Development));
+                    environment));
 
-            await _pulumiOperations.Up(application, projectName, definition, ApplicationEnvironment.Development, microservice);
+            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
         });
 
         return Task.CompletedTask;
@@ -120,6 +108,7 @@ public class ApplicationResourcesCoordinator
             var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
             var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
             var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
+            var environment = application.GetEnvironmentById(@context.EventSourceId);
             _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
             var projectName = GetProjectNameFor(application, microservice);
 
@@ -132,9 +121,9 @@ public class ApplicationResourcesCoordinator
                     {
                         deployable
                     },
-                    ApplicationEnvironment.Development));
+                    environment));
 
-            await _pulumiOperations.Up(application, projectName, definition, ApplicationEnvironment.Development, microservice);
+            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
         });
 
         return Task.CompletedTask;

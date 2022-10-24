@@ -11,6 +11,7 @@ const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{
 export interface ISetStack {
     applicationId?: string;
     microserviceId?: string;
+    id?: string;
     name?: string;
     displayName?: string;
     shortName?: string;
@@ -20,6 +21,7 @@ export class SetStackValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         microserviceId: new Validator(),
+        id: new Validator(),
         name: new Validator(),
         displayName: new Validator(),
         shortName: new Validator(),
@@ -33,6 +35,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
 
     private _applicationId!: string;
     private _microserviceId!: string;
+    private _id!: string;
     private _name!: string;
     private _displayName!: string;
     private _shortName!: string;
@@ -49,6 +52,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
         return [
             'applicationId',
             'microserviceId',
+            'id',
             'name',
             'displayName',
             'shortName',
@@ -70,6 +74,14 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     set microserviceId(value: string) {
         this._microserviceId = value;
         this.propertyChanged('microserviceId');
+    }
+    get id(): string {
+        return this._id;
+    }
+
+    set id(value: string) {
+        this._id = value;
+        this.propertyChanged('id');
     }
     get name(): string {
         return this._name;

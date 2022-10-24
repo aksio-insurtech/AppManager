@@ -7,11 +7,11 @@ using Events.Applications.Environments;
 namespace Domain.Applications.Environments;
 
 [Route("/api/applications/{applicationId}/environments")]
-public class Environments : Controller
+public class ApplicationEnvironments : Controller
 {
     readonly IEventLog _eventLog;
 
-    public Environments(IEventLog eventLog)
+    public ApplicationEnvironments(IEventLog eventLog)
     {
         _eventLog = eventLog;
     }
@@ -19,7 +19,7 @@ public class Environments : Controller
     [HttpPost]
     public async Task CreateEnvironment([FromRoute] ApplicationId applicationId, [FromBody] CreateEnvironment addEnvironment)
     {
-        await _eventLog.Append(addEnvironment.EnvironmentId, new EnvironmentCreated(applicationId, addEnvironment.Name, addEnvironment.DisplayName, addEnvironment.ShortName));
+        await _eventLog.Append(addEnvironment.EnvironmentId, new ApplicationEnvironmentCreated(applicationId, addEnvironment.Name, addEnvironment.DisplayName, addEnvironment.ShortName));
         await _eventLog.Append(TenantId.Development.Value, new TenantAddedToApplicationEnvironment(addEnvironment.EnvironmentId, TenantId.Development, "Development"));
     }
 }

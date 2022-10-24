@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Events.Applications;
+using Events.Applications.Environments;
 
 namespace Reactions.Applications;
 
@@ -24,6 +25,11 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
             .Set(m => m.Resources.AzureContainerRegistryPassword).To(e => e.Password))
         .From<MongoDBConnectionStringChangedForApplication>(_ => _
             .Set(m => m.Resources.MongoDB.ConnectionString).To(e => e.ConnectionString))
+        .Children(_ => _.Environments, _ => _
+            .IdentifiedBy(m => m.Id)
+            .From<ApplicationEnvironmentCreated>(_ => _
+                .UsingParentKey(e => e.ApplicationId)
+                .Set(m => m.Name).To(e => e.Name)))
         .Children(m => m.Resources.MongoDB.Users, cb => cb
             .IdentifiedBy(m => m.UserName)
             .From<MongoDBUserChanged>(e => e

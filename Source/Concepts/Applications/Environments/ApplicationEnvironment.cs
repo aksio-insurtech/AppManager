@@ -3,4 +3,4 @@
 
 namespace Concepts.Applications.Environments;
 
-public record ApplicationEnvironment(ApplicationEnvironmentName Name, ApplicationEnvironmentDisplayName DisplayName, ApplicationEnvironmentShortName ShortName);
+public record ApplicationEnvironment(ApplicationEnvironmentId Id, ApplicationEnvironmentName Name, ApplicationEnvironmentDisplayName DisplayName, ApplicationEnvironmentShortName ShortName);

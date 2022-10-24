@@ -10,7 +10,7 @@ public record ApplicationEnvironmentProjection : IProjectionFor<ApplicationEnvir
     public ProjectionId Identifier => "27449588-0f8c-47e4-b1ee-c326a12ed391";
 
     public void Define(IProjectionBuilderFor<ApplicationEnvironment> builder) => builder
-        .From<EnvironmentCreated>(_ => _
+        .From<ApplicationEnvironmentCreated>(_ => _
             .UsingCompositeKey<ApplicationEnvironmentKey>(_ => _
                 .Set(k => k.ApplicationId).To(e => e.ApplicationId)
                 .Set(k => k.EnvironmentId).ToEventSourceId())
