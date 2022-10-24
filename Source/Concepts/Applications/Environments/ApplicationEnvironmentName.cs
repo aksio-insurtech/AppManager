@@ -3,4 +3,7 @@
 
 namespace Concepts.Applications.Environments;
 
-public record ApplicationEnvironmentName(string Value) : ConceptAs<string>(Value);
+public record ApplicationEnvironmentName(string Value) : ConceptAs<string>(Value)
+{
+    public static implicit operator ApplicationEnvironmentName(string name) => new(name);
+}

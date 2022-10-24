@@ -1,8 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Infrastructure;
 using Pulumi.Automation;
 
@@ -20,11 +20,11 @@ public class BootstrapStacksForMicroservices : IStacksForMicroservices
         _applicationId = applicationId;
     }
 
-    public Task<StackDeployment> GetFor(MicroserviceId microserviceId, ApplicationEnvironment environment) => Task.FromResult(StackDeployment.FromJsonString("{}"));
+    public Task<StackDeployment> GetFor(ApplicationId applicationId, MicroserviceId microserviceId, ApplicationEnvironment environment) => Task.FromResult(StackDeployment.FromJsonString("{}"));
 
-    public Task<bool> HasFor(MicroserviceId microserviceId, ApplicationEnvironment environment) => Task.FromResult(false);
+    public Task<bool> HasFor(ApplicationId applicationId, MicroserviceId microserviceId, ApplicationEnvironment environment) => Task.FromResult(false);
 
-    public Task Save(MicroserviceId microserviceId, ApplicationEnvironment environment, StackDeployment stackDeployment)
+    public Task Save(ApplicationId applicationId, MicroserviceId microserviceId, ApplicationEnvironment environment, StackDeployment stackDeployment)
     {
         _stacksForSaving.Add(new(_applicationId, microserviceId, environment, stackDeployment.Json.ToString()));
         return Task.CompletedTask;

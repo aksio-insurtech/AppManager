@@ -4,7 +4,7 @@
 using System.Text.Json;
 using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
-using Concepts;
+using Concepts.Applications.Environments;
 using Concepts.Azure;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
@@ -16,6 +16,15 @@ namespace Bootstrap;
 
 public static class Program
 {
+    static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters =
+                {
+                    new ConceptAsJsonConverterFactory()
+                }
+    };
+
     public static async Task Main(string[] args)
     {
         if (args.Length == 0)
@@ -30,24 +39,10 @@ public static class Program
         // Wait till its ready and then append the events that represents the actions done (through commands?)
         var configAsJson = await File.ReadAllTextAsync(args[0]);
 
-        var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters =
-                {
-                    new ConceptAsJsonConverterFactory()
-                }
-        })!;
+        var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, _jsonSerializerOptions)!;
+        var appManagerApi = new AppManagerApi(config, "https://ingress832b7458.livelyglacier-aba45b93.norwayeast.azurecontainerapps.io", _jsonSerializerOptions);
+        await appManagerApi.Authenticate();
 
-        // var appManagerApi = new AppManagerApi(config, "https://ingress832b7458.livelyglacier-aba45b93.norwayeast.azurecontainerapps.io");
-        // await appManagerApi.Authenticate();
-        // BootstrapStacksForApplications.AppManagerApi = appManagerApi;
-        // BootstrapStacksForMicroservices.AppManagerApi = appManagerApi;
-        // var stack = await File.ReadAllTextAsync("/Users/einari/Projects/Aksio/stack.json");
-        // var stackAsDynamic = JsonSerializer.Deserialize<dynamic>(stack);
-        // await appManagerApi.SetStack(Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"), stack);
-        // Console.WriteLine("Wholy cow...");
-        // Console.ReadLine();
         var settings = new Settings(
             new AzureSubscription[] { config.Azure.Subscription },
             config.Pulumi.Organization,
@@ -56,6 +51,9 @@ public static class Program
             config.MongoDB.PublicKey,
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
+
+        var development = new ApplicationEnvironment(Guid.Parse("00126dcd-8d1e-42c3-835b-7978a545ec5c"), "Development", "dev", "D");
+        var production = new ApplicationEnvironment(Guid.Parse("a73f765f-d52c-4469-9d57-30c0aaa0ba36"), "Production", "prod", "P");
 
         var application = new Application(
             Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"),
@@ -70,13 +68,11 @@ public static class Program
                 null!,
                 null!,
                 new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
-            new(config.Authentication.ClientId, config.Authentication.ClientSecret));
+            new[] { development, production });
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
         var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
-
-        const ApplicationEnvironment ApplicationEnvironment = ApplicationEnvironment.Development;
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
@@ -96,21 +92,29 @@ public static class Program
             config.Name,
             PulumiFn.Create(async () =>
             {
-                applicationResult = await definitions.Application(executionContext, application, ApplicationEnvironment);
+                applicationResult = await definitions.Application(executionContext, application, development);
 
                 Console.WriteLine("\n\nSetup AppManager as application");
-                var appManagerApi = new AppManagerApi(config, applicationResult.Ingress.Url);
+                var appManagerApi = new AppManagerApi(config, applicationResult.Ingress.Url, _jsonSerializerOptions);
                 await appManagerApi.Authenticate();
 
                 stacksForApplications.AppManagerApi = appManagerApi;
                 stacksForMicroservices.AppManagerApi = appManagerApi;
             }),
-            ApplicationEnvironment);
+            development);
 
         var microservice = new Microservice(
             Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
             application.Id,
             "Gamma");
+
+        var appManagerVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "app-manager");
+        var deployable = new Deployable(
+                    Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
+                    microservice.Id,
+                    "main",
+                    $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
+                    new[] { 80 });
 
         await operations.Up(
             application,
@@ -123,20 +127,11 @@ public static class Program
                 }
 
                 application = await applicationResult.MergeWithApplication(application);
-                var appManagerVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "app-manager");
-
-                var deployable = new Deployable(
-                            Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
-                            microservice.Id,
-                            "main",
-                            $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
-                            new[] { 80 });
-
                 var microserviceResult = await definitions.Microservice(
                     executionContext,
                     application,
                     microservice,
-                    ApplicationEnvironment,
+                    development,
                     false,
                     deployables: new[]
                     {
@@ -147,30 +142,30 @@ public static class Program
                 var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
                 await application.ConfigureIngress(applicationResult.ResourceGroup, applicationResult.Storage, fileShare, logger, microserviceResourceName);
             }),
-            ApplicationEnvironment,
+            development,
             microservice);
 
         await stacksForApplications.SaveAllQueued();
         await stacksForMicroservices.SaveAllQueued();
 
-        // try
-        // {
-        // await appManagerApi.RegisterOrganization(config.TenantId, config.OrganizationName);
-        // await appManagerApi.AddAzureSubscription(config.Azure.Subscription.SubscriptionId.ToString(), config.Azure.Subscription.Name, config.Azure.Subscription.TenantId, config.Azure.Subscription.TenantName);
-        // await appManagerApi.SetAzureServicePrincipal(config.Azure.ServicePrincipal.ClientId, config.Azure.ServicePrincipal.ClientSecret);
-        // await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
-        // await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
-        // await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
-        // await appManagerApi.ConfigureAuthenticationForApplication(application.Id, config.Authentication.ClientId, config.Authentication.ClientSecret);
-        // await appManagerApi.CreateMicroservice(application.Id, microservice.Id, microservice.Name);
-        // await appManagerApi.CreateDeployable(application.Id, microservice.Id, deployable.Id, deployable.Name);
-        // await appManagerApi.SetDeployableImage(application.Id, microservice.Id, deployable.Id, deployable.Image);
-        // }
-        // catch (Exception ex)
-        // {
-        //     Console.WriteLine($"Errors with calling API - {ex.Message}");
-        // }
-        // new MongoDBEventSequenceStorageProvider()
+        try
+        {
+            await appManagerApi.AddAzureSubscription(config.Azure.Subscription.SubscriptionId.ToString(), config.Azure.Subscription.Name, config.Azure.Subscription.TenantId, config.Azure.Subscription.TenantName);
+            await appManagerApi.SetAzureServicePrincipal(config.Azure.ServicePrincipal.ClientId, config.Azure.ServicePrincipal.ClientSecret);
+            await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
+            await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
+
+            await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
+            await appManagerApi.CreateEnvironment(application.Id, development);
+
+            await appManagerApi.CreateMicroservice(application.Id, development, microservice.Id, microservice.Name);
+            await appManagerApi.CreateDeployable(application.Id, development, microservice.Id, deployable.Id, deployable.Name);
+            await appManagerApi.SetDeployableImage(application.Id, development, microservice.Id, deployable.Id, deployable.Image);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errors with calling API - {ex.Message}");
+        }
         Console.WriteLine("Waiting...");
         Console.ReadLine();
     }
