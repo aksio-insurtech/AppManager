@@ -6,7 +6,6 @@ import { CratisVersions } from 'API/cratis/CratisVersions';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import { SemanticVersion } from 'API/cratis/SemanticVersion';
 
-
 function formatVersion(version: SemanticVersion) {
     return `${version.major}.${version.minor}.${version.patch}`;
 }
