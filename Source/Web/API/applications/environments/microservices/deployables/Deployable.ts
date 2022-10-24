@@ -13,4 +13,7 @@ export class Deployable {
 
     @field(String)
     name!: string;
+
+    @field(String)
+    image!: string;
 }

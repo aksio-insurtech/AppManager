@@ -20,5 +20,5 @@ public class Deployable : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId,
-        [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(deployableId.ToString(), new DeployableImageChanged(deployableImageName));
+        [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(deployableId.ToString(), new DeployableImageChanged(applicationId, environmentId, microserviceId, deployableImageName));
 }

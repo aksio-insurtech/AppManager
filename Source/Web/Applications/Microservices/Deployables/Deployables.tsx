@@ -33,8 +33,9 @@ export const Deployables = () => {
         microserviceId: microserviceId!
     });
 
-    return (
+    console.log(deployables.data);
 
+    return (
         <Stack
             direction="column"
             justifyContent="flex-start"

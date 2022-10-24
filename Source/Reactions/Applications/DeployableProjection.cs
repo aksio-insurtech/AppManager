@@ -14,5 +14,5 @@ public class DeployableProjection : IImmediateProjectionFor<Deployable>
             .Set(m => m.MicroserviceId).To(e => e.MicroserviceId)
             .Set(m => m.Name).To(e => e.Name))
         .From<DeployableImageChanged>(_ => _
-            .Set(m => m.Image).To(e => e.ImageName));
+            .Set(m => m.Image).To(e => e.Image));
 }
