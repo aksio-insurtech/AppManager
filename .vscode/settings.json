@@ -59,6 +59,7 @@
         "azuread",
         "Bson",
         "certbot",
+        "cloudlocations",
         "Cratis",
         "deployables",
         "dhparams",
