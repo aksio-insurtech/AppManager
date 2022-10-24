@@ -76,7 +76,7 @@ public static class Program
         var eventLog = new InMemoryEventLog();
         var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
 
-        const CloudRuntimeEnvironment cloudRuntimeEnvironment = CloudRuntimeEnvironment.Development;
+        const ApplicationEnvironment ApplicationEnvironment = ApplicationEnvironment.Development;
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
@@ -96,7 +96,7 @@ public static class Program
             config.Name,
             PulumiFn.Create(async () =>
             {
-                applicationResult = await definitions.Application(executionContext, application, cloudRuntimeEnvironment);
+                applicationResult = await definitions.Application(executionContext, application, ApplicationEnvironment);
 
                 Console.WriteLine("\n\nSetup AppManager as application");
                 var appManagerApi = new AppManagerApi(config, applicationResult.Ingress.Url);
@@ -105,7 +105,7 @@ public static class Program
                 stacksForApplications.AppManagerApi = appManagerApi;
                 stacksForMicroservices.AppManagerApi = appManagerApi;
             }),
-            cloudRuntimeEnvironment);
+            ApplicationEnvironment);
 
         var microservice = new Microservice(
             Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958"),
@@ -136,7 +136,7 @@ public static class Program
                     executionContext,
                     application,
                     microservice,
-                    cloudRuntimeEnvironment,
+                    ApplicationEnvironment,
                     false,
                     deployables: new[]
                     {
@@ -147,7 +147,7 @@ public static class Program
                 var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
                 await application.ConfigureIngress(applicationResult.ResourceGroup, applicationResult.Storage, fileShare, logger, microserviceResourceName);
             }),
-            cloudRuntimeEnvironment,
+            ApplicationEnvironment,
             microservice);
 
         await stacksForApplications.SaveAllQueued();

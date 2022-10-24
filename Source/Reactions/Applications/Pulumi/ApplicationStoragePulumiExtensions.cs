@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
+using Concepts.Applications.Environments;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Storage;
 using Pulumi.AzureNative.Storage.Inputs;
@@ -13,7 +13,7 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationStoragePulumiExtensions
 {
-    public static async Task<StorageResult> SetupStorage(this Application application, CloudRuntimeEnvironment environment, ResourceGroup resourceGroup, Tags tags)
+    public static async Task<StorageResult> SetupStorage(this Application application, ApplicationEnvironment environment, ResourceGroup resourceGroup, Tags tags)
     {
         var truncatedName = application.Name.Value;
         if (truncatedName.Length > 15)
@@ -21,7 +21,7 @@ public static class ApplicationStoragePulumiExtensions
             truncatedName = truncatedName.Substring(0, 15);
         }
 
-        var name = $"{environment.ToShortName()}{truncatedName}".ToLowerInvariant();
+        var name = $"{environment.ShortName}{truncatedName}".ToLowerInvariant();
         var storageAccount = new StorageAccount(name, new StorageAccountArgs
         {
             ResourceGroupName = resourceGroup.Name,

@@ -43,8 +43,8 @@ public class AppManagerApi : IDisposable
         Console.WriteLine($"URL for API is : '{_url}'");
     }
 
-    public Task SetStackForApplication(Guid id, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{id}/stack/{environment}", stack);
-    public Task SetStackForMicroservice(Guid applicationId, Guid microserviceId, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/stack/{environment}", stack);
+    public Task SetStackForApplication(Guid id, ApplicationEnvironment environment, string stack) => Perform($"/api/applications/{id}/stack/{environment}", stack);
+    public Task SetStackForMicroservice(Guid applicationId, Guid microserviceId, ApplicationEnvironment environment, string stack) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/stack/{environment}", stack);
     public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/settings/pulumi", new { organization, accessToken });
     public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/settings/service-principal", new { clientId, clientSecret });
     public Task AddAzureSubscription(string id, string name, string tenantId, string tenantName) => Perform("/api/settings/subscriptions", new { id, name, tenantId, tenantName });

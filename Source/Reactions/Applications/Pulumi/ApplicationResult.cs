@@ -1,14 +1,14 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
+using Concepts.Applications.Environments;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
 
 public record ApplicationResult(
-    CloudRuntimeEnvironment Environment,
+    ApplicationEnvironment Environment,
     ResourceGroup ResourceGroup,
     NetworkResult Network,
     StorageResult Storage,

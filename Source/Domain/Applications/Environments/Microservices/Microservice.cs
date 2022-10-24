@@ -1,8 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Events.Applications.Environments.Microservices;
 using Infrastructure;
 using Pulumi.Automation;
@@ -37,9 +37,10 @@ public class Microservice : Controller
 
     [HttpPost("stack")]
     public Task SetStack(
+        [FromRoute] ApplicationId applicationId,
         [FromRoute] MicroserviceId microserviceId,
-        [FromRoute] CloudRuntimeEnvironment environment,
-        [FromBody] object stack) => _stacksForMicroservices.Save(microserviceId, environment, StackDeployment.FromJsonString(stack.ToString()!));
+        [FromRoute] ApplicationEnvironment environment,
+        [FromBody] object stack) => _stacksForMicroservices.Save(applicationId, microserviceId, environment, StackDeployment.FromJsonString(stack.ToString()!));
 
     [HttpPost("remove")]
     public Task Remove([FromRoute] MicroserviceId microserviceId) => _eventLog.Append(microserviceId, new MicroserviceRemoved());

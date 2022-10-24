@@ -56,6 +56,7 @@
         "aksiosystem",
         "appsettings",
         "Autofac",
+        "azuread",
         "Bson",
         "certbot",
         "Cratis",

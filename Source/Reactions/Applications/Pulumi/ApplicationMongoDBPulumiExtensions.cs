@@ -2,8 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Common;
-using Concepts;
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Pulumi;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
@@ -21,7 +21,7 @@ public static class ApplicationMongoDBPulumiExtensions
         ISettings settings,
         ResourceGroup resourceGroup,
         VirtualNetwork vnet,
-        CloudRuntimeEnvironment environment,
+        ApplicationEnvironment environment,
         Tags tags)
     {
         var mongoDBOrganizationId = settings.MongoDBOrganizationId;
@@ -82,7 +82,7 @@ public static class ApplicationMongoDBPulumiExtensions
             PrivateEndpointIpAddress = networkInterface.IpConfigurations[0].PrivateIPAddress!
         });
 
-        var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
+        var clusterName = $"{application.Name}-{environment.DisplayName}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
             ProjectId = project.Id,

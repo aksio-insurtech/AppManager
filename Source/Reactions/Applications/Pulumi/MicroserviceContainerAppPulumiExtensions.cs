@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
+using Concepts.Applications.Environments;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -11,7 +11,7 @@ namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceContainerAppPulumiExtensions
 {
-    public static Task<ContainerApp> GetContainerApp(this Microservice microservice, Application application, CloudRuntimeEnvironment environment)
+    public static Task<ContainerApp> GetContainerApp(this Microservice microservice, Application application, ApplicationEnvironment environment)
     {
         var resourceGroup = application.GetResourceGroup(environment);
         var containerAppName = microservice.Name.Value.ToLowerInvariant();

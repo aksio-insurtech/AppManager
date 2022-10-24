@@ -3,7 +3,7 @@
 
 using Aksio.Cratis.Execution;
 using Common;
-using Concepts;
+using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.Resources;
 
@@ -30,7 +30,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment)
+    public async Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, ApplicationEnvironment environment)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.SetupResourceGroup(environment);
@@ -99,7 +99,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
-        CloudRuntimeEnvironment environment,
+        ApplicationEnvironment environment,
         bool useContainerRegistry = true,
         ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
@@ -138,7 +138,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         Microservice microservice,
         IEnumerable<Deployable> deployables,
-        CloudRuntimeEnvironment environment)
+        ApplicationEnvironment environment)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.GetResourceGroup(environment);

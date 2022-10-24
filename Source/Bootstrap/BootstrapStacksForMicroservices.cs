@@ -10,7 +10,7 @@ namespace Bootstrap;
 
 public class BootstrapStacksForMicroservices : IStacksForMicroservices
 {
-    record StackForSaving(ApplicationId ApplicationId, MicroserviceId microserviceId, CloudRuntimeEnvironment Environment, string Deployment);
+    record StackForSaving(ApplicationId ApplicationId, MicroserviceId microserviceId, ApplicationEnvironment Environment, string Deployment);
     internal AppManagerApi? AppManagerApi;
     readonly ApplicationId _applicationId;
     readonly List<StackForSaving> _stacksForSaving = new();
@@ -20,11 +20,11 @@ public class BootstrapStacksForMicroservices : IStacksForMicroservices
         _applicationId = applicationId;
     }
 
-    public Task<StackDeployment> GetFor(MicroserviceId microserviceId, CloudRuntimeEnvironment environment) => Task.FromResult(StackDeployment.FromJsonString("{}"));
+    public Task<StackDeployment> GetFor(MicroserviceId microserviceId, ApplicationEnvironment environment) => Task.FromResult(StackDeployment.FromJsonString("{}"));
 
-    public Task<bool> HasFor(MicroserviceId microserviceId, CloudRuntimeEnvironment environment) => Task.FromResult(false);
+    public Task<bool> HasFor(MicroserviceId microserviceId, ApplicationEnvironment environment) => Task.FromResult(false);
 
-    public Task Save(MicroserviceId microserviceId, CloudRuntimeEnvironment environment, StackDeployment stackDeployment)
+    public Task Save(MicroserviceId microserviceId, ApplicationEnvironment environment, StackDeployment stackDeployment)
     {
         _stacksForSaving.Add(new(_applicationId, microserviceId, environment, stackDeployment.Json.ToString()));
         return Task.CompletedTask;

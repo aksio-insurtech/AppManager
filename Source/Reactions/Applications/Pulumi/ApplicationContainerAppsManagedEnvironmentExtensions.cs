@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
+using Concepts.Applications.Environments;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.OperationalInsights;
@@ -14,7 +14,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
     public static ManagedEnvironment SetupContainerAppManagedEnvironment(
         this Application application,
         ResourceGroup resourceGroup,
-        CloudRuntimeEnvironment environment,
+        ApplicationEnvironment environment,
         Workspace applicationInsights,
         NetworkResult network,
         Tags tags)
@@ -58,7 +58,7 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
     public static async Task<(string Id, string Name)> GetContainerAppManagedEnvironment(
         this Application application,
         ResourceGroup resourceGroup,
-        CloudRuntimeEnvironment environment)
+        ApplicationEnvironment environment)
     {
         var result = GetManagedEnvironment.Invoke(new()
         {
@@ -70,5 +70,5 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
         return (getManagedEnvironmentResult.Id, getManagedEnvironmentResult.Name);
     }
 
-    static string GetName(Application application, CloudRuntimeEnvironment environment) => $"{application.Name}-{environment.ToDisplayName()}";
+    static string GetName(Application application, ApplicationEnvironment environment) => $"{application.Name}-{environment.DisplayName}";
 }
