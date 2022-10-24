@@ -14,11 +14,13 @@ export const Ingress = () => {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={(e, value) => setSelectedTab(value)}>
                     <Tab label="General" value="0" />
-                    <Tab label="Routes" value="1" />
+                    <Tab label="Authentication" value="1" />
+                    <Tab label="Routes" value="2" />
                 </TabList>
             </Box>
             <TabPanel value="0"></TabPanel>
             <TabPanel value="1"></TabPanel>
+            <TabPanel value="2"></TabPanel>
         </TabContext>
     );
 };
