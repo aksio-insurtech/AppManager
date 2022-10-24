@@ -3,7 +3,10 @@
 
 import { IModalProps } from '@aksio/cratis-mui';
 import { Stack, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import Editor, { useMonaco } from '@monaco-editor/react';
+
 
 export type AddConfigFileDialogOutput = {
     name: string;
@@ -22,9 +25,16 @@ export const AddConfigFileDialog = (props: IModalProps<{}, AddConfigFileDialogOu
     });
 
     return (
-        <Stack direction="column" width={400} spacing={1}>
+        <Stack direction="column" width={500} spacing={1}>
             <TextField label='Name' fullWidth required defaultValue={name} onChange={e => setName(e.currentTarget.value)} />
-            <TextField label='Value' fullWidth required defaultValue={value} onChange={e => setValue(e.currentTarget.value)} />
+            <Editor
+                height="45vh"
+                theme="vs-dark"
+                defaultValue="{}"
+                language="JSON"
+                defaultLanguage="JSON"
+                onChange={(json) => setValue(json!)}
+            />
         </Stack>
     );
 };

@@ -16,5 +16,5 @@ module.exports = (env, argv) => {
         };
         config.resolve.alias.API = path.resolve('./API');
         config.resolve.alias.Components = path.resolve('./Components');
-    }, 'Bank Sample');
+    }, 'AppManager');
 };
