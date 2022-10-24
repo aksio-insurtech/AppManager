@@ -5,7 +5,7 @@ import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
 
-export const Ingresses = () => {
+export const Ingress = () => {
     const [selectedTab, setSelectedTab] = useState("0");
 
     return (

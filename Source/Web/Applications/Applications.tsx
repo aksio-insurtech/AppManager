@@ -20,7 +20,7 @@ import { ApplicationItem } from './ApplicationItem';
 import { ApplicationHierarchyForListing } from '../API/applications/ApplicationHierarchyForListing';
 import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
 import { Tenants } from './Tenants/Tenants';
-import { Ingresses } from './Ingresses/Ingresses';
+import { Ingress } from './Ingresses/Ingress';
 import { Cratis } from './Cratis/Cratis';
 
 export const Applications = () => {
@@ -122,7 +122,7 @@ export const Applications = () => {
                         <Routes>
                             <Route path=':applicationId' element={<Application />} />
                             <Route path=':applicationId/environments/:environmentId' element={<Application />} />
-                            <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingresses />} />
+                            <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingress />} />
                             <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis />} />
                             <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
