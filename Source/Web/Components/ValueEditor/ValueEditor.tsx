@@ -3,8 +3,10 @@
 
 import { Content, ModalButtons, ModalClosed, useModal } from '@aksio/cratis-mui';
 import { Box, Button, Toolbar } from '@mui/material';
-import { DataGrid, GridColDef, GridRowId, GridRowIdGetter, GridRowsProp, GridValidRowModel } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridRowId, GridRowIdGetter, GridRowsProp, GridSelectionModel, GridValidRowModel } from '@mui/x-data-grid';
 import * as icons from '@mui/icons-material';
+
+export type SelectionChanged<TModel> = (rows: TModel[]) => void;
 
 export interface ValueEditorProps<TOutput, TModel extends GridValidRowModel = GridValidRowModel> {
     addTitle: string;
@@ -13,6 +15,7 @@ export interface ValueEditorProps<TOutput, TModel extends GridValidRowModel = Gr
     modalContent: Content<{}, TOutput>;
     modalClosed: ModalClosed<TOutput>;
     getRowId: GridRowIdGetter<TModel>;
+    onSelectionChanged?: SelectionChanged<TModel>;
 }
 
 export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridValidRowModel>(props: ValueEditorProps<TOutput, TModel>) => {
@@ -21,6 +24,11 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
         ModalButtons.OkCancel,
         props.modalContent,
         props.modalClosed);
+
+    const handleSelectionChanged = (selectionModel: GridSelectionModel, details: GridCallbackDetails) => {
+        const selectedItems = selectionModel.map((id => props.data.find(item => props.getRowId(item) == id))) as TModel[];
+        props.onSelectionChanged?.(selectedItems);
+    };
 
     return (
         <Box sx={{ height: 400, width: '100%', padding: '24px' }}>
@@ -34,6 +42,7 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
                 columns={props.columns}
                 sortingMode="client"
                 getRowId={props.getRowId}
+                onSelectionModelChange={handleSelectionChanged}
                 rows={props.data as GridRowsProp<any>} />
         </Box>
     );
