@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications.Microservices;
+namespace Read.Applications.Environments.Microservices;
 
-public record Microservice(MicroserviceId Id, MicroserviceName Name);
+public record Microservice(MicroserviceKey Id, MicroserviceName Name);

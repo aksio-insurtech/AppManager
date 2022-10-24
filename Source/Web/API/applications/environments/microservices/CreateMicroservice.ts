@@ -6,43 +6,38 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/image');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices');
 
-export interface ISetImage {
+export interface ICreateMicroservice {
     applicationId?: string;
     environmentId?: string;
     microserviceId?: string;
-    deployableId?: string;
-    deployableImageName?: string;
+    name?: string;
 }
 
-export class SetImageValidator extends CommandValidator {
+export class CreateMicroserviceValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
         microserviceId: new Validator(),
-        deployableId: new Validator(),
-        deployableImageName: new Validator(),
+        name: new Validator(),
     };
 }
 
-export class SetImage extends Command<ISetImage> implements ISetImage {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/image';
+export class CreateMicroservice extends Command<ICreateMicroservice> implements ICreateMicroservice {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetImageValidator();
+    readonly validation: CommandValidator = new CreateMicroserviceValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
     private _microserviceId!: string;
-    private _deployableId!: string;
-    private _deployableImageName!: string;
+    private _name!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
             'environmentId',
-            'microserviceId',
-            'deployableId',
         ];
     }
 
@@ -51,8 +46,7 @@ export class SetImage extends Command<ISetImage> implements ISetImage {
             'applicationId',
             'environmentId',
             'microserviceId',
-            'deployableId',
-            'deployableImageName',
+            'name',
         ];
     }
 
@@ -80,24 +74,16 @@ export class SetImage extends Command<ISetImage> implements ISetImage {
         this._microserviceId = value;
         this.propertyChanged('microserviceId');
     }
-    get deployableId(): string {
-        return this._deployableId;
+    get name(): string {
+        return this._name;
     }
 
-    set deployableId(value: string) {
-        this._deployableId = value;
-        this.propertyChanged('deployableId');
-    }
-    get deployableImageName(): string {
-        return this._deployableImageName;
+    set name(value: string) {
+        this._name = value;
+        this.propertyChanged('name');
     }
 
-    set deployableImageName(value: string) {
-        this._deployableImageName = value;
-        this.propertyChanged('deployableImageName');
-    }
-
-    static use(initialValues?: ISetImage): [SetImage, SetCommandValues<ISetImage>] {
-        return useCommand<SetImage, ISetImage>(SetImage, initialValues);
+    static use(initialValues?: ICreateMicroservice): [CreateMicroservice, SetCommandValues<ICreateMicroservice>] {
+        return useCommand<CreateMicroservice, ICreateMicroservice>(CreateMicroservice, initialValues);
     }
 }

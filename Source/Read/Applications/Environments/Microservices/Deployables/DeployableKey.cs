@@ -2,7 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 
 namespace Read.Applications;
 
-public record DeployableOnMicroservice(DeployableId DeployableId, DeployableName Name);
+public record DeployableKey(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId);

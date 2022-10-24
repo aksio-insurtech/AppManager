@@ -16,6 +16,6 @@ public class Applications : Controller
     }
 
     [HttpPost]
-    public Task Create([FromBody] CreateApplication command) =>
+    public Task CreateApplication([FromBody] CreateApplication command) =>
          _eventLog.Append(command.ApplicationId, new ApplicationCreated(command.Name, command.AzureSubscriptionId, command.CloudLocation));
 }

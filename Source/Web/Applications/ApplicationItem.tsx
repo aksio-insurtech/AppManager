@@ -5,7 +5,7 @@ import { ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } 
 import { ListItemActionButton } from './ListItemActionButton';
 import * as icons from '@mui/icons-material';
 import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
-import { Create as CreateMicroservice } from 'API/applications/environments/microservices/Create';
+import { CreateMicroservice } from 'API/applications/environments/microservices/CreateMicroservice';
 import { useNavigate } from 'react-router-dom';
 import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';

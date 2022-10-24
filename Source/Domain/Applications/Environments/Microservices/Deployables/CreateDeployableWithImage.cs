@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications;
+namespace Domain.Applications.Environments.Microservices.Deployables;
 
-public record MicroserviceInEnvironment(MicroserviceId MicroserviceId, MicroserviceName Name, IEnumerable<Deployable> Deployables);
+public record CreateDeployableWithImage(DeployableId DeployableId, DeployableName Name, DeployableImageName Image);

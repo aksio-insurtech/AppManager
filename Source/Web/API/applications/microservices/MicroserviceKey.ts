@@ -4,16 +4,15 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { Deployable } from './Deployable';
 
-export class MicroserviceInEnvironment {
+export class MicroserviceKey {
+
+    @field(String)
+    applicationId!: string;
+
+    @field(String)
+    environmentId!: string;
 
     @field(String)
     microserviceId!: string;
-
-    @field(String)
-    name!: string;
-
-    @field(Deployable, true)
-    deployables!: Deployable[];
 }

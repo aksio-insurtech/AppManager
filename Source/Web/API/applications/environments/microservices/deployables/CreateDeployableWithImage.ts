@@ -6,38 +6,45 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/with-image');
 
-export interface ICreate {
+export interface ICreateDeployableWithImage {
     applicationId?: string;
     environmentId?: string;
     microserviceId?: string;
+    deployableId?: string;
     name?: string;
+    image?: string;
 }
 
-export class CreateValidator extends CommandValidator {
+export class CreateDeployableWithImageValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
         microserviceId: new Validator(),
+        deployableId: new Validator(),
         name: new Validator(),
+        image: new Validator(),
     };
 }
 
-export class Create extends Command<ICreate> implements ICreate {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices';
+export class CreateDeployableWithImage extends Command<ICreateDeployableWithImage> implements ICreateDeployableWithImage {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/with-image';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new CreateValidator();
+    readonly validation: CommandValidator = new CreateDeployableWithImageValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
     private _microserviceId!: string;
+    private _deployableId!: string;
     private _name!: string;
+    private _image!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
             'environmentId',
+            'microserviceId',
         ];
     }
 
@@ -46,7 +53,9 @@ export class Create extends Command<ICreate> implements ICreate {
             'applicationId',
             'environmentId',
             'microserviceId',
+            'deployableId',
             'name',
+            'image',
         ];
     }
 
@@ -74,6 +83,14 @@ export class Create extends Command<ICreate> implements ICreate {
         this._microserviceId = value;
         this.propertyChanged('microserviceId');
     }
+    get deployableId(): string {
+        return this._deployableId;
+    }
+
+    set deployableId(value: string) {
+        this._deployableId = value;
+        this.propertyChanged('deployableId');
+    }
     get name(): string {
         return this._name;
     }
@@ -82,8 +99,16 @@ export class Create extends Command<ICreate> implements ICreate {
         this._name = value;
         this.propertyChanged('name');
     }
+    get image(): string {
+        return this._image;
+    }
 
-    static use(initialValues?: ICreate): [Create, SetCommandValues<ICreate>] {
-        return useCommand<Create, ICreate>(Create, initialValues);
+    set image(value: string) {
+        this._image = value;
+        this.propertyChanged('image');
+    }
+
+    static use(initialValues?: ICreateDeployableWithImage): [CreateDeployableWithImage, SetCommandValues<ICreateDeployableWithImage>] {
+        return useCommand<CreateDeployableWithImage, ICreateDeployableWithImage>(CreateDeployableWithImage, initialValues);
     }
 }

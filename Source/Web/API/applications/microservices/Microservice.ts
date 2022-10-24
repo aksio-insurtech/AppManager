@@ -4,11 +4,12 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { MicroserviceKey } from './MicroserviceKey';
 
 export class Microservice {
 
-    @field(String)
-    id!: string;
+    @field(MicroserviceKey)
+    id!: MicroserviceKey;
 
     @field(String)
     name!: string;

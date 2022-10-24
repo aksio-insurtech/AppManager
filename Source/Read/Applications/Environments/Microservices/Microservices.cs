@@ -3,7 +3,7 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications.Microservices;
+namespace Read.Applications.Environments.Microservices;
 
 [Route("/api/applications/{applicationId}/microservices")]
 public class Microservices : Controller

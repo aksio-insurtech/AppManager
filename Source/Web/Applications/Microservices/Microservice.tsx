@@ -8,6 +8,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
 import { Variables } from '../Variables/Variables';
 import { Secrets } from '../Secrets/Secrets';
+import { Deployables } from './Deployables/Deployables';
 
 export const Microservice = () => {
     const { microserviceId } = useParams();
@@ -27,7 +28,7 @@ export const Microservice = () => {
                 </TabList>
             </Box>
             <TabPanel value="0"></TabPanel>
-            <TabPanel value="1"></TabPanel>
+            <TabPanel value="1"><Deployables/></TabPanel>
             <TabPanel value="2"></TabPanel>
             <TabPanel value="3"><Variables /></TabPanel>
             <TabPanel value="4"><Secrets /></TabPanel>

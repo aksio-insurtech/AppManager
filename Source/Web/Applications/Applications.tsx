@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
-import { Create as CreateApplication } from 'API/applications/Create';
+import { CreateApplication } from 'API/applications/CreateApplication';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ApplicationsHierarchy } from 'API/applications/ApplicationsHierarchy';
 import { Application } from './Application';

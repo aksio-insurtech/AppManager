@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Events.Applications.Environments.Microservices.Deployables;
 
 namespace Domain.Applications.Environments.Microservices.Deployables;
@@ -15,6 +16,8 @@ public class Deployable : Controller
 
     [HttpPost("image")]
     public Task SetImage(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId,
         [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(deployableId.ToString(), new DeployableImageChanged(deployableImageName));

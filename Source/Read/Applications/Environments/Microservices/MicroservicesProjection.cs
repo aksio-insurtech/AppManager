@@ -3,7 +3,7 @@
 
 using Events.Applications.Environments.Microservices;
 
-namespace Read.Applications.Microservices;
+namespace Read.Applications.Environments.Microservices;
 
 public class MicroservicesProjection : IProjectionFor<Microservice>
 {
@@ -11,6 +11,10 @@ public class MicroservicesProjection : IProjectionFor<Microservice>
 
     public void Define(IProjectionBuilderFor<Microservice> builder) => builder
         .From<MicroserviceCreated>(_ => _
+            .UsingCompositeKey<MicroserviceKey>(key => key
+                .Set(k => k.ApplicationId).To(e => e.ApplicationId)
+                .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
+                .Set(k => k.MicroserviceId).ToEventSourceId())
             .Set(m => m.Name).To(e => e.Name))
         .RemovedWith<MicroserviceRemoved>();
 }

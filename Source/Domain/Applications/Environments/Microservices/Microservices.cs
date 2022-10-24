@@ -17,7 +17,7 @@ public class Microservices : Controller
     }
 
     [HttpPost]
-    public Task Create(
+    public Task CreateMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] CreateMicroservice command) => _eventLog.Append(command.MicroserviceId, new MicroserviceCreated(applicationId, environmentId, command.Name));

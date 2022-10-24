@@ -6,45 +6,71 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/deployables');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables');
 
-export interface ICreate {
+export interface ICreateDeployable {
+    applicationId?: string;
+    environmentId?: string;
     microserviceId?: string;
     deployableId?: string;
     name?: string;
 }
 
-export class CreateValidator extends CommandValidator {
+export class CreateDeployableValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
+        applicationId: new Validator(),
+        environmentId: new Validator(),
         microserviceId: new Validator(),
         deployableId: new Validator(),
         name: new Validator(),
     };
 }
 
-export class Create extends Command<ICreate> implements ICreate {
-    readonly route: string = '/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/deployables';
+export class CreateDeployable extends Command<ICreateDeployable> implements ICreateDeployable {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new CreateValidator();
+    readonly validation: CommandValidator = new CreateDeployableValidator();
 
+    private _applicationId!: string;
+    private _environmentId!: string;
     private _microserviceId!: string;
     private _deployableId!: string;
     private _name!: string;
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
+            'environmentId',
             'microserviceId',
         ];
     }
 
     get properties(): string[] {
         return [
+            'applicationId',
+            'environmentId',
             'microserviceId',
             'deployableId',
             'name',
         ];
     }
 
+    get applicationId(): string {
+        return this._applicationId;
+    }
+
+    set applicationId(value: string) {
+        this._applicationId = value;
+        this.propertyChanged('applicationId');
+    }
+    get environmentId(): string {
+        return this._environmentId;
+    }
+
+    set environmentId(value: string) {
+        this._environmentId = value;
+        this.propertyChanged('environmentId');
+    }
     get microserviceId(): string {
         return this._microserviceId;
     }
@@ -70,7 +96,7 @@ export class Create extends Command<ICreate> implements ICreate {
         this.propertyChanged('name');
     }
 
-    static use(initialValues?: ICreate): [Create, SetCommandValues<ICreate>] {
-        return useCommand<Create, ICreate>(Create, initialValues);
+    static use(initialValues?: ICreateDeployable): [CreateDeployable, SetCommandValues<ICreateDeployable>] {
+        return useCommand<CreateDeployable, ICreateDeployable>(CreateDeployable, initialValues);
     }
 }
