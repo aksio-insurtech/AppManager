@@ -18,12 +18,6 @@ export const General = (props: GeneralProps) => {
         <div>
             <h2>Settings</h2>
             <TextField label="Name" value={props.microservice?.name || ''} inputProps={{ readOnly: true }} />
-            <br />
-            <br />
-            <br />
-
-            <h2>Danger zone</h2>
-            <Button variant="outlined">Delete</Button>
         </div>
     );
 };
