@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { Variables } from '../Variables/Variables';
 import { Secrets } from '../Secrets/Secrets';
 import { Deployables } from './Deployables/Deployables';
+import { ConfigFiles } from '../ConfigFiles/ConfigFiles';
+import { General } from './General';
 
 export const Microservice = () => {
     const { applicationId, environmentId, microserviceId } = useParams();
@@ -31,9 +33,9 @@ export const Microservice = () => {
                     <Tab label="Secrets" value="4" />
                 </TabList>
             </Box>
-            <TabPanel value="0"></TabPanel>
+            <TabPanel value="0"><General microservice={microservice.data} /></TabPanel>
             <TabPanel value="1"><Deployables /></TabPanel>
-            <TabPanel value="2"></TabPanel>
+            <TabPanel value="2"><ConfigFiles /></TabPanel>
             <TabPanel value="3"><Variables /></TabPanel>
             <TabPanel value="4"><Secrets /></TabPanel>
         </TabContext>
