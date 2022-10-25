@@ -28,8 +28,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         this Microservice microservice,
         Application application,
         ResourceGroup resourceGroup,
-        string managedEnvironmentId,
-        string managedEnvironmentName,
+        ManagedEnvironment managedEnvironment,
         string containerRegistryLoginServer,
         string containerRegistryUsername,
         string containerRegistryPassword,
@@ -47,7 +46,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(microservice.Name, new()
         {
             ResourceGroupName = resourceGroup.Name,
-            EnvironmentName = managedEnvironmentName,
+            EnvironmentName = managedEnvironment.Name,
             StorageName = storageName,
             Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
@@ -66,7 +65,7 @@ public static class MicroserviceContainerAppPulumiExtensions
             Location = resourceGroup.Location,
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
-            ManagedEnvironmentId = managedEnvironmentId,
+            ManagedEnvironmentId = managedEnvironment.Id,
             Configuration = new ConfigurationArgs
             {
                 Ingress = new IngressArgs

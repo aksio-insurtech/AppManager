@@ -55,19 +55,21 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
         });
     }
 
-    public static async Task<(string Id, string Name)> GetContainerAppManagedEnvironment(
+    public static async Task<ManagedEnvironment> GetContainerAppManagedEnvironment(
         this Application application,
         ResourceGroup resourceGroup,
         ApplicationEnvironment environment)
     {
+        var environmentName = GetName(application, environment);
+
         var result = GetManagedEnvironment.Invoke(new()
         {
             ResourceGroupName = resourceGroup.Name,
-            EnvironmentName = GetName(application, environment)
+            EnvironmentName = environmentName
         });
 
         var getManagedEnvironmentResult = await result.GetValue();
-        return (getManagedEnvironmentResult.Id, getManagedEnvironmentResult.Name);
+        return ManagedEnvironment.Get(getManagedEnvironmentResult.Name, getManagedEnvironmentResult.Id);
     }
 
     static string GetName(Application application, ApplicationEnvironment environment) => $"{application.Name}-{environment.DisplayName}";

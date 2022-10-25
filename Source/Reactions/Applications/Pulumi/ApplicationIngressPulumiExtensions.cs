@@ -21,7 +21,7 @@ public static class ApplicationIngressPulumiExtensions
     public static async Task ConfigureIngress(
         this Application application,
         ResourceGroup resourceGroup,
-        StorageResult storage,
+        Storage storage,
         FileShare fileShare,
         ILogger<FileStorage> fileStorageLogger,
         string? frontendMicroserviceResourceName = default)
@@ -52,7 +52,7 @@ public static class ApplicationIngressPulumiExtensions
     public static async Task<IngressResult> SetupIngress(
         this Application application,
         ResourceGroup resourceGroup,
-        StorageResult storage,
+        Storage storage,
         ManagedEnvironment managedEnvironment,
         Tags tags,
         ILogger<FileStorage> fileStorageLogger,

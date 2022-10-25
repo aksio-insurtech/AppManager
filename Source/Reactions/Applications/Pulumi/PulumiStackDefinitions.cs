@@ -48,14 +48,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
         var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
         var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, network, tags);
-        var managedEnvironmentId = await managedEnvironment.Id.GetValue();
-        var managedEnvironmentName = await managedEnvironment.Name.GetValue();
 
         var kernel = await microservice.SetupContainerApp(
             application,
             resourceGroup,
-            managedEnvironmentId,
-            managedEnvironmentName,
+            managedEnvironment,
             containerRegistry.LoginServer,
             containerRegistry.UserName,
             containerRegistry.Password,
@@ -70,8 +67,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         await kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
 
-        var ingressResult = await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
-
         var applicationResult = new ApplicationResult(
             environment,
             resourceGroup,
@@ -80,7 +75,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             containerRegistry,
             mongoDB,
             managedEnvironment,
-            ingressResult,
             kernel);
         var events = await application.GetEventsToAppend(applicationResult);
 
@@ -94,9 +88,14 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         return applicationResult;
     }
 
-    public Task Ingress(ExecutionContext executionContext, Application application, ApplicationEnvironment environment, Ingress ingress)
+    public async Task<IngressResult> Ingress(ExecutionContext executionContext, Application application, ApplicationEnvironment environment, Ingress ingress)
     {
-        return Task.CompletedTask;
+        var tags = application.GetTags(environment);
+        var resourceGroup = application.GetResourceGroup(environment);
+        var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
+        var storage = await application.GetStorage(environment, resourceGroup);
+
+        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(
@@ -121,8 +120,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var microserviceResult = await microservice.SetupContainerApp(
             application,
             resourceGroup,
-            managedEnvironment.Id,
-            managedEnvironment.Name,
+            managedEnvironment,
             application.Resources.AzureContainerRegistryLoginServer,
             application.Resources.AzureContainerRegistryUserName,
             application.Resources.AzureContainerRegistryPassword,
@@ -153,8 +151,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _ = microservice.SetupContainerApp(
             application,
             resourceGroup,
-            managedEnvironment.Id,
-            managedEnvironment.Name,
+            managedEnvironment,
             application.Resources.AzureContainerRegistryLoginServer,
             application.Resources.AzureContainerRegistryUserName,
             application.Resources.AzureContainerRegistryPassword,
