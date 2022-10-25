@@ -3,6 +3,7 @@
 
 using Aksio.Cratis.Execution;
 using Events.Applications.Environments;
+using Infrastructure;
 
 namespace Domain.Applications.Environments;
 
@@ -10,16 +11,19 @@ namespace Domain.Applications.Environments;
 public class ApplicationEnvironments : Controller
 {
     readonly IEventLog _eventLog;
+    readonly IDockerHub _dockerHub;
 
-    public ApplicationEnvironments(IEventLog eventLog)
+    public ApplicationEnvironments(IEventLog eventLog, IDockerHub dockerHub)
     {
         _eventLog = eventLog;
+        _dockerHub = dockerHub;
     }
 
     [HttpPost]
     public async Task CreateEnvironment([FromRoute] ApplicationId applicationId, [FromBody] CreateEnvironment addEnvironment)
     {
-        await _eventLog.Append(addEnvironment.EnvironmentId, new ApplicationEnvironmentCreated(applicationId, addEnvironment.Name, addEnvironment.DisplayName, addEnvironment.ShortName));
+        var cratisVersion = await _dockerHub.GetLastVersionOfCratis();
+        await _eventLog.Append(addEnvironment.EnvironmentId, new ApplicationEnvironmentCreated(applicationId, addEnvironment.Name, addEnvironment.DisplayName, addEnvironment.ShortName, cratisVersion));
         await _eventLog.Append(TenantId.Development.Value, new TenantAddedToApplicationEnvironment(addEnvironment.EnvironmentId, TenantId.Development, "Development"));
     }
 }

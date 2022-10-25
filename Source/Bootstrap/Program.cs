@@ -87,13 +87,15 @@ public static class Program
             stacksForMicroservices);
 
         ApplicationResult? applicationResult = default;
+        var dockerHub = new DockerHub();
+        var cratisVersion = await dockerHub.GetLastVersionOfCratis();
 
         await operations.Up(
             application,
             config.Name,
             PulumiFn.Create(async () =>
             {
-                applicationResult = await definitions.Application(executionContext, application, development);
+                applicationResult = await definitions.ApplicationEnvironment(executionContext, application, development, cratisVersion);
 
                 Console.WriteLine("\n\nSetup AppManager as application");
                 var appManagerApi = new AppManagerApi(config, applicationResult.Ingress.Url, _jsonSerializerOptions);
@@ -109,7 +111,7 @@ public static class Program
             application.Id,
             "Gamma");
 
-        var appManagerVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "app-manager");
+        var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
         var deployable = new Deployable(
                     Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
                     microservice.Id,

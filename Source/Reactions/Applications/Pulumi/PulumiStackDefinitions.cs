@@ -3,8 +3,8 @@
 
 using Aksio.Cratis.Execution;
 using Common;
+using Concepts;
 using Concepts.Applications.Environments;
-using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.Resources;
 
@@ -31,7 +31,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, ApplicationEnvironment environment)
+    public async Task<ApplicationResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironment environment, SemanticVersion cratisVersion)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.SetupResourceGroup(environment);
@@ -51,8 +51,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var managedEnvironmentId = await managedEnvironment.Id.GetValue();
         var managedEnvironmentName = await managedEnvironment.Name.GetValue();
 
-        var latestVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "cratis");
-
         var kernel = await microservice.SetupContainerApp(
             application,
             resourceGroup,
@@ -64,7 +62,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             kernelStorage,
             new[]
             {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", $"docker.io/aksioinsurtech/cratis:{latestVersion}", new[] { 80 })
+                    new Deployable(Guid.Empty, microservice.Id, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 })
             },
             tags,
             false);

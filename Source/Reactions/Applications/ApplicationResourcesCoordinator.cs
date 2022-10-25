@@ -44,7 +44,7 @@ public class ApplicationResourcesCoordinator
 
         _ = Task.Run(async () =>
         {
-            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, environment));
+            var definition = PulumiFn.Create(() => _stackDefinitions.ApplicationEnvironment(_executionContext, application, environment, @event.CratisVersion));
             await _pulumiOperations.Up(application, application.Name, definition, environment);
         });
     }
