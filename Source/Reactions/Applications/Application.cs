@@ -13,7 +13,7 @@ public record Application(
     AzureSubscriptionId AzureSubscriptionId,
     CloudLocationKey CloudLocation,
     ApplicationResources Resources,
-    IEnumerable<ApplicationEnvironment> Environments)
+    IEnumerable<ApplicationEnvironmentWithArtifacts> Environments)
 {
-    public ApplicationEnvironment GetEnvironmentById(ApplicationEnvironmentId id) => Environments.First(_ => _.Id == id);
+    public ApplicationEnvironmentWithArtifacts GetEnvironmentById(ApplicationEnvironmentId id) => Environments.Single(_ => _.Id == id);
 }

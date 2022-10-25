@@ -42,7 +42,10 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
         var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
 
-        var microservice = new Microservice(Guid.Empty, application.Id, "kernel");
+        var microservice = new Microservice(Guid.Empty, application.Id, "kernel", new Deployable[]
+        {
+            new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 })
+        });
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
         var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
@@ -57,10 +60,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             containerRegistry.UserName,
             containerRegistry.Password,
             kernelStorage,
-            new[]
-            {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 })
-            },
+            microservice.Deployables,
             tags,
             false);
 

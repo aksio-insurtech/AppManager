@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications.Environments;
 using Events.Applications.Environments;
 using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
@@ -65,8 +66,8 @@ public class ApplicationResourcesCoordinator
     public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
     {
         var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var microservice = await _projections.GetInstanceById<Microservice>(@context.EventSourceId);
-        var environment = application.GetEnvironmentById(@context.EventSourceId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var microservice = environment.GetMicroserviceById(context.EventSourceId);
         _logger.CreatingMicroservice(@event.Name, environment.Name, application.Name);
 
         _ = Task.Run(async () =>
@@ -82,17 +83,17 @@ public class ApplicationResourcesCoordinator
 
     public async Task DeployableCreated(DeployableCreated @event, EventContext context)
     {
-        var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
-        var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
-        var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
-        var environment = application.GetEnvironmentById(@context.EventSourceId);
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+        var deployable = microservice.GetDeployableById(@context.EventSourceId);
         _logger.DeployableCreated(microservice.Name, environment.Name, application.Name, deployable.Name, deployable.Image);
 
         _ = Task.Run(async () =>
         {
             var projectName = GetProjectNameFor(application, microservice);
 
-            if (deployable.Image is null)
+            if (string.IsNullOrEmpty(deployable.Image))
             {
                 deployable = new(deployable.Id, deployable.MicroserviceId, deployable.Name, "nginx", deployable.Ports);
             }
@@ -114,10 +115,10 @@ public class ApplicationResourcesCoordinator
 
     public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
     {
-        var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
-        var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
-        var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
-        var environment = application.GetEnvironmentById(@context.EventSourceId);
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+        var deployable = microservice.GetDeployableById(@context.EventSourceId);
         _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image, environment.Name, application.Name);
 
         _ = Task.Run(async () =>
@@ -137,6 +138,27 @@ public class ApplicationResourcesCoordinator
 
             await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
         });
+    }
+
+    public async Task ConsolidateAllForEnvironment(ApplicationId applicationId, ApplicationEnvironmentId environmentId)
+    {
+        var application = await _projections.GetInstanceById<Application>(applicationId);
+        var environment = application.GetEnvironmentById(environmentId);
+
+        foreach (var ingress in environment.Ingresses)
+        {
+            Console.WriteLine(ingress);
+        }
+
+        foreach (var microservice in environment.Microservices)
+        {
+            Console.WriteLine(microservice);
+
+            foreach (var deployable in microservice.Deployables)
+            {
+                Console.WriteLine(deployable);
+            }
+        }
     }
 
     string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";

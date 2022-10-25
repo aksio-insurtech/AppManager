@@ -4,6 +4,8 @@
 using Events.Applications;
 using Events.Applications.Environments;
 using Events.Applications.Environments.Ingresses;
+using Events.Applications.Environments.Microservices;
+using Events.Applications.Environments.Microservices.Deployables;
 
 namespace Reactions.Applications;
 
@@ -26,22 +28,47 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
             .Set(m => m.Resources.AzureContainerRegistryPassword).To(e => e.Password))
         .From<MongoDBConnectionStringChangedForApplication>(_ => _
             .Set(m => m.Resources.MongoDB.ConnectionString).To(e => e.ConnectionString))
+        .From<AzureVirtualNetworkIdentifierSetForApplication>(_ => _
+            .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
+
+        // Environments
         .Children(_ => _.Environments, _ => _
             .IdentifiedBy(m => m.Id)
             .From<ApplicationEnvironmentCreated>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
                 .Set(m => m.Name).To(e => e.Name))
+
+            // Ingresses
             .Children(m => m.Ingresses, _ => _
                 .IdentifiedBy(m => m.Id)
                 .From<IngressCreated>(_ => _
                     .UsingParentKey(e => e.EnvironmentId)
-                    .Set(m => m.Name).To(e => e.Name))))
+                    .Set(m => m.Name).To(e => e.Name)))
+
+            // Microservices
+            .Children(m => m.Microservices, _ => _
+                .IdentifiedBy(m => m.Id)
+                .From<MicroserviceCreated>(_ => _
+                    .UsingParentKey(e => e.EnvironmentId)
+                    .Set(m => m.ApplicationId).To(e => e.ApplicationId)
+                    .Set(m => m.Name).To(e => e.Name))
+
+                // Deployables
+                .Children(m => m.Deployables, _ => _
+                    .IdentifiedBy(m => m.Id)
+                    .From<DeployableCreated>(_ => _
+                        .UsingParentKey(e => e.MicroserviceId)
+                        .Set(m => m.MicroserviceId).To(e => e.MicroserviceId)
+                        .Set(m => m.Name).To(e => e.Name))
+                    .From<DeployableImageChanged>(_ => _
+                        .UsingParentKey(e => e.MicroserviceId)
+                        .Set(m => m.Image).To(e => e.Image)))))
+
+        // MongoDB Users
         .Children(m => m.Resources.MongoDB.Users, cb => cb
             .IdentifiedBy(m => m.UserName)
             .From<MongoDBUserChanged>(e => e
                 .UsingKey(e => e.UserName)
                 .Set(m => m.UserName).To(e => e.UserName)
-                .Set(m => m.Password).To(e => e.Password)))
-        .From<AzureVirtualNetworkIdentifierSetForApplication>(_ => _
-            .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier));
+                .Set(m => m.Password).To(e => e.Password)));
 }
