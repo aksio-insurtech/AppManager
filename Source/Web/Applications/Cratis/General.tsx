@@ -5,22 +5,28 @@ import { useEffect, useState } from 'react';
 import { CratisVersions } from 'API/cratis/CratisVersions';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import { SemanticVersion } from 'API/cratis/SemanticVersion';
+import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
 
 function formatVersion(version: SemanticVersion) {
+    if (!version) {
+        return '0.0.0';
+    }
     return `${version.major}.${version.minor}.${version.patch}`;
 }
 
-export const General = () => {
+interface GeneralProps {
+    environment: ApplicationEnvironment;
+}
+
+export const General = (props: GeneralProps) => {
     const [versions] = CratisVersions.use();
+    const [version, setVersion] = useState<string | undefined>();
 
-    const currentVersion = new SemanticVersion();
-    currentVersion.major = 6;
-    currentVersion.minor = 11;
-    currentVersion.patch = 5;
+    useEffect(() => {
+        setVersion(formatVersion(props.environment.cratisVersion));
+    }, [props.environment.cratisVersion]);
 
-    const [version, setVersion] = useState(formatVersion(currentVersion));
-
-    let actualVersions = [currentVersion];
+    let actualVersions = [props.environment.cratisVersion];
 
     if (!versions.isPerforming && versions.hasData) {
         actualVersions = versions.data;
@@ -28,22 +34,25 @@ export const General = () => {
 
     return (
         <>
-            <InputLabel>Version</InputLabel>
-            <Select
-                label="Version"
-                placeholder="Select Cratis Version"
-                value={version}
-                onChange={(ev) => {
-                    setVersion(ev.target.value);
-                }}>
-                {actualVersions.map(version => {
-                    const formatted = formatVersion(version);
-                    return (
-                        <MenuItem key={formatted} value={formatted}>{formatted}</MenuItem>
-                    );
-                })}
-            </Select>
-
+            {(version && version != '0.0.0') &&
+                <>
+                    <InputLabel>Version</InputLabel>
+                    <Select
+                        label="Version"
+                        placeholder="Select Cratis Version"
+                        value={version}
+                        onChange={(ev) => {
+                            setVersion(ev.target.value);
+                        }}>
+                        {actualVersions.map(version => {
+                            const formatted = formatVersion(version);
+                            return (
+                                <MenuItem key={formatted} value={formatted}>{formatted}</MenuItem>
+                            );
+                        })}
+                    </Select>
+                </>
+            }
         </>
     );
 };

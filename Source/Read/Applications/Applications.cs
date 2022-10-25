@@ -23,7 +23,7 @@ public class Applications : Controller
     [HttpGet("{applicationId}")]
     public Task<Application> GetApplication([FromRoute] ApplicationId applicationId) => _applicationCollection.FindById(applicationId).FirstOrDefaultAsync();
 
-    [HttpGet("resources/{applicationId}")]
+    [HttpGet("{applicationId}/resources")]
     public Task<ApplicationResources> ResourcesForApplication([FromRoute] ApplicationId applicationId) => _applicationResourcesCollection.FindById(applicationId).FirstOrDefaultAsync();
 
     [HttpGet("hierarchy")]

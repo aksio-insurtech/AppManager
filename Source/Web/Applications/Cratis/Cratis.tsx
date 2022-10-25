@@ -5,9 +5,13 @@ import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
 import { General } from './General';
+import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
 
+interface CratisProps {
+    environment: ApplicationEnvironment;
+}
 
-export const Cratis = () => {
+export const Cratis = (props: CratisProps) => {
     const [selectedTab, setSelectedTab] = useState("0");
 
     return (
@@ -17,7 +21,7 @@ export const Cratis = () => {
                     <Tab label="General" value="0" />
                 </TabList>
             </Box>
-            <TabPanel value="0"><General/></TabPanel>
+            <TabPanel value="0"><General {...props}/></TabPanel>
         </TabContext>
     );
 };

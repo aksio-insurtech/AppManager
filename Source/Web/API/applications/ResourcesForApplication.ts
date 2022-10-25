@@ -6,13 +6,13 @@ import { QueryFor, QueryResultWithState, useQuery, PerformQuery } from '@aksio/c
 import { ApplicationResources } from './ApplicationResources';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/resources/{{applicationId}}');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/resources');
 
 export interface ResourcesForApplicationArguments {
     applicationId: string;
 }
 export class ResourcesForApplication extends QueryFor<ApplicationResources, ResourcesForApplicationArguments> {
-    readonly route: string = '/api/applications/resources/{{applicationId}}';
+    readonly route: string = '/api/applications/{{applicationId}}/resources';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ApplicationResources = {} as any;
 

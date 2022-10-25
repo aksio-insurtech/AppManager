@@ -5,6 +5,7 @@
 import { field } from '@aksio/cratis-fundamentals';
 
 import { ApplicationEnvironmentKey } from './ApplicationEnvironmentKey';
+import { SemanticVersion } from './SemanticVersion';
 
 export class ApplicationEnvironment {
 
@@ -19,4 +20,7 @@ export class ApplicationEnvironment {
 
     @field(String)
     shortName!: string;
+
+    @field(SemanticVersion)
+    cratisVersion!: SemanticVersion;
 }

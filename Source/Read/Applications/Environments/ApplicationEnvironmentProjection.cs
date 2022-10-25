@@ -16,5 +16,6 @@ public record ApplicationEnvironmentProjection : IProjectionFor<ApplicationEnvir
                 .Set(k => k.EnvironmentId).ToEventSourceId())
             .Set(m => m.Name).To(e => e.Name)
             .Set(m => m.DisplayName).To(e => e.DisplayName)
-            .Set(m => m.ShortName).To(e => e.ShortName));
+            .Set(m => m.ShortName).To(e => e.ShortName)
+            .Set(m => m.CratisVersion).To(e => e.CratisVersion));
 }

@@ -17,11 +17,12 @@ import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
 import { ApplicationsNav } from './ApplicationsNav';
 import { ListItemActionButton } from './ListItemActionButton';
 import { ApplicationItem } from './ApplicationItem';
-import { ApplicationHierarchyForListing } from '../API/applications/ApplicationHierarchyForListing';
+import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
 import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
 import { Tenants } from './Tenants/Tenants';
 import { Ingress } from './Ingresses/Ingress';
 import { Cratis } from './Cratis/Cratis';
+import { EnvironmentForApplication } from 'API/applications/environments/EnvironmentForApplication';
 
 export const Applications = () => {
     const [currentApplicationId, setCurrentApplicationId] = useState<string>();
@@ -31,6 +32,7 @@ export const Applications = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [applicationsHierarchy] = ApplicationsHierarchy.use();
+    const [applicationEnvironment, performApplicationEnvironmentQuery] = EnvironmentForApplication.use();
 
     const routes: string[] = [
         '/applications/:applicationId',
@@ -46,6 +48,11 @@ export const Applications = () => {
         const match = routes.map(_ => matchPath({ path: _ }, location.pathname)).filter(_ => _ !== null);
         if (match?.length == 1) {
             const params = match[0]?.params || {};
+
+            if (currentEnvironment != params.environmentId) {
+                performApplicationEnvironmentQuery({ applicationId: params.applicationId!, environmentId: params.environmentId! });
+            }
+
             setCurrentApplicationId(params.applicationId);
             setCurrentEnvironment(params.environmentId);
             setCurrentMicroservice(params.microserviceId);
@@ -123,7 +130,7 @@ export const Applications = () => {
                             <Route path=':applicationId' element={<Application />} />
                             <Route path=':applicationId/environments/:environmentId' element={<Application />} />
                             <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingress />} />
-                            <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis />} />
+                            <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis environment={applicationEnvironment.data} />} />
                             <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
