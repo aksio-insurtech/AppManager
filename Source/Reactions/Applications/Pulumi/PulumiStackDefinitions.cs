@@ -94,6 +94,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         return applicationResult;
     }
 
+    public Task Ingress(ExecutionContext executionContext, Application application, ApplicationEnvironment environment, Ingress ingress)
+    {
+        return Task.CompletedTask;
+    }
+
     public async Task<ContainerAppResult> Microservice(
         ExecutionContext executionContext,
         Application application,

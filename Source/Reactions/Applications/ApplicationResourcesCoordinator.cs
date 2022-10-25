@@ -39,7 +39,7 @@ public class ApplicationResourcesCoordinator
     public async Task ApplicationEnvironmentCreated(ApplicationEnvironmentCreated @event, EventContext context)
     {
         var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-        var environment = application.GetEnvironmentById(@context.EventSourceId);
+        var environment = application.GetEnvironmentById(context.EventSourceId);
         _logger.CreatingApplicationEnvironment(@event.Name, application.Name);
 
         _ = Task.Run(async () =>
@@ -49,9 +49,16 @@ public class ApplicationResourcesCoordinator
         });
     }
 
-    public Task IngressCreated(IngressCreated @event, EventContext context)
+    public async Task IngressCreated(IngressCreated @event, EventContext context)
     {
-        return Task.CompletedTask;
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var ingress = environment.GetIngressById(context.EventSourceId);
+        _ = Task.Run(async () =>
+        {
+            var definition = PulumiFn.Create(() => _stackDefinitions.Ingress(_executionContext, application, environment, ingress));
+            await _pulumiOperations.Up(application, application.Name, definition, environment);
+        });
     }
 
     public Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)

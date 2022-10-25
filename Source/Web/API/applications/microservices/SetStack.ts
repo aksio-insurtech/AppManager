@@ -4,6 +4,7 @@
 
 import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
+import { Ingress } from './Ingress';
 import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/microservices/{{microserviceId}}/stack');
@@ -15,6 +16,7 @@ export interface ISetStack {
     name?: string;
     displayName?: string;
     shortName?: string;
+    ingresses?: Ingress;
 }
 
 export class SetStackValidator extends CommandValidator {
@@ -25,6 +27,7 @@ export class SetStackValidator extends CommandValidator {
         name: new Validator(),
         displayName: new Validator(),
         shortName: new Validator(),
+        ingresses: new Validator(),
     };
 }
 
@@ -39,6 +42,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     private _name!: string;
     private _displayName!: string;
     private _shortName!: string;
+    private _ingresses!: Ingress;
 
     get requestArguments(): string[] {
         return [
@@ -56,6 +60,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
             'name',
             'displayName',
             'shortName',
+            'ingresses',
         ];
     }
 
@@ -106,6 +111,14 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     set shortName(value: string) {
         this._shortName = value;
         this.propertyChanged('shortName');
+    }
+    get ingresses(): Ingress {
+        return this._ingresses;
+    }
+
+    set ingresses(value: Ingress) {
+        this._ingresses = value;
+        this.propertyChanged('ingresses');
     }
 
     static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>] {

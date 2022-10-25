@@ -3,6 +3,7 @@
 
 using Events.Applications;
 using Events.Applications.Environments;
+using Events.Applications.Environments.Ingresses;
 
 namespace Reactions.Applications;
 
@@ -29,7 +30,12 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
             .IdentifiedBy(m => m.Id)
             .From<ApplicationEnvironmentCreated>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
-                .Set(m => m.Name).To(e => e.Name)))
+                .Set(m => m.Name).To(e => e.Name))
+            .Children(m => m.Ingresses, _ => _
+                .IdentifiedBy(m => m.Id)
+                .From<IngressCreated>(_ => _
+                    .UsingParentKey(e => e.EnvironmentId)
+                    .Set(m => m.Name).To(e => e.Name))))
         .Children(m => m.Resources.MongoDB.Users, cb => cb
             .IdentifiedBy(m => m.UserName)
             .From<MongoDBUserChanged>(e => e
