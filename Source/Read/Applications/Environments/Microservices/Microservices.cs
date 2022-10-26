@@ -16,6 +16,18 @@ public class Microservices : Controller
         _microserviceCollection = microserviceCollection;
     }
 
+    [HttpGet]
+    public async Task<IEnumerable<Microservice>> MicroservicesInEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId)
+    {
+        var result = await _microserviceCollection.FindAsync(
+            Builders<Microservice>.Filter.And(
+                Filters.StringFilterFor<Microservice>(_ => _.Id.ApplicationId, applicationId),
+                Filters.StringFilterFor<Microservice>(_ => _.Id.EnvironmentId, environmentId)));
+        return result.ToEnumerable();
+    }
+
     [HttpGet("{microserviceId}")]
     public Task<Microservice> GetMicroservice(
         [FromRoute] ApplicationId applicationId,

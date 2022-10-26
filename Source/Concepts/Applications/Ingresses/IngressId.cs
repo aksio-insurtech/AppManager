@@ -7,4 +7,5 @@ public record IngressId(Guid Value) : ConceptAs<Guid>(Value)
 {
     public static implicit operator EventSourceId(IngressId id) => id.Value;
     public static implicit operator IngressId(EventSourceId id) => new(Guid.Parse(id.Value));
+    public static implicit operator IngressId(Guid id) => new(id);
 }

@@ -36,7 +36,8 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
             .IdentifiedBy(m => m.Id)
             .From<ApplicationEnvironmentCreated>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
-                .Set(m => m.Name).To(e => e.Name))
+                .Set(m => m.Name).To(e => e.Name)
+                .Set(m => m.CratisVersion).To(e => e.CratisVersion))
 
             // Ingresses
             .Children(m => m.Ingresses, _ => _

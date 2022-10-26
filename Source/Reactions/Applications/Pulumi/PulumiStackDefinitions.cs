@@ -88,14 +88,19 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         return applicationResult;
     }
 
-    public async Task<IngressResult> Ingress(ExecutionContext executionContext, Application application, ApplicationEnvironment environment, Ingress ingress)
+    public async Task<IngressResult> Ingress(
+        ExecutionContext executionContext,
+        Application application,
+        ApplicationEnvironment environment,
+        Ingress ingress,
+        ResourceGroup? resourceGroup = default)
     {
         var tags = application.GetTags(environment);
-        var resourceGroup = application.GetResourceGroup(environment);
+        resourceGroup ??= application.GetResourceGroup(environment);
         var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
         var storage = await application.GetStorage(environment, resourceGroup);
 
-        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
+        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, ingress, tags, _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(

@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications.Ingresses;
+namespace Read.Applications.Environments.Ingresses;
 
-public record SetRoute(string route, MicroserviceId target);
+public record IngressRoute(string Path, MicroserviceId TargetMicroservice, string TargetPath);

@@ -3,6 +3,6 @@
 
 using Concepts.Applications.Ingresses;
 
-namespace Concepts.Applications.Environments;
+namespace Reactions.Applications;
 
 public record Ingress(IngressId Id, IngressName Name);

@@ -3,4 +3,7 @@
 
 namespace Concepts.Applications.Ingresses;
 
-public record IngressName(string Value) : ConceptAs<string>(Value);
+public record IngressName(string Value) : ConceptAs<string>(Value)
+{
+    public static implicit operator IngressName(string value) => new(value);
+}

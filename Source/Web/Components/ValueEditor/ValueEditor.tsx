@@ -7,19 +7,22 @@ import { DataGrid, GridCallbackDetails, GridColDef, GridRowId, GridRowIdGetter, 
 import * as icons from '@mui/icons-material';
 
 export type SelectionChanged<TModel> = (rows: TModel[]) => void;
+export type RefreshClicked = () => void;
 
-export interface ValueEditorProps<TOutput, TModel extends GridValidRowModel = GridValidRowModel> {
+export interface ValueEditorProps<TOutput, TModel extends GridValidRowModel = GridValidRowModel, TInput={}> {
+    input?: TInput;
     addTitle: string;
     columns: GridColDef[];
     data: TModel[];
-    modalContent: Content<{}, TOutput>;
+    modalContent: Content<TInput, TOutput>;
     modalClosed: ModalClosed<TOutput>;
     getRowId: GridRowIdGetter<TModel>;
     onSelectionChanged?: SelectionChanged<TModel>;
+    onRefresh?: RefreshClicked;
 }
 
-export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridValidRowModel>(props: ValueEditorProps<TOutput, TModel>) => {
-    const [showAddDialog] = useModal(
+export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridValidRowModel, TInput={}>(props: ValueEditorProps<TOutput, TModel, TInput>) => {
+    const [showAddDialog] = useModal<TInput, TOutput>(
         props.addTitle,
         ModalButtons.OkCancel,
         props.modalContent,
@@ -33,7 +36,8 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
     return (
         <Box sx={{ height: 400, width: '100%', padding: '24px' }}>
             <Toolbar>
-                <Button startIcon={<icons.Add />} onClick={showAddDialog}>{props.addTitle}</Button>
+                <Button startIcon={<icons.Add />} onClick={() => showAddDialog(props.input)}>{props.addTitle}</Button>
+                {props.onRefresh && <Button startIcon={<icons.Refresh />} onClick={props.onRefresh}/>}
             </Toolbar>
 
             <DataGrid

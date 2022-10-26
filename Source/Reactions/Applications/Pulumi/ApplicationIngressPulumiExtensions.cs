@@ -14,10 +14,6 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationIngressPulumiExtensions
 {
-    public const string IngressFileShareName = "ingress";
-    const string IngressContainerAppName = "ingress";
-    const string StorageName = "ingress-storage";
-
     public static async Task ConfigureIngress(
         this Application application,
         ResourceGroup resourceGroup,
@@ -54,11 +50,16 @@ public static class ApplicationIngressPulumiExtensions
         ResourceGroup resourceGroup,
         Storage storage,
         ManagedEnvironment managedEnvironment,
+        Ingress ingress,
         Tags tags,
         ILogger<FileStorage> fileStorageLogger,
         string? frontendMicroserviceResourceName = default)
     {
-        var nginxFileShare = new FileShare(IngressFileShareName, new()
+        var ingressContainerAppName = $"{ingress.Name}-ingress";
+        var ingressFileShareName = $"{ingress.Name}-ingress";
+        var storageName = $"{ingress.Name}-ingress-storage";
+
+        var nginxFileShare = new FileShare(ingressFileShareName, new()
         {
             AccountName = storage.AccountName,
             ResourceGroupName = resourceGroup.Name,
@@ -66,11 +67,11 @@ public static class ApplicationIngressPulumiExtensions
 
         await application.ConfigureIngress(resourceGroup, storage, nginxFileShare, fileStorageLogger, frontendMicroserviceResourceName);
 
-        _ = new ManagedEnvironmentsStorage(StorageName, new()
+        _ = new ManagedEnvironmentsStorage(storageName, new()
         {
             ResourceGroupName = resourceGroup.Name,
             EnvironmentName = managedEnvironment.Name,
-            StorageName = StorageName,
+            StorageName = storageName,
             Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
                 AzureFile = new AzureFilePropertiesArgs
@@ -84,7 +85,7 @@ public static class ApplicationIngressPulumiExtensions
         });
 
         // const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
-        var containerApp = new ContainerApp(IngressContainerAppName, new()
+        var containerApp = new ContainerApp(ingressContainerAppName, new()
         {
             Location = resourceGroup.Location,
             Tags = tags,
@@ -110,8 +111,8 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     new()
                     {
-                        Name = StorageName,
-                        StorageName = StorageName,
+                        Name = storageName,
+                        StorageName = storageName,
                         StorageType = StorageType.AzureFile
                     }
                 },
@@ -132,7 +133,7 @@ public static class ApplicationIngressPulumiExtensions
                         new()
                         {
                             MountPath = "/config",
-                            VolumeName = StorageName
+                            VolumeName = storageName
                         }
                     }
                 },
@@ -185,6 +186,6 @@ public static class ApplicationIngressPulumiExtensions
         // }
         var ingressConfig = await containerApp.Configuration.GetValue();
         var fileShareId = await nginxFileShare.Id.GetValue();
-        return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, containerApp);
+        return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
     }
 }

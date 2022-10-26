@@ -5,11 +5,14 @@
 import { field } from '@aksio/cratis-fundamentals';
 
 
-export class Ingress {
+export class IngressRoute {
 
     @field(String)
-    id!: string;
+    path!: string;
 
     @field(String)
-    name!: string;
+    targetMicroservice!: string;
+
+    @field(String)
+    targetPath!: string;
 }

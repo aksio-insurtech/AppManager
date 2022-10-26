@@ -145,6 +145,9 @@ public class ApplicationResourcesCoordinator
         var application = await _projections.GetInstanceById<Application>(applicationId);
         var environment = application.GetEnvironmentById(environmentId);
 
+        // var projectName = GetProjectNameFor(application, microservice);
+        // var definition = PulumiFn.Create(() => _stackDefinitions.ApplicationEnvironment(_executionContext, application, environment, @event.CratisVersion));
+        // await _pulumiOperations.Up(application, application.Name, definition, environment);
         foreach (var ingress in environment.Ingresses)
         {
             Console.WriteLine(ingress);

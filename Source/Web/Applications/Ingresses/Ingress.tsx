@@ -4,9 +4,15 @@
 import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Routes } from './Routes';
+import { IngressById } from 'API/applications/environments/ingresses/IngressById';
+
 
 export const Ingress = () => {
+    const { ingressId } = useParams();
     const [selectedTab, setSelectedTab] = useState("0");
+    const [ingress] = IngressById.use({ ingressId: ingressId! });
 
     return (
         <TabContext value={selectedTab}>
@@ -20,7 +26,7 @@ export const Ingress = () => {
             </Box>
             <TabPanel value="0"></TabPanel>
             <TabPanel value="1"></TabPanel>
-            <TabPanel value="2"></TabPanel>
+            <TabPanel value="2"><Routes ingress={ingress.data}/></TabPanel>
         </TabContext>
     );
 };
