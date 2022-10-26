@@ -31,7 +31,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironment environment, SemanticVersion cratisVersion)
+    public async Task<ApplicationResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.SetupResourceGroup(environment);
@@ -64,7 +64,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             tags,
             false);
 
-        await kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
+        await kernelStorage.CreateAndUploadCratisJson(mongoDB, environment.Tenants, environment.Microservices, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
 
         var applicationResult = new ApplicationResult(
@@ -91,7 +91,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     public async Task<IngressResult> Ingress(
         ExecutionContext executionContext,
         Application application,
-        ApplicationEnvironment environment,
+        ApplicationEnvironmentWithArtifacts environment,
         Ingress ingress,
         ResourceGroup? resourceGroup = default)
     {
@@ -100,7 +100,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
         var storage = await application.GetStorage(environment, resourceGroup);
 
-        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, ingress, tags, _fileStorageLogger);
+        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, ingress, environment.Microservices, tags, _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(
