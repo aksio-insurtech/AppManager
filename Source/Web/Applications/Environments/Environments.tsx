@@ -6,7 +6,7 @@ import { ModalResult } from '@aksio/cratis-mui';
 import { AddEnvironmentDialog, AddEnvironmentDialogOutput } from './AddEnvironmentDialog';
 import { EnvironmentsForApplication } from 'API/applications/environments/EnvironmentsForApplication';
 import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
-import { CreateEnvironment } from 'API/applications/environments/CreateEnvironment';
+import { CreateApplicationEnvironment } from 'API/applications/environments/CreateApplicationEnvironment';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ValueEditorFor } from 'Components';
 import { useRouteParams } from '../RouteParams';
@@ -30,7 +30,7 @@ export const Environments = () => {
             getRowId={(environment) => environment.id.environmentId}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
-                    const command = new CreateEnvironment();
+                    const command = new CreateApplicationEnvironment();
                     command.applicationId = applicationId!;
                     command.environmentId = Guid.create().toString();
                     command.name = output!.name;
