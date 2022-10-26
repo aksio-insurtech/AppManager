@@ -23,7 +23,7 @@ public class Deployable : Controller
         [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(deployableId.ToString(), new DeployableImageChanged(applicationId, environmentId, microserviceId, deployableImageName));
 
     [HttpPost("environment-variable")]
-    public Task SetEnvironmentVariableForMicroservice(
+    public Task SetEnvironmentVariableForDeployable(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,

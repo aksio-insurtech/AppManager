@@ -8,7 +8,7 @@ import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/environment-variable');
 
-export interface ISetEnvironmentVariableForMicroservice {
+export interface ISetEnvironmentVariableForDeployable {
     applicationId?: string;
     environmentId?: string;
     microserviceId?: string;
@@ -17,7 +17,7 @@ export interface ISetEnvironmentVariableForMicroservice {
     value?: string;
 }
 
-export class SetEnvironmentVariableForMicroserviceValidator extends CommandValidator {
+export class SetEnvironmentVariableForDeployableValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
@@ -28,10 +28,10 @@ export class SetEnvironmentVariableForMicroserviceValidator extends CommandValid
     };
 }
 
-export class SetEnvironmentVariableForMicroservice extends Command<ISetEnvironmentVariableForMicroservice> implements ISetEnvironmentVariableForMicroservice {
+export class SetEnvironmentVariableForDeployable extends Command<ISetEnvironmentVariableForDeployable> implements ISetEnvironmentVariableForDeployable {
     readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/environment-variable';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetEnvironmentVariableForMicroserviceValidator();
+    readonly validation: CommandValidator = new SetEnvironmentVariableForDeployableValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
@@ -109,7 +109,7 @@ export class SetEnvironmentVariableForMicroservice extends Command<ISetEnvironme
         this.propertyChanged('value');
     }
 
-    static use(initialValues?: ISetEnvironmentVariableForMicroservice): [SetEnvironmentVariableForMicroservice, SetCommandValues<ISetEnvironmentVariableForMicroservice>] {
-        return useCommand<SetEnvironmentVariableForMicroservice, ISetEnvironmentVariableForMicroservice>(SetEnvironmentVariableForMicroservice, initialValues);
+    static use(initialValues?: ISetEnvironmentVariableForDeployable): [SetEnvironmentVariableForDeployable, SetCommandValues<ISetEnvironmentVariableForDeployable>] {
+        return useCommand<SetEnvironmentVariableForDeployable, ISetEnvironmentVariableForDeployable>(SetEnvironmentVariableForDeployable, initialValues);
     }
 }

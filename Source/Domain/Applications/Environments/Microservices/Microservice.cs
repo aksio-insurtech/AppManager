@@ -26,7 +26,7 @@ public class Microservice : Controller
     [HttpPost("config")]
     public Task SetConfig(
         [FromRoute] ApplicationId applicationId,
-        [FromRoute] string environment,
+        [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId) => Task.CompletedTask;
 
     [HttpPost("environment-variable")]

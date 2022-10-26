@@ -6,24 +6,24 @@ import { Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
 export type AddVariableDialogOutput = {
-    name: string;
+    key: string;
     value: string;
 };
 
 export const AddVariableDialog = (props: IModalProps<{}, AddVariableDialogOutput>) => {
-    const [name, setName] = useState('');
+    const [key, setKey] = useState('');
     const [value, setValue] = useState('');
 
     props.onClose(() => {
         return {
-            name,
+            key,
             value
         };
     });
 
     return (
         <Stack direction="column" width={400} spacing={1}>
-            <TextField label='Name' fullWidth required defaultValue={name} onChange={e => setName(e.currentTarget.value)} />
+            <TextField label='Key' fullWidth required defaultValue={key} onChange={e => setKey(e.currentTarget.value)} />
             <TextField label='Value' fullWidth required defaultValue={value} onChange={e => setValue(e.currentTarget.value)} />
         </Stack>
     );

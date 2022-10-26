@@ -3,21 +3,29 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { useParams } from 'react-router-dom';
 import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddVariableDialog, AddVariableDialogOutput } from './AddVariableDialog';
-import { useRouteParams } from '../RouteParams';
+import { useRouteParams, RouteParams } from '../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
     { field: 'value', headerName: 'Value', width: 250 }
 ];
 
-export const Variables = () => {
-    const { applicationId, environmentId } = useRouteParams();
+export interface Variable {
+    key: string;
+    value: string;
+}
 
-    console.log(applicationId);
+export type VariableSet = (variable: Variable, context: RouteParams) => void;
+
+export interface VariablesProps {
+    onVariableSet: VariableSet
+}
+
+export const Variables = (props: VariablesProps) => {
+    const context = useRouteParams();
 
     return (
         <ValueEditorFor<AddVariableDialogOutput, Tenant>
@@ -28,6 +36,7 @@ export const Variables = () => {
             getRowId={(tenant) => tenant.id}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
+                    props.onVariableSet(output as Variable, context);
                 }
             }} />
     );

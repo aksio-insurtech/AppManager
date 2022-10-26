@@ -10,13 +10,14 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
 import { useState } from 'react';
 import { Secrets } from '../../Secrets/Secrets';
-import { Variables } from '../../Variables/Variables';
+import { Variable, Variables } from '../../Variables/Variables';
 import { CreateDeployable } from 'API/applications/environments/microservices/deployables/CreateDeployable';
 import { CreateDeployableWithImage } from 'API/applications/environments/microservices/deployables/CreateDeployableWithImage';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { DeployablesForMicroservice } from 'API/applications/environments/microservices/deployables/DeployablesForMicroservice';
 import { Deployable } from 'API/applications/environments/microservices/deployables/Deployable';
-import { useRouteParams } from '../../RouteParams';
+import { RouteParams, useRouteParams } from '../../RouteParams';
+import { SetEnvironmentVariableForDeployable } from 'API/applications/environments/microservices/deployables/SetEnvironmentVariableForDeployable';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -33,6 +34,17 @@ export const Deployables = () => {
     });
 
     const [selectedDeployable, setSelectedDeployable] = useState<Deployable | undefined>(undefined);
+
+    const variableSet = async (variable: Variable, context: RouteParams) => {
+        const command = new SetEnvironmentVariableForDeployable();
+        command.applicationId = context.applicationId;
+        command.environmentId = context.environmentId!;
+        command.microserviceId = context.microserviceId!;
+        command.deployableId = selectedDeployable!.id.deployableId;
+        command.key = variable.key;
+        command.value = variable.value;
+        await command.execute();
+    };
 
     return (
         <Stack
@@ -86,7 +98,7 @@ export const Deployables = () => {
                     </Box>
                     <TabPanel value="0"></TabPanel>
                     <TabPanel value="1"></TabPanel>
-                    <TabPanel value="2"><Variables /></TabPanel>
+                    <TabPanel value="2"><Variables onVariableSet={variableSet} /></TabPanel>
                     <TabPanel value="3"><Secrets /></TabPanel>
                 </TabContext>
             }
