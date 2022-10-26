@@ -28,7 +28,7 @@ public class MicroserviceStorage
         FileStorage = fileStorage;
     }
 
-    public async Task CreateAndUploadCratisJson(MongoDBResult mongoDB, string siloHostName, string storageConnectionString, ApplicationMonitoringResult monitoring)
+    public async Task CreateAndUploadCratisJson(MongoDBResult mongoDB, IEnumerable<Tenant> tenants, IEnumerable<Microservice> microservices, string siloHostName, string storageConnectionString, ApplicationMonitoringResult monitoring)
     {
         const string scheme = "mongodb+srv://";
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
@@ -67,43 +67,51 @@ public class MicroserviceStorage
                 }
             }
         };
-        config.Tenants["3352d47d-c154-4457-b3fb-8a2efb725113"] = new() { Name = "Development" };
-        config.Microservices["00000000-0000-0000-0000-000000000000"] = new() { Name = "Something" };
-        config.Storage.Microservices["00000000-0000-0000-0000-000000000000"] = new()
+
+        foreach (var tenant in tenants)
         {
-            Shared = new()
+            config.Tenants[tenant.Id.ToString()] = new() { Name = tenant.Name };
+        }
+
+        foreach (var microservice in microservices)
+        {
+            config.Microservices[microservice.Id.ToString()] = new() { Name = microservice.Name };
+            config.Storage.Microservices[microservice.Id.ToString()] = new()
             {
+                Shared = new()
                 {
-                    "eventStore", new()
                     {
-                        Type = "MongoDB",
-                        ConnectionDetails = $"{mongoDBConnectionString}/event-store-shared"
-                    }
-                }
-            },
-            Tenants = new()
-            {
-                {
-                    "3352d47d-c154-4457-b3fb-8a2efb725113", new()
-                    {
+                        "eventStore", new()
                         {
-                            "readModels", new()
-                            {
-                                Type = "MongoDB",
-                                ConnectionDetails = $"{mongoDBConnectionString}/development-read-models"
-                            }
-                        },
-                        {
-                            "eventStore", new()
-                            {
-                                Type = "MongoDB",
-                                ConnectionDetails = $"{mongoDBConnectionString}/development-event-store"
-                            }
+                            Type = "MongoDB",
+                            ConnectionDetails = $"{mongoDBConnectionString}/{microservice.Name}-es-shared"
                         }
                     }
-                }
+                },
+                Tenants = new StorageForTenants()
+            };
+
+            foreach (var tenant in tenants)
+            {
+                config.Storage.Microservices[microservice.Id.ToString()].Tenants[tenant.Name.ToString()] = new()
+                {
+                    {
+                        "readModels", new()
+                        {
+                            Type = "MongoDB",
+                            ConnectionDetails = $"{mongoDBConnectionString}/${microservice.Name}-${tenant.Name}-rm"
+                        }
+                    },
+                    {
+                        "eventStore", new()
+                        {
+                            Type = "MongoDB",
+                            ConnectionDetails = $"{mongoDBConnectionString}/${microservice.Name}-${tenant.Name}-es"
+                        }
+                    }
+                };
             }
-        };
+        }
 
         var cratisJson = JsonSerializer.Serialize(config, new JsonSerializerOptions()
         {
