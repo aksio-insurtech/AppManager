@@ -14,6 +14,7 @@ public record ApplicationEnvironmentWithArtifacts(
     ApplicationEnvironmentDisplayName DisplayName,
     ApplicationEnvironmentShortName ShortName,
     SemanticVersion CratisVersion,
+    IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,
     IEnumerable<Microservice> Microservices) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
 {

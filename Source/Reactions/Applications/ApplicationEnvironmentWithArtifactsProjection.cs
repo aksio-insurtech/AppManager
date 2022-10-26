@@ -39,6 +39,13 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                 .Set(m => m.Name).To(e => e.Name)
                 .Set(m => m.CratisVersion).To(e => e.CratisVersion))
 
+            // Tenants
+            .Children(m => m.Tenants, _ => _
+                .IdentifiedBy(m => m.Id)
+                .From<TenantAddedToApplicationEnvironment>(_ => _
+                    .Set(m => m.Id).ToEventSourceId()
+                    .Set(m => m.Name).To(e => e.Name)))
+
             // Ingresses
             .Children(m => m.Ingresses, _ => _
                 .IdentifiedBy(m => m.Id)
