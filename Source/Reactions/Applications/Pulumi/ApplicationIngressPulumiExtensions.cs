@@ -17,31 +17,34 @@ public static class ApplicationIngressPulumiExtensions
     public static async Task ConfigureIngress(
         this Application application,
         ResourceGroup resourceGroup,
+        Ingress ingress,
         Storage storage,
         FileShare fileShare,
-        ILogger<FileStorage> fileStorageLogger,
-        string? frontendMicroserviceResourceName = default)
+        IEnumerable<Microservice> microservices,
+        ILogger<FileStorage> fileStorageLogger)
     {
         var nginxFileShareName = await fileShare.Name.GetValue();
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
 
-        var frontendUrl = string.Empty;
-        if (frontendMicroserviceResourceName is not null)
+        var routes = new List<IngressTemplateRouteContent>();
+
+        foreach (var route in ingress.Routes)
         {
-            var getMicroserviceContainerApp = GetContainerApp.Invoke(new()
+            var microservice = microservices.FirstOrDefault(_ => _.Id == route.TargetMicroservice);
+            if (microservice is not null)
             {
-                ResourceGroupName = resourceGroup.Name,
-                ContainerAppName = frontendMicroserviceResourceName
-            });
-            var microserviceContainerApp = await getMicroserviceContainerApp.GetValue();
-            frontendUrl = $"http://{microserviceContainerApp.Configuration!.Ingress!.Fqdn}";
+                var getMicroserviceContainerApp = GetContainerApp.Invoke(new()
+                {
+                    ResourceGroupName = resourceGroup.Name,
+                    ContainerAppName = microservice.Name.Value
+                });
+                var microserviceContainerApp = await getMicroserviceContainerApp.GetValue();
+                var url = $"http://{microserviceContainerApp.Configuration!.Ingress!.Fqdn}{route.TargetPath}";
+                routes.Add(new IngressTemplateRouteContent(route.Path, url));
+            }
         }
 
-        var nginxContent = TemplateTypes.IngressConfig(new
-        {
-            HasFrontend = frontendMicroserviceResourceName is not null,
-            FrontendUrl = frontendUrl
-        });
+        var nginxContent = TemplateTypes.IngressConfig(new IngressTemplateContent(routes));
         nginxFileStorage.Upload("nginx.conf", nginxContent);
     }
 
@@ -51,9 +54,9 @@ public static class ApplicationIngressPulumiExtensions
         Storage storage,
         ManagedEnvironment managedEnvironment,
         Ingress ingress,
+        IEnumerable<Microservice> microservices,
         Tags tags,
-        ILogger<FileStorage> fileStorageLogger,
-        string? frontendMicroserviceResourceName = default)
+        ILogger<FileStorage> fileStorageLogger)
     {
         var ingressContainerAppName = $"{ingress.Name}-ingress";
         var ingressFileShareName = $"{ingress.Name}-ingress";
@@ -65,7 +68,7 @@ public static class ApplicationIngressPulumiExtensions
             ResourceGroupName = resourceGroup.Name,
         });
 
-        await application.ConfigureIngress(resourceGroup, storage, nginxFileShare, fileStorageLogger, frontendMicroserviceResourceName);
+        await application.ConfigureIngress(resourceGroup, ingress, storage, nginxFileShare, microservices, fileStorageLogger);
 
         _ = new ManagedEnvironmentsStorage(storageName, new()
         {

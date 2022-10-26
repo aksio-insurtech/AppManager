@@ -9,7 +9,7 @@ using Events.Applications.Environments.Microservices.Deployables;
 
 namespace Reactions.Applications;
 
-public class ApplicationProjection : IImmediateProjectionFor<Application>
+public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectionFor<Application>
 {
     public ProjectionId Identifier => "c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5";
 
@@ -44,7 +44,15 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
                 .IdentifiedBy(m => m.Id)
                 .From<IngressCreated>(_ => _
                     .UsingParentKey(e => e.EnvironmentId)
-                    .Set(m => m.Name).To(e => e.Name)))
+                    .Set(m => m.Name).To(e => e.Name))
+
+                // Routes
+                .Children(m => m.Routes, _ => _
+                    .IdentifiedBy(m => m.Path)
+                    .From<RouteDefinedOnIngress>(_ => _
+                        .Set(m => m.Path).To(ev => ev.Path)
+                        .Set(m => m.TargetMicroservice).To(ev => ev.TargetMicroservice)
+                        .Set(m => m.TargetPath).To(ev => ev.TargetPath))))
 
             // Microservices
             .Children(m => m.Microservices, _ => _
