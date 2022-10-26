@@ -7,8 +7,8 @@ import { ValueEditorFor } from 'Components';
 import { Ingress } from 'API/applications/environments/ingresses/Ingress';
 import { AddRouteDialog, AddRouteDialogOutput, AddRouteDialogInput } from './AddRouteDialog';
 import { IngressRoute } from 'API/applications/environments/ingresses/IngressRoute';
-import { useParams } from 'react-router-dom';
 import { DefineRoute } from '../../API/applications/environments/ingresses/DefineRoute';
+import { useRouteParams } from '../RouteParams';
 
 
 export interface RoutesProps {
@@ -21,7 +21,7 @@ const columns: GridColDef[] = [
 ];
 
 export const Routes = (props: RoutesProps) => {
-    const input = useParams() as AddRouteDialogInput;
+    const input = useRouteParams() as AddRouteDialogInput;
 
     return (
         <>

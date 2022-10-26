@@ -10,9 +10,10 @@ import { Environments } from './Environments/Environments';
 import { Variables } from './Variables/Variables';
 import { Secrets } from './Secrets/Secrets';
 import { ConfigFiles } from './ConfigFiles/ConfigFiles';
+import { useRouteParams } from './RouteParams';
 
 export const Application = () => {
-    const { applicationId } = useParams();
+    const { applicationId } = useRouteParams();
     const [application] = GetApplication.use({ applicationId: applicationId! });
     const [selectedTab, setSelectedTab] = useState("0");
 

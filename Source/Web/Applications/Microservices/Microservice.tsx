@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { useParams } from 'react-router-dom';
 import { GetMicroservice } from 'API/applications/environments/microservices/GetMicroservice';
 import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -11,9 +10,10 @@ import { Secrets } from '../Secrets/Secrets';
 import { Deployables } from './Deployables/Deployables';
 import { ConfigFiles } from '../ConfigFiles/ConfigFiles';
 import { General } from './General';
+import { useRouteParams } from '../RouteParams';
 
 export const Microservice = () => {
-    const { applicationId, environmentId, microserviceId } = useParams();
+    const { applicationId, environmentId, microserviceId } = useRouteParams();
     const [microservice, performMicroserviceQuery] = GetMicroservice.use({
         applicationId: applicationId!,
         environmentId: environmentId!,

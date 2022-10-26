@@ -3,10 +3,10 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { useParams } from 'react-router-dom';
 import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddSecretDialog, AddSecretDialogOutput } from './AddSecretDialog';
+import { useRouteParams } from '../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -14,7 +14,7 @@ const columns: GridColDef[] = [
 ];
 
 export const Secrets = () => {
-    const { applicationId, environmentId } = useParams();
+    const { applicationId, environmentId } = useRouteParams();
 
     return (
         <ValueEditorFor<AddSecretDialogOutput, Tenant>

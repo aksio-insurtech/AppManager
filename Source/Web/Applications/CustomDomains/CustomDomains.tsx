@@ -3,19 +3,19 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { useParams } from 'react-router-dom';
 import { ValueEditorFor } from 'Components';
 import { AddCustomDomainDialog, AddCustomDomainDialogOutput } from './AddCustomDomainDialog';
 import { AddCustomDomainToApplicationEnvironment } from 'API/applications/environments/AddCustomDomainToApplicationEnvironment';
 import { CustomDomainConfigurationForApplicationEnvironment } from 'API/applications/environments/CustomDomainConfigurationForApplicationEnvironment';
 import { CustomDomain } from 'API/applications/environments/CustomDomain';
+import { useRouteParams } from '../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'domain', headerName: 'Name', width: 250 }
 ];
 
 export const CustomDomains = () => {
-    const { applicationId, environmentId } = useParams();
+    const { applicationId, environmentId } = useRouteParams();
     const [domainsForEnvironment] = CustomDomainConfigurationForApplicationEnvironment.use({ applicationId: applicationId!, environmentId: environmentId! });
     const domains = domainsForEnvironment.data.domains ?? [];
 

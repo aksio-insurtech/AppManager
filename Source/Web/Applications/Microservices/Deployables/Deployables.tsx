@@ -3,7 +3,6 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { useParams } from 'react-router-dom';
 import { ValueEditorFor } from 'Components';
 import { AddDeployableDialog, AddDeployableDialogOutput } from './AddDeployableDialog';
 import { Box, Stack } from '@mui/system';
@@ -17,6 +16,7 @@ import { CreateDeployableWithImage } from 'API/applications/environments/microse
 import { Guid } from '@aksio/cratis-fundamentals';
 import { DeployablesForMicroservice } from 'API/applications/environments/microservices/deployables/DeployablesForMicroservice';
 import { Deployable } from 'API/applications/environments/microservices/deployables/Deployable';
+import { useRouteParams } from '../../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -24,7 +24,7 @@ const columns: GridColDef[] = [
 ];
 
 export const Deployables = () => {
-    const { applicationId, environmentId, microserviceId } = useParams();
+    const { applicationId, environmentId, microserviceId } = useRouteParams();
     const [selectedTab, setSelectedTab] = useState("0");
     const [deployables] = DeployablesForMicroservice.use({
         applicationId: applicationId!,

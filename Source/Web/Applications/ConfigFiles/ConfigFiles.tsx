@@ -3,17 +3,17 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { useParams } from 'react-router-dom';
 import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddConfigFileDialog, AddConfigFileDialogOutput } from './AddConfigFIleDialog';
+import { useRouteParams } from '../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 }
 ];
 
 export const ConfigFiles = () => {
-    const { applicationId, environmentId } = useParams();
+    const { applicationId, environmentId } = useRouteParams();
 
     return (
         <ValueEditorFor<AddConfigFileDialogOutput, Tenant>

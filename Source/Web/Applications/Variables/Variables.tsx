@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddVariableDialog, AddVariableDialogOutput } from './AddVariableDialog';
+import { useRouteParams } from '../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -14,7 +15,9 @@ const columns: GridColDef[] = [
 ];
 
 export const Variables = () => {
-    const { applicationId, environmentId } = useParams();
+    const { applicationId, environmentId } = useRouteParams();
+
+    console.log(applicationId);
 
     return (
         <ValueEditorFor<AddVariableDialogOutput, Tenant>

@@ -6,10 +6,10 @@ import { ModalResult } from '@aksio/cratis-mui';
 import { AddEnvironmentDialog, AddEnvironmentDialogOutput } from './AddEnvironmentDialog';
 import { EnvironmentsForApplication } from 'API/applications/environments/EnvironmentsForApplication';
 import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
-import { useParams } from 'react-router-dom';
 import { CreateEnvironment } from '../../API/applications/environments/CreateEnvironment';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ValueEditorFor } from 'Components';
+import { useRouteParams } from '../RouteParams';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -18,7 +18,7 @@ const columns: GridColDef[] = [
 ];
 
 export const Environments = () => {
-    const { applicationId } = useParams();
+    const { applicationId } = useRouteParams();
     const [environments] = EnvironmentsForApplication.use({ applicationId: applicationId! });
 
     return (
