@@ -12,7 +12,4 @@ export class Application {
 
     @field(String)
     name!: string;
-
-    @field(String)
-    cloudLocation!: string;
 }

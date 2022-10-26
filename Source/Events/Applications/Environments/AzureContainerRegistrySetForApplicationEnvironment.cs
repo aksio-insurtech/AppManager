@@ -6,7 +6,7 @@ using Concepts.Azure;
 namespace Events.Applications.Environments;
 
 [EventType("a64c4d13-2ae4-4f2e-89f1-f85713d75fbe")]
-public record AzureContainerRegistrySetForApplication(
+public record AzureContainerRegistrySetForApplicationEnvironment(
     AzureContainerRegistryLoginServer LoginServer,
     AzureContainerRegistryUserName UserName,
     AzureContainerRegistryPassword Password);

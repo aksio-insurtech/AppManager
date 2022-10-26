@@ -13,11 +13,11 @@ public static class ApplicationNetworkPulumiExtensions
 {
     public static string GetPrivateZoneName(this Application application) => $"{application.Name}.local".ToLowerInvariant();
 
-    public static NetworkResult SetupNetwork(this Application application, UserAssignedIdentity identity, Vault vault, ResourceGroup resourceGroup, Tags tags)
+    public static NetworkResult SetupNetwork(this Application application, ApplicationEnvironmentWithArtifacts environment, UserAssignedIdentity identity, Vault vault, ResourceGroup resourceGroup, Tags tags)
     {
         var virtualNetwork = new VirtualNetwork(application.Name, new()
         {
-            Location = application.CloudLocation.Value,
+            Location = environment.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
             EnableDdosProtection = false,

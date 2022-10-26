@@ -10,11 +10,11 @@ namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceStoragePulumiExtensions
 {
-    public static async Task<MicroserviceStorage> GetStorage(this Microservice microservice, Application application, ResourceGroup resourceGroup, ILogger<FileStorage> fileStorageLogger)
+    public static async Task<MicroserviceStorage> GetStorage(this Microservice microservice, Application application, ApplicationEnvironmentWithArtifacts environment, ResourceGroup resourceGroup, ILogger<FileStorage> fileStorageLogger)
     {
         var getStorageAccountResult = GetStorageAccount.Invoke(new()
         {
-            AccountName = application.Resources.AzureStorageAccountName.Value,
+            AccountName = environment.Resources.AzureStorageAccountName.Value,
             ResourceGroupName = resourceGroup.Name
         });
         var storageAccount = await getStorageAccountResult.GetValue();

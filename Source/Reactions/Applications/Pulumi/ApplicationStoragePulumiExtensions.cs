@@ -52,11 +52,11 @@ public static class ApplicationStoragePulumiExtensions
         return new(storageAccount, fileShareName, storageAccountName, storageAccountKey);
     }
 
-    public static async Task<Storage> GetStorage(this Application application, ApplicationEnvironment environment, ResourceGroup resourceGroup)
+    public static async Task<Storage> GetStorage(this Application application, ApplicationEnvironmentWithArtifacts environment, ResourceGroup resourceGroup)
     {
         var getStorageAccountResult = GetStorageAccount.Invoke(new()
         {
-            AccountName = application.Resources.AzureStorageAccountName.Value,
+            AccountName = environment.Resources.AzureStorageAccountName.Value,
             ResourceGroupName = resourceGroup.Name
         });
         var storageAccount = await getStorageAccountResult.GetValue();

@@ -5,47 +5,49 @@ using Events.Applications.Environments;
 
 namespace Reactions.Applications.Pulumi;
 
+#pragma warning disable RCS1175
+
 public static class ApplicationEnvironmentEvents
 {
-    public static async Task<IEnumerable<object>> GetEventsToAppend(this Application application, ApplicationResult applicationResult)
+    public static async Task<IEnumerable<object>> GetEventsToAppend(this Application application, ApplicationEnvironmentWithArtifacts environment, ApplicationEnvironmentResult applicationResult)
     {
         var events = new List<object>();
 
-        if (application.Resources?.MongoDB?.ConnectionString is null ||
-        application.Resources?.MongoDB?.ConnectionString.Value != applicationResult.MongoDB.ConnectionString)
+        if (environment.Resources?.MongoDB?.ConnectionString is null ||
+        environment.Resources?.MongoDB?.ConnectionString.Value != applicationResult.MongoDB.ConnectionString)
         {
-            events.Add(new MongoDBConnectionStringChangedForApplication(applicationResult.MongoDB.ConnectionString));
+            events.Add(new MongoDBConnectionStringChangedForApplicationEnvironment(applicationResult.MongoDB.ConnectionString));
         }
 
-        if (application.Resources?.MongoDB?.Users is null ||
-            !(application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        if (environment.Resources?.MongoDB?.Users is null ||
+            !(environment.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
         {
             events.Add(new MongoDBUserChanged("kernel", applicationResult.MongoDB.Password));
         }
 
         var resourceGroupId = await applicationResult.ResourceGroup.Id.GetValue();
-        if (application.Resources?.AzureResourceGroupId != resourceGroupId)
+        if (environment.Resources?.AzureResourceGroupId != resourceGroupId)
         {
-            events.Add(new AzureResourceGroupCreatedForApplication(application.AzureSubscriptionId, resourceGroupId));
+            events.Add(new AzureResourceGroupCreatedForApplicationEnvironment(environment.AzureSubscriptionId, resourceGroupId));
         }
 
-        if (application.Resources?.AzureStorageAccountName != applicationResult.Storage.AccountName)
+        if (environment.Resources?.AzureStorageAccountName != applicationResult.Storage.AccountName)
         {
-            events.Add(new AzureStorageAccountSetForApplication(applicationResult.Storage.AccountName));
+            events.Add(new AzureStorageAccountSetForApplicationEnvironment(applicationResult.Storage.AccountName));
         }
 
         var subnets = await applicationResult.Network.VirtualNetwork.Subnets.GetValue();
-        if (application.Resources?.AzureVirtualNetworkIdentifier is null ||
-            application.Resources?.AzureVirtualNetworkIdentifier != subnets[0].Id!)
+        if (environment.Resources?.AzureVirtualNetworkIdentifier is null ||
+            environment.Resources?.AzureVirtualNetworkIdentifier != subnets[0].Id!)
         {
-            events.Add(new AzureVirtualNetworkIdentifierSetForApplication(subnets[0].Id!));
+            events.Add(new AzureVirtualNetworkIdentifierSetForApplicationEnvironment(subnets[0].Id!));
         }
 
-        if (application.Resources?.AzureContainerRegistryLoginServer != applicationResult.ContainerRegistry.LoginServer ||
-            application.Resources?.AzureContainerRegistryUserName != applicationResult.ContainerRegistry.UserName ||
-            application.Resources?.AzureContainerRegistryPassword != applicationResult.ContainerRegistry.Password)
+        if (environment.Resources?.AzureContainerRegistryLoginServer != applicationResult.ContainerRegistry.LoginServer ||
+            environment.Resources?.AzureContainerRegistryUserName != applicationResult.ContainerRegistry.UserName ||
+            environment.Resources?.AzureContainerRegistryPassword != applicationResult.ContainerRegistry.Password)
         {
-            events.Add(new AzureContainerRegistrySetForApplication(
+            events.Add(new AzureContainerRegistrySetForApplicationEnvironment(
                 applicationResult.ContainerRegistry.LoginServer,
                 applicationResult.ContainerRegistry.UserName,
                 applicationResult.ContainerRegistry.Password));

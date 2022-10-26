@@ -5,6 +5,7 @@ using Concepts;
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Concepts.Applications.Ingresses;
+using Concepts.Azure;
 
 namespace Reactions.Applications;
 
@@ -14,6 +15,9 @@ public record ApplicationEnvironmentWithArtifacts(
     ApplicationEnvironmentDisplayName DisplayName,
     ApplicationEnvironmentShortName ShortName,
     SemanticVersion CratisVersion,
+    AzureSubscriptionId AzureSubscriptionId,
+    CloudLocationKey CloudLocation,
+    ApplicationResources Resources,
     IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,
     IEnumerable<Microservice> Microservices) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)

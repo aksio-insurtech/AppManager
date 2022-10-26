@@ -11,16 +11,12 @@ const routeTemplate = Handlebars.compile('/api/applications');
 export interface ICreateApplication {
     applicationId?: string;
     name?: string;
-    azureSubscriptionId?: string;
-    cloudLocation?: string;
 }
 
 export class CreateApplicationValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         name: new Validator(),
-        azureSubscriptionId: new Validator(),
-        cloudLocation: new Validator(),
     };
 }
 
@@ -31,8 +27,6 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
 
     private _applicationId!: string;
     private _name!: string;
-    private _azureSubscriptionId!: string;
-    private _cloudLocation!: string;
 
     get requestArguments(): string[] {
         return [
@@ -43,8 +37,6 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
         return [
             'applicationId',
             'name',
-            'azureSubscriptionId',
-            'cloudLocation',
         ];
     }
 
@@ -63,22 +55,6 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
     set name(value: string) {
         this._name = value;
         this.propertyChanged('name');
-    }
-    get azureSubscriptionId(): string {
-        return this._azureSubscriptionId;
-    }
-
-    set azureSubscriptionId(value: string) {
-        this._azureSubscriptionId = value;
-        this.propertyChanged('azureSubscriptionId');
-    }
-    get cloudLocation(): string {
-        return this._cloudLocation;
-    }
-
-    set cloudLocation(value: string) {
-        this._cloudLocation = value;
-        this.propertyChanged('cloudLocation');
     }
 
     static use(initialValues?: ICreateApplication): [CreateApplication, SetCommandValues<ICreateApplication>] {

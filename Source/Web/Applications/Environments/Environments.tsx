@@ -6,7 +6,7 @@ import { ModalResult } from '@aksio/cratis-mui';
 import { AddEnvironmentDialog, AddEnvironmentDialogOutput } from './AddEnvironmentDialog';
 import { EnvironmentsForApplication } from 'API/applications/environments/EnvironmentsForApplication';
 import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
-import { CreateEnvironment } from '../../API/applications/environments/CreateEnvironment';
+import { CreateEnvironment } from 'API/applications/environments/CreateEnvironment';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ValueEditorFor } from 'Components';
 import { useRouteParams } from '../RouteParams';
@@ -36,6 +36,8 @@ export const Environments = () => {
                     command.name = output!.name;
                     command.displayName = output!.displayName;
                     command.shortName = output!.shortName;
+                    command.azureSubscriptionId = output!.azureSubscription;
+                    command.cloudLocation = output!.cloudLocation;
                     await command.execute();
                 }
             }} />

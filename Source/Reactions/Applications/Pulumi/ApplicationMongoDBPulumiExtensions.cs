@@ -3,7 +3,6 @@
 
 using Common;
 using Concepts.Applications;
-using Concepts.Applications.Environments;
 using Pulumi;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
@@ -21,7 +20,7 @@ public static class ApplicationMongoDBPulumiExtensions
         ISettings settings,
         ResourceGroup resourceGroup,
         VirtualNetwork vnet,
-        ApplicationEnvironment environment,
+        ApplicationEnvironmentWithArtifacts environment,
         Tags tags)
     {
         var mongoDBOrganizationId = settings.MongoDBOrganizationId;
@@ -31,7 +30,7 @@ public static class ApplicationMongoDBPulumiExtensions
             OrgId = mongoDBOrganizationId.Value
         });
 
-        var region = GetRegionName(application.CloudLocation);
+        var region = GetRegionName(environment.CloudLocation);
 
         var privateLinkEndpoint = new PrivateLinkEndpoint(application.Name, new()
         {
@@ -46,7 +45,7 @@ public static class ApplicationMongoDBPulumiExtensions
 
         var privateEndpoint = new PrivateEndpoint(application.Name, new()
         {
-            Location = application.CloudLocation.Value,
+            Location = environment.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
             Subnet = new SubnetArgs
@@ -93,10 +92,10 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var databasePassword = Guid.NewGuid().ToString();
-        if (application.Resources?.MongoDB?.Users is not null &&
-            (application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        if (environment.Resources?.MongoDB?.Users is not null &&
+            (environment.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
         {
-            databasePassword = application.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
+            databasePassword = environment.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
         }
 
         _ = new DatabaseUser("kernel", new()

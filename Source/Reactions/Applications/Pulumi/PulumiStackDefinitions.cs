@@ -4,7 +4,6 @@
 using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
-using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.Resources;
 
@@ -31,13 +30,13 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
+    public async Task<ApplicationEnvironmentResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.SetupResourceGroup(environment);
-        var identity = application.SetupUserAssignedIdentity(resourceGroup, tags);
-        var vault = application.SetupKeyVault(identity, resourceGroup, tags);
-        var network = application.SetupNetwork(identity, vault, resourceGroup, tags);
+        var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
+        var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
+        var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);
         var storage = await application.SetupStorage(environment, resourceGroup, tags);
         var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
         var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
@@ -67,7 +66,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         await kernelStorage.CreateAndUploadCratisJson(mongoDB, environment.Tenants, environment.Microservices, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
 
-        var applicationResult = new ApplicationResult(
+        var applicationResult = new ApplicationEnvironmentResult(
             environment,
             resourceGroup,
             network,
@@ -76,7 +75,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             mongoDB,
             managedEnvironment,
             kernel);
-        var events = await application.GetEventsToAppend(applicationResult);
+        var events = await application.GetEventsToAppend(environment, applicationResult);
 
         // Todo: Set to actual execution context - might not be the right place for this!
         _executionContextManager.Set(executionContext);
@@ -107,14 +106,14 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
-        ApplicationEnvironment environment,
+        ApplicationEnvironmentWithArtifacts environment,
         bool useContainerRegistry = true,
         ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
     {
         var tags = application.GetTags(environment);
         resourceGroup ??= application.GetResourceGroup(environment);
-        var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
+        var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
         storage.CreateAndUploadAppSettings(_settings);
         storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
 
@@ -126,9 +125,9 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             application,
             resourceGroup,
             managedEnvironment,
-            application.Resources.AzureContainerRegistryLoginServer,
-            application.Resources.AzureContainerRegistryUserName,
-            application.Resources.AzureContainerRegistryPassword,
+            environment.Resources.AzureContainerRegistryLoginServer,
+            environment.Resources.AzureContainerRegistryUserName,
+            environment.Resources.AzureContainerRegistryPassword,
             storage,
             deployables,
             tags,
@@ -145,11 +144,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         Microservice microservice,
         IEnumerable<Deployable> deployables,
-        ApplicationEnvironment environment)
+        ApplicationEnvironmentWithArtifacts environment)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.GetResourceGroup(environment);
-        var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
+        var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
 
         var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
 
@@ -157,9 +156,9 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             application,
             resourceGroup,
             managedEnvironment,
-            application.Resources.AzureContainerRegistryLoginServer,
-            application.Resources.AzureContainerRegistryUserName,
-            application.Resources.AzureContainerRegistryPassword,
+            environment.Resources.AzureContainerRegistryLoginServer,
+            environment.Resources.AzureContainerRegistryUserName,
+            environment.Resources.AzureContainerRegistryPassword,
             storage,
             deployables,
             tags);

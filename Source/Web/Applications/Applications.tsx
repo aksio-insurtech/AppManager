@@ -83,8 +83,6 @@ export const Applications = () => {
                 const command = new CreateApplication();
                 command.applicationId = Guid.create().toString();
                 command.name = output!.name;
-                command.azureSubscriptionId = output!.azureSubscription;
-                command.cloudLocation = output!.cloudLocation;
                 await command.execute();
             }
         }

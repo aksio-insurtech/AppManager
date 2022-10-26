@@ -38,7 +38,7 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Up(Application application, string projectName, PulumiFn definition, ApplicationEnvironment environment, Microservice? microservice = default)
+    public async Task Up(Application application, string projectName, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         _logger.UppingStack();
 
@@ -68,7 +68,7 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Down(Application application, string projectName, PulumiFn definition, ApplicationEnvironment environment, Microservice? microservice = default)
+    public async Task Down(Application application, string projectName, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         try
         {
@@ -92,7 +92,7 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Remove(Application application, string projectName, PulumiFn definition, ApplicationEnvironment environment, Microservice? microservice = default)
+    public async Task Remove(Application application, string projectName, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         _logger.StackBeingRemoved();
 
@@ -118,7 +118,7 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task SetTag(string projectName, ApplicationEnvironment environment, string tagName, string value)
+    public async Task SetTag(string projectName, ApplicationEnvironmentWithArtifacts environment, string tagName, string value)
     {
         var stackName = environment.DisplayName;
         var payload = new
@@ -136,7 +136,7 @@ public class PulumiOperations : IPulumiOperations
         await client.PostAsJsonAsync(url, payload);
     }
 
-    async Task<WorkspaceStack> CreateStack(Application application, string projectName, ApplicationEnvironment environment, PulumiFn program, Microservice? microservice = default)
+    async Task<WorkspaceStack> CreateStack(Application application, string projectName, ApplicationEnvironmentWithArtifacts environment, PulumiFn program, Microservice? microservice = default)
     {
         var stackName = environment.DisplayName;
 
@@ -193,8 +193,8 @@ public class PulumiOperations : IPulumiOperations
         _logger.SettingAllConfig();
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
             {
-                { "azure-native:location", new ConfigValue(application.CloudLocation) },
-                { "azure-native:subscriptionId", new ConfigValue(application.AzureSubscriptionId.ToString()) },
+                { "azure-native:location", new ConfigValue(environment.CloudLocation) },
+                { "azure-native:subscriptionId", new ConfigValue(environment.AzureSubscriptionId.ToString()) },
                 { "azure-native:clientId", new ConfigValue(_settings.ServicePrincipal.ClientId) },
                 { "azure-native:clientSecret", new ConfigValue(_settings.ServicePrincipal.ClientSecret, true) },
                 { "azure-native:tenantId", new ConfigValue(_settings.AzureSubscriptions.First().TenantId) }

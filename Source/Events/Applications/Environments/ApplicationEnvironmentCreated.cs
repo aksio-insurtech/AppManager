@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts;
+using Concepts.Applications;
 using Concepts.Applications.Environments;
+using Concepts.Azure;
 
 namespace Events.Applications.Environments;
 
@@ -12,4 +14,6 @@ public record ApplicationEnvironmentCreated(
     ApplicationEnvironmentName Name,
     ApplicationEnvironmentDisplayName DisplayName,
     ApplicationEnvironmentShortName ShortName,
-    SemanticVersion CratisVersion);
+    SemanticVersion CratisVersion,
+    AzureSubscriptionId AzureSubscriptionId,
+    CloudLocationKey CloudLocation);
