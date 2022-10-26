@@ -7,4 +7,4 @@ using Concepts.Applications.Tenants;
 
 namespace Read.Applications.Environments.Tenants;
 
-public record Tenant(TenantId Id, ApplicationEnvironmentId EnvironmentId, TenantName Name);
+public record Tenant(TenantId Id, ApplicationEnvironmentId EnvironmentId, TenantName Name, TenantShortName ShortName);

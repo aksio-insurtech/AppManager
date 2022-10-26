@@ -6,36 +6,33 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/custom-domain');
 
-export interface IAddTenant {
+export interface IAddCustomDomainToApplicationEnvironment {
     applicationId?: string;
     environmentId?: string;
-    tenantId?: string;
-    name?: string;
-    shortName?: string;
+    domain?: string;
+    certificate?: string;
 }
 
-export class AddTenantValidator extends CommandValidator {
+export class AddCustomDomainToApplicationEnvironmentValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
-        tenantId: new Validator(),
-        name: new Validator(),
-        shortName: new Validator(),
+        domain: new Validator(),
+        certificate: new Validator(),
     };
 }
 
-export class AddTenant extends Command<IAddTenant> implements IAddTenant {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants';
+export class AddCustomDomainToApplicationEnvironment extends Command<IAddCustomDomainToApplicationEnvironment> implements IAddCustomDomainToApplicationEnvironment {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/custom-domain';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddTenantValidator();
+    readonly validation: CommandValidator = new AddCustomDomainToApplicationEnvironmentValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
-    private _tenantId!: string;
-    private _name!: string;
-    private _shortName!: string;
+    private _domain!: string;
+    private _certificate!: string;
 
     get requestArguments(): string[] {
         return [
@@ -48,9 +45,8 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
         return [
             'applicationId',
             'environmentId',
-            'tenantId',
-            'name',
-            'shortName',
+            'domain',
+            'certificate',
         ];
     }
 
@@ -70,32 +66,24 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
         this._environmentId = value;
         this.propertyChanged('environmentId');
     }
-    get tenantId(): string {
-        return this._tenantId;
+    get domain(): string {
+        return this._domain;
     }
 
-    set tenantId(value: string) {
-        this._tenantId = value;
-        this.propertyChanged('tenantId');
+    set domain(value: string) {
+        this._domain = value;
+        this.propertyChanged('domain');
     }
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this._name = value;
-        this.propertyChanged('name');
-    }
-    get shortName(): string {
-        return this._shortName;
+    get certificate(): string {
+        return this._certificate;
     }
 
-    set shortName(value: string) {
-        this._shortName = value;
-        this.propertyChanged('shortName');
+    set certificate(value: string) {
+        this._certificate = value;
+        this.propertyChanged('certificate');
     }
 
-    static use(initialValues?: IAddTenant): [AddTenant, SetCommandValues<IAddTenant>] {
-        return useCommand<AddTenant, IAddTenant>(AddTenant, initialValues);
+    static use(initialValues?: IAddCustomDomainToApplicationEnvironment): [AddCustomDomainToApplicationEnvironment, SetCommandValues<IAddCustomDomainToApplicationEnvironment>] {
+        return useCommand<AddCustomDomainToApplicationEnvironment, IAddCustomDomainToApplicationEnvironment>(AddCustomDomainToApplicationEnvironment, initialValues);
     }
 }

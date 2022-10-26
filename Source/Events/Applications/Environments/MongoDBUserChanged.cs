@@ -3,7 +3,7 @@
 
 using Concepts.MongoDB;
 
-namespace Events.Applications;
+namespace Events.Applications.Environments;
 
 [EventType("bf5ea49f-44ab-4e43-90ff-054355e65a67")]
 public record MongoDBUserChanged(MongoDBUserName UserName, MongoDBPassword Password);

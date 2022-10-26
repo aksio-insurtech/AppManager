@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
-using Concepts.Applications.Environments;
 using Events.Applications.Environments.Microservices;
 using Infrastructure;
 using Pulumi.Automation;
@@ -39,7 +38,7 @@ public class Microservice : Controller
     public Task SetStack(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] MicroserviceId microserviceId,
-        [FromRoute] ApplicationEnvironment environment,
+        [FromRoute] Concepts.Applications.Environments.ApplicationEnvironment environment,
         [FromBody] object stack) => _stacksForMicroservices.Save(applicationId, microserviceId, environment, StackDeployment.FromJsonString(stack.ToString()!));
 
     [HttpPost("remove")]

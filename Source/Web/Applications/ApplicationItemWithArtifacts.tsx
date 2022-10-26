@@ -28,9 +28,12 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/cratis`);
     };
 
-
     const handleTenantsClick = () => {
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/tenants`);
+    };
+
+    const handleCustomDomainsClick = () => {
+        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/custom-domains`);
     };
 
     const handleMicroserviceClick = (microservice: MicroserviceInEnvironment) => {
@@ -54,6 +57,11 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                         icon={<icons.Apartment />}
                         title="Tenants"
                         onClick={handleTenantsClick} />
+
+                    <ApplicationArtifactListItem
+                        icon={<icons.Domain />}
+                        title="Custom Domains"
+                        onClick={handleCustomDomainsClick} />
 
                     {environment.ingresses?.map(ingress => {
                         return (

@@ -1,6 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Read.Applications;
+namespace Domain.Applications;
 
-public record ApplicationResources(AzureResources Azure, MongoDBResource MongoDB);
+public record Secret(string Key, string Value);

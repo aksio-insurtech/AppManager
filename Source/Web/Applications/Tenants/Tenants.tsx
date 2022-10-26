@@ -13,7 +13,8 @@ import { ValueEditorFor } from 'Components';
 
 const columns: GridColDef[] = [
     { field: 'id', headerName: 'Id', width: 350 },
-    { field: 'name', headerName: 'Name', width: 250 }
+    { field: 'name', headerName: 'Name', width: 250 },
+    { field: 'shortName', headerName: 'Short Name', width: 250 }
 ];
 
 export const Tenants = () => {

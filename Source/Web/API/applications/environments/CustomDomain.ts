@@ -4,14 +4,12 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { AzureResources } from './AzureResources';
-import { MongoDBResource } from './MongoDBResource';
 
-export class ApplicationResources {
+export class CustomDomain {
 
-    @field(AzureResources)
-    azure!: AzureResources;
+    @field(String)
+    domain!: string;
 
-    @field(MongoDBResource)
-    mongoDB!: MongoDBResource;
+    @field(String)
+    certificate!: string;
 }

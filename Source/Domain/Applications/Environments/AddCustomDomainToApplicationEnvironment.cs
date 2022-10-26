@@ -1,9 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Aksio.Cratis.Execution;
 using Concepts.Applications;
 
-namespace Domain.Applications.Environments.Ingresses;
+namespace Domain.Applications.Environments;
 
-public record AddCustomDomainForTenant(TenantId TenantId, DomainName DomainName);
+public record AddCustomDomainToApplicationEnvironment(DomainName Domain, TLSCertificate Certificate);

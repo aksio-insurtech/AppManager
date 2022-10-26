@@ -1,11 +1,11 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Events.Applications;
+using Events.Applications.Environments;
 
 namespace Reactions.Applications.Pulumi;
 
-public static class ApplicationEvents
+public static class ApplicationEnvironmentEvents
 {
     public static async Task<IEnumerable<object>> GetEventsToAppend(this Application application, ApplicationResult applicationResult)
     {
@@ -14,7 +14,7 @@ public static class ApplicationEvents
         if (application.Resources?.MongoDB?.ConnectionString is null ||
         application.Resources?.MongoDB?.ConnectionString.Value != applicationResult.MongoDB.ConnectionString)
         {
-            events.Add(new MongoDBConnectionStringChangedForApplication(applicationResult.Environment, applicationResult.MongoDB.ConnectionString));
+            events.Add(new MongoDBConnectionStringChangedForApplication(applicationResult.MongoDB.ConnectionString));
         }
 
         if (application.Resources?.MongoDB?.Users is null ||

@@ -8,4 +8,4 @@ using Concepts.Applications.Tenants;
 namespace Events.Applications.Environments;
 
 [EventType("8600851a-6143-4a7b-a255-33a33039d2fe")]
-public record TenantAddedToApplicationEnvironment(ApplicationEnvironmentId EnvironmentId, TenantId TenantId, TenantName Name);
+public record TenantAddedToApplicationEnvironment(ApplicationEnvironmentId EnvironmentId, TenantId TenantId, TenantName Name, TenantShortName ShortName);

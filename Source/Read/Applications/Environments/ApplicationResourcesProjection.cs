@@ -2,14 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Events.Applications;
+using Events.Applications.Environments;
 
-namespace Read.Applications;
+namespace Read.Applications.Environments;
 
-public class ApplicationResourcesProjection : IProjectionFor<ApplicationResources>
+public class ApplicationResourcesProjection : IProjectionFor<ApplicationEnvironmentResources>
 {
     public ProjectionId Identifier => "6390f7ab-67c1-4b18-ac61-79b92c8a8352";
 
-    public void Define(IProjectionBuilderFor<ApplicationResources> builder) => builder
+    public void Define(IProjectionBuilderFor<ApplicationEnvironmentResources> builder) => builder
         .From<MongoDBConnectionStringChangedForApplication>(_ => _
             .Set(m => m.MongoDB.ConnectionString).To(e => e.ConnectionString))
         .Children(m => m.MongoDB.Users, cb => cb

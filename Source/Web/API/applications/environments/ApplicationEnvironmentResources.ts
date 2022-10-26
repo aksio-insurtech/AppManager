@@ -4,18 +4,17 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { AzureResources } from './AzureResources';
+import { MongoDBResource } from './MongoDBResource';
 
-export class Tenant {
+export class ApplicationEnvironmentResources {
 
     @field(String)
     id!: string;
 
-    @field(String)
-    environmentId!: string;
+    @field(AzureResources)
+    azure!: AzureResources;
 
-    @field(String)
-    name!: string;
-
-    @field(String)
-    shortName!: string;
+    @field(MongoDBResource)
+    mongoDB!: MongoDBResource;
 }

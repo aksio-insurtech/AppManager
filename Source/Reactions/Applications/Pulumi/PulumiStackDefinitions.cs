@@ -82,7 +82,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _executionContextManager.Set(executionContext);
         foreach (var @event in events)
         {
-            await _eventLog.Append(application.Id, @event);
+            await _eventLog.Append(environment.Id, @event);
         }
 
         return applicationResult;

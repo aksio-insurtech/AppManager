@@ -3,7 +3,7 @@
 
 import { Application as ApplicationModel } from 'API/applications/Application';
 import { useNavigate } from 'react-router-dom';
-import { ResourcesForApplication } from 'API/applications/ResourcesForApplication';
+//import { ResourcesForApplication } from 'API/applications/ResourcesForApplication';
 import { AllSettings } from 'API/settings/AllSettings';
 
 export interface IGeneralProps {
@@ -13,9 +13,8 @@ export interface IGeneralProps {
 export const General = (props: IGeneralProps) => {
     const navigate = useNavigate();
     const [settings] = AllSettings.use();
-    const [resources] = ResourcesForApplication.use({ applicationId: props.application.id });
-
-    const subscription = settings.data?.azureSubscriptions?.find(_ => _.subscriptionId === resources.data?.azure?.subscriptionId);
+    // const [resources] = ResourcesForApplication.use({ applicationId: props.application.id });
+    // const subscription = settings.data?.azureSubscriptions?.find(_ => _.subscriptionId === resources.data?.azure?.subscriptionId);
 
     return (
         <></>

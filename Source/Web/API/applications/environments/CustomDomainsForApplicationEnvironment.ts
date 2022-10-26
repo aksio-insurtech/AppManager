@@ -4,18 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { CustomDomain } from './CustomDomain';
 
-export class Tenant {
+export class CustomDomainsForApplicationEnvironment {
 
     @field(String)
     id!: string;
 
-    @field(String)
-    environmentId!: string;
-
-    @field(String)
-    name!: string;
-
-    @field(String)
-    shortName!: string;
+    @field(CustomDomain, true)
+    domains!: CustomDomain[];
 }

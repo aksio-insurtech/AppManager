@@ -3,7 +3,7 @@
 
 using Concepts.Azure;
 
-namespace Events.Applications;
+namespace Events.Applications.Environments;
 
 [EventType("3494e0df-619a-4b5b-bdb3-f668586ac898")]
 public record AzureResourceGroupCreatedForApplication(AzureSubscriptionId SubscriptionId, AzureResourceGroupId ResourceGroupId);

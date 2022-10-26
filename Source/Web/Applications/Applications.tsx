@@ -23,6 +23,7 @@ import { Tenants } from './Tenants/Tenants';
 import { Ingress } from './Ingresses/Ingress';
 import { Cratis } from './Cratis/Cratis';
 import { EnvironmentForApplication } from 'API/applications/environments/EnvironmentForApplication';
+import { CustomDomains } from './CustomDomains/CustomDomains';
 
 export const Applications = () => {
     const [currentApplicationId, setCurrentApplicationId] = useState<string>();
@@ -40,6 +41,7 @@ export const Applications = () => {
         '/applications/:applicationId/environments/:environmentId/ingresses/:ingressId',
         '/applications/:applicationId/environments/:environmentId/cratis',
         '/applications/:applicationId/environments/:environmentId/tenants',
+        '/applications/:applicationId/environments/:environmentId/custom-domains',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId',
         '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId'
     ];
@@ -132,6 +134,7 @@ export const Applications = () => {
                             <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingress />} />
                             <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis environment={applicationEnvironment.data} />} />
                             <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
+                            <Route path=':applicationId/environments/:environmentId/custom-domains' element={<CustomDomains />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
                             <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
                         </Routes>
