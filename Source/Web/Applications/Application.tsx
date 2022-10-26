@@ -11,11 +11,15 @@ import { Secrets } from './Secrets/Secrets';
 import { ConfigFiles } from './ConfigFiles/ConfigFiles';
 import { useRouteParams, RouteParams } from './RouteParams';
 import { SetEnvironmentVariableForApplication } from 'API/applications/SetEnvironmentVariableForApplication';
+import { EnvironmentVariablesForApplicationId } from '../API/applications/EnvironmentVariablesForApplicationId';
 
 export const Application = () => {
     const { applicationId } = useRouteParams();
     const [application] = GetApplication.use({ applicationId: applicationId! });
     const [selectedTab, setSelectedTab] = useState("0");
+    const [environmentVariablesQuery] = EnvironmentVariablesForApplicationId.use({ applicationId: applicationId! });
+
+    const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
 
     const variableSet = async (variable: Variable, context: RouteParams) => {
         const command = new SetEnvironmentVariableForApplication();
@@ -40,7 +44,7 @@ export const Application = () => {
             <TabPanel value="0"></TabPanel>
             <TabPanel value="1"><Environments /></TabPanel>
             <TabPanel value="2"><ConfigFiles /></TabPanel>
-            <TabPanel value="3"><Variables onVariableSet={variableSet} /></TabPanel>
+            <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
             <TabPanel value="4"><Secrets /></TabPanel>
         </TabContext>
     );
