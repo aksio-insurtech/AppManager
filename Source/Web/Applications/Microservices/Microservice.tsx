@@ -11,7 +11,7 @@ import { Deployables } from './Deployables/Deployables';
 import { ConfigFiles } from '../ConfigFiles/ConfigFiles';
 import { General } from './General';
 import { RouteParams, useRouteParams } from '../RouteParams';
-import { SetEnvironmentVariableForMicroservice } from 'API/applications/microservices/SetEnvironmentVariableForMicroservice';
+import { SetEnvironmentVariableForMicroservice } from 'API/applications/environments/microservices/SetEnvironmentVariableForMicroservice';
 
 export const Microservice = () => {
     const { applicationId, environmentId, microserviceId } = useRouteParams();

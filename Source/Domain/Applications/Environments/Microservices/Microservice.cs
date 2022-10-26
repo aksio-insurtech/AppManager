@@ -9,7 +9,7 @@ using Pulumi.Automation;
 
 namespace Domain.Applications.Environments.Microservices;
 
-[Route("/api/applications/{applicationId}/{environment}/microservices/{microserviceId}")]
+[Route("/api/applications/{applicationId}/environments/{environmentId}/microservices/{microserviceId}")]
 public class Microservice : Controller
 {
     readonly IEventLog _eventLog;

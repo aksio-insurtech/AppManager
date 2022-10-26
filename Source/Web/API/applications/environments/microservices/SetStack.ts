@@ -6,7 +6,7 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/microservices/{{microserviceId}}/stack');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{environmentId}/microservices/{{microserviceId}}/stack');
 
 export interface ISetStack {
     applicationId?: string;
@@ -29,7 +29,7 @@ export class SetStackValidator extends CommandValidator {
 }
 
 export class SetStack extends Command<ISetStack> implements ISetStack {
-    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/microservices/{{microserviceId}}/stack';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{environmentId}/microservices/{{microserviceId}}/stack';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new SetStackValidator();
 

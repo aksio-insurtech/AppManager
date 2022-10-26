@@ -6,7 +6,7 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/{environment}/microservices/{{microserviceId}}/remove');
+const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/remove');
 
 export interface IRemove {
     microserviceId?: string;
@@ -19,7 +19,7 @@ export class RemoveValidator extends CommandValidator {
 }
 
 export class Remove extends Command<IRemove> implements IRemove {
-    readonly route: string = '/api/applications/{applicationId}/{environment}/microservices/{{microserviceId}}/remove';
+    readonly route: string = '/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/remove';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new RemoveValidator();
 

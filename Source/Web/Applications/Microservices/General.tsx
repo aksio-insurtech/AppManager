@@ -3,7 +3,7 @@
 
 import { Button, TextField } from '@mui/material';
 import { Microservice } from 'API/applications/environments/microservices/Microservice';
-import { Remove } from 'API/applications/microservices/Remove';
+import { Remove } from 'API/applications/environments/microservices/Remove';
 import { useNavigate } from 'react-router-dom';
 
 export interface GeneralProps {
