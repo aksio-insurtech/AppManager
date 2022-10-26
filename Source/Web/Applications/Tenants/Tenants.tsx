@@ -35,6 +35,7 @@ export const Tenants = () => {
                     command.environmentId = environmentId!;
                     command.tenantId = Guid.create().toString();
                     command.name = output!.name;
+                    command.shortName = output!.shortName;
                     await command.execute();
                 }
             }} />
