@@ -47,7 +47,7 @@ export const Microservice = () => {
             <TabPanel value="0"><General microservice={microservice.data} /></TabPanel>
             <TabPanel value="1"><Deployables /></TabPanel>
             <TabPanel value="2"><ConfigFiles /></TabPanel>
-            <TabPanel value="3"><Variables onVariableSet={variableSet} /></TabPanel>
+            <TabPanel value="3"><Variables onVariableSet={variableSet} variables={[]}/></TabPanel>
             <TabPanel value="4"><Secrets /></TabPanel>
         </TabContext>
     );

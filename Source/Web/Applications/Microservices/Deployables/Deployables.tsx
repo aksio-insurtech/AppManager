@@ -98,7 +98,7 @@ export const Deployables = () => {
                     </Box>
                     <TabPanel value="0"></TabPanel>
                     <TabPanel value="1"></TabPanel>
-                    <TabPanel value="2"><Variables onVariableSet={variableSet} /></TabPanel>
+                    <TabPanel value="2"><Variables onVariableSet={variableSet} variables={[]} /></TabPanel>
                     <TabPanel value="3"><Secrets /></TabPanel>
                 </TabContext>
             }

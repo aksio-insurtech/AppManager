@@ -3,13 +3,13 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddVariableDialog, AddVariableDialogOutput } from './AddVariableDialog';
 import { useRouteParams, RouteParams } from '../RouteParams';
+import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
 
 const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Name', width: 250 },
+    { field: 'key', headerName: 'Key', width: 250 },
     { field: 'value', headerName: 'Value', width: 250 }
 ];
 
@@ -21,19 +21,20 @@ export interface Variable {
 export type VariableSet = (variable: Variable, context: RouteParams) => void;
 
 export interface VariablesProps {
-    onVariableSet: VariableSet
+    onVariableSet: VariableSet;
+    variables: EnvironmentVariable[];
 }
 
 export const Variables = (props: VariablesProps) => {
     const context = useRouteParams();
 
     return (
-        <ValueEditorFor<AddVariableDialogOutput, Tenant>
+        <ValueEditorFor<AddVariableDialogOutput, EnvironmentVariable>
             addTitle="Add Variable"
             columns={columns}
-            data={[]}
+            data={props.variables}
             modalContent={AddVariableDialog}
-            getRowId={(tenant) => tenant.id}
+            getRowId={(variable) => variable.key}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
                     props.onVariableSet(output as Variable, context);

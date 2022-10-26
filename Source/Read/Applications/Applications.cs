@@ -8,13 +8,16 @@ public class Applications : Controller
 {
     readonly IMongoCollection<Application> _applicationCollection;
     readonly IMongoCollection<ApplicationHierarchyForListing> _hierarchyCollection;
+    readonly IMongoCollection<EnvironmentVariablesForApplication> _environmentVariablesForApplicationCollection;
 
     public Applications(
         IMongoCollection<Application> applicationCollection,
-        IMongoCollection<ApplicationHierarchyForListing> hierarchyCollection)
+        IMongoCollection<ApplicationHierarchyForListing> hierarchyCollection,
+        IMongoCollection<EnvironmentVariablesForApplication> environmentVariablesForApplicationCollection)
     {
         _applicationCollection = applicationCollection;
         _hierarchyCollection = hierarchyCollection;
+        _environmentVariablesForApplicationCollection = environmentVariablesForApplicationCollection;
     }
 
     [HttpGet("{applicationId}")]
@@ -22,4 +25,8 @@ public class Applications : Controller
 
     [HttpGet("hierarchy")]
     public Task<ClientObservable<IEnumerable<ApplicationHierarchyForListing>>> ApplicationsHierarchy() => _hierarchyCollection.Observe();
+
+    [HttpGet("{applicationId}/environment-variables")]
+    public Task<ClientObservable<EnvironmentVariablesForApplication>> EnvironmentVariablesForApplicationId([FromRoute] ApplicationId applicationId) =>
+        _environmentVariablesForApplicationCollection.ObserveId(applicationId);
 }
