@@ -8,25 +8,31 @@ import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/environment-variable');
 
-export interface ISetEnvironmentVariable {
+export interface ISetEnvironmentVariableForApplicationEnvironment {
     applicationId?: string;
     environmentId?: string;
+    key?: string;
+    value?: string;
 }
 
-export class SetEnvironmentVariableValidator extends CommandValidator {
+export class SetEnvironmentVariableForApplicationEnvironmentValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
+        key: new Validator(),
+        value: new Validator(),
     };
 }
 
-export class SetEnvironmentVariable extends Command<ISetEnvironmentVariable> implements ISetEnvironmentVariable {
+export class SetEnvironmentVariableForApplicationEnvironment extends Command<ISetEnvironmentVariableForApplicationEnvironment> implements ISetEnvironmentVariableForApplicationEnvironment {
     readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/environment-variable';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetEnvironmentVariableValidator();
+    readonly validation: CommandValidator = new SetEnvironmentVariableForApplicationEnvironmentValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
+    private _key!: string;
+    private _value!: string;
 
     get requestArguments(): string[] {
         return [
@@ -39,6 +45,8 @@ export class SetEnvironmentVariable extends Command<ISetEnvironmentVariable> imp
         return [
             'applicationId',
             'environmentId',
+            'key',
+            'value',
         ];
     }
 
@@ -58,8 +66,24 @@ export class SetEnvironmentVariable extends Command<ISetEnvironmentVariable> imp
         this._environmentId = value;
         this.propertyChanged('environmentId');
     }
+    get key(): string {
+        return this._key;
+    }
 
-    static use(initialValues?: ISetEnvironmentVariable): [SetEnvironmentVariable, SetCommandValues<ISetEnvironmentVariable>] {
-        return useCommand<SetEnvironmentVariable, ISetEnvironmentVariable>(SetEnvironmentVariable, initialValues);
+    set key(value: string) {
+        this._key = value;
+        this.propertyChanged('key');
+    }
+    get value(): string {
+        return this._value;
+    }
+
+    set value(value: string) {
+        this._value = value;
+        this.propertyChanged('value');
+    }
+
+    static use(initialValues?: ISetEnvironmentVariableForApplicationEnvironment): [SetEnvironmentVariableForApplicationEnvironment, SetCommandValues<ISetEnvironmentVariableForApplicationEnvironment>] {
+        return useCommand<SetEnvironmentVariableForApplicationEnvironment, ISetEnvironmentVariableForApplicationEnvironment>(SetEnvironmentVariableForApplicationEnvironment, initialValues);
     }
 }

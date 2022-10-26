@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Events.Applications.Environments.Microservices;
 using Infrastructure;
 using Pulumi.Automation;
@@ -29,10 +30,12 @@ public class Microservice : Controller
         [FromRoute] MicroserviceId microserviceId) => Task.CompletedTask;
 
     [HttpPost("environment-variable")]
-    public Task SetEnvironmentVariable(
+    public Task SetEnvironmentVariableForMicroservice(
         [FromRoute] ApplicationId applicationId,
-        [FromRoute] string environment,
-        [FromRoute] MicroserviceId microserviceId) => Task.CompletedTask;
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] EnvironmentVariable environmentVariable) =>
+        _eventLog.Append(microserviceId, new EnvironmentVariableSetForMicroservice(applicationId, environmentId, environmentVariable.Key, environmentVariable.Value));
 
     [HttpPost("stack")]
     public Task SetStack(

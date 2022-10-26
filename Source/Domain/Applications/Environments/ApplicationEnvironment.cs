@@ -3,6 +3,7 @@
 
 using Concepts.Applications.Environments;
 using Events.Applications;
+using Events.Applications.Environments;
 
 namespace Domain.Applications.Environments;
 
@@ -27,5 +28,9 @@ public class ApplicationEnvironment : Controller
     public Task SetConfig([FromRoute] ApplicationId applicationId, [FromRoute] ApplicationEnvironmentId environmentId) => Task.CompletedTask;
 
     [HttpPost("environment-variable")]
-    public Task SetEnvironmentVariable([FromRoute] ApplicationId applicationId, [FromRoute] ApplicationEnvironmentId environmentId) => Task.CompletedTask;
+    public Task SetEnvironmentVariableForApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] EnvironmentVariable environmentVariable) =>
+        _eventLog.Append(environmentId, new EnvironmentVariableSetForApplicationEnvironment(applicationId, environmentVariable.Key, environmentVariable.Value));
 }
