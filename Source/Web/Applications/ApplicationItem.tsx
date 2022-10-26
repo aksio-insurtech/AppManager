@@ -21,7 +21,6 @@ export interface ApplicationItemProps {
     actions?: boolean;
 }
 
-
 export const ApplicationItem = (props: ApplicationItemProps) => {
     const navigate = useNavigate();
 
@@ -78,7 +77,7 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
 
             {props.actions &&
                 <>
-                    {props.application.environments.length > 0 &&
+                    {props.application.environments?.length > 0 &&
                         <ApplicationEnvironmentButton application={props.application} />
                     }
 

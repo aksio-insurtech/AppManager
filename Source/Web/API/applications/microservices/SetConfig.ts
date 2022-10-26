@@ -6,35 +6,35 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{{environment}}/microservices/{{microserviceId}}/config');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/{environment}/microservices/{{microserviceId}}/config');
 
 export interface ISetConfig {
     applicationId?: string;
-    environment?: string;
+    environmentId?: string;
     microserviceId?: string;
 }
 
 export class SetConfigValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
-        environment: new Validator(),
+        environmentId: new Validator(),
         microserviceId: new Validator(),
     };
 }
 
 export class SetConfig extends Command<ISetConfig> implements ISetConfig {
-    readonly route: string = '/api/applications/{{applicationId}}/{{environment}}/microservices/{{microserviceId}}/config';
+    readonly route: string = '/api/applications/{{applicationId}}/{environment}/microservices/{{microserviceId}}/config';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new SetConfigValidator();
 
     private _applicationId!: string;
-    private _environment!: string;
+    private _environmentId!: string;
     private _microserviceId!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
-            'environment',
+            'environmentId',
             'microserviceId',
         ];
     }
@@ -42,7 +42,7 @@ export class SetConfig extends Command<ISetConfig> implements ISetConfig {
     get properties(): string[] {
         return [
             'applicationId',
-            'environment',
+            'environmentId',
             'microserviceId',
         ];
     }
@@ -55,13 +55,13 @@ export class SetConfig extends Command<ISetConfig> implements ISetConfig {
         this._applicationId = value;
         this.propertyChanged('applicationId');
     }
-    get environment(): string {
-        return this._environment;
+    get environmentId(): string {
+        return this._environmentId;
     }
 
-    set environment(value: string) {
-        this._environment = value;
-        this.propertyChanged('environment');
+    set environmentId(value: string) {
+        this._environmentId = value;
+        this.propertyChanged('environmentId');
     }
     get microserviceId(): string {
         return this._microserviceId;

@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { Divider, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material';
+import { Divider, ListSubheader } from '@mui/material';
 import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
 import { ApplicationItem } from './ApplicationItem';
 import * as icons from '@mui/icons-material';
@@ -18,7 +18,7 @@ export interface ApplicationItemWithArtifactsProps {
 
 export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifactsProps) => {
     const navigate = useNavigate();
-    const environment = props.application.environments.find(_ => _.environmentId === props.environmentId);
+    const environment = props.application.environments?.find(_ => _.environmentId === props.environmentId || '') || undefined;
 
     const handleIngressClick = (ingress: IngressInEnvironment) => {
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/ingresses/${ingress.ingressId}`);
