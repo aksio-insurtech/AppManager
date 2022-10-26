@@ -23,29 +23,27 @@ const columns: GridColDef[] = [
 export const Routes = (props: RoutesProps) => {
     const input = useRouteParams() as AddRouteDialogInput;
 
+    const routes = props.ingress.routes ?? [];
+
     return (
-        <>
-            {props.ingress.routes &&
-                <ValueEditorFor<AddRouteDialogOutput, IngressRoute, AddRouteDialogInput>
-                    addTitle="Add route"
-                    columns={columns}
-                    data={props.ingress.routes}
-                    modalContent={AddRouteDialog}
-                    input={input}
-                    getRowId={(route) => route.path}
-                    modalClosed={async (result, output) => {
-                        if (result == ModalResult.success) {
-                            const command = new DefineRoute();
-                            command.applicationId = input.applicationId;
-                            command.environmentId = input.environmentId;
-                            command.ingressId = input.ingressId;
-                            command.path = output!.path;
-                            command.targetPath = output!.targetPath;
-                            command.targetMicroservice = output!.targetMicroservice;
-                            await command.execute();
-                        }
-                    }} />
-            }
-        </>
+        <ValueEditorFor<AddRouteDialogOutput, IngressRoute, AddRouteDialogInput>
+            addTitle="Add route"
+            columns={columns}
+            data={routes}
+            modalContent={AddRouteDialog}
+            input={input}
+            getRowId={(route) => route.path}
+            modalClosed={async (result, output) => {
+                if (result == ModalResult.success) {
+                    const command = new DefineRoute();
+                    command.applicationId = input.applicationId;
+                    command.environmentId = input.environmentId;
+                    command.ingressId = input.ingressId;
+                    command.path = output!.path;
+                    command.targetPath = output!.targetPath;
+                    command.targetMicroservice = output!.targetMicroservice;
+                    await command.execute();
+                }
+            }} />
     );
 };

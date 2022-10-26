@@ -21,6 +21,8 @@ export const Environments = () => {
     const { applicationId } = useRouteParams();
     const [environments] = EnvironmentsForApplication.use({ applicationId: applicationId! });
 
+    console.log(environments.data);
+
     return (
         <ValueEditorFor<AddEnvironmentDialogOutput, ApplicationEnvironment>
             addTitle="Add Environment"
