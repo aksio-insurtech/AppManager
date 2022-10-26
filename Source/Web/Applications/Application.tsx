@@ -18,7 +18,6 @@ export const Application = () => {
     const [application] = GetApplication.use({ applicationId: applicationId! });
     const [selectedTab, setSelectedTab] = useState("0");
     const [environmentVariablesQuery] = EnvironmentVariablesForApplicationId.use({ applicationId: applicationId! });
-
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
 
     const variableSet = async (variable: Variable, context: RouteParams) => {
@@ -31,7 +30,6 @@ export const Application = () => {
 
     return (
         <TabContext value={selectedTab}>
-
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={(e, value) => setSelectedTab(value)}>
                     <Tab label="General" value="0" />

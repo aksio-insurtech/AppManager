@@ -18,6 +18,7 @@ import { DeployablesForMicroservice } from 'API/applications/environments/micros
 import { Deployable } from 'API/applications/environments/microservices/deployables/Deployable';
 import { RouteParams, useRouteParams } from '../../RouteParams';
 import { SetEnvironmentVariableForDeployable } from 'API/applications/environments/microservices/deployables/SetEnvironmentVariableForDeployable';
+import { EnvironmentVariablesForDeployableId } from 'API/applications/environments/microservices/deployables/EnvironmentVariablesForDeployableId';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -34,6 +35,8 @@ export const Deployables = () => {
     });
 
     const [selectedDeployable, setSelectedDeployable] = useState<Deployable | undefined>(undefined);
+    const [environmentVariablesQuery] = EnvironmentVariablesForDeployableId.use({ deployableId: selectedDeployable?.id.deployableId ?? '' });
+    const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
 
     const variableSet = async (variable: Variable, context: RouteParams) => {
         const command = new SetEnvironmentVariableForDeployable();
@@ -98,7 +101,7 @@ export const Deployables = () => {
                     </Box>
                     <TabPanel value="0"></TabPanel>
                     <TabPanel value="1"></TabPanel>
-                    <TabPanel value="2"><Variables onVariableSet={variableSet} variables={[]} /></TabPanel>
+                    <TabPanel value="2"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
                     <TabPanel value="3"><Secrets /></TabPanel>
                 </TabContext>
             }

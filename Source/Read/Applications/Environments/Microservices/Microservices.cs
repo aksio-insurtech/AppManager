@@ -10,10 +10,14 @@ namespace Read.Applications.Environments.Microservices;
 public class Microservices : Controller
 {
     readonly IMongoCollection<Microservice> _microserviceCollection;
+    readonly IMongoCollection<EnvironmentVariablesForMicroservice> _environmentVariablesForMicroserviceCollection;
 
-    public Microservices(IMongoCollection<Microservice> microserviceCollection)
+    public Microservices(
+        IMongoCollection<Microservice> microserviceCollection,
+        IMongoCollection<EnvironmentVariablesForMicroservice> environmentVariablesForMicroserviceCollection)
     {
         _microserviceCollection = microserviceCollection;
+        _environmentVariablesForMicroserviceCollection = environmentVariablesForMicroserviceCollection;
     }
 
     [HttpGet]
@@ -38,4 +42,8 @@ public class Microservices : Controller
                 Filters.StringFilterFor<Microservice>(_ => _.Id.ApplicationId, applicationId),
                 Filters.StringFilterFor<Microservice>(_ => _.Id.EnvironmentId, environmentId),
                 Filters.StringFilterFor<Microservice>(_ => _.Id.MicroserviceId, microserviceId))).FirstOrDefaultAsync();
+
+    [HttpGet("{microserviceId}/environment-variables")]
+    public Task<ClientObservable<EnvironmentVariablesForMicroservice>> EnvironmentVariablesForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
+        _environmentVariablesForMicroserviceCollection.ObserveId(microserviceId);
 }

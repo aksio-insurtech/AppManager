@@ -4,15 +4,21 @@
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 
-namespace Read.Applications;
+namespace Read.Applications.Environments.Microservices.Deployables;
 
 [Route("/api/applications/{applicationId}/environments/{environmentId}/microservices/{microserviceId}/deployables")]
 public class Deployables : Controller
 {
     readonly IMongoCollection<Deployable> _deployableCollection;
+    readonly IMongoCollection<EnvironmentVariablesForDeployable> _environmentVariablesForDeployableCollection;
 
-    public Deployables(IMongoCollection<Deployable> deployableCollection) =>
+    public Deployables(
+        IMongoCollection<Deployable> deployableCollection,
+        IMongoCollection<EnvironmentVariablesForDeployable> environmentVariablesForDeployableCollection)
+    {
         _deployableCollection = deployableCollection;
+        _environmentVariablesForDeployableCollection = environmentVariablesForDeployableCollection;
+    }
 
     [HttpGet]
     public Task<ClientObservable<IEnumerable<Deployable>>> DeployablesForMicroservice(
@@ -23,4 +29,8 @@ public class Deployables : Controller
                 Filters.StringFilterFor<Deployable>(_ => _.Id.ApplicationId, applicationId),
                 Filters.StringFilterFor<Deployable>(_ => _.Id.EnvironmentId, environmentId),
                 Filters.StringFilterFor<Deployable>(_ => _.Id.MicroserviceId, microserviceId)));
+
+    [HttpGet("{deployableId}/environment-variables")]
+    public Task<ClientObservable<EnvironmentVariablesForDeployable>> EnvironmentVariablesForDeployableId([FromRoute] DeployableId deployableId) =>
+        _environmentVariablesForDeployableCollection.ObserveId(deployableId);
 }
