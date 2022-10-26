@@ -11,15 +11,18 @@ public class ApplicationEnvironments : Controller
     readonly IMongoCollection<ApplicationEnvironment> _collection;
     readonly IMongoCollection<ApplicationEnvironmentResources> _applicationEnvironmentResourcesCollection;
     readonly IMongoCollection<CustomDomainsForApplicationEnvironment> _domainsCollection;
+    readonly IMongoCollection<EnvironmentVariablesForApplicationEnvironment> _environmentVariablesForApplicationEnvironmentCollection;
 
     public ApplicationEnvironments(
         IMongoCollection<ApplicationEnvironment> collection,
         IMongoCollection<ApplicationEnvironmentResources> applicationEnvironmentResourcesCollection,
-        IMongoCollection<CustomDomainsForApplicationEnvironment> domainsCollection)
+        IMongoCollection<CustomDomainsForApplicationEnvironment> domainsCollection,
+        IMongoCollection<EnvironmentVariablesForApplicationEnvironment> environmentVariablesForApplicationEnvironmentCollection)
     {
         _collection = collection;
         _applicationEnvironmentResourcesCollection = applicationEnvironmentResourcesCollection;
         _domainsCollection = domainsCollection;
+        _environmentVariablesForApplicationEnvironmentCollection = environmentVariablesForApplicationEnvironmentCollection;
     }
 
     [HttpGet("{environmentId}")]
@@ -51,4 +54,8 @@ public class ApplicationEnvironments : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId) =>
         _domainsCollection.Find(Filters.StringFilterFor<CustomDomainsForApplicationEnvironment>(_ => _.Id, environmentId)).SingleOrDefault();
+
+    [HttpGet("{environmentId}/environment-variables")]
+    public Task<ClientObservable<EnvironmentVariablesForApplicationEnvironment>> EnvironmentVariablesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
+        _environmentVariablesForApplicationEnvironmentCollection.ObserveId(environmentId);
 }

@@ -20,12 +20,12 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
     const navigate = useNavigate();
     const environment = props.application.environments?.find(_ => _.environmentId === props.environmentId || '') || undefined;
 
-    const handleIngressClick = (ingress: IngressInEnvironment) => {
-        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/ingresses/${ingress.ingressId}`);
-    };
-
     const handleCratisKernelClick = () => {
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/cratis`);
+    };
+
+    const handleSettingsClick = () => {
+        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/settings`);
     };
 
     const handleTenantsClick = () => {
@@ -34,6 +34,10 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
 
     const handleCustomDomainsClick = () => {
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/custom-domains`);
+    };
+
+    const handleIngressClick = (ingress: IngressInEnvironment) => {
+        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/ingresses/${ingress.ingressId}`);
     };
 
     const handleMicroserviceClick = (microservice: MicroserviceInEnvironment) => {
@@ -49,6 +53,11 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                     <ListSubheader>{environment.name}</ListSubheader>
 
                     <ApplicationArtifactListItem
+                        icon={<icons.Settings />}
+                        title="Settings"
+                        onClick={handleSettingsClick} />
+
+                    <ApplicationArtifactListItem
                         icon={<icons.Extension />}
                         title="Cratis"
                         onClick={handleCratisKernelClick} />
@@ -62,6 +71,7 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                         icon={<icons.Domain />}
                         title="Custom Domains"
                         onClick={handleCustomDomainsClick} />
+
 
                     {environment.ingresses?.map(ingress => {
                         return (
