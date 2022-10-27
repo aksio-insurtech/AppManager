@@ -101,10 +101,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
         var storage = await application.GetStorage(environment, resourceGroup);
 
-        var result = await application.SetupIngress(resourceGroup, storage, managedEnvironment, ingress, new Dictionary<MicroserviceId, ContainerApp>(), tags, _fileStorageLogger);
-        application.SetupAuthenticationForIngress(environment, resourceGroup, result.ContainerApp, ingress, tags);
-
-        return result;
+        return await application.SetupIngress(environment, resourceGroup, storage, managedEnvironment, ingress, new Dictionary<MicroserviceId, ContainerApp>(), tags, _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(

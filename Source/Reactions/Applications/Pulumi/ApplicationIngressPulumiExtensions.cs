@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
-using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -46,6 +45,7 @@ public static class ApplicationIngressPulumiExtensions
 
     public static async Task<IngressResult> SetupIngress(
         this Application application,
+        ApplicationEnvironmentWithArtifacts environment,
         ResourceGroup resourceGroup,
         Storage storage,
         ManagedEnvironment managedEnvironment,
@@ -95,13 +95,18 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     External = true,
                     TargetPort = 80
-                }
+                },
+                Secrets = ingress.IdentityProviders.Select(idp => new SecretArgs
+                {
+                    Name = GetSecretNameForIdentityProvider(idp),
+                    Value = idp.Secret?.Value ?? string.Empty
+                }).ToList()
             },
             Template = new TemplateArgs
             {
                 Volumes = new VolumeArgs[]
                 {
-                    new()
+                    new ()
                     {
                         Name = storageName,
                         StorageName = storageName,
@@ -139,20 +144,16 @@ public static class ApplicationIngressPulumiExtensions
 
         var ingressConfig = await containerApp.Configuration.GetValue();
         var fileShareId = await nginxFileShare.Id.GetValue();
+        SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress);
         return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
     }
 
-    public static void SetupAuthenticationForIngress(this Application application, ApplicationEnvironment environment, ResourceGroup resourceGroup, ContainerApp containerApp, Ingress ingress, Tags tags)
+    static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name}-authentication-secret";
+
+    static void SetupAuthenticationForIngress(ApplicationEnvironmentWithArtifacts environment, ResourceGroup resourceGroup, ContainerApp containerApp, Ingress ingress)
     {
         foreach (var identityProvider in ingress.IdentityProviders)
         {
-            const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
-
-            // Secrets = new SecretArgs
-            // {
-            //     Name = microsoftProviderAuthenticationSecret,
-            //     Value = application.Authentication?.ClientSecret.Value ?? string.Empty
-            // }
             _ = new ContainerAppsAuthConfig("current", new()
             {
                 AuthConfigName = "current",
@@ -176,7 +177,7 @@ public static class ApplicationIngressPulumiExtensions
                         Registration = new AzureActiveDirectoryRegistrationArgs
                         {
                             ClientId = identityProvider.ClientId.Value,
-                            ClientSecretSettingName = microsoftProviderAuthenticationSecret,
+                            ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
                             OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
                         },
                         Validation = new AzureActiveDirectoryValidationArgs
