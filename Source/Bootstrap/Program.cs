@@ -11,6 +11,7 @@ using Pulumi.Automation;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Read.Settings;
+using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Bootstrap;
 
@@ -53,27 +54,15 @@ public static class Program
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
 
+        var aksioTenant = (TenantId)"d92e197b-7dcb-4893-a762-df334665f0d2";
+        var gammaId = (MicroserviceId)"8c538618-2862-4018-b29d-17a4ec131958";
+
         var development = new ApplicationEnvironmentWithArtifacts(
             Guid.Parse("00126dcd-8d1e-42c3-835b-7978a545ec5c"),
             "Development",
             "dev",
             "D",
             cratisVersion,
-            Enumerable.Empty<Ingress>(),
-            Enumerable.Empty<Microservice>());
-
-        var production = new ApplicationEnvironmentWithArtifacts(
-            Guid.Parse("a73f765f-d52c-4469-9d57-30c0aaa0ba36"),
-            "Production",
-            "prod",
-            "P",
-            cratisVersion,
-            Enumerable.Empty<Ingress>(),
-            Enumerable.Empty<Microservice>());
-
-        var application = new Application(
-            Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"),
-            "AppManager",
             config.Azure.Subscription.SubscriptionId,
             config.CloudLocation,
             new(
@@ -84,11 +73,18 @@ public static class Program
                 null!,
                 null!,
                 new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
-            new[] { development, production });
+            new[] { new Tenant(aksioTenant, "Aksio Insurtech") },
+            Enumerable.Empty<Ingress>(),
+            Enumerable.Empty<Microservice>());
+
+        var application = new Application(
+            Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"),
+            "AppManager",
+            new[] { development });
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
-        var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
+        var executionContext = new ExecutionContext(Aksio.Cratis.Execution.MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
@@ -101,8 +97,11 @@ public static class Program
             stacksForApplications,
             stacksForMicroservices);
 
-        ApplicationResult? applicationResult = default;
-        var ingress = new Ingress(Guid.Parse("6173e1f6-edee-423e-943a-e4bbc90349ce"), "main");
+        ApplicationEnvironmentResult? applicationEnvironmentResult = default;
+        var ingress = new Ingress(
+            Guid.Parse("6173e1f6-edee-423e-943a-e4bbc90349ce"),
+            "main",
+            new[] { new Route("/", gammaId, "/") });
         IngressResult? ingressResult = default;
 
         await operations.Up(
@@ -110,9 +109,9 @@ public static class Program
             config.Name,
             PulumiFn.Create(async () =>
             {
-                applicationResult = await definitions.ApplicationEnvironment(executionContext, application, development, cratisVersion);
-                application = await applicationResult.MergeWithApplication(application);
-                ingressResult = await definitions.Ingress(executionContext, application, development, ingress, applicationResult.ResourceGroup);
+                applicationEnvironmentResult = await definitions.ApplicationEnvironment(executionContext, application, development, cratisVersion);
+                application = await applicationEnvironmentResult.MergeWithApplication(application, development);
+                ingressResult = await definitions.Ingress(executionContext, application, development, ingress, applicationEnvironmentResult.ResourceGroup);
 
                 Console.WriteLine("\n\nSetup AppManager as application");
                 var appManagerApi = new AppManagerApi(config, ingressResult.Url, _jsonSerializerOptions);
@@ -124,7 +123,6 @@ public static class Program
             development);
 
         var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
-        var gammaId = Guid.Parse("8c538618-2862-4018-b29d-17a4ec131958");
         var microservice = new Microservice(
             gammaId,
             application.Id,
@@ -144,26 +142,32 @@ public static class Program
             $"{config.Name}-{microservice.Name}",
             PulumiFn.Create(async () =>
             {
-                if (applicationResult is null)
+                if (applicationEnvironmentResult is null)
                 {
                     return;
                 }
 
-                var storage = await application.GetStorage(development, applicationResult!.ResourceGroup);
+                var storage = await application.GetStorage(development, applicationEnvironmentResult!.ResourceGroup);
 
-                application = await applicationResult.MergeWithApplication(application);
+                application = await applicationEnvironmentResult.MergeWithApplication(application, development);
                 var microserviceResult = await definitions.Microservice(
                     executionContext,
                     application,
                     microservice,
                     development,
                     false,
-                    resourceGroup: applicationResult!.ResourceGroup,
+                    resourceGroup: applicationEnvironmentResult!.ResourceGroup,
                     deployables: microservice.Deployables);
 
                 var fileShare = Pulumi.AzureNative.Storage.FileShare.Get(ingressResult!.FileShareName, ingressResult!.FileShareId);
                 var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
-                await application.ConfigureIngress(applicationResult.ResourceGroup, storage, fileShare, logger, microserviceResourceName);
+                await application.ConfigureIngress(
+                    applicationEnvironmentResult.ResourceGroup,
+                    ingress,
+                    storage,
+                    fileShare,
+                    new[] { microservice },
+                    logger);
             }),
             development,
             microservice);
