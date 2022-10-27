@@ -4,7 +4,7 @@
 using Concepts;
 using Concepts.Applications;
 using Concepts.Applications.Environments;
-using Concepts.Applications.Ingresses;
+using Concepts.Applications.Environments.Ingresses;
 using Concepts.Azure;
 
 namespace Reactions.Applications;

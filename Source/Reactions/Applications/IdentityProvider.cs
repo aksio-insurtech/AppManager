@@ -3,6 +3,6 @@
 
 using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 
-namespace Bootstrap;
+namespace Reactions.Applications;
 
-public record AuthenticationConfig(IdentityProviderClientId ClientId, IdentityProviderClientSecret ClientSecret);
+public record IdentityProvider(IdentityProviderId Id, IdentityProviderName Name, IdentityProviderType Type, IdentityProviderClientId ClientId, IdentityProviderClientSecret Secret);

@@ -3,7 +3,7 @@
 
 using Concepts.Applications;
 using Concepts.Applications.Environments;
-using Concepts.Applications.Ingresses;
+using Concepts.Applications.Environments.Ingresses;
 
 namespace Events.Applications.Environments.Ingresses;
 

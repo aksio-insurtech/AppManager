@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -82,7 +83,6 @@ public static class ApplicationIngressPulumiExtensions
             }
         });
 
-        // const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
         var containerApp = new ContainerApp(ingressContainerAppName, new()
         {
             Location = resourceGroup.Location,
@@ -95,13 +95,7 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     External = true,
                     TargetPort = 80
-                },
-
-                // Secrets = new SecretArgs
-                // {
-                //     Name = microsoftProviderAuthenticationSecret,
-                //     Value = application.Authentication?.ClientSecret.Value ?? string.Empty
-                // }
+                }
             },
             Template = new TemplateArgs
             {
@@ -143,47 +137,58 @@ public static class ApplicationIngressPulumiExtensions
             },
         });
 
-        // if (application.Authentication is not null)
-        // {
-        //     _ = new ContainerAppsAuthConfig("current", new()
-        //     {
-        //         AuthConfigName = "current",
-        //         ResourceGroupName = resourceGroup.Name,
-        //         ContainerAppName = containerApp.Name,
-        //         GlobalValidation = new GlobalValidationArgs()
-        //         {
-        //             UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
-        //             RedirectToProvider = "Microsoft"
-        //         },
-        //         Platform = new AuthPlatformArgs
-        //         {
-        //             Enabled = true
-        //         },
-        //         IdentityProviders = new IdentityProvidersArgs
-        //         {
-        //             AzureActiveDirectory = new AzureActiveDirectoryArgs
-        //             {
-        //                 Enabled = true,
-        //                 IsAutoProvisioned = true,
-        //                 Registration = new AzureActiveDirectoryRegistrationArgs
-        //                 {
-        //                     ClientId = application.Authentication.ClientId.Value,
-        //                     ClientSecretSettingName = microsoftProviderAuthenticationSecret,
-        //                     OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
-        //                 },
-        //                 Validation = new AzureActiveDirectoryValidationArgs
-        //                 {
-        //                     AllowedAudiences =
-        //                     {
-        //                         $"api://{application.Authentication.ClientId}"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     });
-        // }
         var ingressConfig = await containerApp.Configuration.GetValue();
         var fileShareId = await nginxFileShare.Id.GetValue();
         return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
+    }
+
+    public static void SetupAuthenticationForIngress(this Application application, ApplicationEnvironment environment, ResourceGroup resourceGroup, ContainerApp containerApp, Ingress ingress, Tags tags)
+    {
+        foreach (var identityProvider in ingress.IdentityProviders)
+        {
+            const string microsoftProviderAuthenticationSecret = "microsoft-provider-authentication-secret";
+
+            // Secrets = new SecretArgs
+            // {
+            //     Name = microsoftProviderAuthenticationSecret,
+            //     Value = application.Authentication?.ClientSecret.Value ?? string.Empty
+            // }
+            _ = new ContainerAppsAuthConfig("current", new()
+            {
+                AuthConfigName = "current",
+                ResourceGroupName = resourceGroup.Name,
+                ContainerAppName = containerApp.Name,
+                GlobalValidation = new GlobalValidationArgs()
+                {
+                    UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
+                    RedirectToProvider = "Microsoft"
+                },
+                Platform = new AuthPlatformArgs
+                {
+                    Enabled = true
+                },
+                IdentityProviders = new IdentityProvidersArgs
+                {
+                    AzureActiveDirectory = new AzureActiveDirectoryArgs
+                    {
+                        Enabled = true,
+                        IsAutoProvisioned = true,
+                        Registration = new AzureActiveDirectoryRegistrationArgs
+                        {
+                            ClientId = identityProvider.ClientId.Value,
+                            ClientSecretSettingName = microsoftProviderAuthenticationSecret,
+                            OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
+                        },
+                        Validation = new AzureActiveDirectoryValidationArgs
+                        {
+                            AllowedAudiences =
+                            {
+                                $"api://{identityProvider.ClientId}"
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 }

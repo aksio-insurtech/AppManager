@@ -4,6 +4,7 @@
 using System.Text.Json;
 using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
+using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Concepts.Azure;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
@@ -62,7 +63,16 @@ public static class Program
         var ingress = new Ingress(
             Guid.Parse("6173e1f6-edee-423e-943a-e4bbc90349ce"),
             "main",
-            new[] { new Route("/", gammaId, "/") });
+            new[] { new Route("/", gammaId, "/") },
+            new[]
+            {
+                new IdentityProvider(
+                "7a36bbc9-de76-4d83-9ea3-eaab9896cbd8",
+                "Azure AD",
+                IdentityProviderType.Azure,
+                config.Authentication.ClientId,
+                config.Authentication.ClientSecret)
+            });
         IngressResult? ingressResult = default;
 
         var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
