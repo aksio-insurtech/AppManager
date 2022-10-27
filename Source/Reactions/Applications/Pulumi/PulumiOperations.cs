@@ -44,11 +44,8 @@ public class PulumiOperations : IPulumiOperations
 
         try
         {
-            _logger.CreatingStack(application.Name ?? "[N/A]");
             var stack = await CreateStack(application, projectName, environment, definition, microservice);
-
-            _logger.RefreshingStack();
-            await stack.RefreshAsync();
+            await RefreshStack(stack);
 
             _logger.PuttingUpStack();
             await stack.UpAsync(new UpOptions
@@ -72,11 +69,8 @@ public class PulumiOperations : IPulumiOperations
     {
         try
         {
-            _logger.CreatingStack(application.Name ?? "[N/A]");
             var stack = await CreateStack(application, projectName, environment, definition, microservice);
-
-            _logger.RefreshingStack();
-            await stack.RefreshAsync();
+            await RefreshStack(stack);
 
             _logger.TakingDownStack();
             await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
@@ -98,11 +92,8 @@ public class PulumiOperations : IPulumiOperations
 
         try
         {
-            _logger.CreatingStack(application.Name ?? "[N/A]");
             var stack = await CreateStack(application, projectName, environment, definition, microservice);
-
-            _logger.RefreshingStack();
-            await stack.RefreshAsync();
+            await RefreshStack(stack);
 
             _logger.RemovingStack();
             await stack.Workspace.RemoveStackAsync(environment.DisplayName);
@@ -138,6 +129,7 @@ public class PulumiOperations : IPulumiOperations
 
     async Task<WorkspaceStack> CreateStack(Application application, string projectName, ApplicationEnvironmentWithArtifacts environment, PulumiFn program, Microservice? microservice = default)
     {
+        _logger.CreatingStack(application.Name);
         var stackName = environment.DisplayName;
 
         var accessToken = _settings.PulumiAccessToken;
@@ -186,9 +178,9 @@ public class PulumiOperations : IPulumiOperations
         await RemovePendingOperations(stack);
 
         _logger.InstallingPlugins();
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.67.0");
+        await stack.Workspace.InstallPluginAsync("azure-native", "1.83.1");
         await stack.Workspace.InstallPluginAsync("azuread", "5.26.1");
-        await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.0");
+        await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.2");
 
         _logger.SettingAllConfig();
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
@@ -230,6 +222,16 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.ImportStack();
         await stack.ImportStackAsync(stackDeployment);
+    }
+
+    async Task RefreshStack(WorkspaceStack stack)
+    {
+        _logger.RefreshingStack();
+        await stack.RefreshAsync(new()
+        {
+            OnStandardOutput = Console.WriteLine,
+            OnStandardError = Console.Error.WriteLine
+        });
     }
 
     async Task SaveStackForApplication(Application application, ApplicationEnvironment environment, WorkspaceStack stack)

@@ -1,14 +1,13 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Applications.Environments;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
 
 public record ApplicationEnvironmentResult(
-    ApplicationEnvironment Environment,
+    ApplicationEnvironmentWithArtifacts Environment,
     ResourceGroup ResourceGroup,
     NetworkResult Network,
     StorageResult Storage,
@@ -17,12 +16,34 @@ public record ApplicationEnvironmentResult(
     ManagedEnvironment ManagedEnvironment,
     ContainerAppResult Kernel)
 {
-    public Task<Application> MergeWithApplication(Application application, ApplicationEnvironmentWithArtifacts environment)
+    public async Task<ApplicationEnvironmentWithArtifacts> MergeWithApplicationEnvironment(ApplicationEnvironmentWithArtifacts environment)
     {
-        return Task.FromResult<Application>(new(
-            application.Id,
-            application.Name,
-            application.Environments
-        ));
+        var subnets = await Network.VirtualNetwork.Subnets.GetValue();
+        return new(
+            environment.Id,
+            environment.Name,
+            environment.DisplayName,
+            environment.ShortName,
+            environment.CratisVersion,
+            environment.AzureSubscriptionId,
+            environment.CloudLocation,
+            new(
+                subnets[0].Id!,
+                Storage.AccountName,
+                ContainerRegistry.LoginServer,
+                ContainerRegistry.UserName,
+                ContainerRegistry.Password,
+                await ResourceGroup.Id.GetValue(),
+                new(
+                    MongoDB.ConnectionString,
+                    new MongoDBUser[]
+                    {
+                        new("kernel", MongoDB.Password)
+                    }
+                )
+            ),
+            environment.Tenants,
+            environment.Ingresses,
+            environment.Microservices);
     }
 }

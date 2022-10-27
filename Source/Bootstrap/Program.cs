@@ -8,6 +8,7 @@ using Concepts.Azure;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
+using Pulumi.AzureNative.App;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Read.Settings;
@@ -56,6 +57,28 @@ public static class Program
 
         var aksioTenant = (TenantId)"d92e197b-7dcb-4893-a762-df334665f0d2";
         var gammaId = (MicroserviceId)"8c538618-2862-4018-b29d-17a4ec131958";
+        var applicationId = (ApplicationId)"1091c7d3-f533-420d-abc0-bbb7f0defd66";
+
+        var ingress = new Ingress(
+            Guid.Parse("6173e1f6-edee-423e-943a-e4bbc90349ce"),
+            "main",
+            new[] { new Route("/", gammaId, "/") });
+        IngressResult? ingressResult = default;
+
+        var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
+        var microservice = new Microservice(
+            gammaId,
+            applicationId,
+            "Gamma",
+            new Deployable[]
+            {
+                new Deployable(
+                    Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
+                    gammaId,
+                    "main",
+                    $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
+                    new[] { 80 })
+            });
 
         var development = new ApplicationEnvironmentWithArtifacts(
             Guid.Parse("00126dcd-8d1e-42c3-835b-7978a545ec5c"),
@@ -74,11 +97,11 @@ public static class Program
                 null!,
                 new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
             new[] { new Tenant(aksioTenant, "Aksio Insurtech") },
-            Enumerable.Empty<Ingress>(),
-            Enumerable.Empty<Microservice>());
+            new[] { ingress },
+            new[] { microservice });
 
         var application = new Application(
-            Guid.Parse("1091c7d3-f533-420d-abc0-bbb7f0defd66"),
+            applicationId,
             "AppManager",
             new[] { development });
 
@@ -98,11 +121,6 @@ public static class Program
             stacksForMicroservices);
 
         ApplicationEnvironmentResult? applicationEnvironmentResult = default;
-        var ingress = new Ingress(
-            Guid.Parse("6173e1f6-edee-423e-943a-e4bbc90349ce"),
-            "main",
-            new[] { new Route("/", gammaId, "/") });
-        IngressResult? ingressResult = default;
 
         await operations.Up(
             application,
@@ -110,10 +128,9 @@ public static class Program
             PulumiFn.Create(async () =>
             {
                 applicationEnvironmentResult = await definitions.ApplicationEnvironment(executionContext, application, development, cratisVersion);
-                application = await applicationEnvironmentResult.MergeWithApplication(application, development);
+                development = await applicationEnvironmentResult.MergeWithApplicationEnvironment(development);
                 ingressResult = await definitions.Ingress(executionContext, application, development, ingress, applicationEnvironmentResult.ResourceGroup);
 
-                Console.WriteLine("\n\nSetup AppManager as application");
                 var appManagerApi = new AppManagerApi(config, ingressResult.Url, _jsonSerializerOptions);
                 await appManagerApi.Authenticate();
 
@@ -121,21 +138,6 @@ public static class Program
                 stacksForMicroservices.AppManagerApi = appManagerApi;
             }),
             development);
-
-        var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
-        var microservice = new Microservice(
-            gammaId,
-            application.Id,
-            "Gamma",
-            new Deployable[]
-            {
-                new Deployable(
-                    Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
-                    gammaId,
-                    "main",
-                    $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
-                    new[] { 80 })
-            });
 
         await operations.Up(
             application,
@@ -147,34 +149,35 @@ public static class Program
                     return;
                 }
 
-                var storage = await application.GetStorage(development, applicationEnvironmentResult!.ResourceGroup);
+                var resourceGroup = application.GetResourceGroup(development);
 
-                application = await applicationEnvironmentResult.MergeWithApplication(application, development);
+                var storage = await application.GetStorage(development, applicationEnvironmentResult!.ResourceGroup);
                 var microserviceResult = await definitions.Microservice(
                     executionContext,
                     application,
                     microservice,
                     development,
                     false,
-                    resourceGroup: applicationEnvironmentResult!.ResourceGroup,
+                    resourceGroup: resourceGroup,
                     deployables: microservice.Deployables);
 
                 var fileShare = Pulumi.AzureNative.Storage.FileShare.Get(ingressResult!.FileShareName, ingressResult!.FileShareId);
-                var microserviceResourceName = await microserviceResult.ContainerApp.Name.GetValue();
                 await application.ConfigureIngress(
-                    applicationEnvironmentResult.ResourceGroup,
+                    resourceGroup,
                     ingress,
                     storage,
                     fileShare,
-                    new[] { microservice },
+                    new Dictionary<MicroserviceId, ContainerApp>()
+                    {
+                        { microservice.Id, microserviceResult.ContainerApp }
+                    },
                     logger);
             }),
             development,
             microservice);
 
-        await stacksForApplications.SaveAllQueued();
-        await stacksForMicroservices.SaveAllQueued();
-
+        // await stacksForApplications.SaveAllQueued();
+        // await stacksForMicroservices.SaveAllQueued();
         // try
         // {
         //     var appManagerApi = new AppManagerApi(config, "https://ingress832b7458.livelyglacier-aba45b93.norwayeast.azurecontainerapps.io", _jsonSerializerOptions);

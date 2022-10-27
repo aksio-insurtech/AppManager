@@ -5,7 +5,9 @@ using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
 using Microsoft.Extensions.Logging;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
+using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -99,7 +101,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
         var storage = await application.GetStorage(environment, resourceGroup);
 
-        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, ingress, environment.Microservices, tags, _fileStorageLogger);
+        return await application.SetupIngress(resourceGroup, storage, managedEnvironment, ingress, new Dictionary<MicroserviceId, ContainerApp>(), tags, _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(

@@ -25,13 +25,13 @@ public static class MicroserviceStoragePulumiExtensions
             ResourceGroupName = resourceGroup.Name
         });
 
-        var fileShare = new FileShare(microservice.Name.Value.ToLowerInvariant(), new()
+        var fileShareName = microservice.Name.Value.ToLowerInvariant();
+        var fileShare = new FileShare(fileShareName, new()
         {
             AccountName = storageAccount.Name,
             ResourceGroupName = resourceGroup.Name
         });
 
-        var fileShareName = await fileShare.Name.GetValue();
         var storageAccountKey = await storageAccountKeysRequest.GetValue(_ => _.Keys[0].Value);
         var fileStorage = new FileStorage(storageAccount.Name, storageAccountKey, fileShareName, fileStorageLogger);
         return new MicroserviceStorage(application, microservice, fileStorage);

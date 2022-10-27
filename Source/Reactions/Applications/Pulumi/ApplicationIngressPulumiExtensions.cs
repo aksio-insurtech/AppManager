@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -20,7 +21,7 @@ public static class ApplicationIngressPulumiExtensions
         Ingress ingress,
         Storage storage,
         FileShare fileShare,
-        IEnumerable<Microservice> microservices,
+        IDictionary<MicroserviceId, ContainerApp> microservices,
         ILogger<FileStorage> fileStorageLogger)
     {
         var nginxFileShareName = await fileShare.Name.GetValue();
@@ -30,16 +31,10 @@ public static class ApplicationIngressPulumiExtensions
 
         foreach (var route in ingress.Routes)
         {
-            var microservice = microservices.FirstOrDefault(_ => _.Id == route.TargetMicroservice);
-            if (microservice is not null)
+            if (microservices.ContainsKey(route.TargetMicroservice))
             {
-                var getMicroserviceContainerApp = GetContainerApp.Invoke(new()
-                {
-                    ResourceGroupName = resourceGroup.Name,
-                    ContainerAppName = microservice.Name.Value
-                });
-                var microserviceContainerApp = await getMicroserviceContainerApp.GetValue();
-                var url = $"http://{microserviceContainerApp.Configuration!.Ingress!.Fqdn}{route.TargetPath}";
+                var configuration = await microservices[route.TargetMicroservice].Configuration!.GetValue();
+                var url = $"http://{configuration!.Ingress!.Fqdn}{route.TargetPath}";
                 routes.Add(new IngressTemplateRouteContent(route.Path, url));
             }
         }
@@ -54,7 +49,7 @@ public static class ApplicationIngressPulumiExtensions
         Storage storage,
         ManagedEnvironment managedEnvironment,
         Ingress ingress,
-        IEnumerable<Microservice> microservices,
+        IDictionary<MicroserviceId, ContainerApp> microservices,
         Tags tags,
         ILogger<FileStorage> fileStorageLogger)
     {
