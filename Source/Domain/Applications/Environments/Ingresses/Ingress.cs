@@ -38,10 +38,11 @@ public class Ingress : Controller
             @command.TargetMicroservice,
             @command.TargetPath));
 
-    [HttpPost("custom-domain")]
+    [HttpPost("custom-domains")]
     public Task AddCustomDomainToIngress(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] IngressId ingressId,
         [FromBody] AddCustomDomainToIngress command) =>
-         _eventLog.Append(environmentId, new CustomDomainAddedToIngress(command.Domain, command.CertificateId));
+         _eventLog.Append(ingressId, new CustomDomainAddedToIngress(command.Domain, command.CertificateId));
 }

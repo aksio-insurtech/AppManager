@@ -6,11 +6,12 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{ingressId}/custom-domain');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{{ingressId}}/custom-domains');
 
 export interface IAddCustomDomainToIngress {
     applicationId?: string;
     environmentId?: string;
+    ingressId?: string;
     domain?: string;
     certificateId?: string;
 }
@@ -19,18 +20,20 @@ export class AddCustomDomainToIngressValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
+        ingressId: new Validator(),
         domain: new Validator(),
         certificateId: new Validator(),
     };
 }
 
 export class AddCustomDomainToIngress extends Command<IAddCustomDomainToIngress> implements IAddCustomDomainToIngress {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{ingressId}/custom-domain';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{{ingressId}}/custom-domains';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new AddCustomDomainToIngressValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
+    private _ingressId!: string;
     private _domain!: string;
     private _certificateId!: string;
 
@@ -38,6 +41,7 @@ export class AddCustomDomainToIngress extends Command<IAddCustomDomainToIngress>
         return [
             'applicationId',
             'environmentId',
+            'ingressId',
         ];
     }
 
@@ -45,6 +49,7 @@ export class AddCustomDomainToIngress extends Command<IAddCustomDomainToIngress>
         return [
             'applicationId',
             'environmentId',
+            'ingressId',
             'domain',
             'certificateId',
         ];
@@ -65,6 +70,14 @@ export class AddCustomDomainToIngress extends Command<IAddCustomDomainToIngress>
     set environmentId(value: string) {
         this._environmentId = value;
         this.propertyChanged('environmentId');
+    }
+    get ingressId(): string {
+        return this._ingressId;
+    }
+
+    set ingressId(value: string) {
+        this._ingressId = value;
+        this.propertyChanged('ingressId');
     }
     get domain(): string {
         return this._domain;

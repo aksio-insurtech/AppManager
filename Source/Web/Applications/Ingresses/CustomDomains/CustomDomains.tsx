@@ -6,7 +6,7 @@ import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
 import { AddCustomDomainToIngress } from 'API/applications/environments/ingresses/AddCustomDomainToIngress';
 import { CustomDomain } from 'API/applications/environments/ingresses/CustomDomain';
-import { AddCustomDomainDialog, AddCustomDomainDialogOutput } from './AddCustomDomainDialog';
+import { AddCustomDomainDialog, AddCustomDomainDialogInput, AddCustomDomainDialogOutput } from './AddCustomDomainDialog';
 import { useRouteParams } from '../../RouteParams';
 import { Ingress } from 'API/applications/environments/ingresses/Ingress';
 
@@ -20,11 +20,12 @@ const columns: GridColDef[] = [
 ];
 
 export const CustomDomains = (props: CustomDomainsProps) => {
-    const { applicationId, environmentId } = useRouteParams();
+    const { applicationId, environmentId, ingressId } = useRouteParams();
     const domains = props.ingress.customDomains ?? [];
 
     return (
-        <ValueEditorFor<AddCustomDomainDialogOutput, CustomDomain>
+        <ValueEditorFor<AddCustomDomainDialogOutput, CustomDomain, AddCustomDomainDialogInput>
+            input={{ environmentId: environmentId! }}
             addTitle="Add Custom Domain"
             columns={columns}
             data={domains}
@@ -35,6 +36,7 @@ export const CustomDomains = (props: CustomDomainsProps) => {
                     const command = new AddCustomDomainToIngress();
                     command.applicationId = applicationId!;
                     command.environmentId = environmentId!;
+                    command.ingressId = ingressId!;
                     command.domain = output!.domain;
                     command.certificateId = output!.certificateId;
                     await command.execute();

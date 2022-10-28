@@ -11,6 +11,7 @@ const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/en
 export interface IAddCertificateToApplicationEnvironment {
     applicationId?: string;
     environmentId?: string;
+    certificateId?: string;
     name?: string;
     certificate?: string;
 }
@@ -19,6 +20,7 @@ export class AddCertificateToApplicationEnvironmentValidator extends CommandVali
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
+        certificateId: new Validator(),
         name: new Validator(),
         certificate: new Validator(),
     };
@@ -31,6 +33,7 @@ export class AddCertificateToApplicationEnvironment extends Command<IAddCertific
 
     private _applicationId!: string;
     private _environmentId!: string;
+    private _certificateId!: string;
     private _name!: string;
     private _certificate!: string;
 
@@ -45,6 +48,7 @@ export class AddCertificateToApplicationEnvironment extends Command<IAddCertific
         return [
             'applicationId',
             'environmentId',
+            'certificateId',
             'name',
             'certificate',
         ];
@@ -65,6 +69,14 @@ export class AddCertificateToApplicationEnvironment extends Command<IAddCertific
     set environmentId(value: string) {
         this._environmentId = value;
         this.propertyChanged('environmentId');
+    }
+    get certificateId(): string {
+        return this._certificateId;
+    }
+
+    set certificateId(value: string) {
+        this._certificateId = value;
+        this.propertyChanged('certificateId');
     }
     get name(): string {
         return this._name;

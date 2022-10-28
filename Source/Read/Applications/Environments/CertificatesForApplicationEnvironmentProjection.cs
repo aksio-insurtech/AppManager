@@ -11,7 +11,7 @@ public class CertificatesForApplicationEnvironmentProjection : IProjectionFor<Ce
 
     public void Define(IProjectionBuilderFor<CertificatesForApplicationEnvironment> builder) => builder
         .Children(m => m.Certificates, _ => _
-            .IdentifiedBy(m => m.Id)
+            .IdentifiedBy(m => m.CertificateId)
             .From<CertificateAddedToApplicationEnvironment>(_ => _
                 .UsingKey(e => e.CertificateId)
                 .Set(m => m.Name).To(e => e.Name)));

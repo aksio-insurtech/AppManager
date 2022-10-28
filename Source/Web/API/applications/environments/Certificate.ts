@@ -8,7 +8,7 @@ import { field } from '@aksio/cratis-fundamentals';
 export class Certificate {
 
     @field(String)
-    id!: string;
+    certificateId!: string;
 
     @field(String)
     name!: string;
