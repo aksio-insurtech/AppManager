@@ -9,6 +9,7 @@ import { CertificatesForApplicationEnvironmentId } from 'API/applications/enviro
 import { AddCertificateDialog, AdCertificateDialogOutput } from './AddCertificateDialog';
 import { useRouteParams } from '../RouteParams';
 import { Certificate } from 'API/applications/environments/Certificate';
+import { Guid } from '@aksio/cratis-fundamentals';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 }
@@ -33,6 +34,7 @@ export const Certificates = () => {
                     const command = new AddCertificateToApplicationEnvironment();
                     command.applicationId = applicationId!;
                     command.environmentId = environmentId!;
+                    command.certificateId = Guid.create().toString();
                     command.name = output!.name;
                     command.certificate = output!.certificate;
                     await command.execute();
