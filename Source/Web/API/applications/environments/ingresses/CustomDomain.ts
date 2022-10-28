@@ -4,13 +4,12 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { CustomDomain } from './CustomDomain';
 
-export class CustomDomainsForApplicationEnvironment {
+export class CustomDomain {
 
     @field(String)
-    id!: string;
+    domain!: string;
 
-    @field(CustomDomain, true)
-    domains!: CustomDomain[];
+    @field(String)
+    certificateId!: string;
 }

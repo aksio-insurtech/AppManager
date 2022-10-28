@@ -5,4 +5,4 @@ using Concepts.Applications.Environments;
 
 namespace Read.Applications.Environments;
 
-public record CustomDomainsForApplicationEnvironment(ApplicationEnvironmentId Id, IEnumerable<CustomDomain> Domains);
+public record CertificatesForApplicationEnvironment(ApplicationEnvironmentId Id, IEnumerable<Certificate> Certificates);

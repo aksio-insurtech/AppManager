@@ -6,9 +6,9 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{{ingressId}}/define-route');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{{ingressId}}/route');
 
-export interface IDefineRoute {
+export interface IDefineRouteForIngress {
     applicationId?: string;
     environmentId?: string;
     ingressId?: string;
@@ -17,7 +17,7 @@ export interface IDefineRoute {
     targetPath?: string;
 }
 
-export class DefineRouteValidator extends CommandValidator {
+export class DefineRouteForIngressValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
@@ -28,10 +28,10 @@ export class DefineRouteValidator extends CommandValidator {
     };
 }
 
-export class DefineRoute extends Command<IDefineRoute> implements IDefineRoute {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{{ingressId}}/define-route';
+export class DefineRouteForIngress extends Command<IDefineRouteForIngress> implements IDefineRouteForIngress {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{{ingressId}}/route';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new DefineRouteValidator();
+    readonly validation: CommandValidator = new DefineRouteForIngressValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
@@ -108,7 +108,7 @@ export class DefineRoute extends Command<IDefineRoute> implements IDefineRoute {
         this.propertyChanged('targetPath');
     }
 
-    static use(initialValues?: IDefineRoute): [DefineRoute, SetCommandValues<IDefineRoute>] {
-        return useCommand<DefineRoute, IDefineRoute>(DefineRoute, initialValues);
+    static use(initialValues?: IDefineRouteForIngress): [DefineRouteForIngress, SetCommandValues<IDefineRouteForIngress>] {
+        return useCommand<DefineRouteForIngress, IDefineRouteForIngress>(DefineRouteForIngress, initialValues);
     }
 }

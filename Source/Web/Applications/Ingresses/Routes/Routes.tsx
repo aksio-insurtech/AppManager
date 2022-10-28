@@ -7,8 +7,8 @@ import { ValueEditorFor } from 'Components';
 import { Ingress } from 'API/applications/environments/ingresses/Ingress';
 import { AddRouteDialog, AddRouteDialogOutput, AddRouteDialogInput } from './AddRouteDialog';
 import { IngressRoute } from 'API/applications/environments/ingresses/IngressRoute';
-import { DefineRoute } from '../../API/applications/environments/ingresses/DefineRoute';
-import { useRouteParams } from '../RouteParams';
+import { DefineRouteForIngress } from 'API/applications/environments/ingresses/DefineRouteForIngress';
+import { useRouteParams } from '../../RouteParams';
 
 
 export interface RoutesProps {
@@ -35,7 +35,7 @@ export const Routes = (props: RoutesProps) => {
             getRowId={(route) => route.path}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
-                    const command = new DefineRoute();
+                    const command = new DefineRouteForIngress();
                     command.applicationId = input.applicationId;
                     command.environmentId = input.environmentId;
                     command.ingressId = input.ingressId;

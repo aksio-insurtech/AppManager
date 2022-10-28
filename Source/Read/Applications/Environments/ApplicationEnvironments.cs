@@ -10,19 +10,19 @@ public class ApplicationEnvironments : Controller
 {
     readonly IMongoCollection<ApplicationEnvironment> _collection;
     readonly IMongoCollection<ApplicationEnvironmentResources> _applicationEnvironmentResourcesCollection;
-    readonly IMongoCollection<CustomDomainsForApplicationEnvironment> _domainsCollection;
     readonly IMongoCollection<EnvironmentVariablesForApplicationEnvironment> _environmentVariablesForApplicationEnvironmentCollection;
+    readonly IMongoCollection<CertificatesForApplicationEnvironment> _certificatesForApplicationEnvironmentCollection;
 
     public ApplicationEnvironments(
         IMongoCollection<ApplicationEnvironment> collection,
         IMongoCollection<ApplicationEnvironmentResources> applicationEnvironmentResourcesCollection,
-        IMongoCollection<CustomDomainsForApplicationEnvironment> domainsCollection,
-        IMongoCollection<EnvironmentVariablesForApplicationEnvironment> environmentVariablesForApplicationEnvironmentCollection)
+        IMongoCollection<EnvironmentVariablesForApplicationEnvironment> environmentVariablesForApplicationEnvironmentCollection,
+        IMongoCollection<CertificatesForApplicationEnvironment> certificatesForApplicationEnvironmentCollection)
     {
         _collection = collection;
         _applicationEnvironmentResourcesCollection = applicationEnvironmentResourcesCollection;
-        _domainsCollection = domainsCollection;
         _environmentVariablesForApplicationEnvironmentCollection = environmentVariablesForApplicationEnvironmentCollection;
+        _certificatesForApplicationEnvironmentCollection = certificatesForApplicationEnvironmentCollection;
     }
 
     [HttpGet("{environmentId}")]
@@ -43,19 +43,11 @@ public class ApplicationEnvironments : Controller
     public Task<ClientObservable<IEnumerable<ApplicationEnvironment>>> EnvironmentsForApplication([FromRoute] ApplicationId applicationId) =>
         _collection.Observe(Filters.StringFilterFor<ApplicationEnvironment>(_ => _.Id.ApplicationId, applicationId));
 
-    [HttpGet("{environmentId}/custom-domains")]
-    public Task<ClientObservable<CustomDomainsForApplicationEnvironment>> CustomDomainConfigurationForApplicationEnvironment(
-        [FromRoute] ApplicationId applicationId,
-        [FromRoute] ApplicationEnvironmentId environmentId) =>
-        _domainsCollection.ObserveId(environmentId);
-
-    [HttpGet("{environmentId}/custom-domains/http")]
-    public CustomDomainsForApplicationEnvironment Blah(
-        [FromRoute] ApplicationId applicationId,
-        [FromRoute] ApplicationEnvironmentId environmentId) =>
-        _domainsCollection.Find(Filters.StringFilterFor<CustomDomainsForApplicationEnvironment>(_ => _.Id, environmentId)).SingleOrDefault();
-
     [HttpGet("{environmentId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForApplicationEnvironment>> EnvironmentVariablesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
         _environmentVariablesForApplicationEnvironmentCollection.ObserveId(environmentId);
+
+    [HttpGet("{environmentId}/certificates")]
+    public Task<ClientObservable<CertificatesForApplicationEnvironment>> CertificatesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
+        _certificatesForApplicationEnvironmentCollection.ObserveId(environmentId);
 }

@@ -3,7 +3,7 @@
 
 namespace Concepts.Applications;
 
-public record TLSCertificate(string Value) : ConceptAs<string>(Value)
+public record CertificateName(string Value) : ConceptAs<string>(Value)
 {
-    public static implicit operator TLSCertificate(string value) => new(value);
+    public static implicit operator CertificateName(string value) => new(value);
 }

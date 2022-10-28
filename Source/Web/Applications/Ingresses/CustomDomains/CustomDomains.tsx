@@ -4,20 +4,24 @@
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
+import { AddCustomDomainToIngress } from 'API/applications/environments/ingresses/AddCustomDomainToIngress';
+import { CustomDomain } from 'API/applications/environments/ingresses/CustomDomain';
 import { AddCustomDomainDialog, AddCustomDomainDialogOutput } from './AddCustomDomainDialog';
-import { AddCustomDomainToApplicationEnvironment } from 'API/applications/environments/AddCustomDomainToApplicationEnvironment';
-import { CustomDomainConfigurationForApplicationEnvironment } from 'API/applications/environments/CustomDomainConfigurationForApplicationEnvironment';
-import { CustomDomain } from 'API/applications/environments/CustomDomain';
-import { useRouteParams } from '../RouteParams';
+import { useRouteParams } from '../../RouteParams';
+import { Ingress } from 'API/applications/environments/ingresses/Ingress';
+
+
+export interface CustomDomainsProps {
+    ingress: Ingress;
+}
 
 const columns: GridColDef[] = [
-    { field: 'domain', headerName: 'Name', width: 250 }
+    { field: 'domain', headerName: 'Domain', width: 250 }
 ];
 
-export const CustomDomains = () => {
+export const CustomDomains = (props: CustomDomainsProps) => {
     const { applicationId, environmentId } = useRouteParams();
-    const [domainsForEnvironment] = CustomDomainConfigurationForApplicationEnvironment.use({ applicationId: applicationId!, environmentId: environmentId! });
-    const domains = domainsForEnvironment.data.domains ?? [];
+    const domains = props.ingress.customDomains ?? [];
 
     return (
         <ValueEditorFor<AddCustomDomainDialogOutput, CustomDomain>
@@ -28,11 +32,11 @@ export const CustomDomains = () => {
             getRowId={(domain) => domain.domain}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
-                    const command = new AddCustomDomainToApplicationEnvironment();
+                    const command = new AddCustomDomainToIngress();
                     command.applicationId = applicationId!;
                     command.environmentId = environmentId!;
                     command.domain = output!.domain;
-                    command.certificate = output!.certificate;
+                    command.certificateId = output!.certificateId;
                     await command.execute();
                 }
             }} />

@@ -148,7 +148,7 @@ public static class ApplicationIngressPulumiExtensions
         return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
     }
 
-    static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name}-authentication-secret";
+    static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name.Value.Replace(' ', '-')}-authentication-secret".ToLowerInvariant();
 
     static void SetupAuthenticationForIngress(ApplicationEnvironmentWithArtifacts environment, ResourceGroup resourceGroup, ContainerApp containerApp, Ingress ingress)
     {

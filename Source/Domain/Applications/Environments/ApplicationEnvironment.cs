@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 using Concepts.Applications.Environments;
-using Events.Applications;
 using Events.Applications.Environments;
 
 namespace Domain.Applications.Environments;
@@ -18,20 +17,20 @@ public class ApplicationEnvironment : Controller
         _eventLog = eventLog;
     }
 
-    [HttpPost("custom-domain")]
-    public Task AddCustomDomainToApplicationEnvironment(
-        [FromRoute] ApplicationId applicationId,
-        [FromRoute] ApplicationEnvironmentId environmentId,
-        [FromBody] AddCustomDomainToApplicationEnvironment command) =>
-         _eventLog.Append(environmentId, new CustomDomainAddedToApplicationEnvironment(command.Domain, command.Certificate));
-
     [HttpPost("config")]
     public Task SetConfig([FromRoute] ApplicationId applicationId, [FromRoute] ApplicationEnvironmentId environmentId) => Task.CompletedTask;
 
-    [HttpPost("environment-variable")]
+    [HttpPost("environment-variables")]
     public Task SetEnvironmentVariableForApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] EnvironmentVariable environmentVariable) =>
         _eventLog.Append(environmentId, new EnvironmentVariableSetForApplicationEnvironment(applicationId, environmentVariable.Key, environmentVariable.Value));
+
+    [HttpPost("certificates")]
+    public Task AddCertificateToApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] AddCertificateToApplicationEnvironment command) =>
+        _eventLog.Append(environmentId, new CertificateAddedToApplicationEnvironment(Guid.NewGuid(), command.Name, command.Certificate));
 }

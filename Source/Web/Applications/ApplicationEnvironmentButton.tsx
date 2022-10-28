@@ -4,7 +4,7 @@
 import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
 import * as icons from '@mui/icons-material';
 import { MenuItem } from '@mui/material';
-import { EnvironmentOnApplication } from '../API/applications/EnvironmentOnApplication';
+import { EnvironmentOnApplication } from 'API/applications/EnvironmentOnApplication';
 import { useNavigate } from 'react-router-dom';
 import { ActionButtonWithMenu } from './ActionButtonWithMenu';
 

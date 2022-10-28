@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications.Environments;
-using Concepts.Applications.Ingresses;
+using Concepts.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Ingresses;
 
 namespace Domain.Applications.Environments.Ingresses;
@@ -24,8 +24,8 @@ public class Ingress : Controller
         [FromRoute] IngressId ingressId,
         [FromBody] ConfigureAuthentication command) => Task.CompletedTask;
 
-    [HttpPost("define-route")]
-    public Task DefineRoute(
+    [HttpPost("route")]
+    public Task DefineRouteForIngress(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] IngressId ingressId,
@@ -37,4 +37,11 @@ public class Ingress : Controller
             @command.Path,
             @command.TargetMicroservice,
             @command.TargetPath));
+
+    [HttpPost("custom-domain")]
+    public Task AddCustomDomainToIngress(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] AddCustomDomainToIngress command) =>
+         _eventLog.Append(environmentId, new CustomDomainAddedToIngress(command.Domain, command.CertificateId));
 }

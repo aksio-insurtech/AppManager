@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications.Environments;
+namespace Domain.Applications.Environments;
 
-public record CustomDomain(DomainName Domain, TLSCertificate Certificate);
+public record AddCertificateToApplicationEnvironment(CertificateName Name, Certificate Certificate);

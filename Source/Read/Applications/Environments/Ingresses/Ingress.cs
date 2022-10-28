@@ -6,4 +6,4 @@ using Concepts.Applications.Environments.Ingresses;
 namespace Read.Applications.Environments.Ingresses;
 
 // TODO: Change to composite key when Cratis supports it (https://github.com/aksio-insurtech/Cratis/issues/551)
-public record Ingress(IngressId Id, IngressName Name, IEnumerable<IngressRoute> Routes);
+public record Ingress(IngressId Id, IngressName Name, IEnumerable<CustomDomain> CustomDomains, IEnumerable<IngressRoute> Routes);

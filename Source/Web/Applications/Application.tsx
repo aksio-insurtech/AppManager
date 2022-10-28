@@ -11,7 +11,7 @@ import { Secrets } from './Secrets/Secrets';
 import { ConfigFiles } from './ConfigFiles/ConfigFiles';
 import { useRouteParams, RouteParams } from './RouteParams';
 import { SetEnvironmentVariableForApplication } from 'API/applications/SetEnvironmentVariableForApplication';
-import { EnvironmentVariablesForApplicationId } from '../API/applications/EnvironmentVariablesForApplicationId';
+import { EnvironmentVariablesForApplicationId } from 'API/applications/EnvironmentVariablesForApplicationId';
 
 export const Application = () => {
     const { applicationId } = useRouteParams();

@@ -32,8 +32,8 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/tenants`);
     };
 
-    const handleCustomDomainsClick = () => {
-        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/custom-domains`);
+    const handleCertificatesClick = () => {
+        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/certificates`);
     };
 
     const handleIngressClick = (ingress: IngressInEnvironment) => {
@@ -68,10 +68,9 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                         onClick={handleTenantsClick} />
 
                     <ApplicationArtifactListItem
-                        icon={<icons.Domain />}
-                        title="Custom Domains"
-                        onClick={handleCustomDomainsClick} />
-
+                        icon={<icons.Lock />}
+                        title="Certificates"
+                        onClick={handleCertificatesClick} />
 
                     {environment.ingresses?.map(ingress => {
                         return (

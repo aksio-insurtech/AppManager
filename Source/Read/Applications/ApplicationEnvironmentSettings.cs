@@ -3,7 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Events.Applications;
+namespace Read.Applications;
 
-[EventType("7651b7f1-79a0-4321-bab3-3d55a31c57ff")]
-public record CustomDomainAddedToApplicationEnvironment(DomainName Domain, TLSCertificate Certificate);
+public record ApplicationEnvironmentSettings(IEnumerable<EnvironmentVariable> EnvironmentVariables);

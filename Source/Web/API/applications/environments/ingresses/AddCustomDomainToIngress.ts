@@ -6,33 +6,33 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/custom-domain');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{ingressId}/custom-domain');
 
-export interface IAddCustomDomainToApplicationEnvironment {
+export interface IAddCustomDomainToIngress {
     applicationId?: string;
     environmentId?: string;
     domain?: string;
-    certificate?: string;
+    certificateId?: string;
 }
 
-export class AddCustomDomainToApplicationEnvironmentValidator extends CommandValidator {
+export class AddCustomDomainToIngressValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
         domain: new Validator(),
-        certificate: new Validator(),
+        certificateId: new Validator(),
     };
 }
 
-export class AddCustomDomainToApplicationEnvironment extends Command<IAddCustomDomainToApplicationEnvironment> implements IAddCustomDomainToApplicationEnvironment {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/custom-domain';
+export class AddCustomDomainToIngress extends Command<IAddCustomDomainToIngress> implements IAddCustomDomainToIngress {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/ingresses/{ingressId}/custom-domain';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddCustomDomainToApplicationEnvironmentValidator();
+    readonly validation: CommandValidator = new AddCustomDomainToIngressValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
     private _domain!: string;
-    private _certificate!: string;
+    private _certificateId!: string;
 
     get requestArguments(): string[] {
         return [
@@ -46,7 +46,7 @@ export class AddCustomDomainToApplicationEnvironment extends Command<IAddCustomD
             'applicationId',
             'environmentId',
             'domain',
-            'certificate',
+            'certificateId',
         ];
     }
 
@@ -74,16 +74,16 @@ export class AddCustomDomainToApplicationEnvironment extends Command<IAddCustomD
         this._domain = value;
         this.propertyChanged('domain');
     }
-    get certificate(): string {
-        return this._certificate;
+    get certificateId(): string {
+        return this._certificateId;
     }
 
-    set certificate(value: string) {
-        this._certificate = value;
-        this.propertyChanged('certificate');
+    set certificateId(value: string) {
+        this._certificateId = value;
+        this.propertyChanged('certificateId');
     }
 
-    static use(initialValues?: IAddCustomDomainToApplicationEnvironment): [AddCustomDomainToApplicationEnvironment, SetCommandValues<IAddCustomDomainToApplicationEnvironment>] {
-        return useCommand<AddCustomDomainToApplicationEnvironment, IAddCustomDomainToApplicationEnvironment>(AddCustomDomainToApplicationEnvironment, initialValues);
+    static use(initialValues?: IAddCustomDomainToIngress): [AddCustomDomainToIngress, SetCommandValues<IAddCustomDomainToIngress>] {
+        return useCommand<AddCustomDomainToIngress, IAddCustomDomainToIngress>(AddCustomDomainToIngress, initialValues);
     }
 }

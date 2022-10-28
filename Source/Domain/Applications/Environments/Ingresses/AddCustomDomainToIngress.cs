@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications.Environments;
+namespace Domain.Applications.Environments.Ingresses;
 
-public record AddCustomDomainToApplicationEnvironment(DomainName Domain, TLSCertificate Certificate);
+public record AddCustomDomainToIngress(DomainName Domain, CertificateId CertificateId);
