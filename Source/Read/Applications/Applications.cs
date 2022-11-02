@@ -28,5 +28,5 @@ public class Applications : Controller
 
     [HttpGet("{applicationId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForApplication>> EnvironmentVariablesForApplicationId([FromRoute] ApplicationId applicationId) =>
-        _environmentVariablesForApplicationCollection.ObserveId(applicationId);
+        _environmentVariablesForApplicationCollection.ObserveById(applicationId);
 }

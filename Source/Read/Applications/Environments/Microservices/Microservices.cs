@@ -25,10 +25,7 @@ public class Microservices : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId)
     {
-        var result = await _microserviceCollection.FindAsync(
-            Builders<Microservice>.Filter.And(
-                Filters.StringFilterFor<Microservice>(_ => _.Id.ApplicationId, applicationId),
-                Filters.StringFilterFor<Microservice>(_ => _.Id.EnvironmentId, environmentId)));
+        var result = await _microserviceCollection.FindAsync(_ => _.Id.ApplicationId == applicationId && _.Id.EnvironmentId == environmentId);
         return result.ToEnumerable();
     }
 
@@ -37,13 +34,12 @@ public class Microservices : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId) =>
-        _microserviceCollection.Find(
-            Builders<Microservice>.Filter.And(
-                Filters.StringFilterFor<Microservice>(_ => _.Id.ApplicationId, applicationId),
-                Filters.StringFilterFor<Microservice>(_ => _.Id.EnvironmentId, environmentId),
-                Filters.StringFilterFor<Microservice>(_ => _.Id.MicroserviceId, microserviceId))).FirstOrDefaultAsync();
+        _microserviceCollection.Find(_ =>
+            _.Id.ApplicationId == applicationId &&
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.MicroserviceId == microserviceId).FirstOrDefaultAsync();
 
     [HttpGet("{microserviceId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForMicroservice>> EnvironmentVariablesForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
-        _environmentVariablesForMicroserviceCollection.ObserveId(microserviceId);
+        _environmentVariablesForMicroserviceCollection.ObserveById(microserviceId);
 }

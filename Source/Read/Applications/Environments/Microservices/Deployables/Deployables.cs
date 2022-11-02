@@ -25,12 +25,12 @@ public class Deployables : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId) =>
-            _deployableCollection.Observe(Builders<Deployable>.Filter.And(
-                Filters.StringFilterFor<Deployable>(_ => _.Id.ApplicationId, applicationId),
-                Filters.StringFilterFor<Deployable>(_ => _.Id.EnvironmentId, environmentId),
-                Filters.StringFilterFor<Deployable>(_ => _.Id.MicroserviceId, microserviceId)));
+            _deployableCollection.Observe(_ =>
+                _.Id.ApplicationId == applicationId &&
+                _.Id.EnvironmentId == environmentId &&
+                _.Id.MicroserviceId == microserviceId);
 
     [HttpGet("{deployableId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForDeployable>> EnvironmentVariablesForDeployableId([FromRoute] DeployableId deployableId) =>
-        _environmentVariablesForDeployableCollection.ObserveId(deployableId);
+        _environmentVariablesForDeployableCollection.ObserveById(deployableId);
 }

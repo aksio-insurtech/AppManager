@@ -8,6 +8,11 @@ namespace Read.Applications;
 public record EnvironmentOnApplication(
     ApplicationEnvironmentId EnvironmentId,
     ApplicationEnvironmentName Name,
+    DateTimeOffset LastUpdated,
+    DateTimeOffset LastConsolidation,
     IEnumerable<TenantInEnvironment> Tenants,
     IEnumerable<IngressInEnvironment> Ingresses,
-    IEnumerable<MicroserviceInEnvironment> Microservices);
+    IEnumerable<MicroserviceInEnvironment> Microservices)
+{
+    public bool HasChanges => LastConsolidation < LastUpdated;
+}

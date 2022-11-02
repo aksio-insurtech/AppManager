@@ -14,5 +14,5 @@ public class Tenants : Controller
 
     [HttpGet]
     public Task<ClientObservable<IEnumerable<Tenant>>> TenantsForEnvironment([FromRoute] ApplicationEnvironmentId environmentId) =>
-        _collection.Observe(Filters.StringFilterFor<Tenant>(_ => _.EnvironmentId, environmentId));
+        _collection.Observe(_ => _.EnvironmentId == environmentId);
 }

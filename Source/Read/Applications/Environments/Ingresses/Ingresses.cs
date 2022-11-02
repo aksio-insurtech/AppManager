@@ -17,5 +17,5 @@ public class Ingresses : Controller
 
     [HttpGet("{ingressId}")]
     public Task<ClientObservable<Ingress>> IngressById([FromRoute] IngressId ingressId) =>
-        _collection.ObserveId(ingressId);
+        _collection.ObserveById(ingressId);
 }

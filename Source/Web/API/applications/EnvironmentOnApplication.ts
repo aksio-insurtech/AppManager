@@ -16,6 +16,12 @@ export class EnvironmentOnApplication {
     @field(String)
     name!: string;
 
+    @field(Date)
+    lastUpdated!: Date;
+
+    @field(Date)
+    lastConsolidation!: Date;
+
     @field(TenantInEnvironment, true)
     tenants!: TenantInEnvironment[];
 
@@ -24,4 +30,7 @@ export class EnvironmentOnApplication {
 
     @field(MicroserviceInEnvironment, true)
     microservices!: MicroserviceInEnvironment[];
+
+    @field(Boolean)
+    hasChanges!: boolean;
 }

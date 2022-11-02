@@ -30,9 +30,7 @@ public class ApplicationEnvironments : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId)
     {
-        var result = await _collection.FindAsync(Builders<ApplicationEnvironment>.Filter.And(
-            Filters.StringFilterFor<ApplicationEnvironment>(_ => _.Id.ApplicationId, applicationId),
-            Filters.StringFilterFor<ApplicationEnvironment>(_ => _.Id.EnvironmentId, environmentId)));
+        var result = await _collection.FindAsync(_ => _.Id.ApplicationId == applicationId && _.Id.EnvironmentId == environmentId);
         return result.FirstOrDefault();
     }
 
@@ -41,13 +39,13 @@ public class ApplicationEnvironments : Controller
 
     [HttpGet("environments-for-application")]
     public Task<ClientObservable<IEnumerable<ApplicationEnvironment>>> EnvironmentsForApplication([FromRoute] ApplicationId applicationId) =>
-        _collection.Observe(Filters.StringFilterFor<ApplicationEnvironment>(_ => _.Id.ApplicationId, applicationId));
+        _collection.Observe(_ => _.Id.ApplicationId == applicationId);
 
     [HttpGet("{environmentId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForApplicationEnvironment>> EnvironmentVariablesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
-        _environmentVariablesForApplicationEnvironmentCollection.ObserveId(environmentId);
+        _environmentVariablesForApplicationEnvironmentCollection.ObserveById(environmentId);
 
     [HttpGet("{environmentId}/certificates")]
     public Task<ClientObservable<CertificatesForApplicationEnvironment>> CertificatesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
-        _certificatesForApplicationEnvironmentCollection.ObserveId(environmentId);
+        _certificatesForApplicationEnvironmentCollection.ObserveById(environmentId);
 }
