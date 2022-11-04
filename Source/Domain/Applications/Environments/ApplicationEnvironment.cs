@@ -33,4 +33,10 @@ public class ApplicationEnvironment : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] AddCertificateToApplicationEnvironment command) =>
         _eventLog.Append(environmentId, new CertificateAddedToApplicationEnvironment(command.CertificateId, command.Name, command.Certificate));
+
+    [HttpPost("consolidate")]
+    public Task ConsolidateApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId) =>
+        _eventLog.Append(environmentId, new ApplicationEnvironmentConsolidated(applicationId));
 }

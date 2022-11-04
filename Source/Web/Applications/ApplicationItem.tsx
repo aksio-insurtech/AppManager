@@ -14,6 +14,7 @@ import { ApplicationEnvironmentButton } from './ApplicationEnvironmentButton';
 import { ActionButtonWithMenu } from './ActionButtonWithMenu';
 import { CreateIngressDialog } from './CreateIngressDialog';
 import { CreateIngress } from 'API/applications/environments/ingresses/CreateIngress';
+import { ConsolidateApplicationEnvironment } from 'API/applications/environments/ConsolidateApplicationEnvironment';
 
 export interface ApplicationItemProps {
     application: ApplicationHierarchyForListing;
@@ -56,11 +57,18 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
         }
     );
 
+    const [consolidateApplicationEnvironment] = ConsolidateApplicationEnvironment.use({
+        applicationId: props.application.id, environmentId: props.environmentId
+    });
+
+    const currentEnvironment = props.application.environments.find(_ => _.environmentId === props.environmentId);
+    const hasChanged = currentEnvironment?.lastConsolidation.toString() !== currentEnvironment?.lastUpdated.toString();
+
     return (
         <ListItem component="div" disablePadding>
             <ListItemButton sx={{ height: 56 }} onClick={() => {
                 let path = `/applications/${props.application.id}`;
-                if( props.environmentId ) {
+                if (props.environmentId) {
                     path += `/environments/${props.environmentId}`;
                 }
                 navigate(path);
@@ -95,7 +103,10 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                             }} >Add Microservice</MenuItem>
                         </ActionButtonWithMenu>
                     }
-                    <ListItemActionButton title="Application Settings" icon={<icons.Settings />} arrow />
+
+                    {hasChanged &&
+                        <ListItemActionButton title="Consolidate Changes" icon={<icons.PlayArrow />} onClick={() => consolidateApplicationEnvironment.execute()} />
+                    }
                 </>
             }
         </ListItem >
