@@ -21,32 +21,43 @@ public class ApplicationHierarchyForListingProjection : IProjectionFor<Applicati
                 .Set(m => m.LastUpdated).ToEventContextProperty(c => c.Occurred)
                 .IncludeChildProjections())
             .IdentifiedBy(m => m.EnvironmentId)
-            .From<ApplicationEnvironmentConsolidated>(_ => _
-                .UsingParentKey(e => e.ApplicationId)
+
+            .From<ApplicationEnvironmentConsolidationStarted>(_ => _
+                .UsingKey(e => e.EnvironmentId)
+                .Set(m => m.LastConsolidationStarted).ToEventContextProperty(c => c.Occurred))
+            .From<ApplicationEnvironmentConsolidationFailed>(_ => _
+                .UsingKey(e => e.EnvironmentId)
                 .Set(m => m.LastConsolidation).ToEventContextProperty(c => c.Occurred))
+            .From<ApplicationEnvironmentConsolidationCompleted>(_ => _
+                .UsingKey(e => e.EnvironmentId)
+                .Set(m => m.LastConsolidation).ToEventContextProperty(c => c.Occurred))
+
+            .From<EnvironmentVariableSetForApplicationEnvironment>(_ => _
+                .UsingKey(e => e.EnvironmentId))
+
             .From<ApplicationEnvironmentCreated>(_ => _
-                .UsingParentKey(e => e.ApplicationId)
+                .UsingKey(e => e.EnvironmentId)
                 .Set(m => m.Name).To(e => e.Name))
             .Children(_ => _.Tenants, _ => _
                 .IdentifiedBy(m => m.TenantId)
                 .From<TenantAddedToApplicationEnvironment>(_ => _
-                    .UsingParentKey(e => e.EnvironmentId)
+                    .UsingKey(e => e.TenantId)
                     .Set(m => m.Name).To(e => e.Name)))
             .Children(_ => _.Ingresses, _ => _
                 .IdentifiedBy(m => m.IngressId)
                 .From<IngressCreated>(_ => _
-                    .UsingParentKey(e => e.EnvironmentId)
+                    .UsingKey(e => e.IngressId)
                     .Set(m => m.Name).To(e => e.Name)))
             .Children(_ => _.Microservices, _ => _
                 .IdentifiedBy(m => m.MicroserviceId)
                 .From<MicroserviceCreated>(_ => _
-                    .UsingParentKey(e => e.EnvironmentId)
+                    .UsingKey(e => e.MicroserviceId)
                     .Set(m => m.Name).To(e => e.Name))
                 .RemovedWith<MicroserviceRemoved>()
                 .Children(_ => _.Deployables, _ => _
                     .IdentifiedBy(m => m.DeployableId)
                     .From<DeployableCreated>(_ => _
-                        .UsingParentKey(e => e.MicroserviceId)
+                        .UsingKey(e => e.DeployableId)
                         .Set(m => m.Name).To(e => e.Name))))
         .RemovedWith<ApplicationRemoved>());
 }

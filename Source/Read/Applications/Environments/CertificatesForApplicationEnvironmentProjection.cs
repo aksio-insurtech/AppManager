@@ -13,6 +13,7 @@ public class CertificatesForApplicationEnvironmentProjection : IProjectionFor<Ce
         .Children(m => m.Certificates, _ => _
             .IdentifiedBy(m => m.CertificateId)
             .From<CertificateAddedToApplicationEnvironment>(_ => _
+                .UsingParentKey(e => e.EnvironmentId)
                 .UsingKey(e => e.CertificateId)
                 .Set(m => m.Name).To(e => e.Name)));
 }

@@ -7,4 +7,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices;
 
 [EventType("af5f1b91-9c73-4692-8a86-2ba1f1a8e082")]
-public record EnvironmentVariableSetForMicroservice(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, EnvironmentVariableKey Key, EnvironmentVariableValue Value);
+public record EnvironmentVariableSetForMicroservice(ApplicationId ApplicationId, MicroserviceId MicroserviceId, ApplicationEnvironmentId EnvironmentId, EnvironmentVariableKey Key, EnvironmentVariableValue Value);

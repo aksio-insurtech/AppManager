@@ -20,5 +20,5 @@ public class Microservices : Controller
     public Task CreateMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
-        [FromBody] CreateMicroservice command) => _eventLog.Append(command.MicroserviceId, new MicroserviceCreated(applicationId, environmentId, command.Name));
+        [FromBody] CreateMicroservice command) => _eventLog.Append(applicationId, new MicroserviceCreated(applicationId, command.MicroserviceId, environmentId, command.Name));
 }

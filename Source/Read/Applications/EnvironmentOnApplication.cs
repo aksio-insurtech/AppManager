@@ -9,6 +9,7 @@ public record EnvironmentOnApplication(
     ApplicationEnvironmentId EnvironmentId,
     ApplicationEnvironmentName Name,
     DateTimeOffset LastUpdated,
+    DateTimeOffset LastConsolidationStarted,
     DateTimeOffset LastConsolidation,
     IEnumerable<TenantInEnvironment> Tenants,
     IEnumerable<IngressInEnvironment> Ingresses,

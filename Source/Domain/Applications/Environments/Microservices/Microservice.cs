@@ -35,7 +35,7 @@ public class Microservice : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromBody] EnvironmentVariable environmentVariable) =>
-        _eventLog.Append(microserviceId, new EnvironmentVariableSetForMicroservice(applicationId, environmentId, environmentVariable.Key, environmentVariable.Value));
+        _eventLog.Append(applicationId, new EnvironmentVariableSetForMicroservice(applicationId, microserviceId, environmentId, environmentVariable.Key, environmentVariable.Value));
 
     [HttpPost("stack")]
     public Task SetStack(
@@ -45,5 +45,8 @@ public class Microservice : Controller
         [FromBody] object stack) => _stacksForMicroservices.Save(applicationId, microserviceId, environment, StackDeployment.FromJsonString(stack.ToString()!));
 
     [HttpPost("remove")]
-    public Task Remove([FromRoute] MicroserviceId microserviceId) => _eventLog.Append(microserviceId, new MicroserviceRemoved());
+    public Task Remove(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId) => _eventLog.Append(applicationId, new MicroserviceRemoved(applicationId, environmentId, microserviceId));
 }

@@ -1,20 +1,15 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts.Applications.Environments;
 using Events.Applications.Environments;
-using Events.Applications.Environments.Ingresses;
-using Events.Applications.Environments.Microservices;
-using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
-using Pulumi.Automation;
 using Reactions.Applications.Pulumi;
 
 namespace Reactions.Applications;
 
-/// <summary>
-/// [Observer("c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5")].
-/// </summary>
+#pragma warning disable IDE0052
+
+[Observer("c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5")]
 public class ApplicationResourcesCoordinator
 {
     readonly ILogger<ApplicationResources> _logger;
@@ -22,21 +17,34 @@ public class ApplicationResourcesCoordinator
     readonly ExecutionContext _executionContext;
     readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IPulumiOperations _pulumiOperations;
+    readonly IEventLog _eventLog;
 
     public ApplicationResourcesCoordinator(
         ILogger<ApplicationResources> logger,
         IImmediateProjections projections,
         ExecutionContext executionContext,
         IPulumiStackDefinitions stackDefinitions,
-        IPulumiOperations pulumiOperations)
+        IPulumiOperations pulumiOperations,
+        IEventLog eventLog)
     {
         _logger = logger;
         _projections = projections;
         _executionContext = executionContext;
         _stackDefinitions = stackDefinitions;
         _pulumiOperations = pulumiOperations;
+        _eventLog = eventLog;
     }
 
+    public async Task ConsolidationStarted(ApplicationEnvironmentConsolidationStarted @event, EventContext context)
+    {
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(context.EventSourceId);
+        _logger.ConsolidationStarted(environment.Name, application.Name);
+        await Task.Delay(5000);
+        await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
+    }
+
+    /*
     public async Task ApplicationEnvironmentCreated(ApplicationEnvironmentCreated @event, EventContext context)
     {
         var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
@@ -165,4 +173,5 @@ public class ApplicationResourcesCoordinator
     }
 
     string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";
+    */
 }

@@ -3,8 +3,9 @@
 
 using Concepts.Applications;
 using Concepts.Applications.Environments;
+using Concepts.Applications.Environments.Ingresses;
 
 namespace Events.Applications.Environments.Ingresses;
 
 [EventType("7651b7f1-79a0-4321-bab3-3d55a31c57ff")]
-public record CustomDomainAddedToIngress(DomainName Domain, CertificateId CertificateId);
+public record CustomDomainAddedToIngress(ApplicationEnvironmentId EnvironmentId, IngressId IngressId, DomainName Domain, CertificateId CertificateId);

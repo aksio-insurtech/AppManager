@@ -13,6 +13,7 @@ public class EnvironmentVariablesForApplicationEnvironmentProjection : IProjecti
         .Children(m => m.Variables, _ => _
             .IdentifiedBy(m => m.Key)
             .From<EnvironmentVariableSetForApplicationEnvironment>(_ => _
+                .UsingParentKey(e => e.EnvironmentId)
                 .UsingKey(e => e.Key)
                 .Set(m => m.Value).To(e => e.Value)));
 }

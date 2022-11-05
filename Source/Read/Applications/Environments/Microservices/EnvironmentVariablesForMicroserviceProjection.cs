@@ -13,6 +13,7 @@ public class EnvironmentVariablesForMicroserviceProjection : IProjectionFor<Envi
         .Children(m => m.Variables, _ => _
             .IdentifiedBy(m => m.Key)
             .From<EnvironmentVariableSetForMicroservice>(_ => _
+                .UsingParentKey(e => e.MicroserviceId)
                 .UsingKey(e => e.Key)
                 .Set(m => m.Value).To(e => e.Value)));
 }

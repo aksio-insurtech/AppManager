@@ -62,7 +62,7 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
     });
 
     const currentEnvironment = props.application.environments.find(_ => _.environmentId === props.environmentId);
-    const hasChanged = currentEnvironment?.lastConsolidation.toString() !== currentEnvironment?.lastUpdated.toString();
+    const hasChanged = currentEnvironment?.lastConsolidationStarted.toString() !== currentEnvironment?.lastUpdated.toString();
 
     return (
         <ListItem component="div" disablePadding>
@@ -104,9 +104,7 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                         </ActionButtonWithMenu>
                     }
 
-                    {hasChanged &&
-                        <ListItemActionButton title="Consolidate Changes" icon={<icons.PlayArrow />} onClick={() => consolidateApplicationEnvironment.execute()} />
-                    }
+                    <ListItemActionButton title="Consolidate Changes" icon={<icons.PlayArrow />} onClick={() => consolidateApplicationEnvironment.execute()} />
                 </>
             }
         </ListItem >

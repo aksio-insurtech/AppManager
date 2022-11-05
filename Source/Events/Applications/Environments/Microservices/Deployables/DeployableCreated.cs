@@ -7,4 +7,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices.Deployables;
 
 [EventType("12e6d722-1e91-4802-86db-00ff3d61d798")]
-public record DeployableCreated(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableName Name);
+public record DeployableCreated(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId, DeployableName Name);

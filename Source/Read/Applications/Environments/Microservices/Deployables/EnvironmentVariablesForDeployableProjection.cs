@@ -13,6 +13,7 @@ public class EnvironmentVariablesForDeployableProjection : IProjectionFor<Enviro
         .Children(m => m.Variables, _ => _
             .IdentifiedBy(m => m.Key)
             .From<EnvironmentVariableSetForDeployable>(_ => _
+                .UsingParentKey(e => e.DeployableId)
                 .UsingKey(e => e.Key)
                 .Set(m => m.Value).To(e => e.Value)));
 }

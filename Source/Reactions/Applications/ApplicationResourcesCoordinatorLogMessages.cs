@@ -27,4 +27,7 @@ public static partial class ApplicationResourcesCoordinatorLogMessages
 
     [LoggerMessage(6, LogLevel.Information, "Creating ingress '{IngressName}' in '{Environment}' for application '{ApplicationName}'")]
     public static partial void CreatingIngress(this ILogger logger, string ingressName, string environment, string applicationName);
+
+    [LoggerMessage(7, LogLevel.Information, "Consolidation of '{Environment}' for application '{ApplicationName}' started")]
+    public static partial void ConsolidationStarted(this ILogger logger, string environment, string applicationName);
 }

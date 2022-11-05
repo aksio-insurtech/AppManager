@@ -20,6 +20,9 @@ export class EnvironmentOnApplication {
     lastUpdated!: Date;
 
     @field(Date)
+    lastConsolidationStarted!: Date;
+
+    @field(Date)
     lastConsolidation!: Date;
 
     @field(TenantInEnvironment, true)

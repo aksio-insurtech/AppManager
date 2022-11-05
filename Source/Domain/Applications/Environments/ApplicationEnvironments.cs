@@ -24,9 +24,10 @@ public class ApplicationEnvironments : Controller
     {
         var cratisVersion = await _dockerHub.GetLastVersionOfCratis();
         await _eventLog.Append(
-            addEnvironment.EnvironmentId,
+            applicationId,
             new ApplicationEnvironmentCreated(
                 applicationId,
+                addEnvironment.EnvironmentId,
                 addEnvironment.Name,
                 addEnvironment.DisplayName,
                 addEnvironment.ShortName,
@@ -34,6 +35,6 @@ public class ApplicationEnvironments : Controller
                 addEnvironment.AzureSubscriptionId,
                 addEnvironment.CloudLocation));
 
-        await _eventLog.Append(TenantId.Development.Value, new TenantAddedToApplicationEnvironment(addEnvironment.EnvironmentId, TenantId.Development, "Development", "development"));
+        await _eventLog.Append(applicationId, new TenantAddedToApplicationEnvironment(applicationId, addEnvironment.EnvironmentId, TenantId.Development, "Development", "development"));
     }
 }

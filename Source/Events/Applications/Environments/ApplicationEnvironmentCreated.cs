@@ -11,6 +11,7 @@ namespace Events.Applications.Environments;
 [EventType("f98840bd-9c98-456f-821e-d9840ab846ae")]
 public record ApplicationEnvironmentCreated(
     ApplicationId ApplicationId,
+    ApplicationEnvironmentId EnvironmentId,
     ApplicationEnvironmentName Name,
     ApplicationEnvironmentDisplayName DisplayName,
     ApplicationEnvironmentShortName ShortName,

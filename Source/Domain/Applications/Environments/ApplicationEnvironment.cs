@@ -25,18 +25,18 @@ public class ApplicationEnvironment : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] EnvironmentVariable environmentVariable) =>
-        _eventLog.Append(environmentId, new EnvironmentVariableSetForApplicationEnvironment(applicationId, environmentVariable.Key, environmentVariable.Value));
+        _eventLog.Append(applicationId, new EnvironmentVariableSetForApplicationEnvironment(applicationId, environmentId, environmentVariable.Key, environmentVariable.Value));
 
     [HttpPost("certificates")]
     public Task AddCertificateToApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] AddCertificateToApplicationEnvironment command) =>
-        _eventLog.Append(environmentId, new CertificateAddedToApplicationEnvironment(command.CertificateId, command.Name, command.Certificate));
+        _eventLog.Append(applicationId, new CertificateAddedToApplicationEnvironment(applicationId, environmentId, command.CertificateId, command.Name, command.Certificate));
 
     [HttpPost("consolidate")]
     public Task ConsolidateApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId) =>
-        _eventLog.Append(environmentId, new ApplicationEnvironmentConsolidated(applicationId));
+        _eventLog.Append(applicationId, new ApplicationEnvironmentConsolidationStarted(applicationId, environmentId, ApplicationEnvironmentConsolidationId.New()));
 }

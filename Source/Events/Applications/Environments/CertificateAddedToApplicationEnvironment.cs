@@ -6,4 +6,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments;
 
 [EventType("ff757985-016c-4074-8c5c-6d5e5da3e03e")]
-public record CertificateAddedToApplicationEnvironment(CertificateId CertificateId, CertificateName Name, Certificate Certificate);
+public record CertificateAddedToApplicationEnvironment(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, CertificateId CertificateId, CertificateName Name, Certificate Certificate);
