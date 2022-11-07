@@ -12,16 +12,14 @@ public record DeployablesProjection : IProjectionFor<Deployable>
     public void Define(IProjectionBuilderFor<Deployable> builder) => builder
         .From<DeployableCreated>(_ => _
             .UsingCompositeKey<DeployableKey>(key => key
-                .Set(k => k.ApplicationId).To(e => e.ApplicationId)
-                .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
+                .Set(k => k.EnvironmentId).ToEventSourceId()
                 .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)
-                .Set(k => k.DeployableId).ToEventSourceId())
+                .Set(k => k.DeployableId).To(e => e.DeployableId))
             .Set(m => m.Name).To(e => e.Name))
         .From<DeployableImageChanged>(_ => _
             .UsingCompositeKey<DeployableKey>(key => key
-                .Set(k => k.ApplicationId).To(e => e.ApplicationId)
-                .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
+                .Set(k => k.EnvironmentId).ToEventSourceId()
                 .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)
-                .Set(k => k.DeployableId).ToEventSourceId())
+                .Set(k => k.DeployableId).To(e => e.DeployableId))
             .Set(m => m.Image).To(e => e.Image));
 }

@@ -8,6 +8,7 @@ namespace Read.Applications;
 public record EnvironmentOnApplication(
     ApplicationEnvironmentId EnvironmentId,
     ApplicationEnvironmentName Name,
+    ApplicationEnvironmentConsolidationStatus Status,
     DateTimeOffset LastUpdated,
     DateTimeOffset LastConsolidationStarted,
     DateTimeOffset LastConsolidation,

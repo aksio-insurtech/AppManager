@@ -15,17 +15,20 @@ public class ApplicationEnvironmentConsolidationProjection : IProjectionFor<Appl
                     .Set(k => k.ApplicationId).ToEventSourceId()
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.InProgress)
                 .Set(m => m.Started).ToEventContextProperty(c => c.Occurred))
             .From<ApplicationEnvironmentConsolidationFailed>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
                     .Set(k => k.ApplicationId).ToEventSourceId()
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Failed)
                 .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred))
             .From<ApplicationEnvironmentConsolidationCompleted>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
                     .Set(k => k.ApplicationId).ToEventSourceId()
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Completed)
                 .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred));
 }

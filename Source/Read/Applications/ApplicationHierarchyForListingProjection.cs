@@ -23,20 +23,23 @@ public class ApplicationHierarchyForListingProjection : IProjectionFor<Applicati
             .IdentifiedBy(m => m.EnvironmentId)
 
             .From<ApplicationEnvironmentConsolidationStarted>(_ => _
-                .UsingKey(e => e.EnvironmentId)
+                .UsingParentKey(e => e.ApplicationId)
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.InProgress)
                 .Set(m => m.LastConsolidationStarted).ToEventContextProperty(c => c.Occurred))
             .From<ApplicationEnvironmentConsolidationFailed>(_ => _
-                .UsingKey(e => e.EnvironmentId)
+                .UsingParentKey(e => e.ApplicationId)
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Failed)
                 .Set(m => m.LastConsolidation).ToEventContextProperty(c => c.Occurred))
             .From<ApplicationEnvironmentConsolidationCompleted>(_ => _
-                .UsingKey(e => e.EnvironmentId)
+                .UsingParentKey(e => e.ApplicationId)
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Completed)
                 .Set(m => m.LastConsolidation).ToEventContextProperty(c => c.Occurred))
 
             .From<EnvironmentVariableSetForApplicationEnvironment>(_ => _
-                .UsingKey(e => e.EnvironmentId))
+                .UsingParentKey(e => e.ApplicationId))
 
             .From<ApplicationEnvironmentCreated>(_ => _
-                .UsingKey(e => e.EnvironmentId)
+                .UsingParentKey(e => e.ApplicationId)
                 .Set(m => m.Name).To(e => e.Name))
             .Children(_ => _.Tenants, _ => _
                 .IdentifiedBy(m => m.TenantId)

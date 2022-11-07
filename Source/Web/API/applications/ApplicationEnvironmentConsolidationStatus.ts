@@ -2,14 +2,9 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { field } from '@aksio/cratis-fundamentals';
-
-
-export class MicroserviceKey {
-
-    @field(String)
-    environmentId!: string;
-
-    @field(String)
-    microserviceId!: string;
+export enum ApplicationEnvironmentConsolidationStatus {
+    none = 0,
+    inProgress = 1,
+    failed = 2,
+    completed = 3,
 }

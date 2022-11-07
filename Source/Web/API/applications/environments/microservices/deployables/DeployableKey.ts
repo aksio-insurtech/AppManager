@@ -8,9 +8,6 @@ import { field } from '@aksio/cratis-fundamentals';
 export class DeployableKey {
 
     @field(String)
-    applicationId!: string;
-
-    @field(String)
     environmentId!: string;
 
     @field(String)

@@ -6,4 +6,4 @@ using Concepts.Applications.Environments;
 
 namespace Read.Applications;
 
-public record DeployableKey(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId);
+public record DeployableKey(ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId);

@@ -12,9 +12,8 @@ public class MicroservicesProjection : IProjectionFor<Microservice>
     public void Define(IProjectionBuilderFor<Microservice> builder) => builder
         .From<MicroserviceCreated>(_ => _
             .UsingCompositeKey<MicroserviceKey>(key => key
-                .Set(k => k.ApplicationId).To(e => e.ApplicationId)
-                .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
-                .Set(k => k.MicroserviceId).ToEventSourceId())
+                .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)
+                .Set(k => k.EnvironmentId).ToEventSourceId())
             .Set(m => m.Name).To(e => e.Name))
         .RemovedWith<MicroserviceRemoved>();
 }

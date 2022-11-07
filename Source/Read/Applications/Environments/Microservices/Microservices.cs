@@ -25,7 +25,7 @@ public class Microservices : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId)
     {
-        var result = await _microserviceCollection.FindAsync(_ => _.Id.ApplicationId == applicationId && _.Id.EnvironmentId == environmentId);
+        var result = await _microserviceCollection.FindAsync(_ => _.Id.EnvironmentId == environmentId);
         return result.ToEnumerable();
     }
 
@@ -35,7 +35,6 @@ public class Microservices : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId) =>
         _microserviceCollection.Find(_ =>
-            _.Id.ApplicationId == applicationId &&
             _.Id.EnvironmentId == environmentId &&
             _.Id.MicroserviceId == microserviceId).FirstOrDefaultAsync();
 

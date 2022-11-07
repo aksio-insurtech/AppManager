@@ -26,7 +26,6 @@ public class Deployables : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId) =>
             _deployableCollection.Observe(_ =>
-                _.Id.ApplicationId == applicationId &&
                 _.Id.EnvironmentId == environmentId &&
                 _.Id.MicroserviceId == microserviceId);
 

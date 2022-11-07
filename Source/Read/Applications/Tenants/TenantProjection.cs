@@ -11,7 +11,7 @@ public class TenantProjection : IProjectionFor<Tenant>
 
     public void Define(IProjectionBuilderFor<Tenant> builder) => builder
         .From<TenantAddedToApplicationEnvironment>(_ => _
-            .Set(m => m.EnvironmentId).To(e => e.EnvironmentId)
+            .Set(m => m.EnvironmentId).ToEventSourceId()
             .Set(m => m.Name).To(e => e.Name)
             .Set(m => m.ShortName).To(e => e.ShortName));
 }

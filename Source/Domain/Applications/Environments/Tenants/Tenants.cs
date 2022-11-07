@@ -17,5 +17,5 @@ public class Tenants : Controller
     public Task AddTenant(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
-        [FromBody] AddTenant command) => _eventLog.Append(applicationId, new TenantAddedToApplicationEnvironment(applicationId, environmentId, command.TenantId, command.Name, command.ShortName));
+        [FromBody] AddTenant command) => _eventLog.Append(environmentId, new TenantAddedToApplicationEnvironment(command.TenantId, command.Name, command.ShortName));
 }

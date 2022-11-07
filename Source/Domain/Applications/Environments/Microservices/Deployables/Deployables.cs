@@ -19,7 +19,7 @@ public class Deployables : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
-        [FromBody] CreateDeployable command) => _eventLog.Append(applicationId, new DeployableCreated(applicationId, environmentId, microserviceId, command.DeployableId, command.Name));
+        [FromBody] CreateDeployable command) => _eventLog.Append(environmentId, new DeployableCreated(microserviceId, command.DeployableId, command.Name));
 
     [HttpPost("with-image")]
     public async Task CreateDeployableWithImage(
@@ -28,7 +28,7 @@ public class Deployables : Controller
         [FromRoute] MicroserviceId microserviceId,
         [FromBody] CreateDeployableWithImage command)
     {
-        await _eventLog.Append(applicationId, new DeployableCreated(applicationId, environmentId, microserviceId, command.DeployableId, command.Name));
-        await _eventLog.Append(applicationId, new DeployableImageChanged(applicationId, environmentId, microserviceId, command.DeployableId, command.Image));
+        await _eventLog.Append(environmentId, new DeployableCreated(microserviceId, command.DeployableId, command.Name));
+        await _eventLog.Append(environmentId, new DeployableImageChanged(microserviceId, command.DeployableId, command.Image));
     }
 }

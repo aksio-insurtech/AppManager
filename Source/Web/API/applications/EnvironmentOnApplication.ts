@@ -4,6 +4,7 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { ApplicationEnvironmentConsolidationStatus } from './ApplicationEnvironmentConsolidationStatus';
 import { TenantInEnvironment } from './TenantInEnvironment';
 import { IngressInEnvironment } from './IngressInEnvironment';
 import { MicroserviceInEnvironment } from './MicroserviceInEnvironment';
@@ -15,6 +16,9 @@ export class EnvironmentOnApplication {
 
     @field(String)
     name!: string;
+
+    @field(Number)
+    status!: ApplicationEnvironmentConsolidationStatus;
 
     @field(Date)
     lastUpdated!: Date;

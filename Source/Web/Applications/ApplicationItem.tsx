@@ -57,12 +57,16 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
         }
     );
 
+    console.log(props.environmentId);
+
     const [consolidateApplicationEnvironment] = ConsolidateApplicationEnvironment.use({
         applicationId: props.application.id, environmentId: props.environmentId
     });
 
     const currentEnvironment = props.application.environments.find(_ => _.environmentId === props.environmentId);
     const hasChanged = currentEnvironment?.lastConsolidationStarted.toString() !== currentEnvironment?.lastUpdated.toString();
+
+    console.log(currentEnvironment?.status);
 
     return (
         <ListItem component="div" disablePadding>

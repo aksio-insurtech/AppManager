@@ -18,5 +18,5 @@ public class Ingresses : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] CreateIngress createIngress) =>
-        _eventLog.Append(applicationId, new IngressCreated(environmentId, createIngress.IngressId, createIngress.Name));
+        _eventLog.Append(environmentId, new IngressCreated(createIngress.IngressId, createIngress.Name));
 }

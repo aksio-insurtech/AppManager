@@ -7,4 +7,5 @@ public record ApplicationEnvironmentConsolidation(
     ApplicationEnvironmentConsolidationKey Id,
     DateTimeOffset Started,
     DateTimeOffset CompletedOrFailed,
+    ApplicationEnvironmentConsolidationStatus Status,
     string Log);

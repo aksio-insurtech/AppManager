@@ -30,8 +30,7 @@ public class Ingress : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] IngressId ingressId,
         [FromBody] DefineRoute @command) =>
-        _eventLog.Append(applicationId, new RouteDefinedOnIngress(
-            environmentId,
+        _eventLog.Append(environmentId, new RouteDefinedOnIngress(
             ingressId,
             @command.Path,
             @command.TargetMicroservice,
@@ -43,5 +42,5 @@ public class Ingress : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] IngressId ingressId,
         [FromBody] AddCustomDomainToIngress command) =>
-         _eventLog.Append(applicationId, new CustomDomainAddedToIngress(environmentId, ingressId, command.Domain, command.CertificateId));
+         _eventLog.Append(environmentId, new CustomDomainAddedToIngress(ingressId, command.Domain, command.CertificateId));
 }

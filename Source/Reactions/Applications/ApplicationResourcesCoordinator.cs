@@ -38,8 +38,12 @@ public class ApplicationResourcesCoordinator
     public async Task ConsolidationStarted(ApplicationEnvironmentConsolidationStarted @event, EventContext context)
     {
         var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = application.GetEnvironmentById(context.EventSourceId);
-        _logger.ConsolidationStarted(environment.Name, application.Name);
+        var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(context.EventSourceId);
+
+        Console.WriteLine(application);
+        Console.WriteLine(environment);
+
+        // _logger.ConsolidationStarted(environment.Name, application.Name);
         await Task.Delay(5000);
         await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
     }
