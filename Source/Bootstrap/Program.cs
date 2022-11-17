@@ -4,6 +4,7 @@
 using System.Text.Json;
 using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
+using Concepts;
 using Concepts.Azure;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
@@ -24,11 +25,13 @@ public static class Program
         }
 
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
+        var serializerOptions = Globals.JsonSerializerOptions;
+        serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
 
         // Setup application within cloud environment
         // Wait till its ready and then append the events that represents the actions done (through commands?)
         var configAsJson = await File.ReadAllTextAsync(args[0]);
-        var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, Globals.JsonSerializerOptions)!;
+        var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, serializerOptions)!;
 
         var settings = new Settings(
             new AzureSubscription[] { config.Azure.Subscription },
@@ -40,7 +43,7 @@ public static class Program
             config.Azure.ServicePrincipal);
 
         var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync("./AppManager.json");
-        var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, Globals.JsonSerializerOptions)!;
+        var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
         applicationAndEnvironment = await ApplyConfigAndVariables(applicationAndEnvironment, config);
         var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name);
 
@@ -120,6 +123,7 @@ public static class Program
             development,
             microservice);
 #endif
+
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();
         // try
