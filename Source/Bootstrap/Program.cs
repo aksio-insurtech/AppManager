@@ -4,30 +4,17 @@
 using System.Text.Json;
 using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
-using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Concepts.Azure;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
-using Pulumi.Automation;
-using Pulumi.AzureNative.App;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Read.Settings;
-using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Bootstrap;
 
 public static class Program
 {
-    static readonly JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters =
-                {
-                    new ConceptAsJsonConverterFactory()
-                }
-    };
-
     public static async Task Main(string[] args)
     {
         if (args.Length == 0)
@@ -41,11 +28,7 @@ public static class Program
         // Setup application within cloud environment
         // Wait till its ready and then append the events that represents the actions done (through commands?)
         var configAsJson = await File.ReadAllTextAsync(args[0]);
-
-        var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, _jsonSerializerOptions)!;
-
-        var dockerHub = new DockerHub();
-        var cratisVersion = await dockerHub.GetLastVersionOfCratis();
+        var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, Globals.JsonSerializerOptions)!;
 
         var settings = new Settings(
             new AzureSubscription[] { config.Azure.Subscription },
@@ -56,68 +39,15 @@ public static class Program
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
 
-        var aksioTenant = (TenantId)"d92e197b-7dcb-4893-a762-df334665f0d2";
-        var gammaId = (MicroserviceId)"8c538618-2862-4018-b29d-17a4ec131958";
-        var applicationId = (ApplicationId)"1091c7d3-f533-420d-abc0-bbb7f0defd66";
-
-        var ingress = new Ingress(
-            Guid.Parse("6173e1f6-edee-423e-943a-e4bbc90349ce"),
-            "main",
-            new[] { new Route("/", gammaId, "/") },
-            new[]
-            {
-                new IdentityProvider(
-                "7a36bbc9-de76-4d83-9ea3-eaab9896cbd8",
-                "Azure AD",
-                IdentityProviderType.Azure,
-                config.Authentication.ClientId,
-                config.Authentication.ClientSecret)
-            });
-        IngressResult? ingressResult = default;
-
-        var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
-        var microservice = new Microservice(
-            gammaId,
-            applicationId,
-            "Gamma",
-            new Deployable[]
-            {
-                new Deployable(
-                    Guid.Parse("439b3c29-759b-4a03-92a7-d36a59be9ade"),
-                    gammaId,
-                    "main",
-                    $"docker.io/aksioinsurtech/app-manager:{appManagerVersion}",
-                    new[] { 80 })
-            });
-
-        var development = new ApplicationEnvironmentWithArtifacts(
-            Guid.Parse("00126dcd-8d1e-42c3-835b-7978a545ec5c"),
-            "Development",
-            "dev",
-            "D",
-            cratisVersion,
-            config.Azure.Subscription.SubscriptionId,
-            config.CloudLocation,
-            new(
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
-            new[] { new Tenant(aksioTenant, "Aksio Insurtech") },
-            new[] { ingress },
-            new[] { microservice });
-
-        var application = new Application(
-            applicationId,
-            "AppManager",
-            new[] { development });
+        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync("./AppManager.json");
+        var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, Globals.JsonSerializerOptions)!;
+        applicationAndEnvironment = await ApplyConfigAndVariables(applicationAndEnvironment, config);
+        var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name);
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
-        var executionContext = new ExecutionContext(Aksio.Cratis.Execution.MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
+        var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
+        executionContextManager.Set(executionContext);
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
@@ -125,16 +55,21 @@ public static class Program
         var stacksForApplications = new BootstrapStacksForApplications();
         var stacksForMicroservices = new BootstrapStacksForMicroservices(application.Id);
         var operations = new PulumiOperations(
-            loggerFactory.CreateLogger<PulumiOperations>(),
             settings,
+            executionContextManager,
+            definitions,
             stacksForApplications,
-            stacksForMicroservices);
+            stacksForMicroservices,
+            loggerFactory.CreateLogger<PulumiOperations>());
 
+        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment);
+
+#if false
+        IngressResult? ingressResult = default;
         ApplicationEnvironmentResult? applicationEnvironmentResult = default;
 
         await operations.Up(
             application,
-            config.Name,
             PulumiFn.Create(async () =>
             {
                 applicationEnvironmentResult = await definitions.ApplicationEnvironment(executionContext, application, development, cratisVersion);
@@ -151,7 +86,6 @@ public static class Program
 
         await operations.Up(
             application,
-            $"{config.Name}-{microservice.Name}",
             PulumiFn.Create(async () =>
             {
                 if (applicationEnvironmentResult is null)
@@ -185,7 +119,7 @@ public static class Program
             }),
             development,
             microservice);
-
+#endif
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();
         // try
@@ -211,5 +145,49 @@ public static class Program
         // }
         Console.WriteLine("Waiting...");
         Console.ReadLine();
+    }
+
+    static async Task<ApplicationAndEnvironment> ApplyConfigAndVariables(ApplicationAndEnvironment applicationAndEnvironment, ManagementConfig config)
+    {
+        var dockerHub = new DockerHub();
+        var cratisVersion = await dockerHub.GetLastVersionOfCratis();
+        var identityProvider = applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.First();
+        return applicationAndEnvironment with
+        {
+            Environment = applicationAndEnvironment.Environment with
+            {
+                CratisVersion = cratisVersion,
+                Resources = new(
+                    null!,
+                    null!,
+                    null!,
+                    null!,
+                    null!,
+                    null!,
+                    new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
+
+                Certificates = new[]
+                {
+                    applicationAndEnvironment.Environment.Certificates.First() with
+                    {
+                        Value = config.Certificate
+                    }
+                },
+                Ingresses = new[]
+                {
+                    applicationAndEnvironment.Environment.Ingresses.First() with
+                    {
+                        IdentityProviders = new[]
+                        {
+                            identityProvider with
+                            {
+                                ClientId = config.Authentication.ClientId,
+                                ClientSecret = config.Authentication.ClientSecret
+                            }
+                        }
+                    }
+                }
+            }
+        };
     }
 }

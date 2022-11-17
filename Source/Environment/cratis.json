@@ -8,7 +8,7 @@
         }
     },
     "microservices": {
-        "39149c39-4fc7-4b93-ab6e-22b99ba12202": {
+        "8c538618-2862-4018-b29d-17a4ec131958": {
             "name": "Management"
         }
     },
@@ -26,7 +26,7 @@
             "connectionDetails": "mongodb://localhost:27017/cratis-shared"
         },
         "microservices": {
-            "39149c39-4fc7-4b93-ab6e-22b99ba12202": {
+            "8c538618-2862-4018-b29d-17a4ec131958": {
                 "shared": {
                     "eventStore": {
                         "type": "MongoDB",

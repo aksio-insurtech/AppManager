@@ -7,7 +7,6 @@ namespace Reactions.Applications;
 
 public record Microservice(
     MicroserviceId Id,
-    ApplicationId ApplicationId,
     MicroserviceName Name,
     IEnumerable<Deployable> Deployables)
 {

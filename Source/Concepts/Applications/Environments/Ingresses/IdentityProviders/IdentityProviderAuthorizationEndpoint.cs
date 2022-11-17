@@ -3,9 +3,4 @@
 
 namespace Concepts.Applications.Environments.Ingresses.IdentityProviders;
 
-public enum IdentityProviderType
-{
-    None = 0,
-    Azure = 1,
-    IdPorten = 2
-}
+public record IdentityProviderAuthorizationEndpoint(string Value) : ConceptAs<string>(Value);

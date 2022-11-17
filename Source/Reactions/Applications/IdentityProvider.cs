@@ -5,4 +5,11 @@ using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 
 namespace Reactions.Applications;
 
-public record IdentityProvider(IdentityProviderId Id, IdentityProviderName Name, IdentityProviderType Type, IdentityProviderClientId ClientId, IdentityProviderClientSecret Secret);
+public record IdentityProvider(
+    IdentityProviderId Id,
+    IdentityProviderName Name,
+    IdentityProviderType Type,
+    IdentityProviderClientId ClientId,
+    IdentityProviderClientSecret ClientSecret,
+    IdentityProviderAuthorizationEndpoint AuthorizationEndpoint,
+    IdentityProviderTokenEndpoint TokenEndpoint);

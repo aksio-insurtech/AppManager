@@ -43,7 +43,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
         var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
 
-        var microservice = new Microservice(Guid.Empty, application.Id, "kernel", new Deployable[]
+        var microservice = new Microservice(Guid.Empty, "kernel", new Deployable[]
         {
             new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 })
         });

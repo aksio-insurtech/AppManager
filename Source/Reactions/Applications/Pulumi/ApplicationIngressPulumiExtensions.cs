@@ -99,7 +99,7 @@ public static class ApplicationIngressPulumiExtensions
                 Secrets = ingress.IdentityProviders.Select(idp => new SecretArgs
                 {
                     Name = GetSecretNameForIdentityProvider(idp),
-                    Value = idp.Secret?.Value ?? string.Empty
+                    Value = idp.ClientSecret?.Value ?? string.Empty
                 }).ToList()
             },
             Template = new TemplateArgs
