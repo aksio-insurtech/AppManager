@@ -3,7 +3,7 @@
 
 namespace Concepts.Applications.Environments;
 
-public record Certificate(string Value) : ConceptAs<string>(Value)
+public record CertificateValue(string Value) : ConceptAs<string>(Value)
 {
-    public static implicit operator Certificate(string value) => new(value);
+    public static implicit operator CertificateValue(string value) => new(value);
 }

@@ -41,12 +41,27 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                 .Set(m => m.UserName).To(e => e.UserName)
                 .Set(m => m.Password).To(e => e.Password)))
 
+        // Certificates
+        .Children(m => m.Certificates, _ => _
+            .IdentifiedBy(m => m.Id)
+            .From<CertificateAddedToApplicationEnvironment>(_ => _
+                .UsingKey(e => e.CertificateId)
+                .Set(m => m.Name).To(e => e.Name)
+                .Set(m => m.Value).To(e => e.Value)))
+
         // Tenants
         .Children(m => m.Tenants, _ => _
             .IdentifiedBy(m => m.Id)
             .From<TenantAddedToApplicationEnvironment>(_ => _
                 .UsingKey(e => e.TenantId)
-                .Set(m => m.Name).To(e => e.Name)))
+                .Set(m => m.Name).To(e => e.Name))
+            .From<DomainAssociatedWithTenant>(_ => _
+                .UsingKey(e => e.TenantId)
+                .Set(m => m.Domain).To(e => e.Domain)
+                .Set(m => m.CertificateId).To(e => e.CertificateId))
+            .From<OnBehalfOfSetForTenant>(_ => _
+                .UsingKey(e => e.TenantId)
+                .Set(m => m.OnBehalfOf).To(e => e.OnBehalfOf)))
 
         // Ingresses
         .Children(m => m.Ingresses, _ => _

@@ -3,6 +3,6 @@
 
 using Concepts.Applications.Environments;
 
-namespace Domain.Applications.Environments;
+namespace Reactions.Applications;
 
-public record AddCertificateToApplicationEnvironment(CertificateId CertificateId, CertificateName Name, CertificateValue Certificate);
+public record Certificate(CertificateId Id, CertificateName Name, CertificateValue Value);

@@ -18,6 +18,7 @@ public record ApplicationEnvironmentWithArtifacts(
     AzureSubscriptionId AzureSubscriptionId,
     CloudLocationKey CloudLocation,
     ApplicationResources Resources,
+    IEnumerable<Certificate> Certificates,
     IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,
     IEnumerable<Microservice> Microservices) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
