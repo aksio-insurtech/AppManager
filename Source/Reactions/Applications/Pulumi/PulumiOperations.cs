@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Aksio.Cratis.Execution;
 using Common;
 using Concepts.Applications.Environments;
 using Infrastructure;
@@ -22,29 +23,51 @@ public class PulumiOperations : IPulumiOperations
 {
     readonly ILogger<PulumiOperations> _logger;
     readonly ISettings _settings;
+    readonly IExecutionContextManager _executionContextManager;
+    readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IStacksForApplications _stacksForApplications;
     readonly IStacksForMicroservices _stacksForMicroservices;
 
     public PulumiOperations(
-        ILogger<PulumiOperations> logger,
         ISettings applicationSettings,
+        IExecutionContextManager executionContextManager,
+        IPulumiStackDefinitions stackDefinitions,
         IStacksForApplications stacksForApplications,
-        IStacksForMicroservices stacksForMicroservices)
+        IStacksForMicroservices stacksForMicroservices,
+        ILogger<PulumiOperations> logger)
     {
         _logger = logger;
         _settings = applicationSettings;
+        _executionContextManager = executionContextManager;
+        _stackDefinitions = stackDefinitions;
         _stacksForApplications = stacksForApplications;
         _stacksForMicroservices = stacksForMicroservices;
     }
 
+    /// <summary>
+    /// Get the Pulumi project name for a microservice on an application.
+    /// </summary>
+    /// <param name="application">Application to get for.</param>
+    /// <param name="microservice">Microservice to get for.</param>
+    /// <returns>Correct Pulumi project name.</returns>
+    public static string GetProjectNameFor(Application application, Microservice? microservice = null)
+    {
+        if (microservice is not null)
+        {
+            return $"{application.Name}-{microservice.Name}";
+        }
+
+        return application.Name.Value;
+    }
+
     /// <inheritdoc/>
-    public async Task Up(Application application, string projectName, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Up(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         _logger.UppingStack();
 
         try
         {
-            var stack = await CreateStack(application, projectName, environment, definition, microservice);
+            var stack = await CreateStack(application, environment, definition, microservice);
             await RefreshStack(stack);
 
             _logger.PuttingUpStack();
@@ -65,11 +88,11 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Down(Application application, string projectName, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Down(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         try
         {
-            var stack = await CreateStack(application, projectName, environment, definition, microservice);
+            var stack = await CreateStack(application, environment, definition, microservice);
             await RefreshStack(stack);
 
             _logger.TakingDownStack();
@@ -86,13 +109,13 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Remove(Application application, string projectName, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Remove(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         _logger.StackBeingRemoved();
 
         try
         {
-            var stack = await CreateStack(application, projectName, environment, definition, microservice);
+            var stack = await CreateStack(application, environment, definition, microservice);
             await RefreshStack(stack);
 
             _logger.RemovingStack();
@@ -109,7 +132,7 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task SetTag(string projectName, ApplicationEnvironmentWithArtifacts environment, string tagName, string value)
+    public async Task SetTag(Application application, ApplicationEnvironmentWithArtifacts environment, string tagName, string value)
     {
         var stackName = environment.DisplayName;
         var payload = new
@@ -117,7 +140,7 @@ public class PulumiOperations : IPulumiOperations
             name = tagName,
             value
         };
-
+        var projectName = GetProjectNameFor(application);
         var url = $"https://api.pulumi.com/api/stacks/{_settings.PulumiOrganization}/{projectName}/{stackName}/tags";
         var client = new HttpClient();
         client.DefaultRequestHeaders.Accept.Clear();
@@ -127,7 +150,49 @@ public class PulumiOperations : IPulumiOperations
         await client.PostAsJsonAsync(url, payload);
     }
 
-    async Task<WorkspaceStack> CreateStack(Application application, string projectName, ApplicationEnvironmentWithArtifacts environment, PulumiFn program, Microservice? microservice = default)
+    /// <inheritdoc/>
+    public async Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment)
+    {
+        ApplicationEnvironmentResult? applicationEnvironmentResult = default;
+        var executionContext = _executionContextManager.Current;
+
+        await Up(
+            application,
+            PulumiFn.Create(async () =>
+            {
+                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, environment.CratisVersion);
+                environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
+
+                foreach (var ingress in environment.Ingresses)
+                {
+                    await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult.ResourceGroup);
+                }
+            }),
+            environment);
+
+        foreach (var microservice in environment.Microservices)
+        {
+            await Up(
+                application,
+                PulumiFn.Create(async () =>
+                {
+                    var resourceGroup = application.GetResourceGroup(environment);
+                    var storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
+                    var microserviceResult = await _stackDefinitions.Microservice(
+                        executionContext,
+                        application,
+                        microservice,
+                        environment,
+                        false,
+                        resourceGroup: resourceGroup,
+                        deployables: microservice.Deployables);
+                }),
+                environment,
+                microservice);
+        }
+    }
+
+    async Task<WorkspaceStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, PulumiFn program, Microservice? microservice = default)
     {
         _logger.CreatingStack(application.Name);
         var stackName = environment.DisplayName;
@@ -137,6 +202,8 @@ public class PulumiOperations : IPulumiOperations
 
         var mongoDBPublicKey = _settings.MongoDBPublicKey;
         var mongoDBPrivateKey = _settings.MongoDBPrivateKey;
+
+        var projectName = GetProjectNameFor(application, microservice);
 
         var args = new InlineProgramArgs(projectName, stackName, program)
         {
@@ -192,8 +259,8 @@ public class PulumiOperations : IPulumiOperations
                 { "azure-native:tenantId", new ConfigValue(_settings.AzureSubscriptions.First().TenantId) }
             });
 
-        await SetTag(projectName, environment, "application", application.Name);
-        await SetTag(projectName, environment, "environment", stackName);
+        await SetTag(application, environment, "application", application.Name);
+        await SetTag(application, environment, "environment", stackName);
 
         return stack;
     }
