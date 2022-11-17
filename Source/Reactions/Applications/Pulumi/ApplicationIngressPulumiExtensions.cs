@@ -25,11 +25,12 @@ public static class ApplicationIngressPulumiExtensions
         Ingress ingress,
         Storage storage,
         FileShare fileShare,
+        AuthIngressTemplateContent templateContent,
         ILogger<FileStorage> fileStorageLogger)
     {
         var nginxFileShareName = await fileShare.Name.GetValue();
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
-        var nginxContent = TemplateTypes.IngressMiddlewareConfig(new AuthIngressTemplateContent(string.Empty, string.Empty));
+        var nginxContent = TemplateTypes.IngressMiddlewareConfig(templateContent);
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
     }
 
@@ -100,12 +101,24 @@ public static class ApplicationIngressPulumiExtensions
             }
         });
 
-        _ = SetupAuthIngress(resourceGroup, managedEnvironment, ingress, tags, storageName);
         var compositionContainerApp = SetupCompositionIngress(resourceGroup, managedEnvironment, ingress, tags, storageName);
-        var ingressConfig = await compositionContainerApp.Configuration.GetValue();
+
+        var compositionIngressConfig = await compositionContainerApp.Configuration.GetValue();
+
         var fileShareId = await nginxFileShare.Id.GetValue();
         SetupAuthenticationForIngress(environment, resourceGroup, compositionContainerApp, ingress);
-        return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, compositionContainerApp);
+
+        var authContainerApp = SetupAuthIngress(resourceGroup, managedEnvironment, ingress, tags, storageName);
+        var authIngressConfig = await authContainerApp.Configuration.GetValue();
+        await application.ConfigureAuthIngress(
+            resourceGroup,
+            ingress,
+            storage,
+            nginxFileShare,
+            new AuthIngressTemplateContent($"https://{authIngressConfig!.Ingress!.Fqdn}", $"https://{compositionIngressConfig!.Ingress!.Fqdn}"),
+            fileStorageLogger);
+
+        return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, compositionContainerApp);
     }
 
     static ContainerApp SetupAuthIngress(ResourceGroup resourceGroup, ManagedEnvironment managedEnvironment, Ingress ingress, Tags tags, string storageName) =>
@@ -134,26 +147,29 @@ public static class ApplicationIngressPulumiExtensions
                                 StorageType = StorageType.AzureFile
                             }
                         },
-                Containers = new ContainerArgs
+                Containers = new ContainerArgs[]
                 {
-                    Name = "nginx",
-                    Image = "nginx",
-                    Command =
-                        {
-                            "nginx",
-                            "-c",
-                            $"/config/{AuthConfigFile}",
-                            "-g",
-                            "daemon off;"
-                        },
-                    VolumeMounts = new VolumeMountArgs[]
+                    new ContainerArgs
+                    {
+                        Name = "nginx",
+                        Image = "nginx",
+                        Command =
                             {
-                            new()
-                            {
-                                MountPath = "/config",
-                                VolumeName = storageName
-                            }
-                            }
+                                "nginx",
+                                "-c",
+                                $"/config/{AuthConfigFile}",
+                                "-g",
+                                "daemon off;"
+                            },
+                        VolumeMounts = new VolumeMountArgs[]
+                                {
+                                    new()
+                                    {
+                                        MountPath = "/config",
+                                        VolumeName = storageName
+                                    }
+                                }
+                    }
                 },
                 Scale = new ScaleArgs
                 {
