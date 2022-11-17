@@ -1,10 +1,13 @@
 {
+    "id": "1091c7d3-f533-420d-abc0-bbb7f0defd66",
+    "name": "AppManager",
+
     "environment": {
         "id": "00126dcd-8d1e-42c3-835b-7978a545ec5c",
         "name": "Development",
         "displayName": "dev",
         "shortName": "D",
-        "cratisVersion": "6.17.2",
+        "cratisVersion": "6.17.1",
         "azureSubscriptionId": "00000000-0000-0000-0000-000000000000",
         "cloudLocation": "norwayeast",
         "certificates": [
@@ -34,11 +37,11 @@
                         "targetMicroservice": "8c538618-2862-4018-b29d-17a4ec131958"
                     }
                 ],
-                "identifyProviders": [
+                "identityProviders": [
                     {
                         "id": "7a36bbc9-de76-4d83-9ea3-eaab9896cbd8",
                         "name": "Azure AD",
-                        "type": "1",
+                        "type": 1,
                         "clientId": "",
                         "clientSecret": "",
                         "issuer": "",
