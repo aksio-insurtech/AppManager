@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -95,7 +95,7 @@ export class AddCertificateToApplicationEnvironment extends Command<IAddCertific
         this.propertyChanged('certificate');
     }
 
-    static use(initialValues?: IAddCertificateToApplicationEnvironment): [AddCertificateToApplicationEnvironment, SetCommandValues<IAddCertificateToApplicationEnvironment>] {
+    static use(initialValues?: IAddCertificateToApplicationEnvironment): [AddCertificateToApplicationEnvironment, SetCommandValues<IAddCertificateToApplicationEnvironment>, ClearCommandValues] {
         return useCommand<AddCertificateToApplicationEnvironment, IAddCertificateToApplicationEnvironment>(AddCertificateToApplicationEnvironment, initialValues);
     }
 }

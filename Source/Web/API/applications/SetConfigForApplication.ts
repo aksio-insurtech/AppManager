@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -70,7 +70,7 @@ export class SetConfigForApplication extends Command<ISetConfigForApplication> i
         this.propertyChanged('content');
     }
 
-    static use(initialValues?: ISetConfigForApplication): [SetConfigForApplication, SetCommandValues<ISetConfigForApplication>] {
+    static use(initialValues?: ISetConfigForApplication): [SetConfigForApplication, SetCommandValues<ISetConfigForApplication>, ClearCommandValues] {
         return useCommand<SetConfigForApplication, ISetConfigForApplication>(SetConfigForApplication, initialValues);
     }
 }

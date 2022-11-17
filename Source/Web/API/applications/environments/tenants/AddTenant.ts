@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -95,7 +95,7 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
         this.propertyChanged('shortName');
     }
 
-    static use(initialValues?: IAddTenant): [AddTenant, SetCommandValues<IAddTenant>] {
+    static use(initialValues?: IAddTenant): [AddTenant, SetCommandValues<IAddTenant>, ClearCommandValues] {
         return useCommand<AddTenant, IAddTenant>(AddTenant, initialValues);
     }
 }

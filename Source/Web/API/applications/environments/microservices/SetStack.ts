@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -108,7 +108,7 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
         this.propertyChanged('shortName');
     }
 
-    static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>] {
+    static use(initialValues?: ISetStack): [SetStack, SetCommandValues<ISetStack>, ClearCommandValues] {
         return useCommand<SetStack, ISetStack>(SetStack, initialValues);
     }
 }

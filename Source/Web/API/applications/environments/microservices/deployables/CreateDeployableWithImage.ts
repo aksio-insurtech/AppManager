@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -108,7 +108,7 @@ export class CreateDeployableWithImage extends Command<ICreateDeployableWithImag
         this.propertyChanged('image');
     }
 
-    static use(initialValues?: ICreateDeployableWithImage): [CreateDeployableWithImage, SetCommandValues<ICreateDeployableWithImage>] {
+    static use(initialValues?: ICreateDeployableWithImage): [CreateDeployableWithImage, SetCommandValues<ICreateDeployableWithImage>, ClearCommandValues] {
         return useCommand<CreateDeployableWithImage, ICreateDeployableWithImage>(CreateDeployableWithImage, initialValues);
     }
 }

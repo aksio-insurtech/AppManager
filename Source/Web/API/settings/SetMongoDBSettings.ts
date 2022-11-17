@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -69,7 +69,7 @@ export class SetMongoDBSettings extends Command<ISetMongoDBSettings> implements 
         this.propertyChanged('privateKey');
     }
 
-    static use(initialValues?: ISetMongoDBSettings): [SetMongoDBSettings, SetCommandValues<ISetMongoDBSettings>] {
+    static use(initialValues?: ISetMongoDBSettings): [SetMongoDBSettings, SetCommandValues<ISetMongoDBSettings>, ClearCommandValues] {
         return useCommand<SetMongoDBSettings, ISetMongoDBSettings>(SetMongoDBSettings, initialValues);
     }
 }

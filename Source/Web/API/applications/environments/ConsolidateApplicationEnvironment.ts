@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -59,7 +59,7 @@ export class ConsolidateApplicationEnvironment extends Command<IConsolidateAppli
         this.propertyChanged('environmentId');
     }
 
-    static use(initialValues?: IConsolidateApplicationEnvironment): [ConsolidateApplicationEnvironment, SetCommandValues<IConsolidateApplicationEnvironment>] {
+    static use(initialValues?: IConsolidateApplicationEnvironment): [ConsolidateApplicationEnvironment, SetCommandValues<IConsolidateApplicationEnvironment>, ClearCommandValues] {
         return useCommand<ConsolidateApplicationEnvironment, IConsolidateApplicationEnvironment>(ConsolidateApplicationEnvironment, initialValues);
     }
 }

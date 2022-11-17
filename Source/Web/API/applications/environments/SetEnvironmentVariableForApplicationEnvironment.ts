@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -83,7 +83,7 @@ export class SetEnvironmentVariableForApplicationEnvironment extends Command<ISe
         this.propertyChanged('value');
     }
 
-    static use(initialValues?: ISetEnvironmentVariableForApplicationEnvironment): [SetEnvironmentVariableForApplicationEnvironment, SetCommandValues<ISetEnvironmentVariableForApplicationEnvironment>] {
+    static use(initialValues?: ISetEnvironmentVariableForApplicationEnvironment): [SetEnvironmentVariableForApplicationEnvironment, SetCommandValues<ISetEnvironmentVariableForApplicationEnvironment>, ClearCommandValues] {
         return useCommand<SetEnvironmentVariableForApplicationEnvironment, ISetEnvironmentVariableForApplicationEnvironment>(SetEnvironmentVariableForApplicationEnvironment, initialValues);
     }
 }

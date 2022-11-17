@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -96,7 +96,7 @@ export class AddCustomDomainToIngress extends Command<IAddCustomDomainToIngress>
         this.propertyChanged('certificateId');
     }
 
-    static use(initialValues?: IAddCustomDomainToIngress): [AddCustomDomainToIngress, SetCommandValues<IAddCustomDomainToIngress>] {
+    static use(initialValues?: IAddCustomDomainToIngress): [AddCustomDomainToIngress, SetCommandValues<IAddCustomDomainToIngress>, ClearCommandValues] {
         return useCommand<AddCustomDomainToIngress, IAddCustomDomainToIngress>(AddCustomDomainToIngress, initialValues);
     }
 }

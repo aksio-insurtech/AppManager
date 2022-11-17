@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -57,7 +57,7 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
         this.propertyChanged('name');
     }
 
-    static use(initialValues?: ICreateApplication): [CreateApplication, SetCommandValues<ICreateApplication>] {
+    static use(initialValues?: ICreateApplication): [CreateApplication, SetCommandValues<ICreateApplication>, ClearCommandValues] {
         return useCommand<CreateApplication, ICreateApplication>(CreateApplication, initialValues);
     }
 }

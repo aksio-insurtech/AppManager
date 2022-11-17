@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -72,7 +72,7 @@ export class Remove extends Command<IRemove> implements IRemove {
         this.propertyChanged('microserviceId');
     }
 
-    static use(initialValues?: IRemove): [Remove, SetCommandValues<IRemove>] {
+    static use(initialValues?: IRemove): [Remove, SetCommandValues<IRemove>, ClearCommandValues] {
         return useCommand<Remove, IRemove>(Remove, initialValues);
     }
 }

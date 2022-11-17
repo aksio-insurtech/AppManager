@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues } from '@aksio/cratis-applications-frontend/commands';
+import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCommandValues, ClearCommandValues } from '@aksio/cratis-applications-frontend/commands';
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
@@ -81,7 +81,7 @@ export class AddAzureSubscription extends Command<IAddAzureSubscription> impleme
         this.propertyChanged('tenantName');
     }
 
-    static use(initialValues?: IAddAzureSubscription): [AddAzureSubscription, SetCommandValues<IAddAzureSubscription>] {
+    static use(initialValues?: IAddAzureSubscription): [AddAzureSubscription, SetCommandValues<IAddAzureSubscription>, ClearCommandValues] {
         return useCommand<AddAzureSubscription, IAddAzureSubscription>(AddAzureSubscription, initialValues);
     }
 }
