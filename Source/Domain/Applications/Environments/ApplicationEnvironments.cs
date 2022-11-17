@@ -34,6 +34,6 @@ public class ApplicationEnvironments : Controller
                 addEnvironment.AzureSubscriptionId,
                 addEnvironment.CloudLocation));
 
-        await _eventLog.Append(addEnvironment.EnvironmentId, new TenantAddedToApplicationEnvironment(TenantId.Development, "Development", "development"));
+        await _eventLog.Append(addEnvironment.EnvironmentId, new TenantAddedToApplicationEnvironment(TenantId.Development, "Development"));
     }
 }

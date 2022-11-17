@@ -13,6 +13,7 @@ export type AddTenantDialogOutput = {
 export const AddTenantDialog = (props: IModalProps<{}, AddTenantDialogOutput>) => {
     const [name, setName] = useState('');
     const [shortName, setShortName] = useState('');
+    const [domainName, setDomainName] = useState('');
 
     props.onClose(() => {
         return {
@@ -24,7 +25,6 @@ export const AddTenantDialog = (props: IModalProps<{}, AddTenantDialogOutput>) =
     return (
         <Stack direction="column" width={400} spacing={1}>
             <TextField label='Name' fullWidth required defaultValue={name} onChange={e => setName(e.currentTarget.value)} />
-            <TextField label='Short Name' fullWidth required defaultValue={shortName} onChange={e => setShortName(e.currentTarget.value)} />
         </Stack>
     );
 };

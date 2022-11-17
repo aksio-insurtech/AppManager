@@ -4,22 +4,12 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { TenantKey } from './TenantKey';
 
-export class Tenant {
-
-    @field(TenantKey)
-    id!: TenantKey;
+export class TenantKey {
 
     @field(String)
-    name!: string;
+    environmentId!: string;
 
     @field(String)
-    onBehalfOf!: string;
-
-    @field(String)
-    domain!: string;
-
-    @field(String)
-    certificateId!: string;
+    tenantId!: string;
 }

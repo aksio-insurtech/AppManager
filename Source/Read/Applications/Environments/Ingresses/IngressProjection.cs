@@ -13,11 +13,6 @@ public class IngressProjection : IProjectionFor<Ingress>
         .From<IngressCreated>(_ => _
             .UsingKey(e => e.IngressId)
             .Set(m => m.Name).To(e => e.Name))
-        .Children(m => m.CustomDomains, _ => _
-            .IdentifiedBy(m => m.Domain)
-            .From<CustomDomainAddedToIngress>(_ => _
-                .UsingKey(e => e.Domain)
-                .Set(m => m.CertificateId).To(e => e.CertificateId)))
         .Children(m => m.Routes, _ => _
             .IdentifiedBy(m => m.Path)
             .From<RouteDefinedOnIngress>(_ => _

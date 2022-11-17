@@ -6,5 +6,5 @@ using Concepts.Applications.Tenants;
 
 namespace Events.Applications.Environments;
 
-[EventType("8600851a-6143-4a7b-a255-33a33039d2fe")]
-public record TenantAddedToApplicationEnvironment(TenantId TenantId, TenantName Name);
+[EventType("e6ab276c-8620-4140-b9e2-8d4e60e75918")]
+public record OnBehalfOfSetForTenant(TenantId TenantId, OnBehalfOf OnBehalfOf);

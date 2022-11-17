@@ -23,7 +23,6 @@ import { Tenants } from './Tenants/Tenants';
 import { Ingress } from './Ingresses/Ingress';
 import { Cratis } from './Cratis/Cratis';
 import { EnvironmentForApplication } from 'API/applications/environments/EnvironmentForApplication';
-import { CustomDomains } from './Ingresses/CustomDomains/CustomDomains';
 import { Settings } from './ApplicationEnvironmentSettings/Settings';
 import { Certificates } from './Certificates/Certificates';
 

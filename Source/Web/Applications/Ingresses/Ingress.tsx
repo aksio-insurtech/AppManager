@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { Routes } from './Routes/Routes';
 import { IngressById } from 'API/applications/environments/ingresses/IngressById';
 import { useRouteParams } from '../RouteParams';
-import { CustomDomains } from './CustomDomains/CustomDomains';
 
 export const Ingress = () => {
     const { ingressId } = useRouteParams();
@@ -20,15 +19,13 @@ export const Ingress = () => {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={(e, value) => setSelectedTab(value)}>
                     <Tab label="General" value="0" />
-                    <Tab label="Custom Domains" value="1" />
-                    <Tab label="Authentication" value="2" />
-                    <Tab label="Routes" value="3" />
+                    <Tab label="Authentication" value="1" />
+                    <Tab label="Routes" value="2" />
                 </TabList>
             </Box>
             <TabPanel value="0"></TabPanel>
-            <TabPanel value="1"><CustomDomains ingress={ingress.data}/></TabPanel>
-            <TabPanel value="2"></TabPanel>
-            <TabPanel value="3"><Routes ingress={ingress.data}/></TabPanel>
+            <TabPanel value="1"></TabPanel>
+            <TabPanel value="2"><Routes ingress={ingress.data}/></TabPanel>
         </TabContext>
     );
 };

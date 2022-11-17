@@ -7,23 +7,21 @@ import { useState } from 'react';
 import { CertificatesForApplicationEnvironmentId } from 'API/applications/environments/CertificatesForApplicationEnvironmentId';
 
 
-export interface AddCustomDomainDialogInput {
+export interface AssociateDomainDialogInput {
     environmentId: string;
 }
 
-export type AddCustomDomainDialogOutput = {
+export type AssociateDomainDialogOutput = {
     domain: string;
     certificateId: string;
 };
 
-export const AddCustomDomainDialog = (props: IModalProps<AddCustomDomainDialogInput, AddCustomDomainDialogOutput>) => {
+export const AssociateDomainDialog = (props: IModalProps<AssociateDomainDialogInput, AssociateDomainDialogOutput>) => {
     const [domain, setDomain] = useState('');
     const [certificateId, setCertificateId] = useState<string>('');
 
     const [certificatesForEnvironment] = CertificatesForApplicationEnvironmentId.use({ environmentId: props.input!.environmentId });
     const certificates = certificatesForEnvironment.data?.certificates ?? [];
-
-    console.log(certificatesForEnvironment.data);
 
     props.onClose(() => {
         return {

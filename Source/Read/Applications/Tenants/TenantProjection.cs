@@ -11,7 +11,19 @@ public class TenantProjection : IProjectionFor<Tenant>
 
     public void Define(IProjectionBuilderFor<Tenant> builder) => builder
         .From<TenantAddedToApplicationEnvironment>(_ => _
-            .Set(m => m.EnvironmentId).ToEventSourceId()
-            .Set(m => m.Name).To(e => e.Name)
-            .Set(m => m.ShortName).To(e => e.ShortName));
+            .UsingCompositeKey<TenantKey>(_ => _
+                .Set(k => k.EnvironmentId).ToEventSourceId()
+                .Set(k => k.TenantId).To(e => e.TenantId))
+            .Set(m => m.Name).To(e => e.Name))
+        .From<OnBehalfOfSetForTenant>(_ => _
+            .UsingCompositeKey<TenantKey>(_ => _
+                .Set(k => k.EnvironmentId).ToEventSourceId()
+                .Set(k => k.TenantId).To(e => e.TenantId))
+            .Set(m => m.OnBehalfOf).To(e => e.OnBehalfOf))
+        .From<DomainAssociatedWithTenant>(_ => _
+            .UsingCompositeKey<TenantKey>(_ => _
+                .Set(k => k.EnvironmentId).ToEventSourceId()
+                .Set(k => k.TenantId).To(e => e.TenantId))
+            .Set(m => m.Domain).To(e => e.Domain)
+            .Set(m => m.CertificateId).To(e => e.CertificateId));
 }

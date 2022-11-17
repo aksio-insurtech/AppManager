@@ -45,19 +45,21 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
         .Children(m => m.Tenants, _ => _
             .IdentifiedBy(m => m.Id)
             .From<TenantAddedToApplicationEnvironment>(_ => _
-                .Set(m => m.Id).ToEventSourceId()
+                .UsingKey(e => e.TenantId)
                 .Set(m => m.Name).To(e => e.Name)))
 
         // Ingresses
         .Children(m => m.Ingresses, _ => _
             .IdentifiedBy(m => m.Id)
             .From<IngressCreated>(_ => _
+                .UsingKey(e => e.IngressId)
                 .Set(m => m.Name).To(e => e.Name))
 
             // Routes
             .Children(m => m.Routes, _ => _
                 .IdentifiedBy(m => m.Path)
                 .From<RouteDefinedOnIngress>(_ => _
+                    .UsingKey(e => e.Path)
                     .Set(m => m.Path).To(ev => ev.Path)
                     .Set(m => m.TargetMicroservice).To(ev => ev.TargetMicroservice)
                     .Set(m => m.TargetPath).To(ev => ev.TargetPath))))
@@ -66,15 +68,17 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
         .Children(m => m.Microservices, _ => _
             .IdentifiedBy(m => m.Id)
             .From<MicroserviceCreated>(_ => _
+                .UsingKey(e => e.MicroserviceId)
                 .Set(m => m.Name).To(e => e.Name))
 
             // Deployables
             .Children(m => m.Deployables, _ => _
                 .IdentifiedBy(m => m.Id)
                 .From<DeployableCreated>(_ => _
+                    .UsingKey(e => e.DeployableId)
                     .Set(m => m.MicroserviceId).To(e => e.MicroserviceId)
                     .Set(m => m.Name).To(e => e.Name))
                 .From<DeployableImageChanged>(_ => _
-                    .UsingParentKey(e => e.MicroserviceId)
+                    .UsingKey(e => e.DeployableId)
                     .Set(m => m.Image).To(e => e.Image))));
 }

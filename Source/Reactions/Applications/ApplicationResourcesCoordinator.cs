@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Aksio.Cratis.Execution;
 using Events.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications.Pulumi;
@@ -15,6 +16,7 @@ public class ApplicationResourcesCoordinator
     readonly ILogger<ApplicationResources> _logger;
     readonly IImmediateProjections _projections;
     readonly ExecutionContext _executionContext;
+    readonly IExecutionContextManager _executionContextManager;
     readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IPulumiOperations _pulumiOperations;
     readonly IEventLog _eventLog;
@@ -23,6 +25,7 @@ public class ApplicationResourcesCoordinator
         ILogger<ApplicationResources> logger,
         IImmediateProjections projections,
         ExecutionContext executionContext,
+        IExecutionContextManager executionContextManager,
         IPulumiStackDefinitions stackDefinitions,
         IPulumiOperations pulumiOperations,
         IEventLog eventLog)
@@ -30,6 +33,7 @@ public class ApplicationResourcesCoordinator
         _logger = logger;
         _projections = projections;
         _executionContext = executionContext;
+        _executionContextManager = executionContextManager;
         _stackDefinitions = stackDefinitions;
         _pulumiOperations = pulumiOperations;
         _eventLog = eventLog;
@@ -45,6 +49,9 @@ public class ApplicationResourcesCoordinator
 
         // _logger.ConsolidationStarted(environment.Name, application.Name);
         await Task.Delay(5000);
+
+        // Todo: Set to actual execution context - might not be the right place for this!
+        _executionContextManager.Set(_executionContext);
         await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
     }
 

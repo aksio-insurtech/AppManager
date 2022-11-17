@@ -6,38 +6,39 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants/{{tenantId}}/custom-domain');
 
-export interface IAddTenant {
+export interface ISetOnBehalfOf {
     applicationId?: string;
     environmentId?: string;
     tenantId?: string;
-    name?: string;
+    onBehalfOf?: string;
 }
 
-export class AddTenantValidator extends CommandValidator {
+export class SetOnBehalfOfValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
         tenantId: new Validator(),
-        name: new Validator(),
+        onBehalfOf: new Validator(),
     };
 }
 
-export class AddTenant extends Command<IAddTenant> implements IAddTenant {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants';
+export class SetOnBehalfOf extends Command<ISetOnBehalfOf> implements ISetOnBehalfOf {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants/{{tenantId}}/custom-domain';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddTenantValidator();
+    readonly validation: CommandValidator = new SetOnBehalfOfValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
     private _tenantId!: string;
-    private _name!: string;
+    private _onBehalfOf!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
             'environmentId',
+            'tenantId',
         ];
     }
 
@@ -46,7 +47,7 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
             'applicationId',
             'environmentId',
             'tenantId',
-            'name',
+            'onBehalfOf',
         ];
     }
 
@@ -74,16 +75,16 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
         this._tenantId = value;
         this.propertyChanged('tenantId');
     }
-    get name(): string {
-        return this._name;
+    get onBehalfOf(): string {
+        return this._onBehalfOf;
     }
 
-    set name(value: string) {
-        this._name = value;
-        this.propertyChanged('name');
+    set onBehalfOf(value: string) {
+        this._onBehalfOf = value;
+        this.propertyChanged('onBehalfOf');
     }
 
-    static use(initialValues?: IAddTenant): [AddTenant, SetCommandValues<IAddTenant>, ClearCommandValues] {
-        return useCommand<AddTenant, IAddTenant>(AddTenant, initialValues);
+    static use(initialValues?: ISetOnBehalfOf): [SetOnBehalfOf, SetCommandValues<ISetOnBehalfOf>, ClearCommandValues] {
+        return useCommand<SetOnBehalfOf, ISetOnBehalfOf>(SetOnBehalfOf, initialValues);
     }
 }

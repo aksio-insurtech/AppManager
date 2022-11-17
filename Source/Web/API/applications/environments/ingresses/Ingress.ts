@@ -4,7 +4,6 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { CustomDomain } from './CustomDomain';
 import { IngressRoute } from './IngressRoute';
 
 export class Ingress {
@@ -14,9 +13,6 @@ export class Ingress {
 
     @field(String)
     name!: string;
-
-    @field(CustomDomain, true)
-    customDomains!: CustomDomain[];
 
     @field(IngressRoute, true)
     routes!: IngressRoute[];

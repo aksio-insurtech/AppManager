@@ -3,7 +3,7 @@
 
 namespace Concepts.Applications.Tenants;
 
-public record TenantShortName(string Value) : ConceptAs<string>(Value)
+public record OnBehalfOf(string Value) : ConceptAs<string>(Value)
 {
-    public static implicit operator TenantShortName(string name) => new(name);
+    public static implicit operator OnBehalfOf(string name) => new(name);
 }

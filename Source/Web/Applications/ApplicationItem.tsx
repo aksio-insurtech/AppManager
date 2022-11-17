@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
-import { ListItemActionButton } from './ListItemActionButton';
 import * as icons from '@mui/icons-material';
 import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
 import { CreateMicroservice } from 'API/applications/environments/microservices/CreateMicroservice';
@@ -15,6 +14,7 @@ import { ActionButtonWithMenu } from './ActionButtonWithMenu';
 import { CreateIngressDialog } from './CreateIngressDialog';
 import { CreateIngress } from 'API/applications/environments/ingresses/CreateIngress';
 import { ConsolidateApplicationEnvironment } from 'API/applications/environments/ConsolidateApplicationEnvironment';
+import { ConsolidationButton } from './ConsolidationButton';
 
 export interface ApplicationItemProps {
     application: ApplicationHierarchyForListing;
@@ -57,16 +57,11 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
         }
     );
 
-    console.log(props.environmentId);
-
     const [consolidateApplicationEnvironment] = ConsolidateApplicationEnvironment.use({
         applicationId: props.application.id, environmentId: props.environmentId
     });
 
-    const currentEnvironment = props.application.environments.find(_ => _.environmentId === props.environmentId);
-    const hasChanged = currentEnvironment?.lastConsolidationStarted.toString() !== currentEnvironment?.lastUpdated.toString();
-
-    console.log(currentEnvironment?.status);
+    const currentEnvironment = props.application.environments?.find(_ => _.environmentId === props.environmentId);
 
     return (
         <ListItem component="div" disablePadding>
@@ -94,21 +89,22 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                     }
 
                     {props.environmentId &&
-                        <ActionButtonWithMenu icon={<icons.Add />} title="Add">
-                            <MenuItem onClick={() => {
-                                showCreateIngress({
-                                    applicationId: props.application.id
-                                });
-                            }} >Add Ingress</MenuItem>
-                            <MenuItem onClick={() => {
-                                showCreateMicroservice({
-                                    applicationId: props.application.id
-                                });
-                            }} >Add Microservice</MenuItem>
-                        </ActionButtonWithMenu>
+                        <>
+                            <ActionButtonWithMenu icon={<icons.Add />} title="Add">
+                                <MenuItem onClick={() => {
+                                    showCreateIngress({
+                                        applicationId: props.application.id
+                                    });
+                                }} >Add Ingress</MenuItem>
+                                <MenuItem onClick={() => {
+                                    showCreateMicroservice({
+                                        applicationId: props.application.id
+                                    });
+                                }} >Add Microservice</MenuItem>
+                            </ActionButtonWithMenu>
+                            <ConsolidationButton environment={currentEnvironment!} consolidateClicked={() => consolidateApplicationEnvironment.execute()} />
+                        </>
                     }
-
-                    <ListItemActionButton title="Consolidate Changes" icon={<icons.PlayArrow />} onClick={() => consolidateApplicationEnvironment.execute()} />
                 </>
             }
         </ListItem >

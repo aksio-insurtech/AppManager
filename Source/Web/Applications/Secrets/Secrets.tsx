@@ -22,7 +22,7 @@ export const Secrets = () => {
             columns={columns}
             data={[]}
             modalContent={AddSecretDialog}
-            getRowId={(tenant) => tenant.id}
+            getRowId={(tenant) => tenant.id.tenantId}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
                 }

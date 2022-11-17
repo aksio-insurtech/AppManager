@@ -6,4 +6,4 @@ using Concepts.Applications.Tenants;
 
 namespace Domain.Applications.Environments.Tenants;
 
-public record AddTenant(TenantId TenantId, TenantName Name, TenantShortName ShortName);
+public record AddTenant(TenantId TenantId, TenantName Name);

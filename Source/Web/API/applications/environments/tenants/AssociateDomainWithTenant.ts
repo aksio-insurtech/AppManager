@@ -6,38 +6,42 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants/{{tenantId}}/custom-domain');
 
-export interface IAddTenant {
+export interface IAssociateDomainWithTenant {
     applicationId?: string;
     environmentId?: string;
     tenantId?: string;
-    name?: string;
+    domain?: string;
+    certificateId?: string;
 }
 
-export class AddTenantValidator extends CommandValidator {
+export class AssociateDomainWithTenantValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
         tenantId: new Validator(),
-        name: new Validator(),
+        domain: new Validator(),
+        certificateId: new Validator(),
     };
 }
 
-export class AddTenant extends Command<IAddTenant> implements IAddTenant {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants';
+export class AssociateDomainWithTenant extends Command<IAssociateDomainWithTenant> implements IAssociateDomainWithTenant {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/tenants/{{tenantId}}/custom-domain';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new AddTenantValidator();
+    readonly validation: CommandValidator = new AssociateDomainWithTenantValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
     private _tenantId!: string;
-    private _name!: string;
+    private _domain!: string;
+    private _certificateId!: string;
 
     get requestArguments(): string[] {
         return [
             'applicationId',
             'environmentId',
+            'tenantId',
         ];
     }
 
@@ -46,7 +50,8 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
             'applicationId',
             'environmentId',
             'tenantId',
-            'name',
+            'domain',
+            'certificateId',
         ];
     }
 
@@ -74,16 +79,24 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
         this._tenantId = value;
         this.propertyChanged('tenantId');
     }
-    get name(): string {
-        return this._name;
+    get domain(): string {
+        return this._domain;
     }
 
-    set name(value: string) {
-        this._name = value;
-        this.propertyChanged('name');
+    set domain(value: string) {
+        this._domain = value;
+        this.propertyChanged('domain');
+    }
+    get certificateId(): string {
+        return this._certificateId;
     }
 
-    static use(initialValues?: IAddTenant): [AddTenant, SetCommandValues<IAddTenant>, ClearCommandValues] {
-        return useCommand<AddTenant, IAddTenant>(AddTenant, initialValues);
+    set certificateId(value: string) {
+        this._certificateId = value;
+        this.propertyChanged('certificateId');
+    }
+
+    static use(initialValues?: IAssociateDomainWithTenant): [AssociateDomainWithTenant, SetCommandValues<IAssociateDomainWithTenant>, ClearCommandValues] {
+        return useCommand<AssociateDomainWithTenant, IAssociateDomainWithTenant>(AssociateDomainWithTenant, initialValues);
     }
 }

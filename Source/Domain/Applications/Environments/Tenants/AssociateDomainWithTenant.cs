@@ -4,6 +4,6 @@
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 
-namespace Domain.Applications.Environments.Ingresses;
+namespace Domain.Applications.Environments.Tenants;
 
-public record AddCustomDomainToIngress(DomainName Domain, CertificateId CertificateId);
+public record AssociateDomainWithTenant(DomainName Domain, CertificateId CertificateId);

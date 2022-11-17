@@ -19,6 +19,7 @@ export interface ValueEditorProps<TOutput, TModel extends GridValidRowModel = Gr
     getRowId: GridRowIdGetter<TModel>;
     onSelectionChanged?: SelectionChanged<TModel>;
     onRefresh?: RefreshClicked;
+    toolbarContent?: React.ReactNode;
 }
 
 export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridValidRowModel, TInput={}>(props: ValueEditorProps<TOutput, TModel, TInput>) => {
@@ -38,6 +39,7 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
             <Toolbar>
                 <Button startIcon={<icons.Add />} onClick={() => showAddDialog(props.input)}>{props.addTitle}</Button>
                 {props.onRefresh && <Button startIcon={<icons.Refresh />} onClick={props.onRefresh}/>}
+                {props.toolbarContent && props.toolbarContent}
             </Toolbar>
 
             <DataGrid
