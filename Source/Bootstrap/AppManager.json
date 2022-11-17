@@ -41,8 +41,10 @@
                         "type": "1",
                         "clientId": "",
                         "clientSecret": "",
+                        "issuer": "",
                         "authorizationEndpoint": "",
-                        "tokenEndpoint": ""
+                        "tokenEndpoint": "",
+                        "certificationUri": ""
                     }
                 ]
             }

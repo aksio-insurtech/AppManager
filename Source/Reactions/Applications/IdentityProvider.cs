@@ -11,5 +11,7 @@ public record IdentityProvider(
     IdentityProviderType Type,
     IdentityProviderClientId ClientId,
     IdentityProviderClientSecret ClientSecret,
+    IdentityProviderIssuerURL Issuer,
     IdentityProviderAuthorizationEndpoint AuthorizationEndpoint,
-    IdentityProviderTokenEndpoint TokenEndpoint);
+    IdentityProviderTokenEndpoint TokenEndpoint,
+    IdentityProviderCertificationURL CertificationUri);

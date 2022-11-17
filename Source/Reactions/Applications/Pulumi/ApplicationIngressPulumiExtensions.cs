@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -168,28 +169,76 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     Enabled = true
                 },
-                IdentityProviders = new IdentityProvidersArgs
+                IdentityProviders = GetIdentityPropertyConfiguration(identityProvider)
+            });
+        }
+    }
+
+    static IdentityProvidersArgs GetIdentityPropertyConfiguration(IdentityProvider identityProvider)
+    {
+        var args = new IdentityProvidersArgs();
+
+        switch (identityProvider.Type)
+        {
+            case IdentityProviderType.Azure:
+                args.AzureActiveDirectory = new AzureActiveDirectoryArgs
                 {
-                    AzureActiveDirectory = new AzureActiveDirectoryArgs
+                    Enabled = true,
+                    IsAutoProvisioned = true,
+                    Registration = new AzureActiveDirectoryRegistrationArgs
                     {
-                        Enabled = true,
-                        IsAutoProvisioned = true,
-                        Registration = new AzureActiveDirectoryRegistrationArgs
+                        ClientId = identityProvider.ClientId.Value,
+                        ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
+                        OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
+                    },
+                    Validation = new AzureActiveDirectoryValidationArgs
+                    {
+                        AllowedAudiences =
+                                {
+                                    $"api://{identityProvider.ClientId}"
+                                }
+                    }
+                };
+                break;
+
+            case IdentityProviderType.IdPorten:
+                args.CustomOpenIdConnectProviders = new Dictionary<string, CustomOpenIdConnectProviderArgs>
+                {
+                    {
+                        identityProvider.Name.Value,
+                        new CustomOpenIdConnectProviderArgs
                         {
-                            ClientId = identityProvider.ClientId.Value,
-                            ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
-                            OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
-                        },
-                        Validation = new AzureActiveDirectoryValidationArgs
-                        {
-                            AllowedAudiences =
+                            Enabled = true,
+                            Login = new OpenIdConnectLoginArgs
                             {
-                                $"api://{identityProvider.ClientId}"
+                                Scopes = new string[]
+                                {
+                                    "openid",
+                                    "profile"
+                                }
+                            },
+                            Registration = new OpenIdConnectRegistrationArgs
+                            {
+                                ClientId = identityProvider.ClientId.Value,
+                                ClientCredential = new OpenIdConnectClientCredentialArgs
+                                {
+                                    ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
+                                    Method = ClientCredentialMethod.ClientSecretPost
+                                },
+                                OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
+                                {
+                                    Issuer = identityProvider.Issuer.Value,
+                                    AuthorizationEndpoint = identityProvider.AuthorizationEndpoint.Value,
+                                    TokenEndpoint = identityProvider.TokenEndpoint.Value,
+                                    CertificationUri = identityProvider.CertificationUri.Value
+                                }
                             }
                         }
                     }
-                }
-            });
+                };
+                break;
         }
+
+        return args;
     }
 }
