@@ -16,7 +16,24 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationIngressPulumiExtensions
 {
-    public static async Task ConfigureIngress(
+    const string AuthConfigFile = "auth-nginx.conf";
+    const string CompositionConfigFile = "auth-nginx.conf";
+
+    public static async Task ConfigureAuthIngress(
+        this Application application,
+        ResourceGroup resourceGroup,
+        Ingress ingress,
+        Storage storage,
+        FileShare fileShare,
+        ILogger<FileStorage> fileStorageLogger)
+    {
+        var nginxFileShareName = await fileShare.Name.GetValue();
+        var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
+        var nginxContent = TemplateTypes.IngressMiddlewareConfig(new AuthIngressTemplateContent(string.Empty, string.Empty));
+        nginxFileStorage.Upload(AuthConfigFile, nginxContent);
+    }
+
+    public static async Task ConfigureCompositionIngress(
         this Application application,
         ResourceGroup resourceGroup,
         Ingress ingress,
@@ -40,8 +57,8 @@ public static class ApplicationIngressPulumiExtensions
             }
         }
 
-        var nginxContent = TemplateTypes.IngressConfig(new IngressTemplateContent(routes));
-        nginxFileStorage.Upload("nginx.conf", nginxContent);
+        var nginxContent = TemplateTypes.CompositionIngressConfig(new CompositionIngressTemplateContent(routes));
+        nginxFileStorage.Upload("composition-nginx.conf", nginxContent);
     }
 
     public static async Task<IngressResult> SetupIngress(
@@ -55,7 +72,6 @@ public static class ApplicationIngressPulumiExtensions
         Tags tags,
         ILogger<FileStorage> fileStorageLogger)
     {
-        var ingressContainerAppName = $"{ingress.Name}-ingress";
         var ingressFileShareName = $"{ingress.Name}-ingress";
         var storageName = $"{ingress.Name}-ingress-storage";
 
@@ -65,7 +81,7 @@ public static class ApplicationIngressPulumiExtensions
             ResourceGroupName = resourceGroup.Name,
         });
 
-        await application.ConfigureIngress(resourceGroup, ingress, storage, nginxFileShare, microservices, fileStorageLogger);
+        await application.ConfigureCompositionIngress(resourceGroup, ingress, storage, nginxFileShare, microservices, fileStorageLogger);
 
         _ = new ManagedEnvironmentsStorage(storageName, new()
         {
@@ -84,7 +100,71 @@ public static class ApplicationIngressPulumiExtensions
             }
         });
 
-        var containerApp = new ContainerApp(ingressContainerAppName, new()
+        _ = SetupAuthIngress(resourceGroup, managedEnvironment, ingress, tags, storageName);
+        var compositionContainerApp = SetupCompositionIngress(resourceGroup, managedEnvironment, ingress, tags, storageName);
+        var ingressConfig = await compositionContainerApp.Configuration.GetValue();
+        var fileShareId = await nginxFileShare.Id.GetValue();
+        SetupAuthenticationForIngress(environment, resourceGroup, compositionContainerApp, ingress);
+        return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, compositionContainerApp);
+    }
+
+    static ContainerApp SetupAuthIngress(ResourceGroup resourceGroup, ManagedEnvironment managedEnvironment, Ingress ingress, Tags tags, string storageName) =>
+        new($"{ingress.Name}-ingress-composition", new()
+        {
+            Location = resourceGroup.Location,
+            Tags = tags,
+            ResourceGroupName = resourceGroup.Name,
+            ManagedEnvironmentId = managedEnvironment.Id,
+            Configuration = new ConfigurationArgs
+            {
+                Ingress = new IngressArgs
+                {
+                    External = true,
+                    TargetPort = 80
+                }
+            },
+            Template = new TemplateArgs
+            {
+                Volumes = new VolumeArgs[]
+                        {
+                            new ()
+                            {
+                                Name = storageName,
+                                StorageName = storageName,
+                                StorageType = StorageType.AzureFile
+                            }
+                        },
+                Containers = new ContainerArgs
+                {
+                    Name = "nginx",
+                    Image = "nginx",
+                    Command =
+                        {
+                            "nginx",
+                            "-c",
+                            $"/config/{AuthConfigFile}",
+                            "-g",
+                            "daemon off;"
+                        },
+                    VolumeMounts = new VolumeMountArgs[]
+                            {
+                            new()
+                            {
+                                MountPath = "/config",
+                                VolumeName = storageName
+                            }
+                            }
+                },
+                Scale = new ScaleArgs
+                {
+                    MaxReplicas = 1,
+                    MinReplicas = 1,
+                }
+            },
+        });
+
+    static ContainerApp SetupCompositionIngress(ResourceGroup resourceGroup, ManagedEnvironment managedEnvironment, Ingress ingress, Tags tags, string storageName) =>
+        new($"{ingress.Name}-ingress-composition", new()
         {
             Location = resourceGroup.Location,
             Tags = tags,
@@ -106,34 +186,34 @@ public static class ApplicationIngressPulumiExtensions
             Template = new TemplateArgs
             {
                 Volumes = new VolumeArgs[]
-                {
-                    new ()
-                    {
-                        Name = storageName,
-                        StorageName = storageName,
-                        StorageType = StorageType.AzureFile
-                    }
-                },
+                        {
+                            new ()
+                            {
+                                Name = storageName,
+                                StorageName = storageName,
+                                StorageType = StorageType.AzureFile
+                            }
+                        },
                 Containers = new ContainerArgs
                 {
                     Name = "nginx",
                     Image = "nginx",
                     Command =
-                    {
-                        "nginx",
-                        "-c",
-                        "/config/nginx.conf",
-                        "-g",
-                        "daemon off;"
-                    },
-                    VolumeMounts = new VolumeMountArgs[]
-                    {
-                        new()
                         {
-                            MountPath = "/config",
-                            VolumeName = storageName
-                        }
-                    }
+                            "nginx",
+                            "-c",
+                            $"/config/{CompositionConfigFile}",
+                            "-g",
+                            "daemon off;"
+                        },
+                    VolumeMounts = new VolumeMountArgs[]
+                            {
+                            new()
+                            {
+                                MountPath = "/config",
+                                VolumeName = storageName
+                            }
+                            }
                 },
                 Scale = new ScaleArgs
                 {
@@ -142,12 +222,6 @@ public static class ApplicationIngressPulumiExtensions
                 }
             },
         });
-
-        var ingressConfig = await containerApp.Configuration.GetValue();
-        var fileShareId = await nginxFileShare.Id.GetValue();
-        SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress);
-        return new($"https://{ingressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
-    }
 
     static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name.Value.Replace(' ', '-')}-authentication-secret".ToLowerInvariant();
 

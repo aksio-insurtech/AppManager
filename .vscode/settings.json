@@ -79,6 +79,7 @@
         "Pulumi",
         "Templating",
         "vnet",
-        "Xunit"
+        "Xunit",
+        "zumo"
     ]
 }
