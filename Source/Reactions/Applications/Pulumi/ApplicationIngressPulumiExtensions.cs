@@ -17,7 +17,7 @@ namespace Reactions.Applications.Pulumi;
 public static class ApplicationIngressPulumiExtensions
 {
     const string AuthConfigFile = "auth-nginx.conf";
-    const string CompositionConfigFile = "auth-nginx.conf";
+    const string CompositionConfigFile = "composition-nginx.conf";
 
     public static async Task ConfigureAuthIngress(
         this Application application,
@@ -59,7 +59,7 @@ public static class ApplicationIngressPulumiExtensions
         }
 
         var nginxContent = TemplateTypes.CompositionIngressConfig(new CompositionIngressTemplateContent(routes));
-        nginxFileStorage.Upload("composition-nginx.conf", nginxContent);
+        nginxFileStorage.Upload(CompositionConfigFile, nginxContent);
     }
 
     public static async Task<IngressResult> SetupIngress(
