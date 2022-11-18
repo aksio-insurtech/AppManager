@@ -69,6 +69,7 @@
         "failcount",
         "Fqdns",
         "fullchain",
+        "ingressmiddleware",
         "inheritdoc",
         "letsencrypt",
         "Mongodbatlas",
