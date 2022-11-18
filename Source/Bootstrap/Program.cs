@@ -155,12 +155,15 @@ public static class Program
     {
         var dockerHub = new DockerHub();
         var cratisVersion = await dockerHub.GetLastVersionOfCratis();
+        var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
+
         var identityProvider = applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.First();
         return applicationAndEnvironment with
         {
             Environment = applicationAndEnvironment.Environment with
             {
                 CratisVersion = cratisVersion,
+                AzureSubscriptionId = config.Azure.Subscription.SubscriptionId,
                 Resources = new(
                     null!,
                     null!,
@@ -187,6 +190,19 @@ public static class Program
                             {
                                 ClientId = config.Authentication.ClientId,
                                 ClientSecret = config.Authentication.ClientSecret
+                            }
+                        }
+                    }
+                },
+                Microservices = new[]
+                {
+                    applicationAndEnvironment.Environment.Microservices.First() with
+                    {
+                        Deployables = new[]
+                        {
+                            applicationAndEnvironment.Environment.Microservices.First().Deployables.First() with
+                            {
+                                Image = $"docker.io/{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.AppManagerImage}:{appManagerVersion}"
                             }
                         }
                     }

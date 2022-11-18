@@ -170,6 +170,11 @@ public class PulumiOperations : IPulumiOperations
             }),
             environment);
 
+        if (environment.Resources?.AzureResourceGroupId is null)
+        {
+            return;
+        }
+
         foreach (var microservice in environment.Microservices)
         {
             await Up(

@@ -30,7 +30,7 @@ public static class ApplicationIngressPulumiExtensions
     {
         var nginxFileShareName = await fileShare.Name.GetValue();
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
-        var nginxContent = TemplateTypes.IngressMiddlewareConfig(templateContent);
+        var nginxContent = TemplateTypes.AuthIngressConfig(templateContent);
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
     }
 
@@ -122,7 +122,7 @@ public static class ApplicationIngressPulumiExtensions
     }
 
     static ContainerApp SetupAuthIngress(ResourceGroup resourceGroup, ManagedEnvironment managedEnvironment, Ingress ingress, Tags tags, string storageName) =>
-        new($"{ingress.Name}-ingress-composition", new()
+        new($"{ingress.Name}-ingress-auth", new()
         {
             Location = resourceGroup.Location,
             Tags = tags,
