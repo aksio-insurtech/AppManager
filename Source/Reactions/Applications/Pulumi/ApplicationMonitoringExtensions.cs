@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
+using Concepts.Applications.Environments;
 using Pulumi.AzureNative.Insights.V20200202;
 using Pulumi.AzureNative.OperationalInsights;
 using Pulumi.AzureNative.OperationalInsights.Inputs;
@@ -14,7 +14,7 @@ public static class ApplicationMonitoringExtensions
     public static ApplicationMonitoringResult SetupApplicationMonitoring(
         this Application application,
         ResourceGroup resourceGroup,
-        CloudRuntimeEnvironment environment,
+        ApplicationEnvironment environment,
         Tags tags)
     {
         var workspace = new Workspace(application.Name, new()

@@ -1,0 +1,72 @@
+{
+    "id": "1091c7d3-f533-420d-abc0-bbb7f0defd66",
+    "name": "AppManager",
+
+    "environment": {
+        "id": "00126dcd-8d1e-42c3-835b-7978a545ec5c",
+        "name": "Development",
+        "displayName": "dev",
+        "shortName": "D",
+        "cratisVersion": "6.17.1",
+        "azureSubscriptionId": "00000000-0000-0000-0000-000000000000",
+        "cloudLocation": "norwayeast",
+        "certificates": [
+            {
+                "id": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
+                "name": "Development",
+                "value": ""
+            }
+        ],
+        "tenants": [
+            {
+                "id": "ad1fb1bb-1152-464b-8fdd-d622445d46b6",
+                "name": "Aksio Insurtech",
+                "domain": "appmanager.dev.aksio.app",
+                "certificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
+                "onBehalfOf": ""
+            }
+        ],
+        "ingresses": [
+            {
+                "id": "6173e1f6-edee-423e-943a-e4bbc90349ce",
+                "name": "main",
+                "routes": [
+                    {
+                        "path": "/",
+                        "targetPath": "/",
+                        "targetMicroservice": "8c538618-2862-4018-b29d-17a4ec131958"
+                    }
+                ],
+                "identityProviders": [
+                    {
+                        "id": "7a36bbc9-de76-4d83-9ea3-eaab9896cbd8",
+                        "name": "Azure AD",
+                        "type": 1,
+                        "clientId": "",
+                        "clientSecret": "",
+                        "issuer": "",
+                        "authorizationEndpoint": "",
+                        "tokenEndpoint": "",
+                        "certificationUri": ""
+                    }
+                ]
+            }
+        ],
+        "microservices": [
+            {
+                "id": "00126dcd-8d1e-42c3-835b-7978a545ec5c",
+                "name": "Gamma",
+                "deployables": [
+                    {
+                        "id": "439b3c29-759b-4a03-92a7-d36a59be9ade",
+                        "name": "Main",
+                        "image": "docker.io/aksioinsurtech/app-manager:1.0.0",
+                        "ports": [
+                            80
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

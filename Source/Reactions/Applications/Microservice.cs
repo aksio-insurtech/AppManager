@@ -5,4 +5,10 @@ using Concepts.Applications;
 
 namespace Reactions.Applications;
 
-public record Microservice(MicroserviceId Id, ApplicationId ApplicationId, MicroserviceName Name);
+public record Microservice(
+    MicroserviceId Id,
+    MicroserviceName Name,
+    IEnumerable<Deployable> Deployables)
+{
+    public Deployable GetDeployableById(DeployableId id) => Deployables.Single(_ => _.Id == id);
+}

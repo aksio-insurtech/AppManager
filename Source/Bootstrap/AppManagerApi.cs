@@ -3,7 +3,11 @@
 
 using System.Net.Http.Json;
 using System.Text.Json;
-using Concepts;
+using Aksio.Cratis.Execution;
+using Concepts.Applications.Environments;
+using Concepts.Applications.Environments.Ingresses;
+using Concepts.Applications.Tenants;
+using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Bootstrap;
 
@@ -11,12 +15,14 @@ public class AppManagerApi : IDisposable
 {
     readonly ManagementConfig _config;
     readonly string _url;
+    readonly JsonSerializerOptions _jsonSerializerOptions;
     HttpClient _client;
 
-    public AppManagerApi(ManagementConfig config, string url)
+    public AppManagerApi(ManagementConfig config, string url, JsonSerializerOptions jsonSerializerOptions)
     {
         _config = config;
         _url = url;
+        _jsonSerializerOptions = jsonSerializerOptions;
         _client = null!;
     }
 
@@ -43,25 +49,27 @@ public class AppManagerApi : IDisposable
         Console.WriteLine($"URL for API is : '{_url}'");
     }
 
-    public Task SetStackForApplication(Guid id, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{id}/stack/{environment}", stack);
-    public Task SetStackForMicroservice(Guid applicationId, Guid microserviceId, CloudRuntimeEnvironment environment, string stack) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/stack/{environment}", stack);
-    public Task RegisterOrganization(Guid id, string name) => Perform("/api/organizations", new { id = id.ToString(), name });
-    public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/organization/settings/pulumi", new { organization, accessToken });
-    public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/organization/settings/service-principal", new { clientId, clientSecret });
-    public Task AddAzureSubscription(string id, string name, string tenantId, string tenantName) => Perform("/api/organization/settings/subscriptions", new { id, name, tenantId, tenantName });
-    public Task SetMongoDBSettings(string organizationId, string publicKey, string privateKey) => Perform("/api/organization/settings/mongodb", new { organizationId, publicKey, privateKey });
-    public Task CreateApplication(Guid applicationId, string name, Guid azureSubscriptionId, string cloudLocation) => Perform("/api/applications", new { applicationId, name, azureSubscriptionId, cloudLocation });
-    public Task ConfigureAuthenticationForApplication(Guid applicationId, string clientId, string clientSecret) => Perform($"/api/applications/{applicationId}/authentication", new { clientId, clientSecret });
-    public Task CreateMicroservice(Guid applicationId, Guid microserviceId, string name) => Perform($"/api/applications/{applicationId}/microservices", new { microserviceId, name });
-    public Task CreateDeployable(Guid applicationId, Guid microserviceId, Guid deployableId, string name) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/deployables", new { deployableId, name });
-    public Task SetDeployableImage(Guid applicationId, Guid microserviceId, Guid deployableId, string deployableImageName) => Perform($"/api/applications/{applicationId}/microservices/{microserviceId}/deployables/image", new { deployableImageName });
+    public Task SetPulumiSettings(string organization, string accessToken) => Perform("/api/settings/pulumi", new { organization, accessToken });
+    public Task SetAzureServicePrincipal(string clientId, string clientSecret) => Perform("/api/settings/service-principal", new { clientId, clientSecret });
+    public Task AddAzureSubscription(string id, string name, string tenantId, string tenantName) => Perform("/api/settings/subscriptions", new { id, name, tenantId, tenantName });
+    public Task SetMongoDBSettings(string organizationId, string publicKey, string privateKey) => Perform("/api/settings/mongodb", new { organizationId, publicKey, privateKey });
+
+    public Task CreateApplication(ApplicationId applicationId, string name, Guid azureSubscriptionId, string cloudLocation) => Perform("/api/applications", new { applicationId, name, azureSubscriptionId, cloudLocation });
+    public Task CreateEnvironment(ApplicationId applicationId, ApplicationEnvironment environment) => Perform($"/api/applications/{applicationId}/environments", new { environmentId = environment.Id });
+    public Task AddTenantToEnvironment(ApplicationId applicationId, ApplicationEnvironment environment, TenantId tenantId, TenantName tenantName) => Perform($"/api/applications/{applicationId}/environments/{environment.Id}/tenants", new { tenantId = environment.Id, name = tenantName });
+    public Task CreateIngress(ApplicationId applicationId, ApplicationEnvironment environment, IngressId ingressId, IngressName ingressName) => Perform($"/api/applications/{applicationId}/environments/{environment.Id}/ingresses", new { ingressId, name = ingressName });
+    public Task CreateMicroservice(ApplicationId applicationId, ApplicationEnvironment environment, MicroserviceId microserviceId, string name) => Perform($"/api/applications/{applicationId}/environments/{environment.Id}/microservices", new { microserviceId, name });
+    public Task CreateDeployable(ApplicationId applicationId, ApplicationEnvironment environment, MicroserviceId microserviceId, Guid deployableId, string name) => Perform($"/api/applications/{applicationId}/environments/{environment.Id}/microservices/{microserviceId}/deployables", new { deployableId, name });
+    public Task SetDeployableImage(ApplicationId applicationId, ApplicationEnvironment environment, MicroserviceId microserviceId, Guid deployableId, string deployableImageName) => Perform($"/api/applications/{applicationId}/environments/{environment.Id}/microservices/{microserviceId}/deployables/image", new { deployableImageName });
+    public Task SetStackForApplication(ApplicationId id, ApplicationEnvironment environment, string stack) => Perform($"/api/applications/{id}/environments/{environment.Id}/stack", stack);
+    public Task SetStackForMicroservice(ApplicationId applicationId, Guid microserviceId, ApplicationEnvironment environment, string stack) => Perform($"/api/applications/{applicationId}/environments/{environment.Id}/microservices/{microserviceId}/stack", stack);
 
     public void Dispose() => _client.Dispose();
 
     async Task Perform(string route, object body)
     {
         Console.WriteLine($"Calling : {route}");
-        var content = JsonContent.Create(body);
+        var content = JsonContent.Create(body, options: _jsonSerializerOptions);
         var response = await _client.PostAsync(route, content);
         var result = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)

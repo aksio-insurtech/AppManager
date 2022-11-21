@@ -5,7 +5,9 @@ using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
 using Microsoft.Extensions.Logging;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
+using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -30,50 +32,43 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment)
+    public async Task<ApplicationEnvironmentResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.SetupResourceGroup(environment);
-        var identity = application.SetupUserAssignedIdentity(resourceGroup, tags);
-        var vault = application.SetupKeyVault(identity, resourceGroup, tags);
-        var network = application.SetupNetwork(identity, vault, resourceGroup, tags);
+        var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
+        var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
+        var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);
         var storage = await application.SetupStorage(environment, resourceGroup, tags);
         var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
         var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
 
-        var microservice = new Microservice(Guid.Empty, application.Id, "kernel");
+        var microservice = new Microservice(Guid.Empty, "kernel", new Deployable[]
+        {
+            new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 })
+        });
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
         var kernelStorage = new MicroserviceStorage(application, microservice, fileStorage);
 
         var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
         var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, network, tags);
-        var managedEnvironmentId = await managedEnvironment.Id.GetValue();
-        var managedEnvironmentName = await managedEnvironment.Name.GetValue();
-
-        var latestVersion = await DockerHub.GetLatestVersionOfImage("aksioinsurtech", "cratis");
 
         var kernel = await microservice.SetupContainerApp(
             application,
             resourceGroup,
-            managedEnvironmentId,
-            managedEnvironmentName,
+            managedEnvironment,
             containerRegistry.LoginServer,
             containerRegistry.UserName,
             containerRegistry.Password,
             kernelStorage,
-            new[]
-            {
-                    new Deployable(Guid.Empty, microservice.Id, "kernel", $"docker.io/aksioinsurtech/cratis:{latestVersion}", new[] { 80 })
-            },
+            microservice.Deployables,
             tags,
             false);
 
-        await kernelStorage.CreateAndUploadCratisJson(mongoDB, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
+        await kernelStorage.CreateAndUploadCratisJson(mongoDB, environment.Tenants, environment.Microservices, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
         kernelStorage.CreateAndUploadAppSettings(_settings);
 
-        var ingressResult = await application.SetupIngress(resourceGroup, storage, managedEnvironment, tags, _fileStorageLogger);
-
-        var applicationResult = new ApplicationResult(
+        var applicationResult = new ApplicationEnvironmentResult(
             environment,
             resourceGroup,
             network,
@@ -81,32 +76,46 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             containerRegistry,
             mongoDB,
             managedEnvironment,
-            ingressResult,
             kernel);
-        var events = await application.GetEventsToAppend(applicationResult);
+        var events = await application.GetEventsToAppend(environment, applicationResult);
 
         // Todo: Set to actual execution context - might not be the right place for this!
         _executionContextManager.Set(executionContext);
         foreach (var @event in events)
         {
-            await _eventLog.Append(application.Id, @event);
+            await _eventLog.Append(environment.Id, @event);
         }
 
         return applicationResult;
+    }
+
+    public async Task<IngressResult> Ingress(
+        ExecutionContext executionContext,
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        Ingress ingress,
+        ResourceGroup? resourceGroup = default)
+    {
+        var tags = application.GetTags(environment);
+        resourceGroup ??= application.GetResourceGroup(environment);
+        var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
+        var storage = await application.GetStorage(environment, resourceGroup);
+
+        return await application.SetupIngress(environment, resourceGroup, storage, managedEnvironment, ingress, new Dictionary<MicroserviceId, ContainerApp>(), tags, _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
-        CloudRuntimeEnvironment environment,
+        ApplicationEnvironmentWithArtifacts environment,
         bool useContainerRegistry = true,
         ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
     {
         var tags = application.GetTags(environment);
         resourceGroup ??= application.GetResourceGroup(environment);
-        var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
+        var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
         storage.CreateAndUploadAppSettings(_settings);
         storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
 
@@ -117,11 +126,10 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var microserviceResult = await microservice.SetupContainerApp(
             application,
             resourceGroup,
-            managedEnvironment.Id,
-            managedEnvironment.Name,
-            application.Resources.AzureContainerRegistryLoginServer,
-            application.Resources.AzureContainerRegistryUserName,
-            application.Resources.AzureContainerRegistryPassword,
+            managedEnvironment,
+            environment.Resources.AzureContainerRegistryLoginServer,
+            environment.Resources.AzureContainerRegistryUserName,
+            environment.Resources.AzureContainerRegistryPassword,
             storage,
             deployables,
             tags,
@@ -138,22 +146,21 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         Microservice microservice,
         IEnumerable<Deployable> deployables,
-        CloudRuntimeEnvironment environment)
+        ApplicationEnvironmentWithArtifacts environment)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.GetResourceGroup(environment);
-        var storage = await microservice.GetStorage(application, resourceGroup, _fileStorageLogger);
+        var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
 
         var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
 
         _ = microservice.SetupContainerApp(
             application,
             resourceGroup,
-            managedEnvironment.Id,
-            managedEnvironment.Name,
-            application.Resources.AzureContainerRegistryLoginServer,
-            application.Resources.AzureContainerRegistryUserName,
-            application.Resources.AzureContainerRegistryPassword,
+            managedEnvironment,
+            environment.Resources.AzureContainerRegistryLoginServer,
+            environment.Resources.AzureContainerRegistryUserName,
+            environment.Resources.AzureContainerRegistryPassword,
             storage,
             deployables,
             tags);

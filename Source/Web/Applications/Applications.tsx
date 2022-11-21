@@ -2,32 +2,50 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { useEffect, useState } from 'react';
-import { Route, Routes, useNavigate, useParams, useLocation, matchPath } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
-import { Create as CreateApplication } from 'API/applications/Create';
+import { CreateApplication } from 'API/applications/CreateApplication';
 import { Guid } from '@aksio/cratis-fundamentals';
 import { ApplicationsHierarchy } from 'API/applications/ApplicationsHierarchy';
 import { Application } from './Application';
-import { CreateMicroserviceDialog } from './CreateMicroserviceDialog';
-import { Create as CreateMicroservice } from 'API/applications/microservices/Create';
-import { Create as CreateDeployable } from 'API/applications/microservices/deployables/Create';
-import { CreateDeployableDialog } from './CreateDeployableDialog';
+
+import * as icons from '@mui/icons-material';
 import { Microservice } from './Microservices/Microservice';
 import { Deployable } from './Microservices/Deployables/Deployable';
-
+import { Box, Divider, Grid, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Menu, MenuItem } from '@mui/material';
+import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
+import { ApplicationsNav } from './ApplicationsNav';
+import { ListItemActionButton } from './ListItemActionButton';
+import { ApplicationItem } from './ApplicationItem';
+import { ApplicationHierarchyForListing } from 'API/applications/ApplicationHierarchyForListing';
+import { ApplicationItemWithArtifacts } from './ApplicationItemWithArtifacts';
+import { Tenants } from './Tenants/Tenants';
+import { Ingress } from './Ingresses/Ingress';
+import { Cratis } from './Cratis/Cratis';
+import { EnvironmentForApplication } from 'API/applications/environments/EnvironmentForApplication';
+import { Settings } from './ApplicationEnvironmentSettings/Settings';
+import { Certificates } from './Certificates/Certificates';
 
 export const Applications = () => {
-    const [selectedNav, setSelectedNav] = useState('');
-    const [currentApplication, setCurrentApplication] = useState<string>();
+    const [currentApplicationId, setCurrentApplicationId] = useState<string>();
+    const [currentEnvironment, setCurrentEnvironment] = useState<string>();
     const [currentMicroservice, setCurrentMicroservice] = useState<string>();
     const [currentDeployable, setCurrentDeployable] = useState<string>();
     const navigate = useNavigate();
     const location = useLocation();
+    const [applicationsHierarchy] = ApplicationsHierarchy.use();
+    const [applicationEnvironment, performApplicationEnvironmentQuery] = EnvironmentForApplication.use();
 
     const routes: string[] = [
         '/applications/:applicationId',
-        '/applications/:applicationId/microservices/:microserviceId',
-        '/applications/:applicationId/microservices/:microserviceId/deployables/:deployableId'
+        '/applications/:applicationId/environments/:environmentId',
+        '/applications/:applicationId/environments/:environmentId/ingresses/:ingressId',
+        '/applications/:applicationId/environments/:environmentId/settings',
+        '/applications/:applicationId/environments/:environmentId/cratis',
+        '/applications/:applicationId/environments/:environmentId/tenants',
+        '/applications/:applicationId/environments/:environmentId/certificates',
+        '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId',
+        '/applications/:applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId'
     ];
 
     useEffect(() => {
@@ -35,22 +53,95 @@ export const Applications = () => {
         if (match?.length == 1) {
             const params = match[0]?.params || {};
 
-            setCurrentApplication(params.applicationId);
+            if (currentEnvironment != params.environmentId) {
+                performApplicationEnvironmentQuery({ applicationId: params.applicationId!, environmentId: params.environmentId! });
+            }
+
+            setCurrentApplicationId(params.applicationId);
+            setCurrentEnvironment(params.environmentId);
             setCurrentMicroservice(params.microserviceId);
             setCurrentDeployable(params.deployableId);
-
-            setSelectedNav(params.deployableId || params.microserviceId || params.applicationId || '');
+        } else {
+            setCurrentApplicationId(undefined);
+            setCurrentEnvironment(undefined);
+            setCurrentMicroservice(undefined);
+            setCurrentDeployable(undefined);
         }
     }, [location.pathname]);
 
+    let currentApplication: ApplicationHierarchyForListing | undefined;
+    if (currentApplicationId && applicationsHierarchy.data.length > 0) {
+        currentApplication = applicationsHierarchy.data.find(_ => _.id == currentApplicationId);
+    }
+
+    const [showCreateApplication] = useModal(
+        'Create application',
+        ModalButtons.OkCancel,
+        CreateApplicationDialog,
+        async (result, output) => {
+            if (result == ModalResult.success) {
+                const command = new CreateApplication();
+                command.applicationId = Guid.create().toString();
+                command.name = output!.name;
+                await command.execute();
+            }
+        }
+    );
+
     return (
         <>
-        Application
-            <Routes>
-                <Route path=':applicationId' element={<Application />} />
-                <Route path=':applicationId/microservices/:microserviceId' element={<Microservice />} />
-                <Route path=':applicationId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
-            </Routes>
+            <Grid container sx={{ height: '100%' }}>
+                <Grid item xs={2}>
+                    <Paper elevation={1} sx={{ width: '100%', height: '100%' }}>
+                        <ApplicationsNav>
+                            <ListItemButton component="a" onClick={() => navigate('/applications')}>
+                                <ListItemIcon><icons.Apps /></ListItemIcon>
+                                <ListItemText
+                                    sx={{ my: 0 }}
+                                    primaryTypographyProps={{
+                                        fontSize: 20,
+                                        fontWeight: 'medium',
+                                        letterSpacing: 0
+                                    }}>
+                                    Applications
+                                </ListItemText>
+                                <ListItemActionButton title="Add Application" icon={<icons.Add />} onClick={showCreateApplication} />
+                            </ListItemButton>
+
+                            <Divider />
+
+                            {!currentApplication ?
+                                applicationsHierarchy.data.map(application => {
+                                    return (
+                                        <span key={application.id}>
+                                            <ApplicationItem application={application} />
+                                            <Divider />
+                                        </span>
+                                    );
+                                })
+                                : <ApplicationItemWithArtifacts
+                                    application={currentApplication}
+                                    environmentId={currentEnvironment} />
+                            }
+                        </ApplicationsNav>
+                    </Paper>
+                </Grid>
+                <Grid item xs={10}>
+                    <Paper elevation={0} sx={{ height: '100%' }}>
+                        <Routes>
+                            <Route path=':applicationId' element={<Application />} />
+                            <Route path=':applicationId/environments/:environmentId' element={<Application />} />
+                            <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingress />} />
+                            <Route path=':applicationId/environments/:environmentId/settings' element={<Settings />} />
+                            <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis environment={applicationEnvironment.data} />} />
+                            <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
+                            <Route path=':applicationId/environments/:environmentId/certificates' element={<Certificates />} />
+                            <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId' element={<Microservice />} />
+                            <Route path=':applicationId/environments/:environmentId/microservices/:microserviceId/deployables/:deployableId' element={<Deployable />} />
+                        </Routes>
+                    </Paper>
+                </Grid>
+            </Grid>
         </>
     );
 };

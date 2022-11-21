@@ -15,5 +15,6 @@ module.exports = (env, argv) => {
             '/swagger': 'http://localhost:5100'
         };
         config.resolve.alias.API = path.resolve('./API');
-    }, 'Bank Sample');
+        config.resolve.alias.Components = path.resolve('./Components');
+    }, 'AppManager');
 };

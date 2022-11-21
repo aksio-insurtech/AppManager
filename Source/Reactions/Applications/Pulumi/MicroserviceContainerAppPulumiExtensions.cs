@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -11,7 +10,7 @@ namespace Reactions.Applications.Pulumi;
 
 public static class MicroserviceContainerAppPulumiExtensions
 {
-    public static Task<ContainerApp> GetContainerApp(this Microservice microservice, Application application, CloudRuntimeEnvironment environment)
+    public static Task<ContainerApp> GetContainerApp(this Microservice microservice, Application application, ApplicationEnvironmentWithArtifacts environment)
     {
         var resourceGroup = application.GetResourceGroup(environment);
         var containerAppName = microservice.Name.Value.ToLowerInvariant();
@@ -20,7 +19,7 @@ public static class MicroserviceContainerAppPulumiExtensions
             ContainerAppName = containerAppName,
             ResourceGroupName = resourceGroup.Name
         });
-        var containerApp = ContainerApp.Get(containerAppName, getContainerApp.Id);
+        var containerApp = ContainerApp.Get(containerAppName, getContainerApp.Apply(_ => _.Id));
         return Task.FromResult(containerApp);
     }
 
@@ -28,8 +27,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         this Microservice microservice,
         Application application,
         ResourceGroup resourceGroup,
-        string managedEnvironmentId,
-        string managedEnvironmentName,
+        ManagedEnvironment managedEnvironment,
         string containerRegistryLoginServer,
         string containerRegistryUsername,
         string containerRegistryPassword,
@@ -47,7 +45,7 @@ public static class MicroserviceContainerAppPulumiExtensions
         var managedEnvironmentStorage = new ManagedEnvironmentsStorage(microservice.Name, new()
         {
             ResourceGroupName = resourceGroup.Name,
-            EnvironmentName = managedEnvironmentName,
+            EnvironmentName = managedEnvironment.Name,
             StorageName = storageName,
             Properties = new ManagedEnvironmentStoragePropertiesArgs
             {
@@ -66,7 +64,7 @@ public static class MicroserviceContainerAppPulumiExtensions
             Location = resourceGroup.Location,
             Tags = microserviceTags,
             ResourceGroupName = resourceGroup.Name,
-            ManagedEnvironmentId = managedEnvironmentId,
+            ManagedEnvironmentId = managedEnvironment.Id,
             Configuration = new ConfigurationArgs
             {
                 Ingress = new IngressArgs

@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
+using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Pulumi.Automation;
@@ -19,28 +19,28 @@ public class StacksForApplications : IStacksForApplications
         _logger = logger;
     }
 
-    public async Task<bool> HasFor(ApplicationId applicationId, CloudRuntimeEnvironment environment)
+    public async Task<bool> HasFor(ApplicationId applicationId, ApplicationEnvironment environment)
     {
-        var count = await _collection.CountDocumentsAsync(_ => _.Id == applicationId && _.Environment == environment.ToDisplayName());
+        var count = await _collection.CountDocumentsAsync(_ => _.Id == applicationId && _.Environment == environment.DisplayName);
         return count == 1;
     }
 
-    public async Task<StackDeployment> GetFor(ApplicationId applicationId, CloudRuntimeEnvironment environment)
+    public async Task<StackDeployment> GetFor(ApplicationId applicationId, ApplicationEnvironment environment)
     {
         _logger.Getting(applicationId);
-        var result = await _collection.FindAsync(_ => _.Id == applicationId && _.Environment == environment.ToDisplayName());
+        var result = await _collection.FindAsync(_ => _.Id == applicationId && _.Environment == environment.DisplayName);
         var document = result.First();
         return StackDeployment.FromJsonString(document.Deployment.ToString());
     }
 
-    public async Task Save(ApplicationId applicationId, CloudRuntimeEnvironment environment, StackDeployment stackDeployment)
+    public async Task Save(ApplicationId applicationId, ApplicationEnvironment environment, StackDeployment stackDeployment)
     {
         _logger.Saving(applicationId);
         try
         {
             var stackDeploymentBson = BsonDocument.Parse(stackDeployment.Json.ToString());
-            var document = new StackDeploymentForApplication(applicationId, environment.ToDisplayName(), stackDeploymentBson);
-            await _collection.ReplaceOneAsync(_ => _.Id == applicationId && _.Environment == environment.ToDisplayName(), document, new ReplaceOptions { IsUpsert = true });
+            var document = new StackDeploymentForApplication(applicationId, environment.DisplayName, stackDeploymentBson);
+            await _collection.ReplaceOneAsync(_ => _.Id == applicationId && _.Environment == environment.DisplayName, document, new ReplaceOptions { IsUpsert = true });
         }
         catch (Exception ex)
         {

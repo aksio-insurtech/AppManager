@@ -1,23 +1,20 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { Remove } from 'API/applications/Remove';
 import { Application as ApplicationModel } from 'API/applications/Application';
 import { useNavigate } from 'react-router-dom';
-import { ResourcesForApplication } from 'API/applications/ResourcesForApplication';
-import { AllSettings } from 'API/organization/settings/AllSettings';
+//import { ResourcesForApplication } from 'API/applications/ResourcesForApplication';
+import { AllSettings } from 'API/settings/AllSettings';
 
 export interface IGeneralProps {
     application: ApplicationModel;
 }
 
 export const General = (props: IGeneralProps) => {
-    const removeApplicationCommand = new Remove();
     const navigate = useNavigate();
     const [settings] = AllSettings.use();
-    const [resources] = ResourcesForApplication.use({ applicationId: props.application.id });
-
-    const subscription = settings.data?.azureSubscriptions?.find(_ => _.subscriptionId === resources.data?.azure?.subscriptionId);
+    // const [resources] = ResourcesForApplication.use({ applicationId: props.application.id });
+    // const subscription = settings.data?.azureSubscriptions?.find(_ => _.subscriptionId === resources.data?.azure?.subscriptionId);
 
     return (
         <></>

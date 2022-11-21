@@ -11,11 +11,11 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationKeyVaultExtensions
 {
-    public static Vault SetupKeyVault(this Application application, UserAssignedIdentity identity, ResourceGroup resourceGroup, Tags tags)
+    public static Vault SetupKeyVault(this Application application, ApplicationEnvironmentWithArtifacts environment, UserAssignedIdentity identity, ResourceGroup resourceGroup, Tags tags)
     {
         return new Vault(application.Name.Value, new()
         {
-            Location = application.CloudLocation.Value,
+            Location = environment.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
             VaultName = $"{application.Name}",
