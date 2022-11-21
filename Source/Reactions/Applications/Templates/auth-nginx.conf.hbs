@@ -27,7 +27,7 @@ http {
         location = /auth {
             internal;
             rewrite /validate / break;
-            proxy_pass {{IngressMiddlewareURL}};
+            proxy_pass {{IngressMiddlewareURL}}:81;
             proxy_set_header Host $http_host;
 
             proxy_pass_request_body off;
@@ -37,13 +37,13 @@ http {
 
         location /.aksio/id-porten/authorize {
             rewrite /.aksio / break;
-            proxy_pass {{IngressMiddlewareURL}};
+            proxy_pass {{IngressMiddlewareURL}}:81;
             proxy_set_header Host $http_host;
         }
 
         location /.aksio/id-porten/callback {
             rewrite /.aksio / break;
-            proxy_pass {{IngressMiddlewareURL}};
+            proxy_pass {{IngressMiddlewareURL}}:81;
             proxy_set_header Host $http_host;
         }
 

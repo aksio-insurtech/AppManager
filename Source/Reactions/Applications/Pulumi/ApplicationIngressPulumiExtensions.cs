@@ -3,6 +3,7 @@
 
 using Concepts.Applications;
 using Concepts.Applications.Environments.Ingresses.IdentityProviders;
+using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -161,6 +162,26 @@ public static class ApplicationIngressPulumiExtensions
                                 "-g",
                                 "daemon off;"
                             },
+                        VolumeMounts = new VolumeMountArgs[]
+                                {
+                                    new()
+                                    {
+                                        MountPath = "/config",
+                                        VolumeName = storageName
+                                    }
+                                }
+                    },
+                    new ContainerArgs
+                    {
+                        Name = "middleware",
+                        Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}",
+                        Command =
+                            {
+                                "./IngressMiddleware",
+                                "--urls",
+                                $"http://localhost:81"
+                            },
+
                         VolumeMounts = new VolumeMountArgs[]
                                 {
                                     new()
