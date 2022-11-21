@@ -179,7 +179,7 @@ public static class ApplicationIngressPulumiExtensions
                             {
                                 "./IngressMiddleware",
                                 "--urls",
-                                $"http://localhost:81"
+                                "http://localhost:81"
                             },
 
                         VolumeMounts = new VolumeMountArgs[]
