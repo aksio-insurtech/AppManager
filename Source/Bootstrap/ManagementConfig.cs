@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 
 namespace Bootstrap;
 
@@ -13,4 +14,5 @@ public record ManagementConfig(
     AzureConfig Azure,
     PulumiConfig Pulumi,
     MongoDBConfig MongoDB,
-    AuthenticationConfig Authentication);
+    AuthenticationConfig Authentication,
+    CertificateValue Certificate);

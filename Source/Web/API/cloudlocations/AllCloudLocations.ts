@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { QueryFor, QueryResult, useQuery, PerformQuery } from '@aksio/cratis-applications-frontend/queries';
+import { QueryFor, QueryResultWithState, useQuery, PerformQuery } from '@aksio/cratis-applications-frontend/queries';
 import { CloudLocation } from './CloudLocation';
 import Handlebars from 'handlebars';
 
@@ -13,12 +13,16 @@ export class AllCloudLocations extends QueryFor<CloudLocation[]> {
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: CloudLocation[] = [];
 
+    constructor() {
+        super(CloudLocation, true);
+    }
+
     get requestArguments(): string[] {
         return [
         ];
     }
 
-    static use(): [QueryResult<CloudLocation[]>, PerformQuery] {
+    static use(): [QueryResultWithState<CloudLocation[]>, PerformQuery] {
         return useQuery<CloudLocation[], AllCloudLocations>(AllCloudLocations);
     }
 }

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Common;
-using Concepts;
 using Concepts.Applications;
 using Pulumi;
 using Pulumi.AzureNative.Network;
@@ -21,7 +20,7 @@ public static class ApplicationMongoDBPulumiExtensions
         ISettings settings,
         ResourceGroup resourceGroup,
         VirtualNetwork vnet,
-        CloudRuntimeEnvironment environment,
+        ApplicationEnvironmentWithArtifacts environment,
         Tags tags)
     {
         var mongoDBOrganizationId = settings.MongoDBOrganizationId;
@@ -31,7 +30,7 @@ public static class ApplicationMongoDBPulumiExtensions
             OrgId = mongoDBOrganizationId.Value
         });
 
-        var region = GetRegionName(application.CloudLocation);
+        var region = GetRegionName(environment.CloudLocation);
 
         var privateLinkEndpoint = new PrivateLinkEndpoint(application.Name, new()
         {
@@ -46,7 +45,7 @@ public static class ApplicationMongoDBPulumiExtensions
 
         var privateEndpoint = new PrivateEndpoint(application.Name, new()
         {
-            Location = application.CloudLocation.Value,
+            Location = environment.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
             Subnet = new SubnetArgs
@@ -82,7 +81,7 @@ public static class ApplicationMongoDBPulumiExtensions
             PrivateEndpointIpAddress = networkInterface.IpConfigurations[0].PrivateIPAddress!
         });
 
-        var clusterName = $"{application.Name}-{environment.ToDisplayName()}".ToLowerInvariant();
+        var clusterName = $"{application.Name}-{environment.DisplayName}".ToLowerInvariant();
         var cluster = new Cluster(clusterName, new ClusterArgs
         {
             ProjectId = project.Id,
@@ -93,10 +92,10 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var databasePassword = Guid.NewGuid().ToString();
-        if (application.Resources?.MongoDB?.Users is not null &&
-            (application.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        if (environment.Resources?.MongoDB?.Users is not null &&
+            (environment.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
         {
-            databasePassword = application.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
+            databasePassword = environment.Resources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
         }
 
         _ = new DatabaseUser("kernel", new()

@@ -54,10 +54,13 @@
         "Aksio",
         "aksioinsurtech",
         "aksiosystem",
+        "appmanager",
         "appsettings",
         "Autofac",
+        "azuread",
         "Bson",
         "certbot",
+        "cloudlocations",
         "Cratis",
         "deployables",
         "dhparams",
@@ -66,14 +69,18 @@
         "failcount",
         "Fqdns",
         "fullchain",
+        "ingressmiddleware",
         "inheritdoc",
         "letsencrypt",
         "Mongodbatlas",
+        "notnull",
         "Peerings",
+        "Porten",
         "privkey",
         "Pulumi",
         "Templating",
         "vnet",
-        "Xunit"
+        "Xunit",
+        "zumo"
     ]
 }

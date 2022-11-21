@@ -14,7 +14,7 @@ Types.AddAssemblyPrefixesToExclude(
     "Grpc");
 
 var builder = Host.CreateDefaultBuilder()
-                    .UseAksio()
+                    .UseAksio(microserviceId: "8c538618-2862-4018-b29d-17a4ec131958")
                     .ConfigureWebHostDefaults(_ => _.UseStartup<Startup>());
 
 var app = builder.Build();

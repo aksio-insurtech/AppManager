@@ -7,25 +7,26 @@ namespace Read.Applications;
 public class Applications : Controller
 {
     readonly IMongoCollection<Application> _applicationCollection;
-    readonly IMongoCollection<ApplicationResources> _applicationResourcesCollection;
-    readonly IMongoCollection<ApplicationsHierarchyForListing> _hierarchyCollection;
+    readonly IMongoCollection<ApplicationHierarchyForListing> _hierarchyCollection;
+    readonly IMongoCollection<EnvironmentVariablesForApplication> _environmentVariablesForApplicationCollection;
 
     public Applications(
         IMongoCollection<Application> applicationCollection,
-        IMongoCollection<ApplicationResources> applicationResourcesCollection,
-        IMongoCollection<ApplicationsHierarchyForListing> hierarchyCollection)
+        IMongoCollection<ApplicationHierarchyForListing> hierarchyCollection,
+        IMongoCollection<EnvironmentVariablesForApplication> environmentVariablesForApplicationCollection)
     {
         _applicationCollection = applicationCollection;
-        _applicationResourcesCollection = applicationResourcesCollection;
         _hierarchyCollection = hierarchyCollection;
+        _environmentVariablesForApplicationCollection = environmentVariablesForApplicationCollection;
     }
 
     [HttpGet("{applicationId}")]
     public Task<Application> GetApplication([FromRoute] ApplicationId applicationId) => _applicationCollection.FindById(applicationId).FirstOrDefaultAsync();
 
-    [HttpGet("resources/{applicationId}")]
-    public Task<ApplicationResources> ResourcesForApplication([FromRoute] ApplicationId applicationId) => _applicationResourcesCollection.FindById(applicationId).FirstOrDefaultAsync();
-
     [HttpGet("hierarchy")]
-    public Task<ClientObservable<IEnumerable<ApplicationsHierarchyForListing>>> ApplicationsHierarchy() => _hierarchyCollection.Observe();
+    public Task<ClientObservable<IEnumerable<ApplicationHierarchyForListing>>> ApplicationsHierarchy() => _hierarchyCollection.Observe();
+
+    [HttpGet("{applicationId}/environment-variables")]
+    public Task<ClientObservable<EnvironmentVariablesForApplication>> EnvironmentVariablesForApplicationId([FromRoute] ApplicationId applicationId) =>
+        _environmentVariablesForApplicationCollection.ObserveById(applicationId);
 }

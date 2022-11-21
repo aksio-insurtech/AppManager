@@ -8,7 +8,8 @@ namespace Reactions.Applications.Pulumi;
 
 public interface IPulumiStackDefinitions
 {
-    Task<ApplicationResult> Application(ExecutionContext executionContext, Application application, CloudRuntimeEnvironment environment);
-    Task<ContainerAppResult> Microservice(ExecutionContext executionContext, Application application, Microservice microservice, CloudRuntimeEnvironment environment, bool useContainerRegistry = true, ResourceGroup? resourceGroup = default, IEnumerable<Deployable>? deployables = default);
-    Task Deployable(ExecutionContext executionContext, Application application, Microservice microservice, IEnumerable<Deployable> deployables, CloudRuntimeEnvironment environment);
+    Task<ApplicationEnvironmentResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion);
+    Task<IngressResult> Ingress(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, Ingress ingress, ResourceGroup? resourceGroup = default);
+    Task<ContainerAppResult> Microservice(ExecutionContext executionContext, Application application, Microservice microservice, ApplicationEnvironmentWithArtifacts environment, bool useContainerRegistry = true, ResourceGroup? resourceGroup = default, IEnumerable<Deployable>? deployables = default);
+    Task Deployable(ExecutionContext executionContext, Application application, Microservice microservice, IEnumerable<Deployable> deployables, ApplicationEnvironmentWithArtifacts environment);
 }

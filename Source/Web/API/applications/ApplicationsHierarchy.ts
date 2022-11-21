@@ -2,23 +2,27 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { ObservableQueryFor, QueryResult, useObservableQuery } from '@aksio/cratis-applications-frontend/queries';
-import { ApplicationsHierarchyForListing } from './ApplicationsHierarchyForListing';
+import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@aksio/cratis-applications-frontend/queries';
+import { ApplicationHierarchyForListing } from './ApplicationHierarchyForListing';
 import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/hierarchy');
 
-export class ApplicationsHierarchy extends ObservableQueryFor<ApplicationsHierarchyForListing[]> {
+export class ApplicationsHierarchy extends ObservableQueryFor<ApplicationHierarchyForListing[]> {
     readonly route: string = '/api/applications/hierarchy';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly defaultValue: ApplicationsHierarchyForListing[] = [];
+    readonly defaultValue: ApplicationHierarchyForListing[] = [];
+
+    constructor() {
+        super(ApplicationHierarchyForListing, true);
+    }
 
     get requestArguments(): string[] {
         return [
         ];
     }
 
-    static use(): [QueryResult<ApplicationsHierarchyForListing[]>] {
-        return useObservableQuery<ApplicationsHierarchyForListing[], ApplicationsHierarchy>(ApplicationsHierarchy);
+    static use(): [QueryResultWithState<ApplicationHierarchyForListing[]>] {
+        return useObservableQuery<ApplicationHierarchyForListing[], ApplicationsHierarchy>(ApplicationsHierarchy);
     }
 }

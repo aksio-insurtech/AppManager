@@ -1,13 +1,14 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
-using Events.Applications;
+using Aksio.Cratis.Execution;
+using Events.Applications.Environments;
 using Microsoft.Extensions.Logging;
-using Pulumi.Automation;
 using Reactions.Applications.Pulumi;
 
 namespace Reactions.Applications;
+
+#pragma warning disable IDE0052
 
 [Observer("c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5")]
 public class ApplicationResourcesCoordinator
@@ -15,96 +16,106 @@ public class ApplicationResourcesCoordinator
     readonly ILogger<ApplicationResources> _logger;
     readonly IImmediateProjections _projections;
     readonly ExecutionContext _executionContext;
+    readonly IExecutionContextManager _executionContextManager;
     readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IPulumiOperations _pulumiOperations;
+    readonly IEventLog _eventLog;
 
     public ApplicationResourcesCoordinator(
         ILogger<ApplicationResources> logger,
         IImmediateProjections projections,
         ExecutionContext executionContext,
+        IExecutionContextManager executionContextManager,
         IPulumiStackDefinitions stackDefinitions,
-        IPulumiOperations pulumiOperations)
+        IPulumiOperations pulumiOperations,
+        IEventLog eventLog)
     {
         _logger = logger;
         _projections = projections;
         _executionContext = executionContext;
+        _executionContextManager = executionContextManager;
         _stackDefinitions = stackDefinitions;
         _pulumiOperations = pulumiOperations;
+        _eventLog = eventLog;
     }
 
-    public Task ApplicationCreated(ApplicationCreated @event, EventContext context)
+    public async Task ConsolidationStarted(ApplicationEnvironmentConsolidationStarted @event, EventContext context)
     {
-        _logger.CreatingApplication(@event.Name);
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(context.EventSourceId);
+
+        Console.WriteLine(application);
+        Console.WriteLine(environment);
+
+        // _logger.ConsolidationStarted(environment.Name, application.Name);
+        await Task.Delay(5000);
+
+        // Todo: Set to actual execution context - might not be the right place for this!
+        _executionContextManager.Set(_executionContext);
+        await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
+    }
+
+    /*
+    public async Task ApplicationEnvironmentCreated(ApplicationEnvironmentCreated @event, EventContext context)
+    {
+        var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
+        var environment = application.GetEnvironmentById(context.EventSourceId);
+        _logger.CreatingApplicationEnvironment(@event.Name, application.Name);
+
         _ = Task.Run(async () =>
         {
-            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-            await _pulumiOperations.Up(application, application.Name, definition, CloudRuntimeEnvironment.Development);
+            var definition = PulumiFn.Create(() => _stackDefinitions.ApplicationEnvironment(_executionContext, application, environment, @event.CratisVersion));
+            await _pulumiOperations.Up(application, application.Name, definition, environment);
         });
-
-        return Task.CompletedTask;
     }
 
-    public Task ApplicationFrontendConfigured(ApplicationFrontendConfigured @event, EventContext context)
+    public async Task IngressCreated(IngressCreated @event, EventContext context)
     {
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var ingress = environment.GetIngressById(context.EventSourceId);
+        _logger.CreatingIngress(@event.Name, environment.Name, application.Name);
         _ = Task.Run(async () =>
         {
-            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-            var microservice = await _projections.GetInstanceById<Microservice>(@event.MicroserviceId);
-            var containerApp = await microservice.GetContainerApp(application, @event.Environment);
-            var resourceGroup = application.GetResourceGroup(@event.Environment);
-            _logger.ConfiguringFrontend(application.Name);
+            var definition = PulumiFn.Create(() => _stackDefinitions.Ingress(_executionContext, application, environment, ingress));
+            await _pulumiOperations.Up(application, application.Name, definition, environment);
         });
-
-        return Task.CompletedTask;
     }
 
-    public Task Removed(ApplicationRemoved @event, EventContext context)
+    public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
     {
-        _ = Task.Run(async () =>
-        {
-            var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-            _logger.RemovingApplication(application.Name);
-            var definition = PulumiFn.Create(() => _stackDefinitions.Application(_executionContext, application, CloudRuntimeEnvironment.Development));
-            await _pulumiOperations.Down(application, application.Name, definition, CloudRuntimeEnvironment.Development);
-        });
-
-        return Task.CompletedTask;
-    }
-
-    public Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
-    {
-        _logger.CreatingMicroservice(@event.Name);
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var microservice = environment.GetMicroserviceById(context.EventSourceId);
+        _logger.CreatingMicroservice(@event.Name, environment.Name, application.Name);
 
         _ = Task.Run(async () =>
         {
-            var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-            var microservice = await _projections.GetInstanceById<Microservice>(@context.EventSourceId);
             var projectName = GetProjectNameFor(application, microservice);
 
-            var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, CloudRuntimeEnvironment.Development));
+            var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, environment));
 
-            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
-            await _pulumiOperations.SetTag(projectName, CloudRuntimeEnvironment.Development, "Microservice", @event.Name);
+            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
+            await _pulumiOperations.SetTag(projectName, environment, "Microservice", @event.Name);
         });
-
-        return Task.CompletedTask;
     }
 
-    public Task DeployableCreated(DeployableCreated @event, EventContext context)
+    public async Task DeployableCreated(DeployableCreated @event, EventContext context)
     {
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+        var deployable = microservice.GetDeployableById(@context.EventSourceId);
+        _logger.DeployableCreated(microservice.Name, environment.Name, application.Name, deployable.Name, deployable.Image);
+
         _ = Task.Run(async () =>
         {
-            var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
-            var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
-            var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
             var projectName = GetProjectNameFor(application, microservice);
 
-            if (deployable.Image is null)
+            if (string.IsNullOrEmpty(deployable.Image))
             {
                 deployable = new(deployable.Id, deployable.MicroserviceId, deployable.Name, "nginx", deployable.Ports);
             }
-            _logger.DeployableCreated(microservice.Name, deployable.Name, deployable.Image);
 
             var definition = PulumiFn.Create(() =>
                 _stackDefinitions.Deployable(
@@ -115,22 +126,22 @@ public class ApplicationResourcesCoordinator
                     {
                         deployable
                     },
-                    CloudRuntimeEnvironment.Development));
+                    environment));
 
-            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
+            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
         });
-
-        return Task.CompletedTask;
     }
 
-    public Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
     {
+        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+        var environment = application.GetEnvironmentById(@event.EnvironmentId);
+        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+        var deployable = microservice.GetDeployableById(@context.EventSourceId);
+        _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image, environment.Name, application.Name);
+
         _ = Task.Run(async () =>
         {
-            var deployable = await _projections.GetInstanceById<Deployable>(@context.EventSourceId);
-            var microservice = await _projections.GetInstanceById<Microservice>(deployable.MicroserviceId);
-            var application = await _projections.GetInstanceById<Application>(microservice.ApplicationId);
-            _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image);
             var projectName = GetProjectNameFor(application, microservice);
 
             var definition = PulumiFn.Create(() =>
@@ -142,13 +153,36 @@ public class ApplicationResourcesCoordinator
                     {
                         deployable
                     },
-                    CloudRuntimeEnvironment.Development));
+                    environment));
 
-            await _pulumiOperations.Up(application, projectName, definition, CloudRuntimeEnvironment.Development, microservice);
+            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
         });
+    }
 
-        return Task.CompletedTask;
+    public async Task ConsolidateAllForEnvironment(ApplicationId applicationId, ApplicationEnvironmentId environmentId)
+    {
+        var application = await _projections.GetInstanceById<Application>(applicationId);
+        var environment = application.GetEnvironmentById(environmentId);
+
+        // var projectName = GetProjectNameFor(application, microservice);
+        // var definition = PulumiFn.Create(() => _stackDefinitions.ApplicationEnvironment(_executionContext, application, environment, @event.CratisVersion));
+        // await _pulumiOperations.Up(application, application.Name, definition, environment);
+        foreach (var ingress in environment.Ingresses)
+        {
+            Console.WriteLine(ingress);
+        }
+
+        foreach (var microservice in environment.Microservices)
+        {
+            Console.WriteLine(microservice);
+
+            foreach (var deployable in microservice.Deployables)
+            {
+                Console.WriteLine(deployable);
+            }
+        }
     }
 
     string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";
+    */
 }

@@ -2,9 +2,14 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
+import { field } from '@aksio/cratis-fundamentals';
 
-export type Application = {
-    id: string;
-    name: string;
-    cloudLocation: string;
-};
+
+export class Application {
+
+    @field(String)
+    id!: string;
+
+    @field(String)
+    name!: string;
+}
