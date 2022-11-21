@@ -37,7 +37,7 @@ http {
 
         location /.aksio/id-porten/authorize {
             rewrite /.aksio / break;
-            proxy_pass {{IngressMiddlewareURL}};;
+            proxy_pass {{IngressMiddlewareURL}};
             proxy_set_header Host $http_host;
         }
 
