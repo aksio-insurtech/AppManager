@@ -191,7 +191,7 @@ public static class ApplicationIngressPulumiExtensions
                                 {
                                     new()
                                     {
-                                        MountPath = "/config",
+                                        MountPath = "/app/config",
                                         VolumeName = storageName
                                     }
                                 }
