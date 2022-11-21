@@ -179,7 +179,7 @@ public static class ApplicationIngressPulumiExtensions
                     new ContainerArgs
                     {
                         Name = "middleware",
-                        Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}",
+                        Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
                         Command =
                             {
                                 "./IngressMiddleware",
