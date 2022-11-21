@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { QueryFor, QueryResult, useQuery, PerformQuery } from '@aksio/cratis-applications-frontend/queries';
+import { QueryFor, QueryResultWithState, useQuery, PerformQuery } from '@aksio/cratis-applications-frontend/queries';
 import { ApplicationResources } from './ApplicationResources';
 import Handlebars from 'handlebars';
 
@@ -16,13 +16,17 @@ export class ResourcesForApplication extends QueryFor<ApplicationResources, Reso
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ApplicationResources = {} as any;
 
+    constructor() {
+        super(ApplicationResources, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',
         ];
     }
 
-    static use(args?: ResourcesForApplicationArguments): [QueryResult<ApplicationResources>, PerformQuery<ResourcesForApplicationArguments>] {
+    static use(args?: ResourcesForApplicationArguments): [QueryResultWithState<ApplicationResources>, PerformQuery<ResourcesForApplicationArguments>] {
         return useQuery<ApplicationResources, ResourcesForApplication, ResourcesForApplicationArguments>(ResourcesForApplication, args);
     }
 }

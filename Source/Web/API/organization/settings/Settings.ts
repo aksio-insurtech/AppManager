@@ -2,15 +2,31 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
+import { field } from '@aksio/cratis-fundamentals';
+
 import { AzureSubscription } from './AzureSubscription';
 import { AzureServicePrincipal } from './AzureServicePrincipal';
 
-export type Settings = {
-    azureSubscriptions: AzureSubscription[];
-    pulumiOrganization: string;
-    pulumiAccessToken: string;
-    mongoDBOrganizationId: string;
-    mongoDBPublicKey: string;
-    mongoDBPrivateKey: string;
-    servicePrincipal: AzureServicePrincipal;
-};
+export class Settings {
+
+    @field(AzureSubscription, true)
+    azureSubscriptions!: AzureSubscription[];
+
+    @field(String)
+    pulumiOrganization!: string;
+
+    @field(String)
+    pulumiAccessToken!: string;
+
+    @field(String)
+    mongoDBOrganizationId!: string;
+
+    @field(String)
+    mongoDBPublicKey!: string;
+
+    @field(String)
+    mongoDBPrivateKey!: string;
+
+    @field(AzureServicePrincipal)
+    servicePrincipal!: AzureServicePrincipal;
+}

@@ -2,8 +2,14 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
+import { field } from '@aksio/cratis-fundamentals';
 
-export type MongoDBUser = {
-    userName: string;
-    password: string;
-};
+
+export class MongoDBUser {
+
+    @field(String)
+    userName!: string;
+
+    @field(String)
+    password!: string;
+}

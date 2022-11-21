@@ -2,10 +2,20 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
+import { field } from '@aksio/cratis-fundamentals';
 
-export type AzureSubscription = {
-    subscriptionId: string;
-    name: string;
-    tenantName: string;
-    tenantId: string;
-};
+
+export class AzureSubscription {
+
+    @field(String)
+    subscriptionId!: string;
+
+    @field(String)
+    name!: string;
+
+    @field(String)
+    tenantName!: string;
+
+    @field(String)
+    tenantId!: string;
+}
