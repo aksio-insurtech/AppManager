@@ -1,8 +1,14 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts;
 using Concepts.Applications.Environments.Ingresses;
 
 namespace Reactions.Applications;
 
-public record Ingress(IngressId Id, IngressName Name, IEnumerable<Route> Routes, IEnumerable<IdentityProvider> IdentityProviders);
+public record Ingress(
+    IngressId Id,
+    IngressName Name,
+    SemanticVersion MiddlewareVersion,
+    IEnumerable<Route> Routes,
+    IEnumerable<IdentityProvider> IdentityProviders);

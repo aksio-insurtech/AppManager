@@ -156,6 +156,7 @@ public static class Program
         var dockerHub = new DockerHub();
         var cratisVersion = await dockerHub.GetLastVersionOfCratis();
         var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
+        var ingressMiddlewareVersion = await dockerHub.GetLastVersionOfIngressMiddleware();
 
         var identityProvider = applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.First();
         return applicationAndEnvironment with
@@ -184,6 +185,7 @@ public static class Program
                 {
                     applicationAndEnvironment.Environment.Ingresses.First() with
                     {
+                        MiddlewareVersion = ingressMiddlewareVersion,
                         IdentityProviders = new[]
                         {
                             identityProvider with
