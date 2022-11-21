@@ -23,8 +23,6 @@ export const ConfigFiles = () => {
             modalContent={AddConfigFileDialog}
             getRowId={(tenant) => tenant.id.tenantId}
             modalClosed={async (result, output) => {
-                if (result == ModalResult.success) {
-                }
             }} />
     );
 };

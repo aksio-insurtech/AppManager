@@ -24,8 +24,6 @@ export const Secrets = () => {
             modalContent={AddSecretDialog}
             getRowId={(tenant) => tenant.id.tenantId}
             modalClosed={async (result, output) => {
-                if (result == ModalResult.success) {
-                }
             }} />
     );
 };
