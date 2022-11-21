@@ -1,5 +1,5 @@
 {
-{{#if idPorten }}
+{{#if IdPorten }}
     "idPorten": {
         "callback": "Callback url to tell Id-porten to call back to",
         "authorizationEndpoint": "The Id-porten authorization endpoint",
@@ -10,9 +10,11 @@
     },
 {{/if}}
     "tenants": {
-        "<tenant guid>": {
-            "domain": "fully qualified host string",
-            "onBehalfOf": "Value to use for id-porten as behalf of"
+{{#Tenants}}
+        "{{TenantId}}": {
+            "domain": "{{Domain}}",
+            "onBehalfOf": "{{OnBehalfOf}}"
         }
     }
+{{/Tenants}}
 }
