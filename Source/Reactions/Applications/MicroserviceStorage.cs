@@ -84,7 +84,7 @@ public class MicroserviceStorage
                         "eventStore", new()
                         {
                             Type = "MongoDB",
-                            ConnectionDetails = $"{mongoDBConnectionString}/{microservice.Name}-es-shared"
+                            ConnectionDetails = $"{mongoDBConnectionString}/{GetFirstPartOf(microservice.Id)}-es-shared"
                         }
                     }
                 },
@@ -93,20 +93,20 @@ public class MicroserviceStorage
 
             foreach (var tenant in tenants)
             {
-                config.Storage.Microservices[microservice.Id.ToString()].Tenants[tenant.Name.ToString()] = new()
+                config.Storage.Microservices[microservice.Id.ToString()].Tenants[tenant.Id.ToString()] = new()
                 {
                     {
                         "readModels", new()
                         {
                             Type = "MongoDB",
-                            ConnectionDetails = $"{mongoDBConnectionString}/${microservice.Name}-${tenant.Name}-rm"
+                            ConnectionDetails = $"{mongoDBConnectionString}/{GetFirstPartOf(microservice.Id)}-{GetFirstPartOf(tenant.Id)}-rm"
                         }
                     },
                     {
                         "eventStore", new()
                         {
                             Type = "MongoDB",
-                            ConnectionDetails = $"{mongoDBConnectionString}/${microservice.Name}-${tenant.Name}-es"
+                            ConnectionDetails = $"{mongoDBConnectionString}/{GetFirstPartOf(microservice.Id)}-{GetFirstPartOf(tenant.Id)}-es"
                         }
                     }
                 };
@@ -134,4 +134,6 @@ public class MicroserviceStorage
         var content = TemplateTypes.ClusterClient(new { ConnectionString = connectionString });
         FileStorage.Upload("cluster.json", content);
     }
+
+    string GetFirstPartOf(Guid guid) => guid.ToString().Split('-')[0];
 }
