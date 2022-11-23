@@ -1,12 +1,18 @@
 {
+{{#if AzureAD }}
+    "azureAd": {
+        "issuer": "{{AzureAdConfig.Issuer}}",
+        "authorizeEndpoint": "{{AzureAdConfig.AuthorizeEndpoint}}"
+    },
+{{/if}}
 {{#if IdPorten }}
     "idPorten": {
-        "callback": "Callback url to tell Id-porten to call back to",
-        "authorizationEndpoint": "The Id-porten authorization endpoint",
-        "tokenEndpoint": "The Id-porten token endpoint",
-        "clientId": "The client Id to use for getting id/access tokens",
-        "clientSecret": "The client secret to use for getting id/access tokens",
-        "authName": "Name of auth in Container App"
+        "callback": "{{IdPortenConfig.Callback}}",
+        "authorizationEndpoint": "{{IdPortenConfig.AuthorizationEndpoint}}",
+        "tokenEndpoint": "{{IdPortenConfig.TokenEndpoint}}",
+        "clientId": "{{IdPortenConfig.ClientId}}",
+        "clientSecret": "{{IdPortenConfig.ClientSecret}}",
+        "authName": "idporten"
     },
 {{/if}}
     "tenants": {

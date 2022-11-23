@@ -25,6 +25,7 @@ public static class ApplicationIngressPulumiExtensions
 
     public static async Task ConfigureAuthIngress(
         this Application application,
+        ApplicationEnvironmentWithArtifacts environment,
         ResourceGroup resourceGroup,
         Ingress ingress,
         Storage storage,
@@ -37,7 +38,12 @@ public static class ApplicationIngressPulumiExtensions
         var nginxContent = TemplateTypes.AuthIngressConfig(templateContent);
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
 
-        var middlewareContent = new IngressMiddlewareTemplateContent(false, IdPortenConfig.Empty, Enumerable.Empty<TenantConfig>());
+        var middlewareContent = new IngressMiddlewareTemplateContent(
+            true,
+            false,
+            new AzureAdConfig("https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0", $"https://{ingress.AuthDomain}/.aksio/azuread"),
+            IdPortenConfig.Empty,
+            environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), tenant.Domain, tenant.OnBehalfOf)));
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
     }
@@ -136,11 +142,12 @@ public static class ApplicationIngressPulumiExtensions
         var authContainerApp = SetupAuthIngress(resourceGroup, environment, managedEnvironment, ingress, tags, storageName, certificateResourceIdentifiers);
         var authIngressConfig = await authContainerApp.Configuration.GetValue();
         await application.ConfigureAuthIngress(
+            environment,
             resourceGroup,
             ingress,
             storage,
             nginxFileShare,
-            new AuthIngressTemplateContent($"https://{authIngressConfig!.Ingress!.Fqdn}", $"https://{compositionIngressConfig!.Ingress!.Fqdn}"),
+            new AuthIngressTemplateContent($"http://{authIngressConfig!.Ingress!.Fqdn}", $"http://{compositionIngressConfig!.Ingress!.Fqdn}"),
             fileStorageLogger);
 
         return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, authContainerApp, compositionContainerApp);
@@ -171,6 +178,14 @@ public static class ApplicationIngressPulumiExtensions
                         BindingType = BindingType.SniEnabled,
                         CertificateId = certificates[tenant.CertificateId],
                         Name = tenant.Domain.Value
+                    }).Concat(new[]
+                    {
+                        new CustomDomainArgs
+                        {
+                            BindingType = BindingType.SniEnabled,
+                            CertificateId = certificates[ingress.AuthCertificateId],
+                            Name = ingress.AuthDomain.Value
+                        }
                     }).ToArray()
                 },
             },
@@ -216,7 +231,7 @@ public static class ApplicationIngressPulumiExtensions
                             {
                                 "./IngressMiddleware",
                                 "--urls",
-                                "http://localhost:81"
+                                "http://*:81"
                             },
 
                         VolumeMounts = new VolumeMountArgs[]
@@ -248,8 +263,9 @@ public static class ApplicationIngressPulumiExtensions
             {
                 Ingress = new IngressArgs
                 {
-                    External = true,
-                    TargetPort = 80
+                    External = false,
+                    TargetPort = 80,
+                    AllowInsecure = true
                 },
                 Secrets = ingress.IdentityProviders.Select(idp => new SecretArgs
                 {

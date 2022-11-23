@@ -3,9 +3,7 @@
 
 namespace Reactions.Applications.Templates;
 
-public record IngressMiddlewareTemplateContent(
-    bool AzureAd,
-    bool IdPorten,
-    AzureAdConfig AzureAdConfig,
-    IdPortenConfig IdPortenConfig,
-    IEnumerable<TenantConfig> Tenants);
+public record AzureAdConfig(string Issuer, string AuthorizeEndpoint)
+{
+    public static readonly AzureAdConfig Empty = new(string.Empty, string.Empty);
+}
