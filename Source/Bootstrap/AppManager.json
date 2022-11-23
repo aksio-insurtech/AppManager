@@ -1,7 +1,6 @@
 {
     "id": "1091c7d3-f533-420d-abc0-bbb7f0defd66",
     "name": "AppManager",
-
     "environment": {
         "id": "00126dcd-8d1e-42c3-835b-7978a545ec5c",
         "name": "Development",
@@ -14,14 +13,15 @@
             {
                 "id": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
                 "name": "Development",
-                "value": ""
+                "value": "",
+                "password": ""
             }
         ],
         "tenants": [
             {
                 "id": "ad1fb1bb-1152-464b-8fdd-d622445d46b6",
                 "name": "Aksio Insurtech",
-                "domain": "appmanager.dev.aksio.app",
+                "domain": "manager.aksio.app",
                 "certificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
                 "onBehalfOf": ""
             }

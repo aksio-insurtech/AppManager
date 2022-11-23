@@ -2,9 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
+using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.Resources;
@@ -88,6 +90,23 @@ public static class ApplicationIngressPulumiExtensions
             ResourceGroupName = resourceGroup.Name,
         });
 
+        var certificateResourceIdentifiers = new Dictionary<CertificateId, Output<string>>();
+        foreach (var certificate in environment.Certificates)
+        {
+            var certificateResult = new global::Pulumi.AzureNative.App.Certificate(certificate.Name, new()
+            {
+                ResourceGroupName = resourceGroup.Name,
+                Tags = tags,
+                EnvironmentName = managedEnvironment.Name,
+                Properties = new CertificatePropertiesArgs()
+                {
+                    Value = certificate.Value.Value,
+                    Password = certificate.Password.Value
+                }
+            });
+            certificateResourceIdentifiers[certificate.Id] = certificateResult.Id;
+        }
+
         await application.ConfigureCompositionIngress(resourceGroup, ingress, storage, nginxFileShare, microservices, fileStorageLogger);
 
         _ = new ManagedEnvironmentsStorage(storageName, new()
@@ -114,7 +133,7 @@ public static class ApplicationIngressPulumiExtensions
         var fileShareId = await nginxFileShare.Id.GetValue();
         SetupAuthenticationForIngress(environment, resourceGroup, compositionContainerApp, ingress);
 
-        var authContainerApp = SetupAuthIngress(resourceGroup, managedEnvironment, ingress, tags, storageName);
+        var authContainerApp = SetupAuthIngress(resourceGroup, environment, managedEnvironment, ingress, tags, storageName, certificateResourceIdentifiers);
         var authIngressConfig = await authContainerApp.Configuration.GetValue();
         await application.ConfigureAuthIngress(
             resourceGroup,
@@ -124,10 +143,17 @@ public static class ApplicationIngressPulumiExtensions
             new AuthIngressTemplateContent($"https://{authIngressConfig!.Ingress!.Fqdn}", $"https://{compositionIngressConfig!.Ingress!.Fqdn}"),
             fileStorageLogger);
 
-        return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, compositionContainerApp);
+        return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, authContainerApp, compositionContainerApp);
     }
 
-    static ContainerApp SetupAuthIngress(ResourceGroup resourceGroup, ManagedEnvironment managedEnvironment, Ingress ingress, Tags tags, string storageName) =>
+    static ContainerApp SetupAuthIngress(
+        ResourceGroup resourceGroup,
+        ApplicationEnvironmentWithArtifacts environment,
+        ManagedEnvironment managedEnvironment,
+        Ingress ingress,
+        Tags tags,
+        string storageName,
+        IDictionary<CertificateId, Output<string>> certificates) =>
         new($"{ingress.Name}-ingress-auth", new()
         {
             Location = resourceGroup.Location,
@@ -139,8 +165,14 @@ public static class ApplicationIngressPulumiExtensions
                 Ingress = new IngressArgs
                 {
                     External = true,
-                    TargetPort = 80
-                }
+                    TargetPort = 80,
+                    CustomDomains = environment.Tenants.Select(tenant => new CustomDomainArgs
+                    {
+                        BindingType = BindingType.SniEnabled,
+                        CertificateId = certificates[tenant.CertificateId],
+                        Name = tenant.Domain.Value
+                    }).ToArray()
+                },
             },
             Template = new TemplateArgs
             {

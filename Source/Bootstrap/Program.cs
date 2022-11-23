@@ -174,13 +174,12 @@ public static class Program
                     null!,
                     new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
 
-                Certificates = new[]
-                {
-                    applicationAndEnvironment.Environment.Certificates.First() with
-                    {
-                        Value = config.Certificate
-                    }
-                },
+                Certificates = config.Certificates.Select(
+                    c => new Certificate(
+                        c.Id,
+                        c.Name,
+                        Convert.ToBase64String(File.ReadAllBytes(c.File)),
+                        c.Password)),
                 Ingresses = new[]
                 {
                     applicationAndEnvironment.Environment.Ingresses.First() with
