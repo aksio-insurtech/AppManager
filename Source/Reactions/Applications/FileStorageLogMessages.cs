@@ -8,5 +8,8 @@ namespace Reactions.Applications;
 public static partial class FileStorageLogMessages
 {
     [LoggerMessage(0, LogLevel.Information, "Uploading '{FileName}' to file share '{Share}'")]
-    public static partial void Uploading(this ILogger logger, string fileName, string share);
+    public static partial void Uploading(this ILogger<FileStorage> logger, string fileName, string share);
+
+    [LoggerMessage(1, LogLevel.Warning, "File '{FileName}' does not have any content - ignoring upload to '{Share}'")]
+    public static partial void NoContent(this ILogger<FileStorage> logger, string fileName, string share);
 }

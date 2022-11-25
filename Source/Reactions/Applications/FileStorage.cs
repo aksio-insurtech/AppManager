@@ -4,7 +4,6 @@
 using System.Text;
 using Azure.Storage.Files.Shares;
 using Microsoft.Extensions.Logging;
-using Pulumi;
 
 namespace Reactions.Applications;
 
@@ -37,13 +36,11 @@ public class FileStorage
     {
         if (content.Length == 0)
         {
-            Log.Warn($"File '{fileName}' does not have any content - ignoring upload to kernel storage");
+            _logger.NoContent(fileName, ShareName);
             return;
         }
 
         _logger.Uploading(fileName, ShareName);
-
-        Log.Info($"Upload file '{fileName}'");
 
         var file = _directoryClient.GetFileClient(fileName);
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));

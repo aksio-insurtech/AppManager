@@ -26,14 +26,12 @@ public static class ApplicationIngressPulumiExtensions
         this Application application,
         ApplicationEnvironmentWithArtifacts environment,
         IDictionary<MicroserviceId, ContainerApp> microservices,
-        ResourceGroup resourceGroup,
         Ingress ingress,
         Storage storage,
-        FileShare fileShare,
+        string fileShareName,
         ILogger<FileStorage> fileStorageLogger)
     {
-        var nginxFileShareName = await fileShare.Name.GetValue();
-        var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, nginxFileShareName, fileStorageLogger);
+        var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
 
         var routes = new List<IngressTemplateRouteContent>();
         foreach (var route in ingress.Routes)
@@ -118,10 +116,9 @@ public static class ApplicationIngressPulumiExtensions
         await application.ConfigureIngress(
             environment,
             microservices,
-            resourceGroup,
             ingress,
             storage,
-            nginxFileShare,
+            ingressFileShareName,
             fileStorageLogger);
 
         return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
