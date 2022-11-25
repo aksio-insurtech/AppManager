@@ -63,7 +63,8 @@ public static class Program
             definitions,
             stacksForApplications,
             stacksForMicroservices,
-            loggerFactory.CreateLogger<PulumiOperations>());
+            loggerFactory.CreateLogger<PulumiOperations>(),
+            loggerFactory.CreateLogger<FileStorage>());
 
         await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment);
 

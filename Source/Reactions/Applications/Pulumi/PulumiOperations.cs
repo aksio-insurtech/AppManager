@@ -13,6 +13,8 @@ using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.Automation;
+using Pulumi.AzureNative.App;
+using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -22,6 +24,7 @@ namespace Reactions.Applications.Pulumi;
 public class PulumiOperations : IPulumiOperations
 {
     readonly ILogger<PulumiOperations> _logger;
+    readonly ILogger<FileStorage> _fileStorageLogger;
     readonly ISettings _settings;
     readonly IExecutionContextManager _executionContextManager;
     readonly IPulumiStackDefinitions _stackDefinitions;
@@ -34,9 +37,11 @@ public class PulumiOperations : IPulumiOperations
         IPulumiStackDefinitions stackDefinitions,
         IStacksForApplications stacksForApplications,
         IStacksForMicroservices stacksForMicroservices,
-        ILogger<PulumiOperations> logger)
+        ILogger<PulumiOperations> logger,
+        ILogger<FileStorage> fileStorageLogger)
     {
         _logger = logger;
+        _fileStorageLogger = fileStorageLogger;
         _settings = applicationSettings;
         _executionContextManager = executionContextManager;
         _stackDefinitions = stackDefinitions;
@@ -155,6 +160,7 @@ public class PulumiOperations : IPulumiOperations
     {
         ApplicationEnvironmentResult? applicationEnvironmentResult = default;
         var executionContext = _executionContextManager.Current;
+        var ingressResults = new Dictionary<Ingress, IngressResult>();
 
         await Up(
             application,
@@ -165,7 +171,7 @@ public class PulumiOperations : IPulumiOperations
 
                 foreach (var ingress in environment.Ingresses)
                 {
-                    await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult.ResourceGroup);
+                    ingressResults[ingress] = await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult!.ResourceGroup);
                 }
             }),
             environment);
@@ -174,6 +180,9 @@ public class PulumiOperations : IPulumiOperations
         {
             return;
         }
+
+        var containerAppResourceIdentifiersById = new Dictionary<MicroserviceId, string>();
+        var containerAppNamesById = new Dictionary<MicroserviceId, string>();
 
         foreach (var microservice in environment.Microservices)
         {
@@ -191,10 +200,37 @@ public class PulumiOperations : IPulumiOperations
                         false,
                         resourceGroup: resourceGroup,
                         deployables: microservice.Deployables);
+
+                    microserviceResult.ContainerApp.Id.Apply(_ => containerAppResourceIdentifiersById[microservice.Id] = _);
+                    microserviceResult.ContainerApp.Name.Apply(_ => containerAppNamesById[microservice.Id] = _);
                 }),
                 environment,
                 microservice);
         }
+
+        await Up(
+            application,
+            PulumiFn.Create(async () =>
+            {
+                var resourceGroup = application.GetResourceGroup(environment);
+                var storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
+
+                var microserviceContainerApps = containerAppNamesById.ToDictionary(_ => _.Key, _ => ContainerApp.Get(_.Value, containerAppResourceIdentifiersById[_.Key]));
+
+                foreach (var (ingress, result) in ingressResults)
+                {
+                    var fileShare = global::Pulumi.AzureNative.Storage.FileShare.Get(result.FileShareName, result.FileShareId);
+                    await application.ConfigureIngress(
+                        environment,
+                        microserviceContainerApps,
+                        resourceGroup,
+                        ingress,
+                        storage,
+                        fileShare,
+                        _fileStorageLogger);
+                }
+            }),
+            environment);
     }
 
     async Task<WorkspaceStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, PulumiFn program, Microservice? microservice = default)
