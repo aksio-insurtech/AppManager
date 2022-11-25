@@ -1,8 +1,16 @@
 {
+    "cookieDomain": ".aksio.app",
 {{#if AzureAD }}
     "azureAd": {
         "issuer": "{{AzureAdConfig.Issuer}}",
-        "authorizeEndpoint": "{{AzureAdConfig.AuthorizeEndpoint}}"
+        "authorizationEndpoint": "{{AzureAdConfig.AuthorizationEndpoint}}",
+        "tokenEndpoint": "{{AzureADConfig.TokenEndpoint}}",
+        "callback": "{{AzureAdConfig.Callback}}",
+        "clientId": "{{AzureAdConfig.ClientId}}",
+        "clientSecret": "{{AzureAdConfig.ClientSecret}}",
+        "loginUrl": "{{AzureAdConfig.LoginUrl}}",
+        "authName": "azuread"
+
     },
 {{/if}}
 {{#if IdPorten }}
@@ -12,6 +20,7 @@
         "tokenEndpoint": "{{IdPortenConfig.TokenEndpoint}}",
         "clientId": "{{IdPortenConfig.ClientId}}",
         "clientSecret": "{{IdPortenConfig.ClientSecret}}",
+        "loginUrl": "{{IdPortenConfig.LoginUrl}}",
         "authName": "idporten"
     },
 {{/if}}

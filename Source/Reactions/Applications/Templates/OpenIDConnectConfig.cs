@@ -3,15 +3,19 @@
 
 namespace Reactions.Applications.Templates;
 
-public record IdPortenConfig(
+public record OpenIDConnectConfig(
     string Callback,
+    string Issuer,
     string AuthorizationEndpoint,
     string TokenEndpoint,
     string ClientId,
     string ClientSecret,
+    string LoginUrl,
     string AuthName)
 {
-    public static readonly IdPortenConfig Empty = new(
+    public static readonly OpenIDConnectConfig Empty = new(
+        string.Empty,
+        string.Empty,
         string.Empty,
         string.Empty,
         string.Empty,

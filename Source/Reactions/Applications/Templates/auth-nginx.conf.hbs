@@ -30,19 +30,24 @@ http {
             proxy_pass http://localhost:81/;
             proxy_set_header Host $http_host;
 
+            proxy_set_header x-ai-origin-uri https://$host$request_uri;
+
             proxy_pass_request_body off;
             proxy_set_header Content-Length "";
             proxy_set_header X-Original-URI $request_uri;
         }
 
         location /.aksio {
-            rewrite /.aksio / break;
+            rewrite ^/.aksio(/.*)$ $1 break;
             proxy_pass http://localhost:81;
             proxy_set_header Host $http_host;
         }
 
         location / {
             proxy_pass {{CompositionIngressURL}};
+
+            proxy_set_header x-ai-origin-uri $scheme://$host$request_uri;
+            add_header x-ai-origin-uri $scheme://$host$request_uri;
 
             auth_request_set $auth_resp_tenant_id $upstream_http_tenant_id;
             proxy_set_header Tenant-ID $auth_resp_tenant_id;
@@ -51,6 +56,9 @@ http {
             auth_request_set $auth_resp_x_zumo_auth $upstream_http_x_zumo_auth;
             proxy_set_header X-ZUMO-AUTH $auth_resp_x_zumo_auth;
             add_header X-ZUMO-AUTH $auth_resp_x_zumo_auth;
+
+            auth_request_set $saved_set_cookie $upstream_http_set_cookie;
+            add_header Set-Cookie $saved_set_cookie;
         }
     }
 }

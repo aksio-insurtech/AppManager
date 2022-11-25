@@ -38,11 +38,33 @@ public static class ApplicationIngressPulumiExtensions
         var nginxContent = TemplateTypes.AuthIngressConfig(templateContent);
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
 
+        var azureAdConfig = OpenIDConnectConfig.Empty;
+
+        foreach (var identityProvider in ingress.IdentityProviders)
+        {
+            switch (identityProvider.Type)
+            {
+                case IdentityProviderType.Azure:
+                    {
+                        azureAdConfig = new OpenIDConnectConfig(
+                            $"https://{ingress.AuthDomain}/.aksio/aad/login/callback",
+                            identityProvider.Issuer,
+                            identityProvider.AuthorizationEndpoint,
+                            identityProvider.TokenEndpoint,
+                            identityProvider.ClientId,
+                            identityProvider.ClientSecret,
+                            "https://main-ingress-compositionfc07bcef.salmonbush-348730a4.norwayeast.azurecontainerapps.io",
+                            identityProvider.Name);
+                    }
+                    break;
+            }
+        }
+
         var middlewareContent = new IngressMiddlewareTemplateContent(
             true,
             false,
-            new AzureAdConfig("https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0", $"https://{ingress.AuthDomain}/.aksio/azuread"),
-            IdPortenConfig.Empty,
+            azureAdConfig,
+            OpenIDConnectConfig.Empty,
             environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), tenant.Domain, tenant.OnBehalfOf)));
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
@@ -263,7 +285,7 @@ public static class ApplicationIngressPulumiExtensions
             {
                 Ingress = new IngressArgs
                 {
-                    External = false,
+                    External = true,
                     TargetPort = 80,
                     AllowInsecure = true
                 },
@@ -317,92 +339,102 @@ public static class ApplicationIngressPulumiExtensions
 
     static void SetupAuthenticationForIngress(ApplicationEnvironmentWithArtifacts environment, ResourceGroup resourceGroup, ContainerApp containerApp, Ingress ingress)
     {
+        var identityProviderArgs = new IdentityProvidersArgs
+        {
+            CustomOpenIdConnectProviders = new Dictionary<string, CustomOpenIdConnectProviderArgs>()
+        };
+
         foreach (var identityProvider in ingress.IdentityProviders)
         {
-            _ = new ContainerAppsAuthConfig("current", new()
-            {
-                AuthConfigName = "current",
-                ResourceGroupName = resourceGroup.Name,
-                ContainerAppName = containerApp.Name,
-                GlobalValidation = new GlobalValidationArgs()
-                {
-                    UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
-                    RedirectToProvider = "Microsoft"
-                },
-                Platform = new AuthPlatformArgs
-                {
-                    Enabled = true
-                },
-                IdentityProviders = GetIdentityPropertyConfiguration(identityProvider)
-            });
+            ConfigureIdentityProvider(ingress, identityProviderArgs, identityProvider);
         }
+
+        _ = new ContainerAppsAuthConfig("current", new()
+        {
+            AuthConfigName = "current",
+            ResourceGroupName = resourceGroup.Name,
+            ContainerAppName = containerApp.Name,
+            GlobalValidation = new GlobalValidationArgs()
+            {
+                UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
+                RedirectToProvider = "Microsoft"
+            },
+            Platform = new AuthPlatformArgs
+            {
+                Enabled = true
+            },
+            IdentityProviders = identityProviderArgs
+        });
     }
 
-    static IdentityProvidersArgs GetIdentityPropertyConfiguration(IdentityProvider identityProvider)
+    static void ConfigureIdentityProvider(Ingress ingress, IdentityProvidersArgs args, IdentityProvider identityProvider)
     {
-        var args = new IdentityProvidersArgs();
-
         switch (identityProvider.Type)
         {
             case IdentityProviderType.Azure:
-                args.AzureActiveDirectory = new AzureActiveDirectoryArgs
-                {
-                    Enabled = true,
-                    IsAutoProvisioned = true,
-                    Registration = new AzureActiveDirectoryRegistrationArgs
+                args.CustomOpenIdConnectProviders[identityProvider.Name.Value] =
+                    new CustomOpenIdConnectProviderArgs
                     {
-                        ClientId = identityProvider.ClientId.Value,
-                        ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
-                        OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
-                    },
-                    Validation = new AzureActiveDirectoryValidationArgs
-                    {
-                        AllowedAudiences =
-                                {
-                                    $"api://{identityProvider.ClientId}"
-                                }
-                    }
-                };
+                        Enabled = true,
+                        Login = new OpenIdConnectLoginArgs
+                        {
+                            Scopes = new string[]
+                            {
+                                "openid",
+                                "email",
+                                "profile"
+                            }
+                        },
+                        Registration = new OpenIdConnectRegistrationArgs
+                        {
+                            ClientId = identityProvider.ClientId.Value,
+                            ClientCredential = new OpenIdConnectClientCredentialArgs
+                            {
+                                ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
+                                Method = ClientCredentialMethod.ClientSecretPost
+                            },
+                            OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
+                            {
+                                Issuer = identityProvider.Issuer.Value,
+                                AuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/aad/authorize",
+                                TokenEndpoint = identityProvider.TokenEndpoint.Value,
+                                CertificationUri = identityProvider.CertificationUri.Value
+                            }
+                        }
+                    };
                 break;
 
             case IdentityProviderType.IdPorten:
-                args.CustomOpenIdConnectProviders = new Dictionary<string, CustomOpenIdConnectProviderArgs>
-                {
+                args.CustomOpenIdConnectProviders[identityProvider.Name.Value] =
+                    new CustomOpenIdConnectProviderArgs
                     {
-                        identityProvider.Name.Value,
-                        new CustomOpenIdConnectProviderArgs
+                        Enabled = true,
+                        Login = new OpenIdConnectLoginArgs
                         {
-                            Enabled = true,
-                            Login = new OpenIdConnectLoginArgs
+                            Scopes = new string[]
                             {
-                                Scopes = new string[]
-                                {
-                                    "openid",
-                                    "profile"
-                                }
+                                "openid",
+                                "profile"
+                            }
+                        },
+                        Registration = new OpenIdConnectRegistrationArgs
+                        {
+                            ClientId = identityProvider.ClientId.Value,
+                            ClientCredential = new OpenIdConnectClientCredentialArgs
+                            {
+                                ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
+                                Method = ClientCredentialMethod.ClientSecretPost
                             },
-                            Registration = new OpenIdConnectRegistrationArgs
+                            OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
                             {
-                                ClientId = identityProvider.ClientId.Value,
-                                ClientCredential = new OpenIdConnectClientCredentialArgs
-                                {
-                                    ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
-                                    Method = ClientCredentialMethod.ClientSecretPost
-                                },
-                                OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
-                                {
-                                    Issuer = identityProvider.Issuer.Value,
-                                    AuthorizationEndpoint = identityProvider.AuthorizationEndpoint.Value,
-                                    TokenEndpoint = identityProvider.TokenEndpoint.Value,
-                                    CertificationUri = identityProvider.CertificationUri.Value
-                                }
+                                Issuer = identityProvider.Issuer.Value,
+                                AuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/id-porten/authorize",
+                                TokenEndpoint = identityProvider.TokenEndpoint.Value,
+                                CertificationUri = identityProvider.CertificationUri.Value
                             }
                         }
-                    }
-                };
+                    };
                 break;
         }
-
-        return args;
     }
 }

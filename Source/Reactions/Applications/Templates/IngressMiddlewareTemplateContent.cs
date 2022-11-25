@@ -6,6 +6,6 @@ namespace Reactions.Applications.Templates;
 public record IngressMiddlewareTemplateContent(
     bool AzureAd,
     bool IdPorten,
-    AzureAdConfig AzureAdConfig,
-    IdPortenConfig IdPortenConfig,
+    OpenIDConnectConfig AzureAdConfig,
+    OpenIDConnectConfig IdPortenConfig,
     IEnumerable<TenantConfig> Tenants);
