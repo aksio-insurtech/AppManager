@@ -4,7 +4,6 @@
 namespace Reactions.Applications.Templates;
 
 public record OpenIDConnectConfig(
-    string Callback,
     string Issuer,
     string AuthorizationEndpoint,
     string TokenEndpoint,
@@ -14,7 +13,6 @@ public record OpenIDConnectConfig(
     string AuthName)
 {
     public static readonly OpenIDConnectConfig Empty = new(
-        string.Empty,
         string.Empty,
         string.Empty,
         string.Empty,

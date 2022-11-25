@@ -30,8 +30,6 @@
             {
                 "id": "6173e1f6-edee-423e-943a-e4bbc90349ce",
                 "name": "main",
-                "authDomain": "auth.aksio.app",
-                "authCertificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
                 "routes": [
                     {
                         "path": "/",
