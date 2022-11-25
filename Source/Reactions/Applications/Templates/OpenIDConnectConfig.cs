@@ -6,17 +6,9 @@ namespace Reactions.Applications.Templates;
 public record OpenIDConnectConfig(
     string Issuer,
     string AuthorizationEndpoint,
-    string TokenEndpoint,
-    string ClientId,
-    string ClientSecret,
-    string LoginUrl,
-    string AuthName)
+    string ProxyAuthorizationEndpoint)
 {
     public static readonly OpenIDConnectConfig Empty = new(
-        string.Empty,
-        string.Empty,
-        string.Empty,
-        string.Empty,
         string.Empty,
         string.Empty,
         string.Empty);

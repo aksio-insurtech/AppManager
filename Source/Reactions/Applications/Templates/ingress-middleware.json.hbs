@@ -1,13 +1,9 @@
 {
 {{#if IdPorten }}
     "idPorten": {
-        "callback": "{{IdPortenConfig.Callback}}",
+        "issuer": "{{IdPortenConfig.Issuer}}",
         "authorizationEndpoint": "{{IdPortenConfig.AuthorizationEndpoint}}",
-        "tokenEndpoint": "{{IdPortenConfig.TokenEndpoint}}",
-        "clientId": "{{IdPortenConfig.ClientId}}",
-        "clientSecret": "{{IdPortenConfig.ClientSecret}}",
-        "loginUrl": "{{IdPortenConfig.LoginUrl}}",
-        "authName": "idporten"
+        "proxyAuthorizationEndpoint": "{{IdPortenConfig.ProxyAuthorizationEndpoint}}"
     },
 {{/if}}
     "tenants": {

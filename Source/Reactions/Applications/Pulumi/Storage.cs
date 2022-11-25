@@ -3,4 +3,7 @@
 
 namespace Reactions.Applications.Pulumi;
 
-public record Storage(string AccountName, string AccountKey);
+public record Storage(string AccountName, string AccountKey)
+{
+    public string ConnectionString => $"DefaultEndpointsProtocol=https;AccountName={AccountName};AccountKey={AccountKey};EndpointSuffix=core.windows.net";
+}

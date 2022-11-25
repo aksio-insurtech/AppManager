@@ -1,6 +1,9 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Text.Json.Nodes;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Concepts.Applications.Environments.Ingresses.IdentityProviders;
@@ -21,6 +24,7 @@ public static class ApplicationIngressPulumiExtensions
 {
     const string AuthConfigFile = "nginx.conf";
     const string MiddlewareConfigFile = "config.json";
+    const string OpenIDConfigurationBlobName = "openid-configuration";
 
     public static async Task ConfigureIngress(
         this Application application,
@@ -32,7 +36,6 @@ public static class ApplicationIngressPulumiExtensions
         ILogger<FileStorage> fileStorageLogger)
     {
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
-
         var routes = new List<IngressTemplateRouteContent>();
         foreach (var route in ingress.Routes)
         {
@@ -47,9 +50,20 @@ public static class ApplicationIngressPulumiExtensions
         var nginxContent = TemplateTypes.IngressConfig(new IngressTemplateContent(routes));
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
 
+        var idPortenConfig = OpenIDConnectConfig.Empty;
+        var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
+        if (idPortenProvider is not null)
+        {
+            var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/id-porten/authorize";
+            idPortenConfig = new(
+                idPortenProvider.Issuer,
+                idPortenProvider.AuthorizationEndpoint,
+                proxyAuthorizationEndpoint);
+        }
+
         var middlewareContent = new IngressMiddlewareTemplateContent(
-            false,
-            OpenIDConnectConfig.Empty,
+            idPortenProvider is not null,
+            idPortenConfig,
             environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), tenant.Domain, tenant.OnBehalfOf)));
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
@@ -111,7 +125,7 @@ public static class ApplicationIngressPulumiExtensions
 
         var fileShareId = await nginxFileShare.Id.GetValue();
         var containerApp = SetupIngress(resourceGroup, environment, managedEnvironment, ingress, tags, storageName, certificateResourceIdentifiers);
-        SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress);
+        await SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress, storage);
         var authIngressConfig = await containerApp.Configuration.GetValue();
         await application.ConfigureIngress(
             environment,
@@ -149,6 +163,14 @@ public static class ApplicationIngressPulumiExtensions
                         BindingType = BindingType.SniEnabled,
                         CertificateId = certificates[tenant.CertificateId],
                         Name = tenant.Domain.Value
+                    }).Concat(new[]
+                    {
+                        new CustomDomainArgs
+                        {
+                            BindingType = BindingType.SniEnabled,
+                            CertificateId = certificates[ingress.AuthCertificateId],
+                            Name = ingress.AuthDomain.Value
+                        }
                     }).ToArray(),
                 },
                 Secrets = ingress.IdentityProviders.Select(idp => new SecretArgs
@@ -222,7 +244,12 @@ public static class ApplicationIngressPulumiExtensions
 
     static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name.Value.Replace(' ', '-')}-authentication-secret".ToLowerInvariant();
 
-    static void SetupAuthenticationForIngress(ApplicationEnvironmentWithArtifacts environment, ResourceGroup resourceGroup, ContainerApp containerApp, Ingress ingress)
+    static async Task SetupAuthenticationForIngress(
+        ApplicationEnvironmentWithArtifacts environment,
+        ResourceGroup resourceGroup,
+        ContainerApp containerApp,
+        Ingress ingress,
+        Storage storage)
     {
         var identityProviderArgs = new IdentityProvidersArgs
         {
@@ -231,7 +258,14 @@ public static class ApplicationIngressPulumiExtensions
 
         foreach (var identityProvider in ingress.IdentityProviders)
         {
-            ConfigureIdentityProvider(ingress, identityProviderArgs, identityProvider);
+            await ConfigureIdentityProvider(ingress, identityProviderArgs, identityProvider, storage);
+        }
+
+        var redirectToProvider = "Microsoft";
+        var firstProvider = ingress.IdentityProviders.FirstOrDefault();
+        if (firstProvider?.Type == IdentityProviderType.IdPorten)
+        {
+            redirectToProvider = firstProvider.Name;
         }
 
         _ = new ContainerAppsAuthConfig("current", new()
@@ -242,7 +276,12 @@ public static class ApplicationIngressPulumiExtensions
             GlobalValidation = new GlobalValidationArgs()
             {
                 UnauthenticatedClientAction = UnauthenticatedClientActionV2.RedirectToLoginPage,
-                RedirectToProvider = "Microsoft"
+                RedirectToProvider = redirectToProvider,
+                ExcludedPaths = new[]
+                {
+                    "/.aksio/*",
+                    "/.aksio/id-porten/.well-known/openid-configuration"
+                }
             },
             Platform = new AuthPlatformArgs
             {
@@ -252,7 +291,11 @@ public static class ApplicationIngressPulumiExtensions
         });
     }
 
-    static void ConfigureIdentityProvider(Ingress ingress, IdentityProvidersArgs args, IdentityProvider identityProvider)
+    static async Task ConfigureIdentityProvider(
+        Ingress ingress,
+        IdentityProvidersArgs args,
+        IdentityProvider identityProvider,
+        Storage storage)
     {
         switch (identityProvider.Type)
         {
@@ -278,6 +321,21 @@ public static class ApplicationIngressPulumiExtensions
                 break;
 
             case IdentityProviderType.IdPorten:
+                var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/id-porten/authorize";
+                var client = new HttpClient();
+                var url = $"{identityProvider.Issuer}/.well-known/openid-configuration";
+                var result = await client.GetAsync(url);
+                var json = await result.Content.ReadAsStringAsync();
+
+                var document = (JsonNode.Parse(json) as JsonObject)!;
+                document["authorization_endpoint"] = proxyAuthorizationEndpoint;
+
+                var blobContainerClient = new BlobContainerClient(storage.ConnectionString, $"{ingress.Name}-ingress");
+                await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+                await blobContainerClient.UploadBlobAsync(OpenIDConfigurationBlobName, new BinaryData(document.ToJsonString()));
+                var blobClient = blobContainerClient.GetBlobClient(OpenIDConfigurationBlobName);
+
                 args.CustomOpenIdConnectProviders[identityProvider.Name.Value] =
                     new CustomOpenIdConnectProviderArgs
                     {
@@ -300,7 +358,7 @@ public static class ApplicationIngressPulumiExtensions
                             },
                             OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
                             {
-                                WellKnownOpenIdConfiguration = "https://auth.opensjon.no/.aksio/id-porten/.well-known/openid-configuration"
+                                WellKnownOpenIdConfiguration = blobClient.Uri.ToString()
                             }
                         }
                     };

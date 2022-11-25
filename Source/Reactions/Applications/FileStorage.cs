@@ -29,6 +29,7 @@ public class FileStorage
         AccountName = accountName;
         AccessKey = accessKey;
         ShareName = shareName;
+
         _logger = logger;
     }
 
