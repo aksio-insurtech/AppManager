@@ -3,4 +3,4 @@
 
 namespace Reactions.Applications.Templates;
 
-public record CompositionIngressTemplateContent(IEnumerable<IngressTemplateRouteContent> Routes);
+public record IngressTemplateContent(IEnumerable<IngressTemplateRouteContent> Routes);

@@ -3,4 +3,4 @@
 
 namespace Reactions.Applications.Templates;
 
-public record AuthIngressTemplateContent(string IngressMiddlewareURL, string CompositionIngressURL);
+public record TenantConfig(string TenantId, string Domain, string OnBehalfOf);

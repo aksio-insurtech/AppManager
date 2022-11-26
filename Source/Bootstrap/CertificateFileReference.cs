@@ -3,6 +3,6 @@
 
 using Concepts.Applications.Environments;
 
-namespace Reactions.Applications;
+namespace Bootstrap;
 
-public record Certificate(CertificateId Id, CertificateName Name, CertificateValue Value, CertificatePassword Password);
+public record CertificateFileReference(CertificateId Id, CertificateName Name, string File, CertificatePassword Password);

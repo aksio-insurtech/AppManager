@@ -63,7 +63,8 @@ public static class Program
             definitions,
             stacksForApplications,
             stacksForMicroservices,
-            loggerFactory.CreateLogger<PulumiOperations>());
+            loggerFactory.CreateLogger<PulumiOperations>(),
+            loggerFactory.CreateLogger<FileStorage>());
 
         await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment);
 
@@ -156,6 +157,7 @@ public static class Program
         var dockerHub = new DockerHub();
         var cratisVersion = await dockerHub.GetLastVersionOfCratis();
         var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
+        var ingressMiddlewareVersion = await dockerHub.GetLastVersionOfIngressMiddleware();
 
         var identityProvider = applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.First();
         return applicationAndEnvironment with
@@ -173,17 +175,17 @@ public static class Program
                     null!,
                     new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
 
-                Certificates = new[]
-                {
-                    applicationAndEnvironment.Environment.Certificates.First() with
-                    {
-                        Value = config.Certificate
-                    }
-                },
+                Certificates = config.Certificates.Select(
+                    c => new Certificate(
+                        c.Id,
+                        c.Name,
+                        Convert.ToBase64String(File.ReadAllBytes(c.File)),
+                        c.Password)),
                 Ingresses = new[]
                 {
                     applicationAndEnvironment.Environment.Ingresses.First() with
                     {
+                        MiddlewareVersion = ingressMiddlewareVersion,
                         IdentityProviders = new[]
                         {
                             identityProvider with

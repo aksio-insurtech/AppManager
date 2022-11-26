@@ -15,5 +15,5 @@ public static class DockerHubExtensions
     public static Task<IEnumerable<SemanticVersion>> GetVersionsOfCratis(this IDockerHub dockerHub, int numberOfVersions = 25) => dockerHub.GetVersionsOfImage(AksioOrganization, CratisImage, numberOfVersions);
     public static Task<SemanticVersion> GetLastVersionOfCratis(this IDockerHub dockerHub) => dockerHub.GetLatestVersionOfImage(AksioOrganization, CratisImage);
     public static Task<SemanticVersion> GetLastVersionOfAppManager(this IDockerHub dockerHub) => dockerHub.GetLatestVersionOfImage(AksioOrganization, AppManagerImage);
-    public static Task<SemanticVersion> GetLastVersionOfIngressMiddleware(this IDockerHub dockerHub) => dockerHub.GetLatestVersionOfImage(AksioOrganization, AppManagerImage);
+    public static Task<SemanticVersion> GetLastVersionOfIngressMiddleware(this IDockerHub dockerHub) => dockerHub.GetLatestVersionOfImage(AksioOrganization, IngressMiddlewareImage);
 }

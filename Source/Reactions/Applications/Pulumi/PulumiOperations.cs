@@ -13,6 +13,8 @@ using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.Automation;
+using Pulumi.AzureNative.App;
+using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -22,6 +24,7 @@ namespace Reactions.Applications.Pulumi;
 public class PulumiOperations : IPulumiOperations
 {
     readonly ILogger<PulumiOperations> _logger;
+    readonly ILogger<FileStorage> _fileStorageLogger;
     readonly ISettings _settings;
     readonly IExecutionContextManager _executionContextManager;
     readonly IPulumiStackDefinitions _stackDefinitions;
@@ -34,9 +37,11 @@ public class PulumiOperations : IPulumiOperations
         IPulumiStackDefinitions stackDefinitions,
         IStacksForApplications stacksForApplications,
         IStacksForMicroservices stacksForMicroservices,
-        ILogger<PulumiOperations> logger)
+        ILogger<PulumiOperations> logger,
+        ILogger<FileStorage> fileStorageLogger)
     {
         _logger = logger;
+        _fileStorageLogger = fileStorageLogger;
         _settings = applicationSettings;
         _executionContextManager = executionContextManager;
         _stackDefinitions = stackDefinitions;
@@ -155,6 +160,8 @@ public class PulumiOperations : IPulumiOperations
     {
         ApplicationEnvironmentResult? applicationEnvironmentResult = default;
         var executionContext = _executionContextManager.Current;
+        var ingressResults = new Dictionary<Ingress, IngressResult>();
+        Storage storage = null!;
 
         await Up(
             application,
@@ -162,10 +169,11 @@ public class PulumiOperations : IPulumiOperations
             {
                 applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, environment.CratisVersion);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
+                storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
 
                 foreach (var ingress in environment.Ingresses)
                 {
-                    await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult.ResourceGroup);
+                    ingressResults[ingress] = await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult!.ResourceGroup);
                 }
             }),
             environment);
@@ -174,6 +182,8 @@ public class PulumiOperations : IPulumiOperations
         {
             return;
         }
+
+        var microserviceContainerApps = new Dictionary<MicroserviceId, ContainerApp>();
 
         foreach (var microservice in environment.Microservices)
         {
@@ -191,9 +201,22 @@ public class PulumiOperations : IPulumiOperations
                         false,
                         resourceGroup: resourceGroup,
                         deployables: microservice.Deployables);
+
+                    microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
                 }),
                 environment,
                 microservice);
+        }
+
+        foreach (var (ingress, result) in ingressResults)
+        {
+            await application.ConfigureIngress(
+                environment,
+                microserviceContainerApps,
+                ingress,
+                storage,
+                result.FileShareName,
+                _fileStorageLogger);
         }
     }
 
@@ -250,7 +273,7 @@ public class PulumiOperations : IPulumiOperations
         await RemovePendingOperations(stack);
 
         _logger.InstallingPlugins();
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.83.1");
+        await stack.Workspace.InstallPluginAsync("azure-native", "1.86.0");
         await stack.Workspace.InstallPluginAsync("azuread", "5.26.1");
         await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.5.2");
 

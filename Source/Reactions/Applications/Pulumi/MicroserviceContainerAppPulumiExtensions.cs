@@ -71,6 +71,7 @@ public static class MicroserviceContainerAppPulumiExtensions
                 {
                     External = false,
                     TargetPort = 80,
+                    Transport = IngressTransportMethod.Http,
                     AllowInsecure = true
                 },
                 Secrets = !useContainerRegistry ? new InputList<SecretArgs>()

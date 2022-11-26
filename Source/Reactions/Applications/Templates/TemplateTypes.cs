@@ -24,12 +24,7 @@ public static class TemplateTypes
     /// <summary>
     /// The template for 'nginx.conf' for the "auth ingress controller".
     /// </summary>
-    public static readonly HandlebarsTemplate<object, object> AuthIngressConfig = Handlebars.Compile(GetTemplate("auth-nginx.conf"));
-
-    /// <summary>
-    /// The template for 'nginx.conf' for the "composition ingress controller".
-    /// </summary>
-    public static readonly HandlebarsTemplate<object, object> CompositionIngressConfig = Handlebars.Compile(GetTemplate("composition-nginx.conf"));
+    public static readonly HandlebarsTemplate<object, object> IngressConfig = Handlebars.Compile(GetTemplate("nginx.conf"));
 
     /// <summary>
     /// The template for Ingress Middleware config.
