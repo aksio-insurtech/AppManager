@@ -158,6 +158,7 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     External = true,
                     TargetPort = 80,
+                    Transport = IngressTransportMethod.Http,
                     CustomDomains = environment.Tenants.Select(tenant => new CustomDomainArgs
                     {
                         BindingType = BindingType.SniEnabled,
@@ -333,8 +334,9 @@ public static class ApplicationIngressPulumiExtensions
                 var blobContainerClient = new BlobContainerClient(storage.ConnectionString, $"{ingress.Name}-ingress");
                 await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
-                await blobContainerClient.UploadBlobAsync(OpenIDConfigurationBlobName, new BinaryData(document.ToJsonString()));
                 var blobClient = blobContainerClient.GetBlobClient(OpenIDConfigurationBlobName);
+                await blobClient.DeleteIfExistsAsync();
+                await blobContainerClient.UploadBlobAsync(OpenIDConfigurationBlobName, new BinaryData(document.ToJsonString()));
 
                 args.CustomOpenIdConnectProviders[identityProvider.Name.Value] =
                     new CustomOpenIdConnectProviderArgs
