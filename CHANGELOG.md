@@ -1,3 +1,10 @@
+# [v0.3.39] - 2022-11-26 [PR: #106](https://github.com/aksio-insurtech/AppManager/pull/106)
+
+### Fixed
+
+- Basically end to end working with identity & custom domains.
+
+
 # [v0.3.35] - 2022-9-15 [PR: #91](https://github.com/aksio-insurtech/AppManager/pull/91)
 
 ### Fixed
