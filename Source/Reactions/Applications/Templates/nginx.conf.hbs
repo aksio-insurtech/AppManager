@@ -6,13 +6,6 @@ http {
         ''      close;
     }
 
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $connection_upgrade;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header accept-encoding deflate;
-
     server {
         listen 80;
         auth_request /auth;
@@ -30,8 +23,6 @@ http {
             proxy_pass http://localhost:81/;
             proxy_set_header Host $http_host;
 
-            proxy_set_header x-ai-origin-uri https://$host$request_uri;
-
             proxy_pass_request_body off;
             proxy_set_header Content-Length "";
             proxy_set_header X-Original-URI $request_uri;
@@ -46,6 +37,14 @@ http {
 {{#Routes}}
         location {{Path}} {
             proxy_pass {{TargetUrl}};
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header accept-encoding deflate;
 
             auth_request_set $auth_resp_tenant_id $upstream_http_tenant_id;
             proxy_set_header Tenant-ID $auth_resp_tenant_id;
