@@ -1,3 +1,11 @@
+# [v0.3.41] - 2022-11-27 [PR: #107](https://github.com/aksio-insurtech/AppManager/pull/107)
+
+### Fixed
+
+- Configuring Nginx correctly for WebSockets by moving upgrade and all needed headers into the location for each route.
+- Upgraded Cratis with improved WebSockets support.
+
+
 # [v0.3.39] - 2022-11-26 [PR: #106](https://github.com/aksio-insurtech/AppManager/pull/106)
 
 ### Fixed
