@@ -173,7 +173,14 @@ public class PulumiOperations : IPulumiOperations
 
                 foreach (var ingress in environment.Ingresses)
                 {
-                    ingressResults[ingress] = await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult!.ResourceGroup);
+                    ingressResults[ingress] = await _stackDefinitions.Ingress(
+                        executionContext,
+                        application,
+                        environment,
+                        ingress,
+                        applicationEnvironmentResult!.ManagedEnvironment,
+                        applicationEnvironmentResult!.Certificates,
+                        applicationEnvironmentResult!.ResourceGroup);
                 }
             }),
             environment);
@@ -191,6 +198,8 @@ public class PulumiOperations : IPulumiOperations
                 application,
                 PulumiFn.Create(async () =>
                 {
+                    var managedEnvironment = ManagedEnvironment.Get(application.Name, applicationEnvironmentResult!.ManagedEnvironment.Id);
+
                     var resourceGroup = application.GetResourceGroup(environment);
                     var storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
                     var microserviceResult = await _stackDefinitions.Microservice(
@@ -198,6 +207,7 @@ public class PulumiOperations : IPulumiOperations
                         application,
                         microservice,
                         environment,
+                        managedEnvironment,
                         false,
                         resourceGroup: resourceGroup,
                         deployables: microservice.Deployables);

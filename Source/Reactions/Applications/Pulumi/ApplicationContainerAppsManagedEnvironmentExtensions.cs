@@ -30,7 +30,6 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
             Location = resourceGroup.Location,
             Tags = tags,
             ResourceGroupName = resourceGroup.Name,
-            EnvironmentName = GetName(application, environment),
             AppLogsConfiguration = new AppLogsConfigurationArgs
             {
                 Destination = "log-analytics",
@@ -54,23 +53,4 @@ public static class ApplicationContainerAppsManagedEnvironmentExtensions
             ZoneRedundant = false
         });
     }
-
-    public static async Task<ManagedEnvironment> GetContainerAppManagedEnvironment(
-        this Application application,
-        ResourceGroup resourceGroup,
-        ApplicationEnvironment environment)
-    {
-        var environmentName = GetName(application, environment);
-
-        var result = GetManagedEnvironment.Invoke(new()
-        {
-            ResourceGroupName = resourceGroup.Name,
-            EnvironmentName = environmentName
-        });
-
-        var getManagedEnvironmentResult = await result.GetValue();
-        return ManagedEnvironment.Get(getManagedEnvironmentResult.Name, getManagedEnvironmentResult.Id);
-    }
-
-    static string GetName(Application application, ApplicationEnvironment environment) => $"{application.Name}-{environment.DisplayName}";
 }

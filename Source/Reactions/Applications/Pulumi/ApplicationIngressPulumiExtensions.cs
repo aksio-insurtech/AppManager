@@ -75,6 +75,7 @@ public static class ApplicationIngressPulumiExtensions
         ResourceGroup resourceGroup,
         Storage storage,
         ManagedEnvironment managedEnvironment,
+        IDictionary<CertificateId, Output<string>> certificates,
         Ingress ingress,
         IDictionary<MicroserviceId, ContainerApp> microservices,
         Tags tags,
@@ -89,24 +90,7 @@ public static class ApplicationIngressPulumiExtensions
             ResourceGroupName = resourceGroup.Name,
         });
 
-        var certificateResourceIdentifiers = new Dictionary<CertificateId, Output<string>>();
-        foreach (var certificate in environment.Certificates)
-        {
-            var certificateResult = new global::Pulumi.AzureNative.App.Certificate(certificate.Name, new()
-            {
-                ResourceGroupName = resourceGroup.Name,
-                Tags = tags,
-                EnvironmentName = managedEnvironment.Name,
-                Properties = new CertificatePropertiesArgs()
-                {
-                    Value = certificate.Value.Value,
-                    Password = certificate.Password.Value
-                }
-            });
-            certificateResourceIdentifiers[certificate.Id] = certificateResult.Id;
-        }
-
-        _ = new ManagedEnvironmentsStorage(storageName, new()
+        var managedEnvironmentStorage = new ManagedEnvironmentsStorage(storageName, new()
         {
             ResourceGroupName = resourceGroup.Name,
             EnvironmentName = managedEnvironment.Name,
@@ -133,9 +117,9 @@ public static class ApplicationIngressPulumiExtensions
             managedEnvironment,
             ingress,
             tags,
-            storageName,
+            managedEnvironmentStorage,
             domains,
-            certificateResourceIdentifiers);
+            certificates);
         await SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress, storage);
         var authIngressConfig = await containerApp.Configuration.GetValue();
         await application.ConfigureIngress(
@@ -170,7 +154,7 @@ public static class ApplicationIngressPulumiExtensions
         ManagedEnvironment managedEnvironment,
         Ingress ingress,
         Tags tags,
-        string storageName,
+        ManagedEnvironmentsStorage storage,
         IEnumerable<Domain> domains,
         IDictionary<CertificateId, Output<string>> certificates) =>
         new($"{ingress.Name}-ingress", new()
@@ -205,8 +189,8 @@ public static class ApplicationIngressPulumiExtensions
                         {
                             new ()
                             {
-                                Name = storageName,
-                                StorageName = storageName,
+                                Name = storage.Name,
+                                StorageName = storage.Name,
                                 StorageType = StorageType.AzureFile
                             }
                         },
@@ -229,7 +213,7 @@ public static class ApplicationIngressPulumiExtensions
                                     new()
                                     {
                                         MountPath = "/config",
-                                        VolumeName = storageName
+                                        VolumeName = storage.Name
                                     }
                                 }
                     },
@@ -249,7 +233,7 @@ public static class ApplicationIngressPulumiExtensions
                                     new()
                                     {
                                         MountPath = "/app/config",
-                                        VolumeName = storageName
+                                        VolumeName = storage.Name
                                     }
                                 }
                     }

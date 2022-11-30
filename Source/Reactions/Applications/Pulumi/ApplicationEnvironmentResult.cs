@@ -1,6 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications.Environments;
+using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 
@@ -14,6 +16,7 @@ public record ApplicationEnvironmentResult(
     ContainerRegistryResult ContainerRegistry,
     MongoDBResult MongoDB,
     ManagedEnvironment ManagedEnvironment,
+    IDictionary<CertificateId, Output<string>> Certificates,
     ContainerAppResult Kernel)
 {
     public async Task<ApplicationEnvironmentWithArtifacts> MergeWithApplicationEnvironment(ApplicationEnvironmentWithArtifacts environment)

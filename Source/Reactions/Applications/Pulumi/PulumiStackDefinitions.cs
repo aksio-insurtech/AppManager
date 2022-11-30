@@ -4,7 +4,9 @@
 using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
+using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
+using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
@@ -53,6 +55,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
         var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, network, tags);
 
+        var certificates = application.SetupCertificates(environment, managedEnvironment, resourceGroup, tags);
+
         var kernel = await microservice.SetupContainerApp(
             application,
             resourceGroup,
@@ -76,6 +80,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             containerRegistry,
             mongoDB,
             managedEnvironment,
+            certificates,
             kernel);
         var events = await application.GetEventsToAppend(environment, applicationResult);
 
@@ -94,14 +99,24 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
         Ingress ingress,
+        ManagedEnvironment managedEnvironment,
+        IDictionary<CertificateId, Output<string>> certificates,
         ResourceGroup? resourceGroup = default)
     {
         var tags = application.GetTags(environment);
         resourceGroup ??= application.GetResourceGroup(environment);
-        var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
         var storage = await application.GetStorage(environment, resourceGroup);
 
-        return await application.SetupIngress(environment, resourceGroup, storage, managedEnvironment, ingress, new Dictionary<MicroserviceId, ContainerApp>(), tags, _fileStorageLogger);
+        return await application.SetupIngress(
+            environment,
+            resourceGroup,
+            storage,
+            managedEnvironment,
+            certificates,
+            ingress,
+            new Dictionary<MicroserviceId, ContainerApp>(),
+            tags,
+            _fileStorageLogger);
     }
 
     public async Task<ContainerAppResult> Microservice(
@@ -109,6 +124,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         Microservice microservice,
         ApplicationEnvironmentWithArtifacts environment,
+        ManagedEnvironment managedEnvironment,
         bool useContainerRegistry = true,
         ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
@@ -118,8 +134,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
         storage.CreateAndUploadAppSettings(_settings);
         storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
-
-        var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
 
         deployables ??= Array.Empty<Deployable>();
 
@@ -146,13 +160,12 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         Application application,
         Microservice microservice,
         IEnumerable<Deployable> deployables,
+        ManagedEnvironment managedEnvironment,
         ApplicationEnvironmentWithArtifacts environment)
     {
         var tags = application.GetTags(environment);
         var resourceGroup = application.GetResourceGroup(environment);
         var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
-
-        var managedEnvironment = await application.GetContainerAppManagedEnvironment(resourceGroup, environment);
 
         _ = microservice.SetupContainerApp(
             application,
