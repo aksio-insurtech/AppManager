@@ -272,7 +272,7 @@ public static class ApplicationIngressPulumiExtensions
             redirectToProvider = firstProvider.Name;
         }
 
-        _ = new ContainerAppsAuthConfig("current", new()
+        _ = new ContainerAppsAuthConfig(ingress.Name, new()
         {
             AuthConfigName = "current",
             ResourceGroupName = resourceGroup.Name,
