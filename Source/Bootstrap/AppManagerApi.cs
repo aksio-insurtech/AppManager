@@ -31,9 +31,9 @@ public class AppManagerApi : IDisposable
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             { "grant_type", "client_credentials" },
-            { "client_id", _config.Authentication.ClientId },
-            { "client_secret", _config.Authentication.ClientSecret },
-            { "scope", $"api://{_config.Authentication.ClientId}/.default" }
+            { "client_id", _config.IdentityProviders.First().ClientId },
+            { "client_secret", _config.IdentityProviders.First().ClientSecret },
+            { "scope", $"api://{_config.IdentityProviders.First().ClientId}/.default" }
         });
 
         var client = new HttpClient();

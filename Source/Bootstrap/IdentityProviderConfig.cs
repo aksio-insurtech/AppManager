@@ -5,4 +5,7 @@ using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 
 namespace Bootstrap;
 
-public record AuthenticationConfig(IdentityProviderClientId ClientId, IdentityProviderClientSecret ClientSecret);
+public record IdentityProviderConfig(
+    IdentityProviderId Id,
+    IdentityProviderClientId ClientId,
+    IdentityProviderClientSecret ClientSecret);

@@ -12,7 +12,7 @@
         "certificates": [
             {
                 "id": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
-                "name": "Development",
+                "name": "development",
                 "value": "",
                 "password": ""
             }
