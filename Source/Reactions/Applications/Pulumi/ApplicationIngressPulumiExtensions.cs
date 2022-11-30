@@ -64,7 +64,7 @@ public static class ApplicationIngressPulumiExtensions
         var middlewareContent = new IngressMiddlewareTemplateContent(
             idPortenProvider is not null,
             idPortenConfig,
-            environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), tenant.Domain, tenant.OnBehalfOf)));
+            environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), tenant.Domain?.Name ?? string.Empty, tenant.OnBehalfOf ?? string.Empty)));
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
     }
@@ -124,7 +124,18 @@ public static class ApplicationIngressPulumiExtensions
         });
 
         var fileShareId = await nginxFileShare.Id.GetValue();
-        var containerApp = SetupIngress(resourceGroup, environment, managedEnvironment, ingress, tags, storageName, certificateResourceIdentifiers);
+
+        var domains = GetAllDomains(environment, ingress);
+
+        var containerApp = SetupIngress(
+            resourceGroup,
+            environment,
+            managedEnvironment,
+            ingress,
+            tags,
+            storageName,
+            domains,
+            certificateResourceIdentifiers);
         await SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress, storage);
         var authIngressConfig = await containerApp.Configuration.GetValue();
         await application.ConfigureIngress(
@@ -138,6 +149,21 @@ public static class ApplicationIngressPulumiExtensions
         return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
     }
 
+    static IEnumerable<Domain> GetAllDomains(ApplicationEnvironmentWithArtifacts environment, Ingress ingress)
+    {
+        var domains = new List<Domain>();
+        if (ingress.Domain is not null)
+        {
+            domains.Add(ingress.Domain);
+        }
+        if (ingress.AuthDomain is not null)
+        {
+            domains.Add(ingress.AuthDomain);
+        }
+        domains.AddRange(environment.Tenants.Select(_ => _.Domain!).Where(_ => _ is not null));
+        return domains;
+    }
+
     static ContainerApp SetupIngress(
         ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
@@ -145,6 +171,7 @@ public static class ApplicationIngressPulumiExtensions
         Ingress ingress,
         Tags tags,
         string storageName,
+        IEnumerable<Domain> domains,
         IDictionary<CertificateId, Output<string>> certificates) =>
         new($"{ingress.Name}-ingress", new()
         {
@@ -159,20 +186,12 @@ public static class ApplicationIngressPulumiExtensions
                     External = true,
                     TargetPort = 80,
                     Transport = IngressTransportMethod.Http,
-                    CustomDomains = environment.Tenants.Select(tenant => new CustomDomainArgs
+                    CustomDomains = domains.Select(domain => new CustomDomainArgs
                     {
                         BindingType = BindingType.SniEnabled,
-                        CertificateId = certificates[tenant.CertificateId],
-                        Name = tenant.Domain.Value
-                    }).Concat(new[]
-                    {
-                        new CustomDomainArgs
-                        {
-                            BindingType = BindingType.SniEnabled,
-                            CertificateId = certificates[ingress.AuthCertificateId],
-                            Name = ingress.AuthDomain.Value
-                        }
-                    }).ToArray(),
+                        CertificateId = certificates[domain.CertificateId],
+                        Name = domain.Name.Value
+                    }).ToArray()
                 },
                 Secrets = ingress.IdentityProviders.Select(idp => new SecretArgs
                 {

@@ -57,8 +57,8 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                 .Set(m => m.Name).To(e => e.Name))
             .From<DomainAssociatedWithTenant>(_ => _
                 .UsingKey(e => e.TenantId)
-                .Set(m => m.Domain).To(e => e.Domain)
-                .Set(m => m.CertificateId).To(e => e.CertificateId))
+                .Set(m => m.Domain!.Name).To(e => e.Domain)
+                .Set(m => m.Domain!.CertificateId).To(e => e.CertificateId))
             .From<OnBehalfOfSetForTenant>(_ => _
                 .UsingKey(e => e.TenantId)
                 .Set(m => m.OnBehalfOf).To(e => e.OnBehalfOf)))

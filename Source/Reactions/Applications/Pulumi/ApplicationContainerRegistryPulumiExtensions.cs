@@ -21,7 +21,7 @@ public static class ApplicationContainerRegistryPulumiExtensions
             Tags = tags,
             Sku = new SkuArgs
             {
-                Name = SkuName.Standard
+                Name = SkuName.Basic
             },
             AdminUserEnabled = true,
         });

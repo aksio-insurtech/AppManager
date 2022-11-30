@@ -24,6 +24,12 @@ public static class Program
             return;
         }
 
+        var filename = "./AppManager.json";
+        if (args.Length == 2)
+        {
+            filename = args[1];
+        }
+
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
         var serializerOptions = Globals.JsonSerializerOptions;
         serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
@@ -42,7 +48,7 @@ public static class Program
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
 
-        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync("./AppManager.json");
+        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
         var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
         applicationAndEnvironment = await ApplyConfigAndVariables(applicationAndEnvironment, config);
         var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name);
@@ -67,63 +73,6 @@ public static class Program
             loggerFactory.CreateLogger<FileStorage>());
 
         await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment);
-
-#if false
-        IngressResult? ingressResult = default;
-        ApplicationEnvironmentResult? applicationEnvironmentResult = default;
-
-        await operations.Up(
-            application,
-            PulumiFn.Create(async () =>
-            {
-                applicationEnvironmentResult = await definitions.ApplicationEnvironment(executionContext, application, development, cratisVersion);
-                development = await applicationEnvironmentResult.MergeWithApplicationEnvironment(development);
-                ingressResult = await definitions.Ingress(executionContext, application, development, ingress, applicationEnvironmentResult.ResourceGroup);
-
-                var appManagerApi = new AppManagerApi(config, ingressResult.Url, _jsonSerializerOptions);
-                await appManagerApi.Authenticate();
-
-                stacksForApplications.AppManagerApi = appManagerApi;
-                stacksForMicroservices.AppManagerApi = appManagerApi;
-            }),
-            development);
-
-        await operations.Up(
-            application,
-            PulumiFn.Create(async () =>
-            {
-                if (applicationEnvironmentResult is null)
-                {
-                    return;
-                }
-
-                var resourceGroup = application.GetResourceGroup(development);
-
-                var storage = await application.GetStorage(development, applicationEnvironmentResult!.ResourceGroup);
-                var microserviceResult = await definitions.Microservice(
-                    executionContext,
-                    application,
-                    microservice,
-                    development,
-                    false,
-                    resourceGroup: resourceGroup,
-                    deployables: microservice.Deployables);
-
-                var fileShare = Pulumi.AzureNative.Storage.FileShare.Get(ingressResult!.FileShareName, ingressResult!.FileShareId);
-                await application.ConfigureIngress(
-                    resourceGroup,
-                    ingress,
-                    storage,
-                    fileShare,
-                    new Dictionary<MicroserviceId, ContainerApp>()
-                    {
-                        { microservice.Id, microserviceResult.ContainerApp }
-                    },
-                    logger);
-            }),
-            development,
-            microservice);
-#endif
 
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();
@@ -159,7 +108,73 @@ public static class Program
         var appManagerVersion = await dockerHub.GetLastVersionOfAppManager();
         var ingressMiddlewareVersion = await dockerHub.GetLastVersionOfIngressMiddleware();
 
-        var identityProvider = applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.First();
+        if (applicationAndEnvironment.Environment.Ingresses.Any() &&
+            applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.Any())
+        {
+            var identityProvider = applicationAndEnvironment.Environment.Ingresses.First().IdentityProviders.First();
+            applicationAndEnvironment = applicationAndEnvironment with
+            {
+                Environment = applicationAndEnvironment.Environment with
+                {
+
+                    Ingresses = new[]
+                    {
+                        applicationAndEnvironment.Environment.Ingresses.First() with
+                        {
+                            MiddlewareVersion = ingressMiddlewareVersion,
+                            IdentityProviders = new[]
+                            {
+                                identityProvider with
+                                {
+                                    ClientId = config.Authentication.ClientId,
+                                    ClientSecret = config.Authentication.ClientSecret
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        if (applicationAndEnvironment.Environment.Certificates.Any())
+        {
+            applicationAndEnvironment = applicationAndEnvironment with
+            {
+                Environment = applicationAndEnvironment.Environment with
+                {
+                    Certificates = config.Certificates.Select(
+                        c => new Certificate(
+                            c.Id,
+                            c.Name,
+                            Convert.ToBase64String(File.ReadAllBytes(c.File)),
+                            c.Password)),
+                }
+            };
+        }
+
+        if (applicationAndEnvironment.Environment.Microservices.Any())
+        {
+            applicationAndEnvironment = applicationAndEnvironment with
+            {
+                Environment = applicationAndEnvironment.Environment with
+                {
+                    Microservices = new[]
+                    {
+                        applicationAndEnvironment.Environment.Microservices.First() with
+                        {
+                            Deployables = new[]
+                            {
+                                applicationAndEnvironment.Environment.Microservices.First().Deployables.First() with
+                                {
+                                    Image = $"docker.io/{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.AppManagerImage}:{appManagerVersion}"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
         return applicationAndEnvironment with
         {
             Environment = applicationAndEnvironment.Environment with
@@ -174,41 +189,6 @@ public static class Program
                     null!,
                     null!,
                     new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
-
-                Certificates = config.Certificates.Select(
-                    c => new Certificate(
-                        c.Id,
-                        c.Name,
-                        Convert.ToBase64String(File.ReadAllBytes(c.File)),
-                        c.Password)),
-                Ingresses = new[]
-                {
-                    applicationAndEnvironment.Environment.Ingresses.First() with
-                    {
-                        MiddlewareVersion = ingressMiddlewareVersion,
-                        IdentityProviders = new[]
-                        {
-                            identityProvider with
-                            {
-                                ClientId = config.Authentication.ClientId,
-                                ClientSecret = config.Authentication.ClientSecret
-                            }
-                        }
-                    }
-                },
-                Microservices = new[]
-                {
-                    applicationAndEnvironment.Environment.Microservices.First() with
-                    {
-                        Deployables = new[]
-                        {
-                            applicationAndEnvironment.Environment.Microservices.First().Deployables.First() with
-                            {
-                                Image = $"docker.io/{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.AppManagerImage}:{appManagerVersion}"
-                            }
-                        }
-                    }
-                }
             }
         };
     }
