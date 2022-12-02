@@ -102,8 +102,8 @@ public static class MicroserviceContainerAppPulumiExtensions
                 {
                     new ()
                     {
-                        Name = storageName,
-                        StorageName = storageName,
+                        Name = managedEnvironmentStorage.Name,
+                        StorageName = managedEnvironmentStorage.Name,
                         StorageType = StorageType.AzureFile
                     }
                 },
