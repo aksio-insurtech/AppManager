@@ -52,6 +52,7 @@ public static class ApplicationIngressPulumiExtensions
 
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
+        IEnumerable<TenantConfig> tenantConfigs;
         if (idPortenProvider is not null)
         {
             var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/id-porten/authorize";
@@ -59,12 +60,28 @@ public static class ApplicationIngressPulumiExtensions
                 idPortenProvider.Issuer,
                 idPortenProvider.AuthorizationEndpoint,
                 proxyAuthorizationEndpoint);
+            tenantConfigs = environment.Tenants.Select(tenant =>
+            {
+                var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == idPortenProvider.Id);
+                return new TenantConfig(
+                    tenant.Id.ToString(),
+                    providerConfig?.Domain?.Name ?? string.Empty,
+                    providerConfig?.OnBehalfOf ?? string.Empty);
+            });
+        }
+        else
+        {
+            tenantConfigs = environment.Tenants.Select(tenant =>
+                new TenantConfig(
+                    tenant.Id.ToString(),
+                    string.Empty,
+                    string.Empty));
         }
 
         var middlewareContent = new IngressMiddlewareTemplateContent(
             idPortenProvider is not null,
             idPortenConfig,
-            environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), tenant.Domain?.Name ?? string.Empty, tenant.OnBehalfOf ?? string.Empty)));
+            tenantConfigs);
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
     }
@@ -144,7 +161,11 @@ public static class ApplicationIngressPulumiExtensions
         {
             domains.Add(ingress.AuthDomain);
         }
-        domains.AddRange(environment.Tenants.Select(_ => _.Domain!).Where(_ => _ is not null));
+        var tenantDomains = environment.Tenants.SelectMany(_ => _.IdentityProviders.Select(i => i.Domain!)).Where(_ => _ is not null);
+        if (tenantDomains is not null)
+        {
+            domains.AddRange(tenantDomains);
+        }
         return domains;
     }
 
