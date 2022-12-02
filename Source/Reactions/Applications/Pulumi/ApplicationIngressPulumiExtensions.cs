@@ -312,7 +312,7 @@ public static class ApplicationIngressPulumiExtensions
                     {
                         ClientId = identityProvider.ClientId.Value,
                         ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
-                        OpenIdIssuer = "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
+                        OpenIdIssuer = identityProvider.Issuer.Value
                     },
                     Validation = new AzureActiveDirectoryValidationArgs
                     {
