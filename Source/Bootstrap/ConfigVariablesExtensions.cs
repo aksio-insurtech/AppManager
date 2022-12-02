@@ -97,8 +97,8 @@ public static class ConfigVariablesExtensions
                     Password = certificateConfig.Password
                 });
             }
-            certificates.AddRange(applicationAndEnvironment.Environment.Certificates.Where(_ => certificates.Any(c => c.Id != _.Id)));
         }
+        certificates.AddRange(applicationAndEnvironment.Environment.Certificates.Where(_ => !certificates.Any(c => c.Id == _.Id)));
         return applicationAndEnvironment with
         {
             Environment = applicationAndEnvironment.Environment with
@@ -126,7 +126,7 @@ public static class ConfigVariablesExtensions
                     });
                 }
             }
-            providers.AddRange(ingress.IdentityProviders.Where(_ => providers.Any(p => p.Id != _.Id)));
+            providers.AddRange(ingress.IdentityProviders.Where(_ => !providers.Any(p => p.Id == _.Id)));
             ingresses.Add(ingress with
             {
                 IdentityProviders = providers
