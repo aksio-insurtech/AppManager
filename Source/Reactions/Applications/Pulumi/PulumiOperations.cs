@@ -208,7 +208,7 @@ public class PulumiOperations : IPulumiOperations
                         microservice,
                         environment,
                         managedEnvironment,
-                        false,
+                        true,
                         resourceGroup: resourceGroup,
                         deployables: microservice.Deployables);
 
