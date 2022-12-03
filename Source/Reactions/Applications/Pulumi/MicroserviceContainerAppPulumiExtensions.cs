@@ -110,7 +110,7 @@ public static class MicroserviceContainerAppPulumiExtensions
                 Containers = deployables.Select(deployable => new ContainerArgs
                 {
                     Name = deployable.Name.Value.ToLowerInvariant(),
-                    Image = deployable.Image,
+                    Image = GetDeployableImageName(deployable, containerRegistryLoginServer),
 
                     VolumeMounts = new VolumeMountArgs[]
                     {
@@ -138,5 +138,14 @@ public static class MicroserviceContainerAppPulumiExtensions
 
         var configuration = await containerApp.Configuration.GetValue();
         return new ContainerAppResult(containerApp, configuration!.Ingress!.Fqdn);
+    }
+
+    static string GetDeployableImageName(Deployable deployable, string containerRegistryLoginServer)
+    {
+        if (!deployable.Image.Contains('/'))
+        {
+            return $"{containerRegistryLoginServer}/{deployable.Image}";
+        }
+        return deployable.Image;
     }
 }
