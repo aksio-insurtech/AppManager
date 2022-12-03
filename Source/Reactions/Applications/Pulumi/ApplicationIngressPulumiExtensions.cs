@@ -161,7 +161,9 @@ public static class ApplicationIngressPulumiExtensions
         {
             domains.Add(ingress.AuthDomain);
         }
-        var tenantDomains = environment.Tenants.SelectMany(_ => _.IdentityProviders.Select(i => i.Domain!)).Where(_ => _ is not null);
+        var tenantDomains = environment.Tenants.SelectMany(_ => _.IdentityProviders
+            .Where(i => ingress.IdentityProviders.Any(idp => idp.Id == i.Id))
+            .Select(i => i.Domain!)).Where(_ => _ is not null);
         if (tenantDomains is not null)
         {
             domains.AddRange(tenantDomains);
@@ -304,8 +306,7 @@ public static class ApplicationIngressPulumiExtensions
                 RedirectToProvider = redirectToProvider,
                 ExcludedPaths = new[]
                 {
-                    "/.aksio/*",
-                    "/.aksio/id-porten/.well-known/openid-configuration"
+                    "/.aksio/*"
                 }
             },
             Platform = new AuthPlatformArgs
@@ -346,7 +347,7 @@ public static class ApplicationIngressPulumiExtensions
                 break;
 
             case IdentityProviderType.IdPorten:
-                var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/id-porten/authorize";
+                var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain!.Name}/.aksio/id-porten/authorize";
                 var client = new HttpClient();
                 var url = $"{identityProvider.Issuer}/.well-known/openid-configuration";
                 var result = await client.GetAsync(url);
