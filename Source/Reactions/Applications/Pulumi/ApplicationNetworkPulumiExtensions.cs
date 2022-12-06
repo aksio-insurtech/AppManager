@@ -26,7 +26,7 @@ public static class ApplicationNetworkPulumiExtensions
             {
                 AddressPrefixes =
                     {
-                        "10.0.0.0/16"
+                        "10.100.0.0/16"
                     }
             },
             Subnets =
@@ -37,28 +37,17 @@ public static class ApplicationNetworkPulumiExtensions
                         ServiceEndpoints =
                         {
                             new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.Storage" },
+                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.ContainerRegistry" },
                             new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
                         },
-                        AddressPrefix = "10.0.0.0/24",
-                        PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
-                        PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
-                    },
-                    new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
-                    {
-                        Name = "internal",
-                        ServiceEndpoints =
-                        {
-                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.Storage" },
-                            new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
-                        },
-                        AddressPrefix = "10.0.1.0/24",
+                        AddressPrefix = "10.100.0.0/23",
                         PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
                         PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     },
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
                         Name = "mongodb",
-                        AddressPrefix = "10.0.2.0/24",
+                        AddressPrefix = "10.100.2.0/24",
                         PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
                         PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     }

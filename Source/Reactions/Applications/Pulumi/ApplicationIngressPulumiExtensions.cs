@@ -193,6 +193,7 @@ public static class ApplicationIngressPulumiExtensions
                     External = true,
                     TargetPort = 80,
                     Transport = IngressTransportMethod.Http,
+
                     CustomDomains = domains.Select(domain => new CustomDomainArgs
                     {
                         BindingType = BindingType.SniEnabled,
