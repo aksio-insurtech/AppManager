@@ -96,7 +96,7 @@ public static class Program
         // {
         //     Console.WriteLine($"Errors with calling API - {ex.Message}");
         // }
-        Console.WriteLine("Waiting...");
+        Console.WriteLine("Done... Hit any key..");
         Console.ReadLine();
     }
 }
