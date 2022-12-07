@@ -5,11 +5,9 @@ namespace Reactions.Applications.Templates;
 
 public record OpenIDConnectConfig(
     string Issuer,
-    string AuthorizationEndpoint,
-    string ProxyAuthorizationEndpoint)
+    string AuthorizationEndpoint)
 {
     public static readonly OpenIDConnectConfig Empty = new(
-        string.Empty,
         string.Empty,
         string.Empty);
 }
