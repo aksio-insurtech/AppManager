@@ -52,30 +52,37 @@ public static class ApplicationIngressPulumiExtensions
 
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
-        IEnumerable<TenantConfig> tenantConfigs;
+        var tenantConfigs = Enumerable.Empty<TenantConfig>();
         if (idPortenProvider is not null)
         {
-            var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain}/.aksio/id-porten/authorize";
             idPortenConfig = new(
                 idPortenProvider.Issuer,
-                idPortenProvider.AuthorizationEndpoint,
-                proxyAuthorizationEndpoint);
+                idPortenProvider.AuthorizationEndpoint);
             tenantConfigs = environment.Tenants.Select(tenant =>
             {
                 var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == idPortenProvider.Id);
                 return new TenantConfig(
                     tenant.Id.ToString(),
                     providerConfig?.Domain?.Name ?? string.Empty,
-                    providerConfig?.OnBehalfOf ?? string.Empty);
+                    providerConfig?.OnBehalfOf ?? string.Empty,
+                    Enumerable.Empty<string>());
             });
         }
         else
         {
-            tenantConfigs = environment.Tenants.Select(tenant =>
-                new TenantConfig(
-                    tenant.Id.ToString(),
-                    string.Empty,
-                    string.Empty));
+            var aadPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
+            if (aadPortenProvider is not null)
+            {
+                tenantConfigs = environment.Tenants.Select(tenant =>
+                {
+                    var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadPortenProvider.Id);
+                    return new TenantConfig(
+                        tenant.Id.ToString(),
+                        string.Empty,
+                        string.Empty,
+                        providerConfig?.TenantIdClaims ?? Enumerable.Empty<string>());
+                });
+            }
         }
 
         var middlewareContent = new IngressMiddlewareTemplateContent(
