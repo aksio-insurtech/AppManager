@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.ObjectModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Aksio.Cratis.Configuration;
@@ -75,13 +76,23 @@ public class MicroserviceStorage
 
         foreach (var microservice in microservices)
         {
-            config.Microservices[microservice.Id.ToString()] = new() { Name = microservice.Name };
+            config.Microservices[microservice.Id.ToString()] = new()
+            {
+                Name = microservice.Name,
+                Inbox = new()
+                {
+                    FromOutboxes = new Collection<Outbox>(microservice.ConnectedWith.Select(_ => new Outbox
+                    {
+                        Microservice = _.ToString()
+                    }).ToList())
+                }
+            };
             config.Storage.Microservices[microservice.Id.ToString()] = new()
             {
                 Shared = new()
                 {
                     {
-                        "eventStore", new()
+                        "eventStore", new ()
                         {
                             Type = "MongoDB",
                             ConnectionDetails = $"{mongoDBConnectionString}/{GetFirstPartOf(microservice.Id)}-es-shared"
