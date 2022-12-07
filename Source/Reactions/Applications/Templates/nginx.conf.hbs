@@ -6,6 +6,20 @@ http {
         ''      close;
     }
 
+    # We are limited by the Container App ingress, but keeping the limits here anyways
+    # Read more here: https://learn.microsoft.com/en-us/azure/container-apps/ingress
+    client_max_body_size        2048m;
+    proxy_connect_timeout       7200;
+    proxy_send_timeout          7200;
+    proxy_read_timeout          7200;
+    send_timeout                7200;
+
+    client_header_timeout       7200;
+    client_body_timeout         7200;
+    fastcgi_read_timeout        7200;
+    fastcgi_buffers             8 128k;
+    fastcgi_buffer_size         128k;
+
     server {
         listen 80;
         auth_request /auth;
