@@ -81,10 +81,12 @@ public class MicroserviceStorage
                 Name = microservice.Name,
                 Inbox = new()
                 {
-                    FromOutboxes = new Collection<Outbox>(microservice.ConnectedWith.Select(_ => new Outbox
-                    {
-                        Microservice = _.ToString()
-                    }).ToList())
+                    FromOutboxes = microservice.ConnectedWith is null ?
+                        new Collection<Outbox>() :
+                        new Collection<Outbox>(microservice.ConnectedWith.Select(_ => new Outbox
+                        {
+                            Microservice = _
+                        }).ToList())
                 }
             };
             config.Storage.Microservices[microservice.Id.ToString()] = new()
