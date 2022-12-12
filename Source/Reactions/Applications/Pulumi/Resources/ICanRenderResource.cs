@@ -13,5 +13,5 @@ public interface ICanRenderResource
 public interface ICanRenderResource<TConfiguration> : ICanRenderResource
     where TConfiguration : IResourceConfiguration
 {
-    Task Render(RenderContext context, TConfiguration configuration);
+    Task Render(RenderContextForResource context, TConfiguration configuration);
 }

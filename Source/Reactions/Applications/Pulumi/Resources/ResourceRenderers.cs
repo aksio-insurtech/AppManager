@@ -38,6 +38,8 @@ public class ResourceRenderers : IResourceRenderers
                     resource.Name,
                     context.Application,
                     context.Environment,
+                    context.ResourceGroup,
+                    context.Tags,
                     context.Storage,
                     context.VirtualNetwork);
                 await (renderMethod.Invoke(renderer, new object[] { resourceContext, resource.Configuration }) as Task)!;

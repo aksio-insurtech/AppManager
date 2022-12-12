@@ -188,7 +188,13 @@ public class PulumiOperations : IPulumiOperations
                 }
 
                 await _resourceRenderers.Render(
-                    new(application, environment, storage, applicationEnvironmentResult.Network.VirtualNetwork),
+                    new(
+                        application,
+                        environment,
+                        applicationEnvironmentResult.ResourceGroup,
+                        application.GetTags(environment),
+                        storage,
+                        applicationEnvironmentResult.Network.VirtualNetwork),
                     environment.Resources);
             }),
             environment);

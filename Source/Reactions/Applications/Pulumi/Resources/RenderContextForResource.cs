@@ -3,6 +3,7 @@
 
 using Concepts.Resources;
 using Pulumi.AzureNative.Network;
+using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi.Resources;
 
@@ -11,5 +12,7 @@ public record RenderContextForResource(
     ResourceName Name,
     Application Application,
     ApplicationEnvironmentWithArtifacts Environment,
+    ResourceGroup ResourceGroup,
+    Tags Tags,
     Storage Storage,
     VirtualNetwork VirtualNetwork);
