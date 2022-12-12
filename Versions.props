@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
         <AksioDefaults>1.5.15</AksioDefaults>
-        <AksioCratis>6.18.1</AksioCratis>
+        <AksioCratis>6.18.2</AksioCratis>
     </PropertyGroup>
 </Project>
