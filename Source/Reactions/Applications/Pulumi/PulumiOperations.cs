@@ -175,6 +175,16 @@ public class PulumiOperations : IPulumiOperations
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
                 storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
 
+                await _resourceRenderers.Render(
+                    new(
+                        application,
+                        environment,
+                        applicationEnvironmentResult.ResourceGroup,
+                        application.GetTags(environment),
+                        storage,
+                        applicationEnvironmentResult.Network.VirtualNetwork),
+                    environment.Resources);
+
                 foreach (var ingress in environment.Ingresses)
                 {
                     ingressResults[ingress] = await _stackDefinitions.Ingress(
@@ -186,16 +196,6 @@ public class PulumiOperations : IPulumiOperations
                         applicationEnvironmentResult!.Certificates,
                         applicationEnvironmentResult!.ResourceGroup);
                 }
-
-                await _resourceRenderers.Render(
-                    new(
-                        application,
-                        environment,
-                        applicationEnvironmentResult.ResourceGroup,
-                        application.GetTags(environment),
-                        storage,
-                        applicationEnvironmentResult.Network.VirtualNetwork),
-                    environment.Resources);
             }),
             environment);
 
