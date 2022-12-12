@@ -21,7 +21,7 @@ public static class ApplicationResourceGroupPulumiExtensions
 
     public static ResourceGroup GetResourceGroup(this Application application, ApplicationEnvironmentWithArtifacts environment)
     {
-        return ResourceGroup.Get(GetResourceGroupName(application, environment), environment.Resources.AzureResourceGroupId.Value);
+        return ResourceGroup.Get(GetResourceGroupName(application, environment), environment.ApplicationResources.AzureResourceGroupId.Value);
     }
 
     static string GetResourceGroupName(Application application, ApplicationEnvironmentWithArtifacts environment)

@@ -48,6 +48,7 @@ public record ApplicationEnvironmentResult(
             environment.Certificates,
             environment.Tenants,
             environment.Ingresses,
-            environment.Microservices);
+            environment.Microservices,
+            environment.Resources);
     }
 }

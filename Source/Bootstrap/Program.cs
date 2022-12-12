@@ -4,11 +4,16 @@
 using System.Text.Json;
 using Aksio.Cratis.Execution;
 using Aksio.Cratis.Json;
+using Aksio.Cratis.Serialization;
+using Aksio.Cratis.Types;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Concepts;
 using Concepts.Azure;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
+using Reactions.Applications.Pulumi.Resources;
 using Read.Settings;
 
 namespace Bootstrap;
@@ -28,6 +33,38 @@ public static class Program
         {
             filename = args[1];
         }
+
+        Types.AddAssemblyPrefixesToExclude(
+            "AutoMapper",
+            "Autofac",
+            "Azure",
+            "Elasticsearch",
+            "FluentValidation",
+            "Handlebars",
+            "Humanizer",
+            "NJsonSchema",
+            "MongoDB",
+            "Orleans",
+            "Serilog",
+            "Swashbuckle",
+            "Pulumi",
+            "Grpc",
+            "Namotion",
+            "YamlDotNet",
+            "OneOf",
+            "Azure",
+            "Ben",
+            "CliWrap",
+            "DnsClient",
+            "Semver",
+            "SharpCompress");
+
+        var types = new Types();
+        var derivedTypes = new DerivedTypes(types);
+        Globals.Configure(derivedTypes);
+        var containerBuilder = new ContainerBuilder();
+        containerBuilder.RegisterDefaults(types);
+        var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
 
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
         var serializerOptions = Globals.JsonSerializerOptions;
@@ -60,6 +97,7 @@ public static class Program
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
 
+        var resourceRenderers = new ResourceRenderers(types, serviceProvider);
         var stacksForApplications = new BootstrapStacksForApplications();
         var stacksForMicroservices = new BootstrapStacksForMicroservices(application.Id);
         var operations = new PulumiOperations(
@@ -68,6 +106,7 @@ public static class Program
             definitions,
             stacksForApplications,
             stacksForMicroservices,
+            resourceRenderers,
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
 

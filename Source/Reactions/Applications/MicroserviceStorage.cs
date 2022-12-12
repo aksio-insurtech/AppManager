@@ -85,7 +85,7 @@ public class MicroserviceStorage
                         new Collection<Outbox>() :
                         new Collection<Outbox>(microservice.ConnectedWith.Select(_ => new Outbox
                         {
-                            Microservice = _
+                            Microservice = _.ToString()
                         }).ToList())
                 }
             };

@@ -24,7 +24,7 @@ public static class ConfigVariablesExtensions
             {
                 CratisVersion = cratisVersion,
                 AzureSubscriptionId = config.Azure.Subscription.SubscriptionId,
-                Resources = new(
+                ApplicationResources = new(
                     null!,
                     null!,
                     null!,

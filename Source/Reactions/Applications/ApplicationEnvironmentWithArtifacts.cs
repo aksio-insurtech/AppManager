@@ -17,11 +17,12 @@ public record ApplicationEnvironmentWithArtifacts(
     SemanticVersion CratisVersion,
     AzureSubscriptionId AzureSubscriptionId,
     CloudLocationKey CloudLocation,
-    ApplicationResources Resources,
+    ApplicationResources ApplicationResources,
     IEnumerable<Certificate> Certificates,
     IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,
-    IEnumerable<Microservice> Microservices) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
+    IEnumerable<Microservice> Microservices,
+    IEnumerable<Resource> Resources) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
 {
     public Ingress GetIngressById(IngressId id) => Ingresses.Single(_ => _.Id == id);
     public Microservice GetMicroserviceById(MicroserviceId id) => Microservices.Single(_ => _.Id == id);
