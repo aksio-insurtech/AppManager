@@ -63,6 +63,9 @@ http {
             auth_request_set $auth_resp_tenant_id $upstream_http_tenant_id;
             proxy_set_header Tenant-ID $auth_resp_tenant_id;
             add_header Tenant-ID $auth_resp_tenant_id;
+
+            auth_request_set $auth_resp_cookie $sent_http_set_cookie;
+            add_header Set-Cookie $auth_resp_cookie;
         }
 {{/Routes}}
     }
