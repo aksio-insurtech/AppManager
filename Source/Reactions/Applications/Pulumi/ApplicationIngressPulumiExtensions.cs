@@ -85,9 +85,18 @@ public static class ApplicationIngressPulumiExtensions
             }
         }
 
+        var identityDetailsUrl = string.Empty;
+        if (ingress.IdentityDetailsProvider is not null &&
+            microservices.ContainsKey(ingress.IdentityDetailsProvider))
+        {
+            var configuration = await microservices[ingress.IdentityDetailsProvider].Configuration!.GetValue();
+            identityDetailsUrl = $"http://{configuration!.Ingress!.Fqdn}/.aksio/me";
+        }
+
         var middlewareContent = new IngressMiddlewareTemplateContent(
             idPortenProvider is not null,
             idPortenConfig,
+            identityDetailsUrl,
             tenantConfigs);
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
