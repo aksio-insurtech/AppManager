@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -116,7 +117,7 @@ public static class MicroserviceContainerAppPulumiExtensions
                     {
                         new()
                         {
-                            MountPath = "/app/config",
+                            MountPath = deployable.ConfigPath?.Value ?? ConfigPath.Default.Value,
                             VolumeName = storageName
                         }
                     },

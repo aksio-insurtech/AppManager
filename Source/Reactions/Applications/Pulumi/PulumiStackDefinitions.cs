@@ -4,6 +4,7 @@
 using Aksio.Cratis.Execution;
 using Common;
 using Concepts;
+using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi;
@@ -50,7 +51,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             "kernel",
             new Deployable[]
             {
-                new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 })
+                new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 }, ConfigPath.Default)
             },
             Enumerable.Empty<MicroserviceId>());
 
