@@ -1,3 +1,16 @@
+# [v0.4.0] - 2022-12-27 [PR: #118](https://github.com/aksio-insurtech/AppManager/pull/118)
+
+### Added
+
+- Config path for deployables is now overridable
+- Introducing resource system
+- Implemented Service Bus as resource
+- Outbox -> Inbox configuration in place
+- VNET configuration done
+- Azure AD issuer made configurable, we can now chose multi/single tenant
+- Custom domains up and running
+
+
 # [v0.3.41] - 2022-11-27 [PR: #107](https://github.com/aksio-insurtech/AppManager/pull/107)
 
 ### Fixed
