@@ -3,7 +3,6 @@
 
 using Concepts;
 using Concepts.Applications;
-using Concepts.Applications.Environments;
 using Concepts.Applications.Environments.Ingresses;
 
 namespace Reactions.Applications;
@@ -12,7 +11,8 @@ public record Ingress(
     IngressId Id,
     IngressName Name,
     SemanticVersion MiddlewareVersion,
-    DomainName AuthDomain,
-    CertificateId AuthCertificateId,
+    MicroserviceId IdentityDetailsProvider,
+    Domain? Domain,
+    Domain? AuthDomain,
     IEnumerable<Route> Routes,
     IEnumerable<IdentityProvider> IdentityProviders);

@@ -2,7 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications.Environments.Ingresses.IdentityProviders;
+using Concepts.Applications.Tenants;
 
-namespace Bootstrap;
+namespace Reactions.Applications;
 
-public record AuthenticationConfig(IdentityProviderClientId ClientId, IdentityProviderClientSecret ClientSecret);
+public record TenantIdentityProviderConfig(IdentityProviderId Id, Domain? Domain, OnBehalfOf? OnBehalfOf, IEnumerable<string>? TenantIdClaims);

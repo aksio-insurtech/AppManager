@@ -13,39 +13,39 @@ public static class ApplicationEnvironmentEvents
     {
         var events = new List<object>();
 
-        if (environment.Resources?.MongoDB?.ConnectionString is null ||
-        environment.Resources?.MongoDB?.ConnectionString.Value != applicationResult.MongoDB.ConnectionString)
+        if (environment.ApplicationResources?.MongoDB?.ConnectionString is null ||
+        environment.ApplicationResources?.MongoDB?.ConnectionString.Value != applicationResult.MongoDB.ConnectionString)
         {
             events.Add(new MongoDBConnectionStringChangedForApplicationEnvironment(applicationResult.MongoDB.ConnectionString));
         }
 
-        if (environment.Resources?.MongoDB?.Users is null ||
-            !(environment.Resources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        if (environment.ApplicationResources?.MongoDB?.Users is null ||
+            !(environment.ApplicationResources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
         {
             events.Add(new MongoDBUserChanged("kernel", applicationResult.MongoDB.Password));
         }
 
         var resourceGroupId = await applicationResult.ResourceGroup.Id.GetValue();
-        if (environment.Resources?.AzureResourceGroupId != resourceGroupId)
+        if (environment.ApplicationResources?.AzureResourceGroupId != resourceGroupId)
         {
             events.Add(new AzureResourceGroupCreatedForApplicationEnvironment(environment.AzureSubscriptionId, resourceGroupId));
         }
 
-        if (environment.Resources?.AzureStorageAccountName != applicationResult.Storage.AccountName)
+        if (environment.ApplicationResources?.AzureStorageAccountName != applicationResult.Storage.AccountName)
         {
             events.Add(new AzureStorageAccountSetForApplicationEnvironment(applicationResult.Storage.AccountName));
         }
 
         var subnets = await applicationResult.Network.VirtualNetwork.Subnets.GetValue();
-        if (environment.Resources?.AzureVirtualNetworkIdentifier is null ||
-            environment.Resources?.AzureVirtualNetworkIdentifier != subnets[0].Id!)
+        if (environment.ApplicationResources?.AzureVirtualNetworkIdentifier is null ||
+            environment.ApplicationResources?.AzureVirtualNetworkIdentifier != subnets[0].Id!)
         {
             events.Add(new AzureVirtualNetworkIdentifierSetForApplicationEnvironment(subnets[0].Id!));
         }
 
-        if (environment.Resources?.AzureContainerRegistryLoginServer != applicationResult.ContainerRegistry.LoginServer ||
-            environment.Resources?.AzureContainerRegistryUserName != applicationResult.ContainerRegistry.UserName ||
-            environment.Resources?.AzureContainerRegistryPassword != applicationResult.ContainerRegistry.Password)
+        if (environment.ApplicationResources?.AzureContainerRegistryLoginServer != applicationResult.ContainerRegistry.LoginServer ||
+            environment.ApplicationResources?.AzureContainerRegistryUserName != applicationResult.ContainerRegistry.UserName ||
+            environment.ApplicationResources?.AzureContainerRegistryPassword != applicationResult.ContainerRegistry.Password)
         {
             events.Add(new AzureContainerRegistrySetForApplicationEnvironment(
                 applicationResult.ContainerRegistry.LoginServer,

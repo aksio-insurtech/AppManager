@@ -21,20 +21,20 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
             .Set(m => m.CloudLocation).To(e => e.CloudLocation))
 
         .From<AzureResourceGroupCreatedForApplicationEnvironment>(_ => _
-            .Set(m => m.Resources.AzureResourceGroupId).To(e => e.ResourceGroupId))
+            .Set(m => m.ApplicationResources.AzureResourceGroupId).To(e => e.ResourceGroupId))
         .From<AzureStorageAccountSetForApplicationEnvironment>(_ => _
-            .Set(m => m.Resources.AzureStorageAccountName).To(e => e.AccountName))
+            .Set(m => m.ApplicationResources.AzureStorageAccountName).To(e => e.AccountName))
         .From<AzureContainerRegistrySetForApplicationEnvironment>(_ => _
-            .Set(m => m.Resources.AzureContainerRegistryLoginServer).To(e => e.LoginServer)
-            .Set(m => m.Resources.AzureContainerRegistryUserName).To(e => e.UserName)
-            .Set(m => m.Resources.AzureContainerRegistryPassword).To(e => e.Password))
+            .Set(m => m.ApplicationResources.AzureContainerRegistryLoginServer).To(e => e.LoginServer)
+            .Set(m => m.ApplicationResources.AzureContainerRegistryUserName).To(e => e.UserName)
+            .Set(m => m.ApplicationResources.AzureContainerRegistryPassword).To(e => e.Password))
         .From<MongoDBConnectionStringChangedForApplicationEnvironment>(_ => _
-            .Set(m => m.Resources.MongoDB.ConnectionString).To(e => e.ConnectionString))
+            .Set(m => m.ApplicationResources.MongoDB.ConnectionString).To(e => e.ConnectionString))
         .From<AzureVirtualNetworkIdentifierSetForApplicationEnvironment>(_ => _
-            .Set(m => m.Resources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
+            .Set(m => m.ApplicationResources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
 
         // MongoDB Users
-        .Children(m => m.Resources.MongoDB.Users, cb => cb
+        .Children(m => m.ApplicationResources.MongoDB.Users, cb => cb
             .IdentifiedBy(m => m.UserName)
             .From<MongoDBUserChanged>(e => e
                 .UsingKey(e => e.UserName)
@@ -54,14 +54,15 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
             .IdentifiedBy(m => m.Id)
             .From<TenantAddedToApplicationEnvironment>(_ => _
                 .UsingKey(e => e.TenantId)
-                .Set(m => m.Name).To(e => e.Name))
-            .From<DomainAssociatedWithTenant>(_ => _
-                .UsingKey(e => e.TenantId)
-                .Set(m => m.Domain).To(e => e.Domain)
-                .Set(m => m.CertificateId).To(e => e.CertificateId))
-            .From<OnBehalfOfSetForTenant>(_ => _
-                .UsingKey(e => e.TenantId)
-                .Set(m => m.OnBehalfOf).To(e => e.OnBehalfOf)))
+                .Set(m => m.Name).To(e => e.Name)))
+
+        // .From<DomainAssociatedWithTenant>(_ => _
+        //     .UsingKey(e => e.TenantId)
+        //     .Set(m => m.Domain!.Name).To(e => e.Domain)
+        //     .Set(m => m.Domain!.CertificateId).To(e => e.CertificateId))
+        // .From<OnBehalfOfSetForTenant>(_ => _
+        //     .UsingKey(e => e.TenantId)
+        //     .Set(m => m.OnBehalfOf).To(e => e.OnBehalfOf)))
 
         // Ingresses
         .Children(m => m.Ingresses, _ => _

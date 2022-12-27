@@ -12,7 +12,7 @@
         "certificates": [
             {
                 "id": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
-                "name": "Development",
+                "name": "development",
                 "value": "",
                 "password": ""
             }
@@ -21,8 +21,10 @@
             {
                 "id": "ad1fb1bb-1152-464b-8fdd-d622445d46b6",
                 "name": "Aksio Insurtech",
-                "domain": "manager.aksio.app",
-                "certificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
+                "domain": {
+                    "name": "manager.aksio.app",
+                    "certificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d"
+                },
                 "onBehalfOf": "vpk"
             }
         ],
@@ -30,8 +32,10 @@
             {
                 "id": "6173e1f6-edee-423e-943a-e4bbc90349ce",
                 "name": "main",
-                "authDomain": "auth.aksio.app",
-                "authCertificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d",
+                "authDomain": {
+                    "name": "auth.aksio.app",
+                    "certificateId": "6f25abbe-1a2f-46f0-b7df-303e0791f81d"
+                },
                 "routes": [
                     {
                         "path": "/",

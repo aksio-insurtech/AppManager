@@ -8,7 +8,8 @@ namespace Reactions.Applications;
 public record Microservice(
     MicroserviceId Id,
     MicroserviceName Name,
-    IEnumerable<Deployable> Deployables)
+    IEnumerable<Deployable> Deployables,
+    IEnumerable<MicroserviceId> ConnectedWith)
 {
     public Deployable GetDeployableById(DeployableId id) => Deployables.Single(_ => _.Id == id);
 }

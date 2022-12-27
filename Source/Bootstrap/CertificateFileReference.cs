@@ -5,4 +5,4 @@ using Concepts.Applications.Environments;
 
 namespace Bootstrap;
 
-public record CertificateFileReference(CertificateId Id, CertificateName Name, string File, CertificatePassword Password);
+public record CertificateFileReference(CertificateId Id, string File, CertificatePassword Password);

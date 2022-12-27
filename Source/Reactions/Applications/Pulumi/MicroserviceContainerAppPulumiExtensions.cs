@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
@@ -102,21 +103,21 @@ public static class MicroserviceContainerAppPulumiExtensions
                 {
                     new ()
                     {
-                        Name = storageName,
-                        StorageName = storageName,
+                        Name = managedEnvironmentStorage.Name,
+                        StorageName = managedEnvironmentStorage.Name,
                         StorageType = StorageType.AzureFile
                     }
                 },
                 Containers = deployables.Select(deployable => new ContainerArgs
                 {
                     Name = deployable.Name.Value.ToLowerInvariant(),
-                    Image = deployable.Image,
+                    Image = GetDeployableImageName(deployable, containerRegistryLoginServer),
 
                     VolumeMounts = new VolumeMountArgs[]
                     {
                         new()
                         {
-                            MountPath = "/app/config",
+                            MountPath = deployable.ConfigPath?.Value ?? ConfigPath.Default.Value,
                             VolumeName = storageName
                         }
                     },
@@ -138,5 +139,14 @@ public static class MicroserviceContainerAppPulumiExtensions
 
         var configuration = await containerApp.Configuration.GetValue();
         return new ContainerAppResult(containerApp, configuration!.Ingress!.Fqdn);
+    }
+
+    static string GetDeployableImageName(Deployable deployable, string containerRegistryLoginServer)
+    {
+        if (!deployable.Image.Contains('/'))
+        {
+            return $"{containerRegistryLoginServer}/{deployable.Image}";
+        }
+        return deployable.Image;
     }
 }

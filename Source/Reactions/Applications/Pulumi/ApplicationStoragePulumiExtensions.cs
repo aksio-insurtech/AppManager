@@ -56,7 +56,7 @@ public static class ApplicationStoragePulumiExtensions
     {
         var getStorageAccountResult = GetStorageAccount.Invoke(new()
         {
-            AccountName = environment.Resources.AzureStorageAccountName.Value,
+            AccountName = environment.ApplicationResources.AzureStorageAccountName.Value,
             ResourceGroupName = resourceGroup.Name
         });
         var storageAccount = await getStorageAccountResult.GetValue();

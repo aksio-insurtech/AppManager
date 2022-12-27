@@ -2,16 +2,21 @@
 {{#if IdPorten }}
     "idPorten": {
         "issuer": "{{IdPortenConfig.Issuer}}",
-        "authorizationEndpoint": "{{IdPortenConfig.AuthorizationEndpoint}}",
-        "proxyAuthorizationEndpoint": "{{IdPortenConfig.ProxyAuthorizationEndpoint}}"
+        "authorizationEndpoint": "{{IdPortenConfig.AuthorizationEndpoint}}"
     },
 {{/if}}
     "tenants": {
 {{#Tenants}}
         "{{TenantId}}": {
             "domain": "{{Domain}}",
-            "onBehalfOf": "{{OnBehalfOf}}"
+            "onBehalfOf": "{{OnBehalfOf}}",
+            "tenantIdClaims": [
+            {{#TenantIdClaims}}
+                "{{this}}"
+            {{/TenantIdClaims}}
+            ]
         }
 {{/Tenants}}
-    }
+    },
+    "identityDetailsUrl": "{{IdentityDetailsUrl}}"
 }

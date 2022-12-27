@@ -6,4 +6,5 @@ namespace Reactions.Applications.Templates;
 public record IngressMiddlewareTemplateContent(
     bool IdPorten,
     OpenIDConnectConfig IdPortenConfig,
+    string IdentityDetailsUrl,
     IEnumerable<TenantConfig> Tenants);

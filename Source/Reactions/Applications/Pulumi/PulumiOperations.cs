@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.App;
+using Reactions.Applications.Pulumi.Resources;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
@@ -30,6 +31,7 @@ public class PulumiOperations : IPulumiOperations
     readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IStacksForApplications _stacksForApplications;
     readonly IStacksForMicroservices _stacksForMicroservices;
+    readonly IResourceRenderers _resourceRenderers;
 
     public PulumiOperations(
         ISettings applicationSettings,
@@ -37,6 +39,7 @@ public class PulumiOperations : IPulumiOperations
         IPulumiStackDefinitions stackDefinitions,
         IStacksForApplications stacksForApplications,
         IStacksForMicroservices stacksForMicroservices,
+        IResourceRenderers resourceRenderers,
         ILogger<PulumiOperations> logger,
         ILogger<FileStorage> fileStorageLogger)
     {
@@ -47,6 +50,7 @@ public class PulumiOperations : IPulumiOperations
         _stackDefinitions = stackDefinitions;
         _stacksForApplications = stacksForApplications;
         _stacksForMicroservices = stacksForMicroservices;
+        _resourceRenderers = resourceRenderers;
     }
 
     /// <summary>
@@ -171,14 +175,31 @@ public class PulumiOperations : IPulumiOperations
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
                 storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
 
+                await _resourceRenderers.Render(
+                    new(
+                        application,
+                        environment,
+                        applicationEnvironmentResult.ResourceGroup,
+                        application.GetTags(environment),
+                        storage,
+                        applicationEnvironmentResult.Network.VirtualNetwork),
+                    environment.Resources);
+
                 foreach (var ingress in environment.Ingresses)
                 {
-                    ingressResults[ingress] = await _stackDefinitions.Ingress(executionContext, application, environment, ingress, applicationEnvironmentResult!.ResourceGroup);
+                    ingressResults[ingress] = await _stackDefinitions.Ingress(
+                        executionContext,
+                        application,
+                        environment,
+                        ingress,
+                        applicationEnvironmentResult!.ManagedEnvironment,
+                        applicationEnvironmentResult!.Certificates,
+                        applicationEnvironmentResult!.ResourceGroup);
                 }
             }),
             environment);
 
-        if (environment.Resources?.AzureResourceGroupId is null)
+        if (environment.ApplicationResources?.AzureResourceGroupId is null)
         {
             return;
         }
@@ -191,6 +212,8 @@ public class PulumiOperations : IPulumiOperations
                 application,
                 PulumiFn.Create(async () =>
                 {
+                    var managedEnvironment = ManagedEnvironment.Get(application.Name, applicationEnvironmentResult!.ManagedEnvironment.Id);
+
                     var resourceGroup = application.GetResourceGroup(environment);
                     var storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
                     var microserviceResult = await _stackDefinitions.Microservice(
@@ -198,7 +221,8 @@ public class PulumiOperations : IPulumiOperations
                         application,
                         microservice,
                         environment,
-                        false,
+                        managedEnvironment,
+                        true,
                         resourceGroup: resourceGroup,
                         deployables: microservice.Deployables);
 
