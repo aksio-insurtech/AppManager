@@ -1,2 +1,2 @@
 #!/bin/bash
-docker buildx build -t opensjoncontainerapp4716a5a2.azurecr.io/cratis:6.18.2 -f ./Dockerfile --platform linux/amd64 --push ../
+docker buildx build -t opensjoncontainerapp4716a5a2.azurecr.io/cratis:6.24.1 -f ./Dockerfile --platform linux/amd64 --push ../
