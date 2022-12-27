@@ -37,6 +37,10 @@ export class AddCertificateToApplicationEnvironment extends Command<IAddCertific
     private _name!: string;
     private _certificate!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

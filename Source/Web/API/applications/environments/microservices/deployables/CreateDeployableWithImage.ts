@@ -40,6 +40,10 @@ export class CreateDeployableWithImage extends Command<ICreateDeployableWithImag
     private _name!: string;
     private _image!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

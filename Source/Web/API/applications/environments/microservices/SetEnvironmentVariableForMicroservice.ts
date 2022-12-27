@@ -37,6 +37,10 @@ export class SetEnvironmentVariableForMicroservice extends Command<ISetEnvironme
     private _key!: string;
     private _value!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

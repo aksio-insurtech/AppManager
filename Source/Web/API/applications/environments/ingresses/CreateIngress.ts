@@ -34,6 +34,10 @@ export class CreateIngress extends Command<ICreateIngress> implements ICreateIng
     private _ingressId!: string;
     private _name!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

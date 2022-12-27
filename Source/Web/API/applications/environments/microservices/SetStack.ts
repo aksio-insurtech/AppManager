@@ -40,6 +40,10 @@ export class SetStack extends Command<ISetStack> implements ISetStack {
     private _displayName!: string;
     private _shortName!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

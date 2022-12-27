@@ -31,6 +31,10 @@ export class Remove extends Command<IRemove> implements IRemove {
     private _environmentId!: string;
     private _microserviceId!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

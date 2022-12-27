@@ -28,6 +28,10 @@ export class SetConfig extends Command<ISetConfig> implements ISetConfig {
     private _applicationId!: string;
     private _environmentId!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

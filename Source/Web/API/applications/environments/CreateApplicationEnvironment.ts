@@ -43,6 +43,10 @@ export class CreateApplicationEnvironment extends Command<ICreateApplicationEnvi
     private _azureSubscriptionId!: string;
     private _cloudLocation!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

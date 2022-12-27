@@ -34,6 +34,10 @@ export class SetOnBehalfOf extends Command<ISetOnBehalfOf> implements ISetOnBeha
     private _tenantId!: string;
     private _onBehalfOf!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

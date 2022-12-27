@@ -34,6 +34,10 @@ export class AddTenant extends Command<IAddTenant> implements IAddTenant {
     private _tenantId!: string;
     private _name!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

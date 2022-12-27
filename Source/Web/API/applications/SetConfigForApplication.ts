@@ -31,6 +31,10 @@ export class SetConfigForApplication extends Command<ISetConfigForApplication> i
     private _name!: string;
     private _content!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

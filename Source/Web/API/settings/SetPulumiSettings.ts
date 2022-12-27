@@ -28,6 +28,10 @@ export class SetPulumiSettings extends Command<ISetPulumiSettings> implements IS
     private _organization!: string;
     private _accessToken!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
         ];

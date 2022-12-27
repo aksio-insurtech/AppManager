@@ -28,6 +28,10 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
     private _applicationId!: string;
     private _name!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
         ];

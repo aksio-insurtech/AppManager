@@ -40,6 +40,10 @@ export class DefineRouteForIngress extends Command<IDefineRouteForIngress> imple
     private _targetMicroservice!: string;
     private _targetPath!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

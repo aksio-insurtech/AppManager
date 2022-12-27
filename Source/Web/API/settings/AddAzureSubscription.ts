@@ -34,6 +34,10 @@ export class AddAzureSubscription extends Command<IAddAzureSubscription> impleme
     private _tenantId!: string;
     private _tenantName!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
         ];

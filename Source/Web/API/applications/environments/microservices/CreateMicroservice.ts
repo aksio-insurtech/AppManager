@@ -34,6 +34,10 @@ export class CreateMicroservice extends Command<ICreateMicroservice> implements 
     private _microserviceId!: string;
     private _name!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

@@ -28,6 +28,10 @@ export class SetAzureServicePrincipal extends Command<ISetAzureServicePrincipal>
     private _clientId!: string;
     private _clientSecret!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
         ];

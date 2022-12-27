@@ -37,6 +37,10 @@ export class ConfigureOpenIDConnectAuthentication extends Command<IConfigureOpen
     private _clientId!: string;
     private _clientSecret!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

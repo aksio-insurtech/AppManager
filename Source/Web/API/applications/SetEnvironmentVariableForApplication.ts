@@ -31,6 +31,10 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
     private _key!: string;
     private _value!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

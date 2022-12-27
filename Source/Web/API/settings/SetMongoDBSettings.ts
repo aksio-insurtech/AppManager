@@ -31,6 +31,10 @@ export class SetMongoDBSettings extends Command<ISetMongoDBSettings> implements 
     private _publicKey!: string;
     private _privateKey!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
         ];

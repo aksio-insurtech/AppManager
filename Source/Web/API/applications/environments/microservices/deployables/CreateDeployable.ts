@@ -37,6 +37,10 @@ export class CreateDeployable extends Command<ICreateDeployable> implements ICre
     private _deployableId!: string;
     private _name!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

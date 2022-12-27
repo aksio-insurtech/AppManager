@@ -37,6 +37,10 @@ export class SetImage extends Command<ISetImage> implements ISetImage {
     private _deployableId!: string;
     private _deployableImageName!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

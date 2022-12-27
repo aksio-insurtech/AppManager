@@ -31,6 +31,10 @@ export class SetSecretForApplication extends Command<ISetSecretForApplication> i
     private _key!: string;
     private _value!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

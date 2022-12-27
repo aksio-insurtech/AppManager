@@ -31,6 +31,10 @@ export class SetConfig extends Command<ISetConfig> implements ISetConfig {
     private _environmentId!: string;
     private _microserviceId!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

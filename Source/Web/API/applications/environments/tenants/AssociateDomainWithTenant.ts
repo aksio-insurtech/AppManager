@@ -37,6 +37,10 @@ export class AssociateDomainWithTenant extends Command<IAssociateDomainWithTenan
     private _domain!: string;
     private _certificateId!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',

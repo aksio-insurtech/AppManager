@@ -28,6 +28,10 @@ export class ConsolidateApplicationEnvironment extends Command<IConsolidateAppli
     private _applicationId!: string;
     private _environmentId!: string;
 
+    constructor() {
+        super(Object, false);
+    }
+
     get requestArguments(): string[] {
         return [
             'applicationId',
