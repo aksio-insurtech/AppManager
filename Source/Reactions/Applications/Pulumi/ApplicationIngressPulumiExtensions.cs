@@ -179,8 +179,10 @@ public static class ApplicationIngressPulumiExtensions
         }
         var tenantDomains = environment.Tenants.SelectMany(_ => _.IdentityProviders
             .Where(i => ingress.IdentityProviders.Any(idp => idp.Id == i.Id))
-            .Select(i => i.Domain!)).Where(_ => _ is not null);
-        if (tenantDomains is not null)
+            .Select(i => i.Domain!))
+            .Where(_ => _ is not null)
+            .ToArray();
+        if (tenantDomains?.Length > 0)
         {
             domains.AddRange(tenantDomains);
         }
