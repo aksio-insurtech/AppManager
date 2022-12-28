@@ -21,7 +21,14 @@
             {
                 "id": "ad1fb1bb-1152-464b-8fdd-d622445d46b6",
                 "name": "Aksio Insurtech",
-                "identityProviders": []
+                "identityProviders": [
+                    {
+                        "id": "7a36bbc9-de76-4d83-9ea3-eaab9896cbd8",
+                        "tenantIdClaims": [
+                            "1042fa82-e1c7-40a8-9c61-a7831ef3f10a"
+                        ]
+                    }
+                ]
             }
         ],
         "ingresses": [
@@ -47,7 +54,7 @@
                         "type": 1,
                         "clientId": "",
                         "clientSecret": "",
-                        "issuer": "https://login.microsoftonline.com/common/v2.0"
+                        "issuer": "https://login.microsoftonline.com/1042fa82-e1c7-40a8-9c61-a7831ef3f10a/v2.0"
                     }
                 ]
             }
