@@ -115,7 +115,7 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
-        var connectionString = connectionStrings[0].StandardSrv ?? string.Empty;
+        var connectionString = connectionStrings[0].PrivateEndpoints[0].SrvConnectionString ?? string.Empty;
         return new(cluster, connectionString, databasePassword);
     }
 
