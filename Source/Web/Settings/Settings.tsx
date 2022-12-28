@@ -11,6 +11,7 @@ import { SetPulumiSettings } from 'API/settings/SetPulumiSettings';
 import { Box, Button, Stack, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useModal, ModalButtons, ModalResult } from '@aksio/cratis-mui';
+import { SetAzureServicePrincipal } from '../API/settings/SetAzureServicePrincipal';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -25,6 +26,8 @@ export const Settings = () => {
     const [mongoDBOrganizationId, setMongoDBOrganizationId] = useState('');
     const [mongoDBPublicKey, setMongoDBPublicKey] = useState('');
     const [mongoDBPrivateKey, setMongoDBPrivateKey] = useState('');
+    const [clientId, setClientId] = useState('');
+    const [clientSecret, setClientSecret] = useState('');
 
     const [showAddSubscription] = useModal(
         'Add Azure subscription',
@@ -43,12 +46,21 @@ export const Settings = () => {
     );
 
     useEffect(() => {
+        setClientId(settings.data.servicePrincipal?.clientId || '');
+        setClientSecret(settings.data.servicePrincipal?.clientSecret || '');
         setPulumiOrganization(settings.data.pulumiOrganization || '');
         setPulumiAccessToken(settings.data.pulumiAccessToken || '');
         setMongoDBOrganizationId(settings.data.mongoDBOrganizationId || '');
         setMongoDBPublicKey(settings.data.mongoDBPublicKey || '');
         setMongoDBPrivateKey(settings.data.mongoDBPrivateKey || '');
     }, [settings.data]);
+
+    const saveAzureServicePrincipal = async () => {
+        const command = new SetAzureServicePrincipal();
+        command.clientId = clientId;
+        command.clientSecret = clientSecret;
+        await command.execute();
+    }
 
     const savePulumiSettings = async () => {
         const command = new SetPulumiSettings();
@@ -81,6 +93,11 @@ export const Settings = () => {
                         rows={settings.data?.azureSubscriptions || []} />
                 </Box>
                 <Button onClick={showAddSubscription}>Add</Button>
+
+                <h2>Azure Service Principal</h2>
+                <TextField label='Service Principal Id (ClientId)' fullWidth required value={clientId} onChange={(e) => setClientId(e.currentTarget.value)} />
+                <TextField label='Service Principal Secret (ClientSecret)' type="password" fullWidth required value={clientSecret} onChange={(e) => setClientSecret(e.currentTarget.value)} />
+                <Button onClick={saveAzureServicePrincipal}>Save</Button>
 
                 <h2>Pulumi</h2>
                 <TextField label="Organization" value={pulumiOrganization} onChange={(e) => setPulumiOrganization(e.currentTarget.value)} />
