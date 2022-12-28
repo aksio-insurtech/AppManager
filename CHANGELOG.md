@@ -1,3 +1,10 @@
+# [v0.5.4] - 2022-12-28 [PR: #120](https://github.com/aksio-insurtech/AppManager/pull/120)
+
+### Fixed
+
+- Fixing path for GitHub action that builds the diagnostics image.
+
+
 # [v0.5.1] - 2022-12-28 [PR: #119](https://github.com/aksio-insurtech/AppManager/pull/119)
 
 ### Fixed
