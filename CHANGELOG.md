@@ -1,3 +1,11 @@
+# [v0.5.1] - 2022-12-28 [PR: #119](https://github.com/aksio-insurtech/AppManager/pull/119)
+
+### Fixed
+
+- Using Azure private endpoints connection string for MongoDB.
+- Adding null checks for domains.
+
+
 # [v0.4.0] - 2022-12-27 [PR: #118](https://github.com/aksio-insurtech/AppManager/pull/118)
 
 ### Added
