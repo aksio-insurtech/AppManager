@@ -12,12 +12,16 @@ import { SetEnvironmentVariableForApplicationEnvironment } from 'API/application
 import { EnvironmentVariablesForApplicationEnvironmentId } from 'API/applications/environments/EnvironmentVariablesForApplicationEnvironmentId';
 import { SetConfigFileForApplicationEnvironment } from 'API/applications/environments/SetConfigFileForApplicationEnvironment';
 import { ConfigFile } from 'API/applications/ConfigFile';
+import { ConfigFilesForApplicationEnvironmentId } from 'API/applications/environments/ConfigFilesForApplicationEnvironmentId';
 
 export const Settings = () => {
     const { applicationId, environmentId, microserviceId } = useRouteParams();
     const [selectedTab, setSelectedTab] = useState("0");
     const [environmentVariablesQuery] = EnvironmentVariablesForApplicationEnvironmentId.use({ environmentId: environmentId! });
+    const [configFilesQuery] = ConfigFilesForApplicationEnvironmentId.use({ environmentId: environmentId! });
+
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
+    const configFiles = configFilesQuery.data?.files ?? [];
 
     const variableSet = async (variable: Variable, context: RouteParams) => {
         const command = new SetEnvironmentVariableForApplicationEnvironment();
@@ -46,8 +50,8 @@ export const Settings = () => {
                     <Tab label="Secrets" value="2" />
                 </TabList>
             </Box>
-            <TabPanel value="0"><ConfigFiles onConfigFileSet={configFileSet} files={[]} /></TabPanel>
-            <TabPanel value="1"><Variables onVariableSet={variableSet} variables={environmentVariables}/></TabPanel>
+            <TabPanel value="0"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
+            <TabPanel value="1"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
             <TabPanel value="2"><Secrets /></TabPanel>
         </TabContext>
     );
