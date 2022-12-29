@@ -11,7 +11,7 @@ import { SetPulumiSettings } from 'API/settings/SetPulumiSettings';
 import { Box, Button, Stack, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useModal, ModalButtons, ModalResult } from '@aksio/cratis-mui';
-import { SetAzureServicePrincipal } from '../API/settings/SetAzureServicePrincipal';
+import { SetAzureServicePrincipal } from 'API/settings/SetAzureServicePrincipal';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
