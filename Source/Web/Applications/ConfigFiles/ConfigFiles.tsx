@@ -3,26 +3,36 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
 import { AddConfigFileDialog, AddConfigFileDialogOutput } from './AddConfigFIleDialog';
-import { useRouteParams } from '../RouteParams';
+import { useRouteParams, RouteParams } from '../RouteParams';
+import { ConfigFile } from 'API/applications/ConfigFile';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 }
 ];
 
-export const ConfigFiles = () => {
-    const { applicationId, environmentId } = useRouteParams();
+export type ConfigFileSet = (file: ConfigFile, context: RouteParams) => void;
+
+export interface ConfigFilesProps {
+    onConfigFileSet: ConfigFileSet;
+    files: ConfigFile[]
+}
+
+export const ConfigFiles = (props: ConfigFilesProps) => {
+    const context = useRouteParams();
 
     return (
-        <ValueEditorFor<AddConfigFileDialogOutput, Tenant>
+        <ValueEditorFor<AddConfigFileDialogOutput, ConfigFile>
             addTitle="Add config file"
             columns={columns}
-            data={[]}
+            data={props.files}
             modalContent={AddConfigFileDialog}
-            getRowId={(tenant) => tenant.id.tenantId}
+            getRowId={(file) => file.name}
             modalClosed={async (result, output) => {
+                if (result == ModalResult.success) {
+                    props.onConfigFileSet(output as ConfigFile, context);
+                }
             }} />
     );
 };

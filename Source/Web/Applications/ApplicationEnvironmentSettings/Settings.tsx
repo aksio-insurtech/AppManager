@@ -10,6 +10,8 @@ import { ConfigFiles } from '../ConfigFiles/ConfigFiles';
 import { RouteParams, useRouteParams } from '../RouteParams';
 import { SetEnvironmentVariableForApplicationEnvironment } from 'API/applications/environments/SetEnvironmentVariableForApplicationEnvironment';
 import { EnvironmentVariablesForApplicationEnvironmentId } from 'API/applications/environments/EnvironmentVariablesForApplicationEnvironmentId';
+import { SetConfigFileForApplicationEnvironment } from 'API/applications/environments/SetConfigFileForApplicationEnvironment';
+import { ConfigFile } from 'API/applications/ConfigFile';
 
 export const Settings = () => {
     const { applicationId, environmentId, microserviceId } = useRouteParams();
@@ -26,6 +28,15 @@ export const Settings = () => {
         await command.execute();
     };
 
+    const configFileSet = async (file: ConfigFile, context: RouteParams) => {
+        const command = new SetConfigFileForApplicationEnvironment();
+        command.applicationId = context.applicationId;
+        command.environmentId = context.environmentId!;
+        command.name = file.name;
+        command.content = file.content;
+        await command.execute();
+    };
+
     return (
         <TabContext value={selectedTab}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -35,7 +46,7 @@ export const Settings = () => {
                     <Tab label="Secrets" value="2" />
                 </TabList>
             </Box>
-            <TabPanel value="0"><ConfigFiles /></TabPanel>
+            <TabPanel value="0"><ConfigFiles onConfigFileSet={configFileSet} files={[]} /></TabPanel>
             <TabPanel value="1"><Variables onVariableSet={variableSet} variables={environmentVariables}/></TabPanel>
             <TabPanel value="2"><Secrets /></TabPanel>
         </TabContext>

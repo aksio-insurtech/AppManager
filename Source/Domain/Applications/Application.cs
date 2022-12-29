@@ -17,7 +17,10 @@ public class Application : Controller
     }
 
     [HttpPost("config")]
-    public Task SetConfigForApplication([FromRoute] ApplicationId applicationId, ConfigFile configFile) => Task.CompletedTask;
+    public Task SetConfigFileForApplication(
+        [FromRoute] ApplicationId applicationId,
+        [FromBody] ConfigFile configFile) =>
+        _eventLog.Append(applicationId, new ConfigFileSetForApplication(configFile.Name, configFile.Content));
 
     [HttpPost("environment-variable")]
     public Task SetEnvironmentVariableForApplication([FromRoute] ApplicationId applicationId, [FromBody] EnvironmentVariable environmentVariable) =>

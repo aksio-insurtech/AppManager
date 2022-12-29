@@ -24,10 +24,12 @@ public class Microservice : Controller
     }
 
     [HttpPost("config")]
-    public Task SetConfig(
+    public Task SetConfigFileForMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
-        [FromRoute] MicroserviceId microserviceId) => Task.CompletedTask;
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] ConfigFile configFile) =>
+        _eventLog.Append(environmentId, new ConfigFileSetForMicroservice(microserviceId, environmentId, configFile.Name, configFile.Content));
 
     [HttpPost("environment-variable")]
     public Task SetEnvironmentVariableForMicroservice(

@@ -12,6 +12,8 @@ import { ConfigFiles } from './ConfigFiles/ConfigFiles';
 import { useRouteParams, RouteParams } from './RouteParams';
 import { SetEnvironmentVariableForApplication } from 'API/applications/SetEnvironmentVariableForApplication';
 import { EnvironmentVariablesForApplicationId } from 'API/applications/EnvironmentVariablesForApplicationId';
+import { ConfigFile } from 'API/applications/ConfigFile';
+import { SetConfigFileForApplication } from 'API/applications/SetConfigFileForApplication';
 
 export const Application = () => {
     const { applicationId } = useRouteParams();
@@ -28,6 +30,14 @@ export const Application = () => {
         await command.execute();
     };
 
+    const configFileSet = async (file: ConfigFile, context: RouteParams) => {
+        const command = new SetConfigFileForApplication();
+        command.applicationId = context.applicationId;
+        command.name = file.name;
+        command.content = file.content;
+        await command.execute();
+    };
+
     return (
         <TabContext value={selectedTab}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -41,7 +51,7 @@ export const Application = () => {
             </Box>
             <TabPanel value="0"></TabPanel>
             <TabPanel value="1"><Environments /></TabPanel>
-            <TabPanel value="2"><ConfigFiles /></TabPanel>
+            <TabPanel value="2"><ConfigFiles onConfigFileSet={configFileSet} files={[]} /></TabPanel>
             <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
             <TabPanel value="4"><Secrets /></TabPanel>
         </TabContext>

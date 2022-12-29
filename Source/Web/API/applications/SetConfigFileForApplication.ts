@@ -8,13 +8,13 @@ import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/config');
 
-export interface ISetConfigForApplication {
+export interface ISetConfigFileForApplication {
     applicationId?: string;
     name?: string;
     content?: string;
 }
 
-export class SetConfigForApplicationValidator extends CommandValidator {
+export class SetConfigFileForApplicationValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         name: new Validator(),
@@ -22,10 +22,10 @@ export class SetConfigForApplicationValidator extends CommandValidator {
     };
 }
 
-export class SetConfigForApplication extends Command<ISetConfigForApplication> implements ISetConfigForApplication {
+export class SetConfigFileForApplication extends Command<ISetConfigFileForApplication> implements ISetConfigFileForApplication {
     readonly route: string = '/api/applications/{{applicationId}}/config';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetConfigForApplicationValidator();
+    readonly validation: CommandValidator = new SetConfigFileForApplicationValidator();
 
     private _applicationId!: string;
     private _name!: string;
@@ -74,7 +74,7 @@ export class SetConfigForApplication extends Command<ISetConfigForApplication> i
         this.propertyChanged('content');
     }
 
-    static use(initialValues?: ISetConfigForApplication): [SetConfigForApplication, SetCommandValues<ISetConfigForApplication>, ClearCommandValues] {
-        return useCommand<SetConfigForApplication, ISetConfigForApplication>(SetConfigForApplication, initialValues);
+    static use(initialValues?: ISetConfigFileForApplication): [SetConfigFileForApplication, SetCommandValues<ISetConfigFileForApplication>, ClearCommandValues] {
+        return useCommand<SetConfigFileForApplication, ISetConfigFileForApplication>(SetConfigFileForApplication, initialValues);
     }
 }

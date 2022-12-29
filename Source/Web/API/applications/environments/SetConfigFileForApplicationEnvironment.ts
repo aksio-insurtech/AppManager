@@ -8,25 +8,31 @@ import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/config');
 
-export interface ISetConfig {
+export interface ISetConfigFileForApplicationEnvironment {
     applicationId?: string;
     environmentId?: string;
+    name?: string;
+    content?: string;
 }
 
-export class SetConfigValidator extends CommandValidator {
+export class SetConfigFileForApplicationEnvironmentValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
+        name: new Validator(),
+        content: new Validator(),
     };
 }
 
-export class SetConfig extends Command<ISetConfig> implements ISetConfig {
+export class SetConfigFileForApplicationEnvironment extends Command<ISetConfigFileForApplicationEnvironment> implements ISetConfigFileForApplicationEnvironment {
     readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/config';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetConfigValidator();
+    readonly validation: CommandValidator = new SetConfigFileForApplicationEnvironmentValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
+    private _name!: string;
+    private _content!: string;
 
     constructor() {
         super(Object, false);
@@ -43,6 +49,8 @@ export class SetConfig extends Command<ISetConfig> implements ISetConfig {
         return [
             'applicationId',
             'environmentId',
+            'name',
+            'content',
         ];
     }
 
@@ -62,8 +70,24 @@ export class SetConfig extends Command<ISetConfig> implements ISetConfig {
         this._environmentId = value;
         this.propertyChanged('environmentId');
     }
+    get name(): string {
+        return this._name;
+    }
 
-    static use(initialValues?: ISetConfig): [SetConfig, SetCommandValues<ISetConfig>, ClearCommandValues] {
-        return useCommand<SetConfig, ISetConfig>(SetConfig, initialValues);
+    set name(value: string) {
+        this._name = value;
+        this.propertyChanged('name');
+    }
+    get content(): string {
+        return this._content;
+    }
+
+    set content(value: string) {
+        this._content = value;
+        this.propertyChanged('content');
+    }
+
+    static use(initialValues?: ISetConfigFileForApplicationEnvironment): [SetConfigFileForApplicationEnvironment, SetCommandValues<ISetConfigFileForApplicationEnvironment>, ClearCommandValues] {
+        return useCommand<SetConfigFileForApplicationEnvironment, ISetConfigFileForApplicationEnvironment>(SetConfigFileForApplicationEnvironment, initialValues);
     }
 }

@@ -10,17 +10,17 @@ import Editor, { useMonaco } from '@monaco-editor/react';
 
 export type AddConfigFileDialogOutput = {
     name: string;
-    value: string;
+    content: string;
 };
 
 export const AddConfigFileDialog = (props: IModalProps<{}, AddConfigFileDialogOutput>) => {
     const [name, setName] = useState('');
-    const [value, setValue] = useState('');
+    const [content, setContent] = useState('');
 
     props.onClose(() => {
         return {
             name,
-            value
+            content
         };
     });
 
@@ -33,7 +33,7 @@ export const AddConfigFileDialog = (props: IModalProps<{}, AddConfigFileDialogOu
                 defaultValue="{}"
                 language="JSON"
                 defaultLanguage="JSON"
-                onChange={(json) => setValue(json!)}
+                onChange={(json) => setContent(json!)}
             />
         </Stack>
     );
