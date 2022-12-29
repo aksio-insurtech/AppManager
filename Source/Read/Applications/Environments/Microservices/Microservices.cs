@@ -12,15 +12,18 @@ public class Microservices : Controller
     readonly IMongoCollection<Microservice> _microserviceCollection;
     readonly IMongoCollection<ConfigFilesForMicroservice> _configFilesForMicroserviceCollection;
     readonly IMongoCollection<EnvironmentVariablesForMicroservice> _environmentVariablesForMicroserviceCollection;
+    readonly IMongoCollection<SecretsForMicroservice> _secretsForMicroserviceCollection;
 
     public Microservices(
         IMongoCollection<Microservice> microserviceCollection,
         IMongoCollection<ConfigFilesForMicroservice> configFilesForMicroserviceCollection,
-        IMongoCollection<EnvironmentVariablesForMicroservice> environmentVariablesForMicroserviceCollection)
+        IMongoCollection<EnvironmentVariablesForMicroservice> environmentVariablesForMicroserviceCollection,
+        IMongoCollection<SecretsForMicroservice> secretsForMicroserviceCollection)
     {
         _microserviceCollection = microserviceCollection;
         _configFilesForMicroserviceCollection = configFilesForMicroserviceCollection;
         _environmentVariablesForMicroserviceCollection = environmentVariablesForMicroserviceCollection;
+        _secretsForMicroserviceCollection = secretsForMicroserviceCollection;
     }
 
     [HttpGet]
@@ -48,4 +51,8 @@ public class Microservices : Controller
     [HttpGet("{microserviceId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForMicroservice>> EnvironmentVariablesForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
         _environmentVariablesForMicroserviceCollection.ObserveById(microserviceId);
+
+    [HttpGet("{microserviceId}/secrets")]
+    public Task<ClientObservable<SecretsForMicroservice>> SecretsForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
+        _secretsForMicroserviceCollection.ObserveById(microserviceId);
 }

@@ -6,7 +6,7 @@ import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
 import { Environments } from './Environments/Environments';
-import { Variables, Variable } from './Variables/Variables';
+import { Variables } from './Variables/Variables';
 import { Secrets } from './Secrets/Secrets';
 import { ConfigFiles } from './ConfigFiles/ConfigFiles';
 import { useRouteParams, RouteParams } from './RouteParams';
@@ -15,6 +15,10 @@ import { EnvironmentVariablesForApplicationId } from 'API/applications/Environme
 import { ConfigFile } from 'API/applications/ConfigFile';
 import { SetConfigFileForApplication } from 'API/applications/SetConfigFileForApplication';
 import { ConfigFilesForApplicationId } from 'API/applications/ConfigFilesForApplicationId';
+import { SetSecretForApplication } from 'API/applications/SetSecretForApplication';
+import { SecretsForApplicationId } from 'API/applications/SecretsForApplicationId';
+import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
+import { Secret } from 'API/applications/environments/microservices/Secret';
 
 export const Application = () => {
     const { applicationId } = useRouteParams();
@@ -22,11 +26,13 @@ export const Application = () => {
     const [selectedTab, setSelectedTab] = useState("0");
     const [environmentVariablesQuery] = EnvironmentVariablesForApplicationId.use({ applicationId: applicationId! });
     const [configFilesQuery] = ConfigFilesForApplicationId.use({ applicationId: applicationId! });
+    const [secretsQuery] = SecretsForApplicationId.use({ applicationId: applicationId! });
 
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
     const configFiles = configFilesQuery.data?.files ?? [];
+    const secrets = secretsQuery.data?.secrets ?? [];
 
-    const variableSet = async (variable: Variable, context: RouteParams) => {
+    const variableSet = async (variable: EnvironmentVariable, context: RouteParams) => {
         const command = new SetEnvironmentVariableForApplication();
         command.applicationId = context.applicationId;
         command.key = variable.key;
@@ -39,6 +45,14 @@ export const Application = () => {
         command.applicationId = context.applicationId;
         command.name = file.name;
         command.content = file.content;
+        await command.execute();
+    };
+
+    const secretSet = async (secret: Secret, context: RouteParams) => {
+        const command = new SetSecretForApplication();
+        command.applicationId = context.applicationId;
+        command.key = secret.key;
+        command.value = secret.value;
         await command.execute();
     };
 
@@ -57,7 +71,7 @@ export const Application = () => {
             <TabPanel value="1"><Environments /></TabPanel>
             <TabPanel value="2"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
             <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
-            <TabPanel value="4"><Secrets /></TabPanel>
+            <TabPanel value="4"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
         </TabContext>
     );
 };

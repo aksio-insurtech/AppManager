@@ -20,14 +20,23 @@ public class Deployable : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId,
-        [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(environmentId, new DeployableImageChanged(microserviceId, deployableId, deployableImageName));
+        [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(deployableId, new DeployableImageChanged(environmentId, microserviceId, deployableId, deployableImageName));
 
-    [HttpPost("environment-variable")]
+    [HttpPost("environment-variables")]
     public Task SetEnvironmentVariableForDeployable(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId,
         [FromBody] EnvironmentVariable environmentVariable) =>
-        _eventLog.Append(environmentId, new EnvironmentVariableSetForDeployable(microserviceId, deployableId, environmentVariable.Key, environmentVariable.Value));
+        _eventLog.Append(deployableId, new EnvironmentVariableSetForDeployable(environmentId, microserviceId, deployableId, environmentVariable.Key, environmentVariable.Value));
+
+    [HttpPost("secrets")]
+    public Task SetSecretForDeployable(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromRoute] DeployableId deployableId,
+        [FromBody] Secret secret) =>
+        _eventLog.Append(deployableId, new SecretSetForDeployable(environmentId, microserviceId, deployableId, secret.Key, secret.Value));
 }

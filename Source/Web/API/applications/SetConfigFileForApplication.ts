@@ -6,7 +6,7 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/config');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/config-files');
 
 export interface ISetConfigFileForApplication {
     applicationId?: string;
@@ -23,7 +23,7 @@ export class SetConfigFileForApplicationValidator extends CommandValidator {
 }
 
 export class SetConfigFileForApplication extends Command<ISetConfigFileForApplication> implements ISetConfigFileForApplication {
-    readonly route: string = '/api/applications/{{applicationId}}/config';
+    readonly route: string = '/api/applications/{{applicationId}}/config-files';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new SetConfigFileForApplicationValidator();
 

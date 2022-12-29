@@ -6,7 +6,7 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/secret');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/secrets');
 
 export interface ISetSecretForApplication {
     applicationId?: string;
@@ -23,7 +23,7 @@ export class SetSecretForApplicationValidator extends CommandValidator {
 }
 
 export class SetSecretForApplication extends Command<ISetSecretForApplication> implements ISetSecretForApplication {
-    readonly route: string = '/api/applications/{{applicationId}}/secret';
+    readonly route: string = '/api/applications/{{applicationId}}/secrets';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new SetSecretForApplicationValidator();
 

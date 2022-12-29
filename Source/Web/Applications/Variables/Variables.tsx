@@ -13,12 +13,7 @@ const columns: GridColDef[] = [
     { field: 'value', headerName: 'Value', width: 250 }
 ];
 
-export interface Variable {
-    key: string;
-    value: string;
-}
-
-export type VariableSet = (variable: Variable, context: RouteParams) => void;
+export type VariableSet = (variable: EnvironmentVariable, context: RouteParams) => void;
 
 export interface VariablesProps {
     onVariableSet: VariableSet;
@@ -37,7 +32,7 @@ export const Variables = (props: VariablesProps) => {
             getRowId={(variable) => variable.key}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
-                    props.onVariableSet(output as Variable, context);
+                    props.onVariableSet(output as EnvironmentVariable, context);
                 }
             }} />
     );

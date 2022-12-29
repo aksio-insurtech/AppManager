@@ -6,28 +6,34 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environment-variables');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/secrets');
 
-export interface ISetEnvironmentVariableForApplication {
+export interface ISetSecretForMicroservice {
     applicationId?: string;
+    environmentId?: string;
+    microserviceId?: string;
     key?: string;
     value?: string;
 }
 
-export class SetEnvironmentVariableForApplicationValidator extends CommandValidator {
+export class SetSecretForMicroserviceValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
+        environmentId: new Validator(),
+        microserviceId: new Validator(),
         key: new Validator(),
         value: new Validator(),
     };
 }
 
-export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmentVariableForApplication> implements ISetEnvironmentVariableForApplication {
-    readonly route: string = '/api/applications/{{applicationId}}/environment-variables';
+export class SetSecretForMicroservice extends Command<ISetSecretForMicroservice> implements ISetSecretForMicroservice {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/secrets';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetEnvironmentVariableForApplicationValidator();
+    readonly validation: CommandValidator = new SetSecretForMicroserviceValidator();
 
     private _applicationId!: string;
+    private _environmentId!: string;
+    private _microserviceId!: string;
     private _key!: string;
     private _value!: string;
 
@@ -38,12 +44,16 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
     get requestArguments(): string[] {
         return [
             'applicationId',
+            'environmentId',
+            'microserviceId',
         ];
     }
 
     get properties(): string[] {
         return [
             'applicationId',
+            'environmentId',
+            'microserviceId',
             'key',
             'value',
         ];
@@ -56,6 +66,22 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
     set applicationId(value: string) {
         this._applicationId = value;
         this.propertyChanged('applicationId');
+    }
+    get environmentId(): string {
+        return this._environmentId;
+    }
+
+    set environmentId(value: string) {
+        this._environmentId = value;
+        this.propertyChanged('environmentId');
+    }
+    get microserviceId(): string {
+        return this._microserviceId;
+    }
+
+    set microserviceId(value: string) {
+        this._microserviceId = value;
+        this.propertyChanged('microserviceId');
     }
     get key(): string {
         return this._key;
@@ -74,7 +100,7 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
         this.propertyChanged('value');
     }
 
-    static use(initialValues?: ISetEnvironmentVariableForApplication): [SetEnvironmentVariableForApplication, SetCommandValues<ISetEnvironmentVariableForApplication>, ClearCommandValues] {
-        return useCommand<SetEnvironmentVariableForApplication, ISetEnvironmentVariableForApplication>(SetEnvironmentVariableForApplication, initialValues);
+    static use(initialValues?: ISetSecretForMicroservice): [SetSecretForMicroservice, SetCommandValues<ISetSecretForMicroservice>, ClearCommandValues] {
+        return useCommand<SetSecretForMicroservice, ISetSecretForMicroservice>(SetSecretForMicroservice, initialValues);
     }
 }

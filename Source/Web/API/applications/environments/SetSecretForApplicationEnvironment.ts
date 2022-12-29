@@ -6,28 +6,31 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environment-variables');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/secrets');
 
-export interface ISetEnvironmentVariableForApplication {
+export interface ISetSecretForApplicationEnvironment {
     applicationId?: string;
+    environmentId?: string;
     key?: string;
     value?: string;
 }
 
-export class SetEnvironmentVariableForApplicationValidator extends CommandValidator {
+export class SetSecretForApplicationEnvironmentValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
+        environmentId: new Validator(),
         key: new Validator(),
         value: new Validator(),
     };
 }
 
-export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmentVariableForApplication> implements ISetEnvironmentVariableForApplication {
-    readonly route: string = '/api/applications/{{applicationId}}/environment-variables';
+export class SetSecretForApplicationEnvironment extends Command<ISetSecretForApplicationEnvironment> implements ISetSecretForApplicationEnvironment {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/secrets';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetEnvironmentVariableForApplicationValidator();
+    readonly validation: CommandValidator = new SetSecretForApplicationEnvironmentValidator();
 
     private _applicationId!: string;
+    private _environmentId!: string;
     private _key!: string;
     private _value!: string;
 
@@ -38,12 +41,14 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
     get requestArguments(): string[] {
         return [
             'applicationId',
+            'environmentId',
         ];
     }
 
     get properties(): string[] {
         return [
             'applicationId',
+            'environmentId',
             'key',
             'value',
         ];
@@ -56,6 +61,14 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
     set applicationId(value: string) {
         this._applicationId = value;
         this.propertyChanged('applicationId');
+    }
+    get environmentId(): string {
+        return this._environmentId;
+    }
+
+    set environmentId(value: string) {
+        this._environmentId = value;
+        this.propertyChanged('environmentId');
     }
     get key(): string {
         return this._key;
@@ -74,7 +87,7 @@ export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmen
         this.propertyChanged('value');
     }
 
-    static use(initialValues?: ISetEnvironmentVariableForApplication): [SetEnvironmentVariableForApplication, SetCommandValues<ISetEnvironmentVariableForApplication>, ClearCommandValues] {
-        return useCommand<SetEnvironmentVariableForApplication, ISetEnvironmentVariableForApplication>(SetEnvironmentVariableForApplication, initialValues);
+    static use(initialValues?: ISetSecretForApplicationEnvironment): [SetSecretForApplicationEnvironment, SetCommandValues<ISetSecretForApplicationEnvironment>, ClearCommandValues] {
+        return useCommand<SetSecretForApplicationEnvironment, ISetSecretForApplicationEnvironment>(SetSecretForApplicationEnvironment, initialValues);
     }
 }

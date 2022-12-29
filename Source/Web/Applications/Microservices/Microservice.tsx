@@ -5,7 +5,7 @@ import { GetMicroservice } from 'API/applications/environments/microservices/Get
 import { Box, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState } from 'react';
-import { Variable, Variables } from '../Variables/Variables';
+import { Variables } from '../Variables/Variables';
 import { Secrets } from '../Secrets/Secrets';
 import { Deployables } from './Deployables/Deployables';
 import { ConfigFiles } from '../ConfigFiles/ConfigFiles';
@@ -16,6 +16,10 @@ import { EnvironmentVariablesForMicroserviceId } from 'API/applications/environm
 import { ConfigFile } from 'API/applications/ConfigFile';
 import { SetConfigFileForMicroservice } from 'API/applications/environments/microservices/SetConfigFileForMicroservice';
 import { ConfigFilesForMicroserviceId } from 'API/applications/environments/microservices/ConfigFilesForMicroserviceId';
+import { SetSecretForMicroservice } from 'API/applications/environments/microservices/SetSecretForMicroservice';
+import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
+import { Secret } from 'API/applications/environments/microservices/Secret';
+import { SecretsForMicroserviceId } from 'API/applications/environments/microservices/SecretsForMicroserviceId';
 
 export const Microservice = () => {
     const { applicationId, environmentId, microserviceId } = useRouteParams();
@@ -27,11 +31,13 @@ export const Microservice = () => {
     const [selectedTab, setSelectedTab] = useState("0");
     const [environmentVariablesQuery] = EnvironmentVariablesForMicroserviceId.use({ microserviceId: microserviceId! });
     const [configFilesQuery] = ConfigFilesForMicroserviceId.use({ microserviceId: microserviceId! });
+    const [secretsQuery] = SecretsForMicroserviceId.use({ microserviceId: microserviceId! });
 
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
     const configFiles = configFilesQuery.data?.files ?? [];
+    const secrets = secretsQuery.data?.secrets ?? [];
 
-    const variableSet = async (variable: Variable, context: RouteParams) => {
+    const variableSet = async (variable: EnvironmentVariable, context: RouteParams) => {
         const command = new SetEnvironmentVariableForMicroservice();
         command.applicationId = applicationId;
         command.environmentId = environmentId!;
@@ -51,6 +57,16 @@ export const Microservice = () => {
         await command.execute();
     };
 
+    const secretSet = async (secret: Secret, context: RouteParams) => {
+        const command = new SetSecretForMicroservice();
+        command.applicationId = context.applicationId;
+        command.environmentId = context.environmentId!;
+        command.microserviceId = context.microserviceId!;
+        command.key = secret.key;
+        command.value = secret.value;
+        await command.execute();
+    };
+
     return (
         <TabContext value={selectedTab}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -66,7 +82,7 @@ export const Microservice = () => {
             <TabPanel value="1"><Deployables /></TabPanel>
             <TabPanel value="2"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
             <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables}/></TabPanel>
-            <TabPanel value="4"><Secrets /></TabPanel>
+            <TabPanel value="4"><Secrets onSecretSet={secretSet} secrets={secrets}/></TabPanel>
         </TabContext>
     );
 };

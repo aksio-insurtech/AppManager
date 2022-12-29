@@ -11,13 +11,16 @@ public class Deployables : Controller
 {
     readonly IMongoCollection<Deployable> _deployableCollection;
     readonly IMongoCollection<EnvironmentVariablesForDeployable> _environmentVariablesForDeployableCollection;
+    readonly IMongoCollection<SecretsForDeployable> _secretsForDeployableCollection;
 
     public Deployables(
         IMongoCollection<Deployable> deployableCollection,
-        IMongoCollection<EnvironmentVariablesForDeployable> environmentVariablesForDeployableCollection)
+        IMongoCollection<EnvironmentVariablesForDeployable> environmentVariablesForDeployableCollection,
+        IMongoCollection<SecretsForDeployable> secretsForDeployableCollection)
     {
         _deployableCollection = deployableCollection;
         _environmentVariablesForDeployableCollection = environmentVariablesForDeployableCollection;
+        _secretsForDeployableCollection = secretsForDeployableCollection;
     }
 
     [HttpGet]
@@ -32,4 +35,8 @@ public class Deployables : Controller
     [HttpGet("{deployableId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForDeployable>> EnvironmentVariablesForDeployableId([FromRoute] DeployableId deployableId) =>
         _environmentVariablesForDeployableCollection.ObserveById(deployableId);
+
+    [HttpGet("{deployableId}/secrets")]
+    public Task<ClientObservable<SecretsForDeployable>> SecretsForDeployableId([FromRoute] DeployableId deployableId) =>
+        _secretsForDeployableCollection.ObserveById(deployableId);
 }

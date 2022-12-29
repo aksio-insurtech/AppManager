@@ -17,7 +17,7 @@ public class ApplicationEnvironment : Controller
         _eventLog = eventLog;
     }
 
-    [HttpPost("config")]
+    [HttpPost("config-files")]
     public Task SetConfigFileForApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
@@ -30,6 +30,13 @@ public class ApplicationEnvironment : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] EnvironmentVariable environmentVariable) =>
         _eventLog.Append(environmentId, new EnvironmentVariableSetForApplicationEnvironment(applicationId, environmentId, environmentVariable.Key, environmentVariable.Value));
+
+    [HttpPost("secrets")]
+    public Task SetSecretForApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] Secret secret) =>
+        _eventLog.Append(environmentId, new SecretSetForApplicationEnvironment(applicationId, environmentId, secret.Key, secret.Value));
 
     [HttpPost("certificates")]
     public Task AddCertificateToApplicationEnvironment(

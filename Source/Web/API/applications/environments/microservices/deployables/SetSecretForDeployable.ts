@@ -6,36 +6,39 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/config-files');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/secrets');
 
-export interface ISetConfigFileForMicroservice {
+export interface ISetSecretForDeployable {
     applicationId?: string;
     environmentId?: string;
     microserviceId?: string;
-    name?: string;
-    content?: string;
+    deployableId?: string;
+    key?: string;
+    value?: string;
 }
 
-export class SetConfigFileForMicroserviceValidator extends CommandValidator {
+export class SetSecretForDeployableValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
         microserviceId: new Validator(),
-        name: new Validator(),
-        content: new Validator(),
+        deployableId: new Validator(),
+        key: new Validator(),
+        value: new Validator(),
     };
 }
 
-export class SetConfigFileForMicroservice extends Command<ISetConfigFileForMicroservice> implements ISetConfigFileForMicroservice {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/config-files';
+export class SetSecretForDeployable extends Command<ISetSecretForDeployable> implements ISetSecretForDeployable {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/secrets';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetConfigFileForMicroserviceValidator();
+    readonly validation: CommandValidator = new SetSecretForDeployableValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
     private _microserviceId!: string;
-    private _name!: string;
-    private _content!: string;
+    private _deployableId!: string;
+    private _key!: string;
+    private _value!: string;
 
     constructor() {
         super(Object, false);
@@ -46,6 +49,7 @@ export class SetConfigFileForMicroservice extends Command<ISetConfigFileForMicro
             'applicationId',
             'environmentId',
             'microserviceId',
+            'deployableId',
         ];
     }
 
@@ -54,8 +58,9 @@ export class SetConfigFileForMicroservice extends Command<ISetConfigFileForMicro
             'applicationId',
             'environmentId',
             'microserviceId',
-            'name',
-            'content',
+            'deployableId',
+            'key',
+            'value',
         ];
     }
 
@@ -83,24 +88,32 @@ export class SetConfigFileForMicroservice extends Command<ISetConfigFileForMicro
         this._microserviceId = value;
         this.propertyChanged('microserviceId');
     }
-    get name(): string {
-        return this._name;
+    get deployableId(): string {
+        return this._deployableId;
     }
 
-    set name(value: string) {
-        this._name = value;
-        this.propertyChanged('name');
+    set deployableId(value: string) {
+        this._deployableId = value;
+        this.propertyChanged('deployableId');
     }
-    get content(): string {
-        return this._content;
-    }
-
-    set content(value: string) {
-        this._content = value;
-        this.propertyChanged('content');
+    get key(): string {
+        return this._key;
     }
 
-    static use(initialValues?: ISetConfigFileForMicroservice): [SetConfigFileForMicroservice, SetCommandValues<ISetConfigFileForMicroservice>, ClearCommandValues] {
-        return useCommand<SetConfigFileForMicroservice, ISetConfigFileForMicroservice>(SetConfigFileForMicroservice, initialValues);
+    set key(value: string) {
+        this._key = value;
+        this.propertyChanged('key');
+    }
+    get value(): string {
+        return this._value;
+    }
+
+    set value(value: string) {
+        this._value = value;
+        this.propertyChanged('value');
+    }
+
+    static use(initialValues?: ISetSecretForDeployable): [SetSecretForDeployable, SetCommandValues<ISetSecretForDeployable>, ClearCommandValues] {
+        return useCommand<SetSecretForDeployable, ISetSecretForDeployable>(SetSecretForDeployable, initialValues);
     }
 }

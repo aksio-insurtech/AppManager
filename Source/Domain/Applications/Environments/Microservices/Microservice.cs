@@ -23,7 +23,7 @@ public class Microservice : Controller
         _stacksForMicroservices = stacksForMicroservices;
     }
 
-    [HttpPost("config")]
+    [HttpPost("config-files")]
     public Task SetConfigFileForMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
@@ -31,13 +31,21 @@ public class Microservice : Controller
         [FromBody] ConfigFile configFile) =>
         _eventLog.Append(environmentId, new ConfigFileSetForMicroservice(microserviceId, environmentId, configFile.Name, configFile.Content));
 
-    [HttpPost("environment-variable")]
+    [HttpPost("environment-variables")]
     public Task SetEnvironmentVariableForMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromBody] EnvironmentVariable environmentVariable) =>
         _eventLog.Append(environmentId, new EnvironmentVariableSetForMicroservice(microserviceId, environmentId, environmentVariable.Key, environmentVariable.Value));
+
+    [HttpPost("secrets")]
+    public Task SetSecretForMicroservice(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] Secret secret) =>
+        _eventLog.Append(microserviceId, new SecretSetForMicroservice(microserviceId, environmentId, secret.Key, secret.Value));
 
     [HttpPost("stack")]
     public Task SetStack(

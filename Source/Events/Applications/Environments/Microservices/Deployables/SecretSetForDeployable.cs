@@ -6,5 +6,5 @@ using Concepts.Applications.Environments;
 
 namespace Events.Applications.Environments.Microservices.Deployables;
 
-[EventType("91021fa2-3bd2-4b04-a4ae-d371827f205f")]
-public record EnvironmentVariableSetForDeployable(ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId, EnvironmentVariableKey Key, EnvironmentVariableValue Value);
+[EventType("5b8b0626-58b9-454e-bce2-a6564baec53d")]
+public record SecretSetForDeployable(ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId, SecretKey Key, SecretValue Value);
