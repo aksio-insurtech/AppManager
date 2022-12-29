@@ -4,15 +4,16 @@
 import { IModalProps } from '@aksio/cratis-mui';
 import { Stack, TextField } from '@mui/material';
 import { useState } from 'react';
+import { Secret } from 'API/applications/Secret';
 
-export type AddVariableDialogOutput = {
+export type AddSecretDialogOutput = {
     key: string;
     value: string;
 };
 
-export const AddVariableDialog = (props: IModalProps<{}, AddVariableDialogOutput>) => {
-    const [key, setKey] = useState('');
-    const [value, setValue] = useState('');
+export const SetSecretDialog = (props: IModalProps<Secret, AddSecretDialogOutput>) => {
+    const [key, setKey] = useState(props.input?.key || '');
+    const [value, setValue] = useState(props.input?.value || '');
 
     props.onClose(() => {
         return {

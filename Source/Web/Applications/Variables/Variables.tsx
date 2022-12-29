@@ -4,7 +4,7 @@
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
-import { AddVariableDialog, AddVariableDialogOutput } from './AddVariableDialog';
+import { SetVariableDialog, AddVariableDialogOutput } from './SetVariableDialog';
 import { useRouteParams, RouteParams } from '../RouteParams';
 import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
 
@@ -24,12 +24,13 @@ export const Variables = (props: VariablesProps) => {
     const context = useRouteParams();
 
     return (
-        <ValueEditorFor<AddVariableDialogOutput, EnvironmentVariable>
+        <ValueEditorFor<AddVariableDialogOutput, EnvironmentVariable, EnvironmentVariable>
             addTitle="Add Variable"
             columns={columns}
             data={props.variables}
-            modalContent={AddVariableDialog}
+            modalContent={SetVariableDialog}
             getRowId={(variable) => variable.key}
+            onEditItem={(variable) => variable}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
                     props.onVariableSet(output as EnvironmentVariable, context);

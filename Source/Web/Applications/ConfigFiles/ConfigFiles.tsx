@@ -4,7 +4,7 @@
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
-import { AddConfigFileDialog, AddConfigFileDialogOutput } from './AddConfigFIleDialog';
+import { SetConfigFileDialog, AddConfigFileDialogOutput } from './SetConfigFIleDialog';
 import { useRouteParams, RouteParams } from '../RouteParams';
 import { ConfigFile } from 'API/applications/ConfigFile';
 
@@ -23,12 +23,13 @@ export const ConfigFiles = (props: ConfigFilesProps) => {
     const context = useRouteParams();
 
     return (
-        <ValueEditorFor<AddConfigFileDialogOutput, ConfigFile>
+        <ValueEditorFor<AddConfigFileDialogOutput, ConfigFile, ConfigFile>
             addTitle="Add config file"
             columns={columns}
             data={props.files}
-            modalContent={AddConfigFileDialog}
+            modalContent={SetConfigFileDialog}
             getRowId={(file) => file.name}
+            onEditItem={(file) => file}
             modalClosed={async (result, output) => {
                 if (result == ModalResult.success) {
                     props.onConfigFileSet(output as ConfigFile, context);

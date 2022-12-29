@@ -4,15 +4,16 @@
 import { IModalProps } from '@aksio/cratis-mui';
 import { Stack, TextField } from '@mui/material';
 import { useState } from 'react';
+import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
 
-export type AddSecretDialogOutput = {
+export type AddVariableDialogOutput = {
     key: string;
     value: string;
 };
 
-export const AddSecretDialog = (props: IModalProps<{}, AddSecretDialogOutput>) => {
-    const [key, setKey] = useState('');
-    const [value, setValue] = useState('');
+export const SetVariableDialog = (props: IModalProps<EnvironmentVariable, AddVariableDialogOutput>) => {
+    const [key, setKey] = useState(props.input?.key || '');
+    const [value, setValue] = useState(props.input?.value || '');
 
     props.onClose(() => {
         return {

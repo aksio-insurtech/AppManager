@@ -6,6 +6,7 @@ import { Stack, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import Editor, { useMonaco } from '@monaco-editor/react';
+import { ConfigFile } from 'API/applications/environments/microservices/ConfigFile';
 
 
 export type AddConfigFileDialogOutput = {
@@ -13,9 +14,9 @@ export type AddConfigFileDialogOutput = {
     content: string;
 };
 
-export const AddConfigFileDialog = (props: IModalProps<{}, AddConfigFileDialogOutput>) => {
-    const [name, setName] = useState('');
-    const [content, setContent] = useState('');
+export const SetConfigFileDialog = (props: IModalProps<ConfigFile, AddConfigFileDialogOutput>) => {
+    const [name, setName] = useState(props.input?.name || '');
+    const [content, setContent] = useState(props.input?.content || '{}');
 
     props.onClose(() => {
         return {
@@ -31,6 +32,7 @@ export const AddConfigFileDialog = (props: IModalProps<{}, AddConfigFileDialogOu
                 height="45vh"
                 theme="vs-dark"
                 defaultValue="{}"
+                value={content}
                 language="JSON"
                 defaultLanguage="JSON"
                 onChange={(json) => setContent(json!)}
