@@ -24,6 +24,7 @@ namespace Reactions.Applications.Pulumi;
 /// </summary>
 public class PulumiOperations : IPulumiOperations
 {
+    static readonly AsyncLocal<PulumiStack> _currentStack = new();
     readonly ILogger<PulumiOperations> _logger;
     readonly ILogger<FileStorage> _fileStorageLogger;
     readonly ISettings _settings;
@@ -32,6 +33,8 @@ public class PulumiOperations : IPulumiOperations
     readonly IStacksForApplications _stacksForApplications;
     readonly IStacksForMicroservices _stacksForMicroservices;
     readonly IResourceRenderers _resourceRenderers;
+
+    internal static PulumiStack CurrentStack => _currentStack.Value!;
 
     public PulumiOperations(
         ISettings applicationSettings,
@@ -70,25 +73,25 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Up(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Up(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         _logger.UppingStack();
 
         try
         {
             var stack = await CreateStack(application, environment, definition, microservice);
-            await RefreshStack(stack);
+            await RefreshStack(stack.Stack);
 
             _logger.PuttingUpStack();
-            await stack.UpAsync(new UpOptions
+            await stack.Stack.UpAsync(new UpOptions
             {
                 OnStandardOutput = Console.WriteLine,
                 OnStandardError = Console.Error.WriteLine
             });
 
             await (microservice is not null ?
-                SaveStackForMicroservice(application, microservice, environment, stack) :
-                SaveStackForApplication(application, environment, stack));
+                SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
+                SaveStackForApplication(application, environment, stack.Stack));
         }
         catch (Exception ex)
         {
@@ -97,19 +100,19 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Down(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Down(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         try
         {
             var stack = await CreateStack(application, environment, definition, microservice);
-            await RefreshStack(stack);
+            await RefreshStack(stack.Stack);
 
             _logger.TakingDownStack();
-            await stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
+            await stack.Stack.DestroyAsync(new DestroyOptions { OnStandardOutput = Console.WriteLine });
 
             await (microservice is not null ?
-                SaveStackForMicroservice(application, microservice, environment, stack) :
-                SaveStackForApplication(application, environment, stack));
+                SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
+                SaveStackForApplication(application, environment, stack.Stack));
         }
         catch (Exception ex)
         {
@@ -118,21 +121,21 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Remove(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Remove(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
     {
         _logger.StackBeingRemoved();
 
         try
         {
             var stack = await CreateStack(application, environment, definition, microservice);
-            await RefreshStack(stack);
+            await RefreshStack(stack.Stack);
 
             _logger.RemovingStack();
-            await stack.Workspace.RemoveStackAsync(environment.DisplayName);
+            await stack.Stack.Workspace.RemoveStackAsync(environment.DisplayName);
 
             await (microservice is not null ?
-                SaveStackForMicroservice(application, microservice, environment, stack) :
-                SaveStackForApplication(application, environment, stack));
+                SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
+                SaveStackForApplication(application, environment, stack.Stack));
         }
         catch (Exception ex)
         {
@@ -169,7 +172,7 @@ public class PulumiOperations : IPulumiOperations
 
         await Up(
             application,
-            PulumiFn.Create(async () =>
+            async () =>
             {
                 applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, environment.CratisVersion);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
@@ -196,7 +199,7 @@ public class PulumiOperations : IPulumiOperations
                         applicationEnvironmentResult!.Certificates,
                         applicationEnvironmentResult!.ResourceGroup);
                 }
-            }),
+            },
             environment);
 
         if (environment.ApplicationResources?.AzureResourceGroupId is null)
@@ -210,7 +213,7 @@ public class PulumiOperations : IPulumiOperations
         {
             await Up(
                 application,
-                PulumiFn.Create(async () =>
+                async () =>
                 {
                     var managedEnvironment = ManagedEnvironment.Get(application.Name, applicationEnvironmentResult!.ManagedEnvironment.Id);
 
@@ -227,7 +230,7 @@ public class PulumiOperations : IPulumiOperations
                         deployables: microservice.Deployables);
 
                     microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
-                }),
+                },
                 environment,
                 microservice);
         }
@@ -244,7 +247,7 @@ public class PulumiOperations : IPulumiOperations
         }
     }
 
-    async Task<WorkspaceStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, PulumiFn program, Microservice? microservice = default)
+    async Task<PulumiStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, Func<Task> program, Microservice? microservice = default)
     {
         _logger.CreatingStack(application.Name);
         var stackName = environment.DisplayName;
@@ -257,7 +260,15 @@ public class PulumiOperations : IPulumiOperations
 
         var projectName = GetProjectNameFor(application, microservice);
 
-        var args = new InlineProgramArgs(projectName, stackName, program)
+        PulumiStack? pulumiStack = null;
+
+        var pulumiProgram = PulumiFn.Create(async () =>
+        {
+            _currentStack.Value = pulumiStack!;
+            await program();
+        });
+
+        var args = new InlineProgramArgs(projectName, stackName, pulumiProgram)
         {
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
             EnvironmentVariables = new Dictionary<string, string?>
@@ -293,8 +304,12 @@ public class PulumiOperations : IPulumiOperations
             await stack.CancelAsync();
         }
 
+        _logger.ExportStack();
+        var stackDeployment = await stack.ExportStackAsync();
+        var stackAsJson = JsonNode.Parse(stackDeployment.Json.GetRawText())!.AsObject();
         _logger.RemovingPendingOperations();
-        await RemovePendingOperations(stack);
+
+        await RemovePendingOperations(stack, stackAsJson);
 
         _logger.InstallingPlugins();
         await stack.Workspace.InstallPluginAsync("azure-native", "1.86.0");
@@ -314,16 +329,12 @@ public class PulumiOperations : IPulumiOperations
         await SetTag(application, environment, "application", application.Name);
         await SetTag(application, environment, "environment", stackName);
 
-        return stack;
+        return pulumiStack = new(stack, stackAsJson);
     }
 
-    async Task RemovePendingOperations(WorkspaceStack stack)
+    async Task RemovePendingOperations(WorkspaceStack stack, JsonNode stackAsJson)
     {
-        _logger.ExportStack();
-
-        var stackDeployment = await stack.ExportStackAsync();
-        var jsonNode = JsonNode.Parse(stackDeployment.Json.GetRawText())!.AsObject();
-        var deployment = jsonNode!["deployment"]!.AsObject();
+        var deployment = stackAsJson!["deployment"]!.AsObject();
         if (deployment["pending_operations"] is not JsonArray pendingOperations || pendingOperations.Count == 0)
         {
             _logger.NoPendingOperations();
@@ -332,12 +343,12 @@ public class PulumiOperations : IPulumiOperations
 
         deployment.Remove("pending_operations");
         deployment.Add("pending_operations", new JsonArray());
-        var jsonString = jsonNode.ToJsonString(new JsonSerializerOptions()
+        var jsonString = stackAsJson.ToJsonString(new JsonSerializerOptions()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
-        stackDeployment = StackDeployment.FromJsonString(jsonString);
+        var stackDeployment = StackDeployment.FromJsonString(jsonString);
 
         _logger.ImportStack();
         await stack.ImportStackAsync(stackDeployment);

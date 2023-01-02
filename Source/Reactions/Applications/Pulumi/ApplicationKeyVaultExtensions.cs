@@ -14,12 +14,12 @@ public static class ApplicationKeyVaultExtensions
     public static Vault SetupKeyVault(this Application application, ApplicationEnvironmentWithArtifacts environment, UserAssignedIdentity identity, ResourceGroup resourceGroup, Tags tags)
     {
         var name = $"{application.Name}-{environment.DisplayName}";
-        return new Vault(name, new()
+        return new Vault(application.Name.Value, new()
         {
             Location = environment.CloudLocation.Value,
             ResourceGroupName = resourceGroup.Name,
             Tags = tags,
-            VaultName = $"{application.Name}",
+            VaultName = name,
             Properties = new VaultPropertiesArgs
             {
                 AccessPolicies =

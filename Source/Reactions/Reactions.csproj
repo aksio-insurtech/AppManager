@@ -4,13 +4,15 @@
 		<ProjectReference Include="../Concepts/Concepts.csproj" />
 		<ProjectReference Include="../Events/Events.csproj" />
 		<ProjectReference Include="../Read/Read.csproj" />
-        <ProjectReference Include="../Infrastructure/Infrastructure.csproj" />
+		<ProjectReference Include="../Infrastructure/Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="handlebars.net" Version="2.1.2" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.12.1" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
-        <PackageReference Include="semver" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Azure.Management.Fluent" Version="1.38.1" />
+		<PackageReference Include="Microsoft.Azure.Management.ResourceManager.Fluent" Version="1.38.1" />
+		<PackageReference Include="semver" Version="2.2.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="$(MSBuildThisFileDirectory)/Applications/Templates/**/*" />

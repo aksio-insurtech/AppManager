@@ -1,8 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Pulumi.Automation;
-
 namespace Reactions.Applications.Pulumi;
 
 /// <summary>
@@ -18,7 +16,7 @@ public interface IPulumiOperations
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Up(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
+    Task Up(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
 
     /// <summary>
     /// Down a stack.
@@ -28,7 +26,7 @@ public interface IPulumiOperations
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Down(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
+    Task Down(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
 
     /// <summary>
     /// Completely remove a stack and its history.
@@ -38,7 +36,7 @@ public interface IPulumiOperations
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Remove(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
+    Task Remove(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
 
     /// <summary>
     /// Set a tag for a stack in a project.

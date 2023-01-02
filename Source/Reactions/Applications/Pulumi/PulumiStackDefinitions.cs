@@ -38,7 +38,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     public async Task<ApplicationEnvironmentResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
     {
         var tags = application.GetTags(environment);
-        var resourceGroup = application.SetupResourceGroup(environment);
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+        var resourceGroup = await application.SetupResourceGroup(environment, _settings.ServicePrincipal, subscription);
         var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
         var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
         var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);

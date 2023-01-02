@@ -6,4 +6,5 @@ namespace Concepts.Azure;
 public record AzureSubscriptionId(Guid Value) : ConceptAs<Guid>(Value)
 {
     public static implicit operator AzureSubscriptionId(string value) => new(Guid.Parse(value));
+    public static implicit operator string(AzureSubscriptionId value) => value.ToString();
 }
