@@ -25,7 +25,7 @@ public static class ApplicationMongoDBPulumiExtensions
     {
         var mongoDBOrganizationId = settings.MongoDBOrganizationId;
 
-        var project = new Project(application.Name, new ProjectArgs
+        var project = new Project($"{application.Name}-{environment.ShortName}", new ProjectArgs
         {
             OrgId = mongoDBOrganizationId.Value
         });
