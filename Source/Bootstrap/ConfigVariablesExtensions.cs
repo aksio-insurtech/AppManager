@@ -23,7 +23,7 @@ public static class ConfigVariablesExtensions
             Environment = applicationAndEnvironment.Environment with
             {
                 CratisVersion = cratisVersion,
-                AzureSubscriptionId = config.Azure.Subscription.SubscriptionId,
+                AzureSubscriptionId = config.Azure.EnvironmentSubscriptionId,
                 ApplicationResources = new(
                     null!,
                     null!,
