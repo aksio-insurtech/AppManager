@@ -41,12 +41,18 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
+    public async Task Application(Application application, CloudLocationKey cloudLocation)
+    {
+        var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
+        await application.SetupResourceGroup(_sharedEnvironment, cloudLocation, _settings.ServicePrincipal, sharedSubscription);
+    }
+
     public async Task<ApplicationEnvironmentResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
     {
         var tags = application.GetTags(environment);
         var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
+        var sharedResourceGroup = await application.SetupResourceGroup(_sharedEnvironment, environment.CloudLocation, _settings.ServicePrincipal, sharedSubscription);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
-        var sharedResourceGroup = await application.SetupResourceGroup(_sharedEnvironment, environment.CloudLocation, _settings.ServicePrincipal, subscription);
         var resourceGroup = await application.SetupResourceGroup(environment, environment.CloudLocation, _settings.ServicePrincipal, subscription);
         var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
         var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);

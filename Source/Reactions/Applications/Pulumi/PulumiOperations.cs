@@ -174,6 +174,7 @@ public class PulumiOperations : IPulumiOperations
             application,
             async () =>
             {
+                await _stackDefinitions.Application(application, environment.CloudLocation);
                 applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, environment.CratisVersion);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
                 storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
