@@ -18,6 +18,12 @@ namespace Reactions.Applications.Pulumi;
 
 public class PulumiStackDefinitions : IPulumiStackDefinitions
 {
+    static readonly ApplicationEnvironment _sharedEnvironment = new(
+        Guid.Parse("5e4d2c45-4ebb-4bc4-a178-b1d1d5ed44ff"),
+        "Shared",
+        "shared",
+        "S");
+
     readonly ISettings _settings;
     readonly IExecutionContextManager _executionContextManager;
     readonly IEventLog _eventLog;
@@ -39,12 +45,13 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     {
         var tags = application.GetTags(environment);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
-        var resourceGroup = await application.SetupResourceGroup(environment, _settings.ServicePrincipal, subscription);
+        var sharedResourceGroup = await application.SetupResourceGroup(_sharedEnvironment, environment.CloudLocation, _settings.ServicePrincipal, subscription);
+        var resourceGroup = await application.SetupResourceGroup(environment, environment.CloudLocation, _settings.ServicePrincipal, subscription);
         var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
         var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
         var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);
         var storage = await application.SetupStorage(environment, resourceGroup, tags);
-        var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
+        var containerRegistry = await application.SetupContainerRegistry(sharedResourceGroup, tags);
         var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
 
         var microservice = new Microservice(
