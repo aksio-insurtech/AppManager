@@ -14,7 +14,7 @@ public static class ApplicationResourceGroupPulumiExtensions
     public static async Task<ResourceGroup> SetupResourceGroup(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation, AzureServicePrincipal servicePrincipal, AzureSubscription subscription)
     {
         var name = GetResourceGroupName(application, environment, cloudLocation);
-        if (!PulumiOperations.CurrentStack.HasResourceGroup())
+        if (!PulumiOperations.CurrentStack.HasResourceGroup(name))
         {
             var credentials = SdkContext.AzureCredentialsFactory.FromServicePrincipal(
                 clientId: servicePrincipal.ClientId,

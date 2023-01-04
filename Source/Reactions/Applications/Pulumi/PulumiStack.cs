@@ -16,15 +16,23 @@ public record PulumiStack(WorkspaceStack Stack, JsonNode Json)
     /// <summary>
     /// Check if stack has a resource group defined.
     /// </summary>
+    /// <param name="name">Name of the resource group to check for.</param>
     /// <returns>True if it has, false if not.</returns>
-    public bool HasResourceGroup()
+    public bool HasResourceGroup(string name)
     {
-        var resourceGroup = Json["deployment"]!.AsObject()["resources"]!.AsArray().FirstOrDefault(_ => _!["type"]!.GetValue<string>().Equals("azure-native:resources:ResourceGroup"));
-        var external = resourceGroup!["external"];
-        if (external is not null)
+        var resourceGroup = Json["deployment"]!.AsObject()["resources"]!.AsArray().FirstOrDefault(_ =>
+            _!["type"]!.GetValue<string>().Equals("azure-native:resources:ResourceGroup") &&
+            _!["outputs"]!.AsObject()["name"]!.GetValue<string>().Equals(name));
+        if (resourceGroup is not null)
         {
-            return !external.GetValue<bool>();
+            var external = resourceGroup!["external"];
+            if (external is not null)
+            {
+                return !external.GetValue<bool>();
+            }
+
+            return true;
         }
-        return resourceGroup is not null;
+        return false;
     }
 }
