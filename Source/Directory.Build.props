@@ -21,5 +21,6 @@
         <PackageReference Include="Aksio.Cratis.Applications.CQRS" Version="$(AksioCratis)" />
         <PackageReference Include="Aksio.Cratis.Applications.CQRS.MongoDB" Version="$(AksioCratis)" />
         <PackageReference Include="Aksio.Cratis.Applications.ProxyGenerator" Version="$(AksioCratis)" />
+        <PackageReference Include="Aksio.Cratis.Kernel.Common" Version="$(AksioCratis)" />
     </ItemGroup>
 </Project>

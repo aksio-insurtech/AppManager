@@ -4,8 +4,8 @@
 using System.Collections.ObjectModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Aksio.Cratis.Configuration;
-using Aksio.Cratis.Extensions.Orleans.Configuration;
+using Aksio.Cratis.Kernel.Configuration;
+using Aksio.Cratis.Kernel.Orleans.Configuration;
 using Common;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Templates;
@@ -101,7 +101,7 @@ public class MicroserviceStorage
                         }
                     }
                 },
-                Tenants = new StorageForTenants()
+                Tenants = new Aksio.Cratis.Configuration.StorageForTenants()
             };
 
             foreach (var tenant in tenants)
