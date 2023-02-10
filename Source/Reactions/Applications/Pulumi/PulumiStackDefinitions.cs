@@ -156,7 +156,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         resourceGroup ??= application.GetResourceGroup(environment);
         var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
         storage.CreateAndUploadAppSettings(_settings);
-        storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
 
         deployables ??= Array.Empty<Deployable>();
 
@@ -171,6 +170,13 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             deployables,
             tags,
             useContainerRegistry);
+
+        microserviceResult.ContainerApp.Configuration.Apply(_ => _?.Ingress).Apply(_ =>
+        {
+            var url = $"http://{_?.Fqdn}";
+            storage.CreateAndUploadClientCratisConfig(storage.FileStorage.ConnectionString, url);
+            return _?.Fqdn;
+        });
 
         // Todo: Set to actual execution context - might not be the right place for this!
         _executionContextManager.Set(executionContext);
