@@ -7,5 +7,6 @@ public enum IdentityProviderType
 {
     None = 0,
     Azure = 1,
-    IdPorten = 2
+    IdPorten = 2,
+    OpenIDConnect = 3,
 }

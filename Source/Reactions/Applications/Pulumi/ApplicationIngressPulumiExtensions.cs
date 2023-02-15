@@ -409,6 +409,34 @@ public static class ApplicationIngressPulumiExtensions
                         }
                     };
                 break;
+
+            case IdentityProviderType.OpenIDConnect:
+                args.CustomOpenIdConnectProviders[identityProvider.Name.Value] = new CustomOpenIdConnectProviderArgs
+                {
+                    Enabled = true,
+                    Login = new OpenIdConnectLoginArgs
+                    {
+                        Scopes = new string[]
+                            {
+                                "openid",
+                                "profile"
+                            }
+                    },
+                    Registration = new OpenIdConnectRegistrationArgs
+                    {
+                        ClientId = identityProvider.ClientId.Value,
+                        ClientCredential = new OpenIdConnectClientCredentialArgs
+                        {
+                            ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
+                            Method = ClientCredentialMethod.ClientSecretPost
+                        },
+                        OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
+                        {
+                            WellKnownOpenIdConfiguration = $"{identityProvider.Issuer}/.well-known/openid-configuration"
+                        }
+                    }
+                };
+                break;
         }
     }
 }
