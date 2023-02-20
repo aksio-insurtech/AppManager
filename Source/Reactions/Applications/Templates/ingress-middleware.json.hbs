@@ -15,7 +15,7 @@
                 "{{this}}"{{#unless @last}},{{/unless}}
             {{/TenantIdClaims}}
             ]
-        }
+        }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
     "identityDetailsUrl": "{{IdentityDetailsUrl}}"
