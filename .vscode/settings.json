@@ -57,6 +57,7 @@
         "appmanager",
         "appsettings",
         "Autofac",
+        "Autosize",
         "azuread",
         "Bson",
         "certbot",
