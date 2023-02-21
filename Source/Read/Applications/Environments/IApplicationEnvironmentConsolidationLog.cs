@@ -3,7 +3,7 @@
 
 using Concepts.Applications.Environments;
 
-namespace Reactions.Applications.Pulumi;
+namespace Read.Applications.Environments;
 
 /// <summary>
 /// Defines a log for specific application environment consolidation.

@@ -15,6 +15,7 @@ using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.App;
 using Reactions.Applications.Pulumi.Resources;
+using Read.Applications.Environments;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
@@ -191,19 +192,7 @@ public class PulumiOperations : IPulumiOperations
         var ingressResults = new Dictionary<Ingress, IngressResult>();
         Storage storage = null!;
 
-        var upOptions = new UpOptions
-        {
-            OnStandardOutput = (message) =>
-            {
-                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
-                Console.WriteLine(message);
-            },
-            OnStandardError = (message) =>
-            {
-                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
-                Console.WriteLine(message);
-            }
-        };
+        var upOptions = GetUpOptionsForConsolidation(application, environment, consolidationId);
 
         await Up(
             application,
@@ -244,27 +233,13 @@ public class PulumiOperations : IPulumiOperations
         }
 
         var microserviceContainerApps = new Dictionary<MicroserviceId, ContainerApp>();
-
         foreach (var microservice in environment.Microservices)
         {
             await Up(
                 application,
                 async () =>
                 {
-                    var managedEnvironment = ManagedEnvironment.Get(application.Name, applicationEnvironmentResult!.ManagedEnvironment.Id);
-
-                    var resourceGroup = application.GetResourceGroup(environment);
-                    var storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
-                    var microserviceResult = await _stackDefinitions.Microservice(
-                        executionContext,
-                        application,
-                        microservice,
-                        environment,
-                        managedEnvironment,
-                        true,
-                        resourceGroup: resourceGroup,
-                        deployables: microservice.Deployables);
-
+                    var microserviceResult = await HandleMicroservice(executionContext, application, applicationEnvironmentResult!.ManagedEnvironment.Id, microservice, environment);
                     microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
                 },
                 environment,
@@ -281,6 +256,34 @@ public class PulumiOperations : IPulumiOperations
                 result.FileShareName,
                 _fileStorageLogger);
         }
+    }
+
+    /// <inheritdoc/>
+    public async Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, Deployable deployable, Concepts.Applications.DeployableImageName image)
+    {
+        var upOptions = GetUpOptionsForConsolidation(application, environment, ApplicationEnvironmentConsolidationId.New());
+        var executionContext = _executionContextManager.Current;
+
+        await Up(
+            application,
+            async () =>
+            {
+                var resourceGroup = application.GetResourceGroup(environment);
+                var result = GetManagedEnvironment.Invoke(new()
+                {
+                    EnvironmentName = application.Name.Value,
+                    ResourceGroupName = resourceGroup.Name
+                });
+
+                var managedEnvironmentId = result.Apply(r => r.Id);
+
+                var containerApp = await microservice.GetContainerApp(application, environment);
+
+                var microserviceResult = await HandleMicroservice(executionContext, application, managedEnvironmentId, microservice, environment);
+            },
+            environment,
+            microservice,
+            upOptions);
     }
 
     async Task<PulumiStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, Func<Task> program, Microservice? microservice = default)
@@ -400,7 +403,7 @@ public class PulumiOperations : IPulumiOperations
         });
     }
 
-    async Task SaveStackForApplication(Application application, ApplicationEnvironment environment, WorkspaceStack stack)
+    async Task SaveStackForApplication(Application application, Concepts.Applications.Environments.ApplicationEnvironment environment, WorkspaceStack stack)
     {
         _logger.SavingStackDeploymentForApplication(application.Name);
 
@@ -408,11 +411,45 @@ public class PulumiOperations : IPulumiOperations
         await _stacksForApplications.Save(application.Id, environment, deployment);
     }
 
-    async Task SaveStackForMicroservice(Application application, Microservice microservice, ApplicationEnvironment environment, WorkspaceStack stack)
+    async Task SaveStackForMicroservice(Application application, Microservice microservice, Concepts.Applications.Environments.ApplicationEnvironment environment, WorkspaceStack stack)
     {
         _logger.SavingStackDeploymentForMicroservice(microservice.Name);
 
         var deployment = await stack.ExportStackAsync();
         await _stacksForMicroservices.Save(application.Id, microservice.Id, environment, deployment);
     }
+
+    async Task<ContainerAppResult> HandleMicroservice(ExecutionContext executionContext, Application application, Output<string> managedEnvironmentId, Microservice microservice, ApplicationEnvironmentWithArtifacts environment)
+    {
+        var managedEnvironment = ManagedEnvironment.Get(application.Name, managedEnvironmentId);
+
+        var resourceGroup = application.GetResourceGroup(environment);
+        return await _stackDefinitions.Microservice(
+            executionContext,
+            application,
+            microservice,
+            environment,
+            managedEnvironment,
+            true,
+            resourceGroup: resourceGroup,
+            deployables: microservice.Deployables);
+    }
+
+    UpOptions GetUpOptionsForConsolidation(
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentConsolidationId consolidationId)
+        => new()
+        {
+            OnStandardOutput = (message) =>
+            {
+                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
+                Console.WriteLine(message);
+            },
+            OnStandardError = (message) =>
+            {
+                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
+                Console.WriteLine(message);
+            }
+        };
 }

@@ -40,7 +40,7 @@ export const Consolidations = () => {
         setSelectedConsolidation(selectedItems[0]);
     };
 
-    let log = consolidation.data.log || '';
+    let log = consolidation.data.message || '';
     log = log.replace(/\\n/g, '\n');
 
     if (textArea.current) {

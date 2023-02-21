@@ -29,6 +29,6 @@ public class Deployables : Controller
         [FromBody] CreateDeployableWithImage command)
     {
         await _eventLog.Append(environmentId, new DeployableCreated(environmentId, microserviceId, command.DeployableId, command.Name));
-        await _eventLog.Append(environmentId, new DeployableImageChanged(environmentId, microserviceId, command.DeployableId, command.Image));
+        await _eventLog.Append(environmentId, new DeployableImageChanged(applicationId, environmentId, microserviceId, command.DeployableId, command.Image));
     }
 }

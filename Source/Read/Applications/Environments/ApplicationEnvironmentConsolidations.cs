@@ -8,10 +8,14 @@ namespace Read.Applications.Environments;
 [Route("/api/applications/{applicationId}/environments/{environmentId}/consolidations")]
 public class ApplicationEnvironmentConsolidations : Controller
 {
+    readonly IApplicationEnvironmentConsolidationLog _consolidationLog;
     readonly IMongoCollection<ApplicationEnvironmentConsolidation> _consolidations;
 
-    public ApplicationEnvironmentConsolidations(IMongoCollection<ApplicationEnvironmentConsolidation> consolidations)
+    public ApplicationEnvironmentConsolidations(
+        IApplicationEnvironmentConsolidationLog consolidationLog,
+        IMongoCollection<ApplicationEnvironmentConsolidation> consolidations)
     {
+        _consolidationLog = consolidationLog;
         _consolidations = consolidations;
     }
 
@@ -22,9 +26,14 @@ public class ApplicationEnvironmentConsolidations : Controller
         => _consolidations.Observe(consolidation => consolidation.Id.ApplicationId == applicationId && consolidation.Id.EnvironmentId == environmentId);
 
     [HttpGet("{consolidationId}")]
-    public Task<ClientObservable<ApplicationEnvironmentConsolidation>> Consolidation(
+    public Task<ClientObservable<LogMessage>> Consolidation(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] ApplicationEnvironmentConsolidationId consolidationId)
-        => _consolidations.ObserveById(new ApplicationEnvironmentConsolidationKey(applicationId, environmentId, consolidationId));
+    {
+        var observable = new ClientObservable<LogMessage>();
+        var log = _consolidationLog.LogFor(applicationId, environmentId, consolidationId);
+        log.Subscribe(_ => observable.OnNext(new(_)));
+        return Task.FromResult(observable);
+    }
 }

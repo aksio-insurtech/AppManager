@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@aksio/cratis-applications-frontend/queries';
-import { ApplicationEnvironmentConsolidation } from './ApplicationEnvironmentConsolidation';
+import { LogMessage } from './LogMessage';
 import Handlebars from 'handlebars';
 
 const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/consolidations/{{consolidationId}}');
@@ -13,13 +13,13 @@ export interface ConsolidationArguments {
     environmentId: string;
     consolidationId: string;
 }
-export class Consolidation extends ObservableQueryFor<ApplicationEnvironmentConsolidation, ConsolidationArguments> {
+export class Consolidation extends ObservableQueryFor<LogMessage, ConsolidationArguments> {
     readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/consolidations/{{consolidationId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly defaultValue: ApplicationEnvironmentConsolidation = {} as any;
+    readonly defaultValue: LogMessage = {} as any;
 
     constructor() {
-        super(ApplicationEnvironmentConsolidation, false);
+        super(LogMessage, false);
     }
 
     get requestArguments(): string[] {
@@ -30,7 +30,7 @@ export class Consolidation extends ObservableQueryFor<ApplicationEnvironmentCons
         ];
     }
 
-    static use(args?: ConsolidationArguments): [QueryResultWithState<ApplicationEnvironmentConsolidation>] {
-        return useObservableQuery<ApplicationEnvironmentConsolidation, Consolidation, ConsolidationArguments>(Consolidation, args);
+    static use(args?: ConsolidationArguments): [QueryResultWithState<LogMessage>] {
+        return useObservableQuery<LogMessage, Consolidation, ConsolidationArguments>(Consolidation, args);
     }
 }

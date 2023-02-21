@@ -5,9 +5,8 @@ using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using Aksio.Cratis.Execution;
 using Concepts.Applications.Environments;
-using Read.Applications;
 
-namespace Reactions.Applications.Pulumi;
+namespace Read.Applications.Environments;
 
 /// <summary>
 /// Represents an implementation of <see cref="IApplicationEnvironmentConsolidationLog"/>.
@@ -35,7 +34,16 @@ public class ApplicationEnvironmentConsolidationLog : IApplicationEnvironmentCon
             return consolidation;
         }
 
-        consolidation = new BehaviorSubject<string>(string.Empty);
+        var key = new ApplicationEnvironmentConsolidationKey(applicationId, environmentId, consolidationId);
+        var storedConsolidation = _collection.Find(_ => _.Id == key).FirstOrDefault();
+        if (storedConsolidation is not null)
+        {
+            consolidation = new BehaviorSubject<string>(storedConsolidation.Log);
+        }
+        else
+        {
+            consolidation = new BehaviorSubject<string>(string.Empty);
+        }
         _consolidations[consolidationId] = consolidation;
         return consolidation;
     }
@@ -50,7 +58,7 @@ public class ApplicationEnvironmentConsolidationLog : IApplicationEnvironmentCon
         var key = new ApplicationEnvironmentConsolidationKey(applicationId, environmentId, consolidationId);
         if (_consolidations.TryGetValue(consolidationId, out var consolidation))
         {
-            consolidation.OnNext(consolidation.Value + message);
+            consolidation.OnNext($"{consolidation.Value}\n{message}");
         }
         else
         {
@@ -58,7 +66,7 @@ public class ApplicationEnvironmentConsolidationLog : IApplicationEnvironmentCon
             if (storedConsolidation is not null)
             {
                 consolidation = new BehaviorSubject<string>(storedConsolidation.Log);
-                consolidation.OnNext(storedConsolidation.Log + message);
+                consolidation.OnNext($"{storedConsolidation.Log}\n{message}");
             }
             else
             {

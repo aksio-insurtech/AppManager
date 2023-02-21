@@ -11,5 +11,7 @@ public record ApplicationEnvironmentId(Guid Value) : ConceptAs<Guid>(Value)
 
     public static implicit operator ApplicationEnvironmentId(EventSourceId id) => Guid.Parse(id.Value);
 
+    public static implicit operator ModelKey(ApplicationEnvironmentId environmentId) => new(environmentId.Value.ToString());
+
     public static ApplicationEnvironmentId New() => Guid.NewGuid();
 }

@@ -16,6 +16,7 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
         .From<ApplicationEnvironmentCreated>(_ => _
             .Set(m => m.Id).ToEventSourceId()
             .Set(m => m.Name).To(e => e.Name)
+            .Set(m => m.DisplayName).To(e => e.DisplayName)
             .Set(m => m.CratisVersion).To(e => e.CratisVersion)
             .Set(m => m.AzureSubscriptionId).To(e => e.AzureSubscriptionId)
             .Set(m => m.CloudLocation).To(e => e.CloudLocation))

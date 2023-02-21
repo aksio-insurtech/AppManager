@@ -1,6 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Pulumi.Automation;
 
@@ -60,4 +61,15 @@ public interface IPulumiOperations
     /// <param name="consolidationId">The unique identifier of the consolidation.</param>
     /// <returns>Awaitable task.</returns>
     Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment, ApplicationEnvironmentConsolidationId consolidationId);
+
+    /// <summary>
+    /// Set the image for a deployable.
+    /// </summary>
+    /// <param name="application">Application the environment is for.</param>
+    /// <param name="environment">The environment to consolidate.</param>
+    /// <param name="microservice">The microservice to set for.</param>
+    /// <param name="deployable">The deployable on the microservice to set for.</param>
+    /// <param name="image">The image to set.</param>
+    /// <returns>Awaitable task.</returns>
+    Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, Deployable deployable, DeployableImageName image);
 }
