@@ -58,8 +58,10 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
     );
 
     const [consolidateApplicationEnvironment] = ConsolidateApplicationEnvironment.use({
-        applicationId: props.application.id, environmentId: props.environmentId
+        applicationId: props.application.id,
+        environmentId: props.environmentId
     });
+
 
     const currentEnvironment = props.application.environments?.find(_ => _.environmentId === props.environmentId);
 

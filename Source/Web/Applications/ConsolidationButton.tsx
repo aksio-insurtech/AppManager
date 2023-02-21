@@ -23,7 +23,11 @@ export const ConsolidationButton = (props: ConsolidationButtonProps) => {
 
         case ApplicationEnvironmentConsolidationStatus.none:
         case ApplicationEnvironmentConsolidationStatus.completed:
-            element = <ListItemActionButton title="Consolidate Changes" icon={<icons.Upgrade />} onClick={() => props.consolidateClicked()} />;
+            if (props.environment?.lastUpdated.getTime() === props.environment?.lastConsolidation.getTime()) {
+                element = <ListItemActionButton title="Run automation" icon={<icons.PlayCircle />} onClick={() => props.consolidateClicked()} />;
+            } else {
+                element = <ListItemActionButton title="Consolidate Changes" icon={<icons.Upgrade />} onClick={() => props.consolidateClicked()} />;
+            }
             break;
 
         case ApplicationEnvironmentConsolidationStatus.failed:
