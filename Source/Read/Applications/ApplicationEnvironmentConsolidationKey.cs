@@ -5,4 +5,7 @@ using Concepts.Applications.Environments;
 
 namespace Read.Applications;
 
-public record ApplicationEnvironmentConsolidationKey(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, ApplicationEnvironmentConsolidationId ConsolidationId);
+public record ApplicationEnvironmentConsolidationKey(
+    ApplicationId ApplicationId,
+    ApplicationEnvironmentId EnvironmentId,
+    ApplicationEnvironmentConsolidationId ConsolidationId);

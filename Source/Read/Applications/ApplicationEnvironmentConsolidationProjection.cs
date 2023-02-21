@@ -12,21 +12,21 @@ public class ApplicationEnvironmentConsolidationProjection : IProjectionFor<Appl
     public void Define(IProjectionBuilderFor<ApplicationEnvironmentConsolidation> builder) => builder
             .From<ApplicationEnvironmentConsolidationStarted>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
-                    .Set(k => k.ApplicationId).ToEventSourceId()
+                    .Set(k => k.ApplicationId).To(e => e.ApplicationId)
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.InProgress)
                 .Set(m => m.Started).ToEventContextProperty(c => c.Occurred))
             .From<ApplicationEnvironmentConsolidationFailed>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
-                    .Set(k => k.ApplicationId).ToEventSourceId()
+                    .Set(k => k.ApplicationId).To(e => e.ApplicationId)
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Failed)
                 .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred))
             .From<ApplicationEnvironmentConsolidationCompleted>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
-                    .Set(k => k.ApplicationId).ToEventSourceId()
+                    .Set(k => k.ApplicationId).To(e => e.ApplicationId)
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Completed)

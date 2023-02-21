@@ -33,6 +33,7 @@ public class PulumiOperations : IPulumiOperations
     readonly IStacksForApplications _stacksForApplications;
     readonly IStacksForMicroservices _stacksForMicroservices;
     readonly IResourceRenderers _resourceRenderers;
+    readonly IApplicationEnvironmentConsolidationLog _applicationEnvironmentConsolidationLog;
 
     internal static PulumiStack CurrentStack => _currentStack.Value!;
 
@@ -43,6 +44,7 @@ public class PulumiOperations : IPulumiOperations
         IStacksForApplications stacksForApplications,
         IStacksForMicroservices stacksForMicroservices,
         IResourceRenderers resourceRenderers,
+        IApplicationEnvironmentConsolidationLog applicationEnvironmentConsolidationLog,
         ILogger<PulumiOperations> logger,
         ILogger<FileStorage> fileStorageLogger)
     {
@@ -54,6 +56,7 @@ public class PulumiOperations : IPulumiOperations
         _stacksForApplications = stacksForApplications;
         _stacksForMicroservices = stacksForMicroservices;
         _resourceRenderers = resourceRenderers;
+        _applicationEnvironmentConsolidationLog = applicationEnvironmentConsolidationLog;
     }
 
     /// <summary>
@@ -73,7 +76,12 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Up(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Up(
+        Application application,
+        Func<Task> definition,
+        ApplicationEnvironmentWithArtifacts environment,
+        Microservice? microservice = default,
+        UpOptions? options = default)
     {
         _logger.UppingStack();
 
@@ -83,11 +91,13 @@ public class PulumiOperations : IPulumiOperations
             await RefreshStack(stack.Stack);
 
             _logger.PuttingUpStack();
-            await stack.Stack.UpAsync(new UpOptions
+
+            options ??= new UpOptions
             {
                 OnStandardOutput = Console.WriteLine,
                 OnStandardError = Console.Error.WriteLine
-            });
+            };
+            await stack.Stack.UpAsync(options);
 
             await (microservice is not null ?
                 SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
@@ -100,7 +110,11 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Down(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Down(
+        Application application,
+        Func<Task> definition,
+        ApplicationEnvironmentWithArtifacts environment,
+        Microservice? microservice = default)
     {
         try
         {
@@ -121,7 +135,11 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task Remove(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default)
+    public async Task Remove(
+        Application application,
+        Func<Task> definition,
+        ApplicationEnvironmentWithArtifacts environment,
+        Microservice? microservice = default)
     {
         _logger.StackBeingRemoved();
 
@@ -163,12 +181,29 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment)
+    public async Task ConsolidateEnvironment(
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentConsolidationId consolidationId)
     {
         ApplicationEnvironmentResult? applicationEnvironmentResult = default;
         var executionContext = _executionContextManager.Current;
         var ingressResults = new Dictionary<Ingress, IngressResult>();
         Storage storage = null!;
+
+        var upOptions = new UpOptions
+        {
+            OnStandardOutput = (message) =>
+            {
+                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
+                Console.WriteLine(message);
+            },
+            OnStandardError = (message) =>
+            {
+                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
+                Console.WriteLine(message);
+            }
+        };
 
         await Up(
             application,

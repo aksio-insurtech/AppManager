@@ -3,6 +3,7 @@
 
 using Aksio.Cratis.Execution;
 using Events.Applications.Environments;
+using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications.Pulumi;
 
@@ -47,12 +48,17 @@ public class ApplicationResourcesCoordinator
         Console.WriteLine(application);
         Console.WriteLine(environment);
 
-        // _logger.ConsolidationStarted(environment.Name, application.Name);
-        await Task.Delay(5000);
+        _logger.ConsolidationStarted(environment.Model.Name, application.Model.Name);
+        await _pulumiOperations.ConsolidateEnvironment(application.Model, environment.Model, @event.ConsolidationId);
 
         // Todo: Set to actual execution context - might not be the right place for this!
         _executionContextManager.Set(_executionContext);
         await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
+    }
+
+    public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    {
+        await Task.CompletedTask;
     }
 
     /*

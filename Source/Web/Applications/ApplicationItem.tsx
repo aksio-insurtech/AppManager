@@ -62,7 +62,6 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
         environmentId: props.environmentId
     });
 
-
     const currentEnvironment = props.application.environments?.find(_ => _.environmentId === props.environmentId);
 
     return (
