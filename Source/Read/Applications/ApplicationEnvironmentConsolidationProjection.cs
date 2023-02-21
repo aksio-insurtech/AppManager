@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Events.Applications.Environments;
+using Events.Applications.Environments.Microservices.Deployables;
 
 namespace Read.Applications;
 
@@ -23,12 +24,21 @@ public class ApplicationEnvironmentConsolidationProjection : IProjectionFor<Appl
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Failed)
-                .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred))
+                .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred)
+                .Set(m => m.Errors).To(e => e.Errors)
+                .Set(m => m.StackTrace).To(e => e.StackTrace))
             .From<ApplicationEnvironmentConsolidationCompleted>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
                     .Set(k => k.ApplicationId).To(e => e.ApplicationId)
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
                     .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Completed)
-                .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred));
+                .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred))
+            .From<DeployableImageChanged>(_ => _
+                .UsingCompositeKey<ApplicationEnvironmentConsolidationKey>(key => key
+                    .Set(k => k.ApplicationId).To(e => e.ApplicationId)
+                    .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)
+                    .Set(k => k.ConsolidationId).To(e => e.ConsolidationId))
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.InProgress)
+                .Set(m => m.Started).ToEventContextProperty(c => c.Occurred));
 }

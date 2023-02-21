@@ -54,7 +54,7 @@ export const Consolidations = () => {
             height={'100%'}
             spacing={5}>
 
-            <Box sx={{ height: 400, width: '100%', padding: '24px' }}>
+            <Box sx={{ height: 600, width: '100%', padding: '24px' }}>
                 <DataGrid
                     hideFooterPagination={true}
                     filterMode="client"

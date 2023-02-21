@@ -21,6 +21,12 @@ export class ApplicationEnvironmentConsolidation {
     @field(Number)
     status!: ApplicationEnvironmentConsolidationStatus;
 
+    @field(String, true)
+    errors!: String[];
+
+    @field(String)
+    stackTrace!: string;
+
     @field(String)
     log!: string;
 }

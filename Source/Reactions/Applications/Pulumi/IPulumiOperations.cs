@@ -19,9 +19,10 @@ public interface IPulumiOperations
     /// <param name="definition">The configuration of a stack to up.</param>
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
-    /// <param name="options">Optional <see cref="UpOptions"/>.</param>
+    /// <param name="upOptions">Optional <see cref="UpOptions"/>.</param>
+    /// <param name="refreshOptions">Optional <see cref="RefreshOptions"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Up(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default, UpOptions? options = default);
+    Task Up(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default, UpOptions? upOptions = default, RefreshOptions? refreshOptions = default);
 
     /// <summary>
     /// Down a stack.
@@ -68,8 +69,9 @@ public interface IPulumiOperations
     /// <param name="application">Application the environment is for.</param>
     /// <param name="environment">The environment to consolidate.</param>
     /// <param name="microservice">The microservice to set for.</param>
+    /// <param name="consolidationId">The unique identifier of the consolidation.</param>
     /// <param name="deployable">The deployable on the microservice to set for.</param>
     /// <param name="image">The image to set.</param>
     /// <returns>Awaitable task.</returns>
-    Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, Deployable deployable, DeployableImageName image);
+    Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, ApplicationEnvironmentConsolidationId consolidationId, Deployable deployable, DeployableImageName image);
 }

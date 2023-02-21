@@ -45,7 +45,14 @@ public static class ApplicationResourceGroupPulumiExtensions
 
     public static ResourceGroup GetResourceGroup(this Application application, ApplicationEnvironmentWithArtifacts environment)
     {
-        return ResourceGroup.Get(GetResourceGroupName(application, environment, environment.CloudLocation), environment.ApplicationResources.AzureResourceGroupId.Value);
+        var result = global::Pulumi.AzureNative.Resources.GetResourceGroup.Invoke(new()
+        {
+            ResourceGroupName = GetResourceGroupName(application, environment, environment.CloudLocation)
+        });
+
+        var resourceGroupId = result.Apply(_ => _.Id);
+
+        return ResourceGroup.Get(GetResourceGroupName(application, environment, environment.CloudLocation), resourceGroupId);
     }
 
     static string GetResourceGroupName(Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation)

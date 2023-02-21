@@ -8,4 +8,6 @@ public record ApplicationEnvironmentConsolidation(
     DateTimeOffset Started,
     DateTimeOffset CompletedOrFailed,
     ApplicationEnvironmentConsolidationStatus Status,
+    IEnumerable<string> Errors,
+    string StackTrace,
     string Log);

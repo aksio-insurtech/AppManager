@@ -23,7 +23,12 @@ public class ApplicationEnvironmentConsolidations : Controller
     public Task<ClientObservable<IEnumerable<ApplicationEnvironmentConsolidation>>> Consolidations(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId)
-        => _consolidations.Observe(consolidation => consolidation.Id.ApplicationId == applicationId && consolidation.Id.EnvironmentId == environmentId);
+    {
+        var sort = new SortDefinitionBuilder<ApplicationEnvironmentConsolidation>().Descending(_ => _.CompletedOrFailed);
+        return _consolidations.Observe(
+            consolidation => consolidation.Id.ApplicationId == applicationId && consolidation.Id.EnvironmentId == environmentId,
+            new FindOptions<ApplicationEnvironmentConsolidation, ApplicationEnvironmentConsolidation> { Sort = sort });
+    }
 
     [HttpGet("{consolidationId}")]
     public Task<ClientObservable<LogMessage>> Consolidation(

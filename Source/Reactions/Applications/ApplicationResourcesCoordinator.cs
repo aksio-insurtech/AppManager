@@ -40,40 +40,72 @@ public class ApplicationResourcesCoordinator
         _eventLog = eventLog;
     }
 
-    public async Task ConsolidationStarted(ApplicationEnvironmentConsolidationStarted @event, EventContext context)
+    public Task ConsolidationStarted(ApplicationEnvironmentConsolidationStarted @event, EventContext context)
     {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(context.EventSourceId);
+        _ = Task.Run(async () =>
+        {
+            var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+            var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(context.EventSourceId);
 
-        _logger.ConsolidationStarted(environment.Model.Name, application.Model.Name);
-        await _pulumiOperations.ConsolidateEnvironment(application.Model, environment.Model, @event.ConsolidationId);
+            _logger.ConsolidationStarted(environment.Model.Name, application.Model.Name);
+            try
+            {
+                await _pulumiOperations.ConsolidateEnvironment(application.Model, environment.Model, @event.ConsolidationId);
 
-        // Todo: Set to actual execution context - might not be the right place for this!
-        _executionContextManager.Set(_executionContext);
-        await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
+                // Todo: Set to actual execution context - might not be the right place for this!
+                _executionContextManager.Set(_executionContext);
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
+            }
+            catch (Exception ex)
+            {
+                // Todo: Set to actual execution context - might not be the right place for this!
+                _executionContextManager.Set(_executionContext);
+                var messages = ex.GetAllMessages();
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationFailed(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId, messages, ex.StackTrace ?? string.Empty));
+            }
+        });
+
+        return Task.CompletedTask;
     }
 
-    public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    public Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
     {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId);
-        var microservice = environment.Model.GetMicroserviceById(@event.MicroserviceId);
-        var deployable = microservice.GetDeployableById(@event.DeployableId);
+        _ = Task.Run(async () =>
+        {
+            var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+            var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId);
+            var microservice = environment.Model.GetMicroserviceById(@event.MicroserviceId);
+            var deployable = microservice.GetDeployableById(@event.DeployableId);
 
-        _logger.ChangingDeployableImage(
-            microservice.Name,
-            deployable.Name,
-            @event.Image,
-            environment.Model.Name,
-            application.Model.Name);
+            _logger.ChangingDeployableImage(
+                microservice.Name,
+                deployable.Name,
+                @event.Image,
+                environment.Model.Name,
+                application.Model.Name);
 
-        await _pulumiOperations.SetImageForDeployable(
-            application.Model,
-            environment.Model,
-            microservice,
-            deployable,
-            @event.Image);
+            try
+            {
+                await _pulumiOperations.SetImageForDeployable(
+                    application.Model,
+                    environment.Model,
+                    microservice,
+                    @event.ConsolidationId,
+                    deployable,
+                    @event.Image);
 
-        await Task.CompletedTask;
+                _executionContextManager.Set(_executionContext);
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
+            }
+            catch (Exception ex)
+            {
+                // Todo: Set to actual execution context - might not be the right place for this!
+                _executionContextManager.Set(_executionContext);
+                var messages = ex.GetAllMessages();
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationFailed(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId, messages, ex.StackTrace ?? string.Empty));
+            }
+        });
+
+        return Task.CompletedTask;
     }
 }

@@ -82,23 +82,24 @@ public class PulumiOperations : IPulumiOperations
         Func<Task> definition,
         ApplicationEnvironmentWithArtifacts environment,
         Microservice? microservice = default,
-        UpOptions? options = default)
+        UpOptions? upOptions = default,
+        RefreshOptions? refreshOptions = default)
     {
         _logger.UppingStack();
 
         try
         {
             var stack = await CreateStack(application, environment, definition, microservice);
-            await RefreshStack(stack.Stack);
+            await RefreshStack(stack.Stack, refreshOptions);
 
             _logger.PuttingUpStack();
 
-            options ??= new UpOptions
+            upOptions ??= new UpOptions
             {
                 OnStandardOutput = Console.WriteLine,
                 OnStandardError = Console.Error.WriteLine
             };
-            await stack.Stack.UpAsync(options);
+            await stack.Stack.UpAsync(upOptions);
 
             await (microservice is not null ?
                 SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
@@ -107,6 +108,8 @@ public class PulumiOperations : IPulumiOperations
         catch (Exception ex)
         {
             _logger.Errored(ex);
+
+            throw;
         }
     }
 
@@ -193,6 +196,7 @@ public class PulumiOperations : IPulumiOperations
         Storage storage = null!;
 
         var upOptions = GetUpOptionsForConsolidation(application, environment, consolidationId);
+        var refreshOptions = GetRefreshOptionsForConsolidation(application, environment, consolidationId);
 
         await Up(
             application,
@@ -225,7 +229,9 @@ public class PulumiOperations : IPulumiOperations
                         applicationEnvironmentResult!.ResourceGroup);
                 }
             },
-            environment);
+            environment,
+            upOptions: upOptions,
+            refreshOptions: refreshOptions);
 
         if (environment.ApplicationResources?.AzureResourceGroupId is null)
         {
@@ -243,7 +249,9 @@ public class PulumiOperations : IPulumiOperations
                     microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
                 },
                 environment,
-                microservice);
+                microservice,
+                upOptions,
+                refreshOptions);
         }
 
         foreach (var (ingress, result) in ingressResults)
@@ -259,9 +267,16 @@ public class PulumiOperations : IPulumiOperations
     }
 
     /// <inheritdoc/>
-    public async Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, Deployable deployable, Concepts.Applications.DeployableImageName image)
+    public async Task SetImageForDeployable(
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        Microservice microservice,
+        ApplicationEnvironmentConsolidationId consolidationId,
+        Deployable deployable,
+        Concepts.Applications.DeployableImageName image)
     {
-        var upOptions = GetUpOptionsForConsolidation(application, environment, ApplicationEnvironmentConsolidationId.New());
+        var upOptions = GetUpOptionsForConsolidation(application, environment, consolidationId);
+        var refreshOptions = GetRefreshOptionsForConsolidation(application, environment, consolidationId);
         var executionContext = _executionContextManager.Current;
 
         await Up(
@@ -283,7 +298,8 @@ public class PulumiOperations : IPulumiOperations
             },
             environment,
             microservice,
-            upOptions);
+            upOptions,
+            refreshOptions);
     }
 
     async Task<PulumiStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, Func<Task> program, Microservice? microservice = default)
@@ -393,14 +409,16 @@ public class PulumiOperations : IPulumiOperations
         await stack.ImportStackAsync(stackDeployment);
     }
 
-    async Task RefreshStack(WorkspaceStack stack)
+    async Task RefreshStack(WorkspaceStack stack, RefreshOptions? options = default)
     {
-        _logger.RefreshingStack();
-        await stack.RefreshAsync(new()
+        options ??= new()
         {
             OnStandardOutput = Console.WriteLine,
             OnStandardError = Console.Error.WriteLine
-        });
+        };
+
+        _logger.RefreshingStack();
+        await stack.RefreshAsync(options);
     }
 
     async Task SaveStackForApplication(Application application, Concepts.Applications.Environments.ApplicationEnvironment environment, WorkspaceStack stack)
@@ -435,21 +453,42 @@ public class PulumiOperations : IPulumiOperations
             deployables: microservice.Deployables);
     }
 
+    RefreshOptions GetRefreshOptionsForConsolidation(
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentConsolidationId consolidationId)
+    {
+        var options = new RefreshOptions();
+        SetOptionsForConsolidation(application, environment, consolidationId, options);
+        return options;
+    }
+
     UpOptions GetUpOptionsForConsolidation(
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
         ApplicationEnvironmentConsolidationId consolidationId)
-        => new()
-        {
-            OnStandardOutput = (message) =>
+    {
+        var options = new UpOptions();
+        SetOptionsForConsolidation(application, environment, consolidationId, options);
+        return options;
+    }
+
+    void SetOptionsForConsolidation(
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentConsolidationId consolidationId,
+        global::Pulumi.Automation.UpdateOptions options)
+    {
+        options.OnStandardOutput = (message) =>
             {
                 _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
                 Console.WriteLine(message);
-            },
-            OnStandardError = (message) =>
+            };
+
+        options.OnStandardError = (message) =>
             {
                 _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
                 Console.WriteLine(message);
-            }
-        };
+            };
+    }
 }
