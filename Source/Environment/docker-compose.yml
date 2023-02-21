@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   cratis-kernel:
-    image: aksioinsurtech/cratis:8.5.2-development
+    image: aksioinsurtech/cratis:8.5.4-development
 
     volumes:
       - ./cratis.json:/app/cratis.json:ro
