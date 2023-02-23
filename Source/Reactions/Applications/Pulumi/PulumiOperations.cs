@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Read.Applications.Environments;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
@@ -25,7 +26,6 @@ namespace Reactions.Applications.Pulumi;
 /// </summary>
 public class PulumiOperations : IPulumiOperations
 {
-    static readonly AsyncLocal<PulumiStack> _currentStack = new();
     readonly ILogger<PulumiOperations> _logger;
     readonly ILogger<FileStorage> _fileStorageLogger;
     readonly ISettings _settings;
@@ -35,8 +35,6 @@ public class PulumiOperations : IPulumiOperations
     readonly IStacksForMicroservices _stacksForMicroservices;
     readonly IResourceRenderers _resourceRenderers;
     readonly IApplicationEnvironmentConsolidationLog _applicationEnvironmentConsolidationLog;
-
-    internal static PulumiStack CurrentStack => _currentStack.Value!;
 
     public PulumiOperations(
         ISettings applicationSettings,
@@ -198,14 +196,31 @@ public class PulumiOperations : IPulumiOperations
         var upOptions = GetUpOptionsForConsolidation(application, environment, consolidationId);
         var refreshOptions = GetRefreshOptionsForConsolidation(application, environment, consolidationId);
 
+        var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
+        var sharedEnvironment = environment with
+        {
+            Id = PulumiStackDefinitions.SharedEnvironment.Id,
+            Name = PulumiStackDefinitions.SharedEnvironment.Name,
+            DisplayName = PulumiStackDefinitions.SharedEnvironment.DisplayName,
+            ShortName = PulumiStackDefinitions.SharedEnvironment.ShortName,
+            AzureSubscriptionId = sharedSubscription.SubscriptionId
+        };
+
+        await Up(
+            application,
+            async () => await _stackDefinitions.Application(application, sharedEnvironment),
+            sharedEnvironment,
+            upOptions: upOptions,
+            refreshOptions: refreshOptions);
+
         await Up(
             application,
             async () =>
             {
-                await _stackDefinitions.Application(application, environment.CloudLocation);
-                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, environment.CratisVersion);
+                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, sharedEnvironment, environment.CratisVersion);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
-                storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup);
+                var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+                storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup, _settings.ServicePrincipal, subscription);
 
                 await _resourceRenderers.Render(
                     new(
@@ -245,7 +260,13 @@ public class PulumiOperations : IPulumiOperations
                 application,
                 async () =>
                 {
-                    var microserviceResult = await HandleMicroservice(executionContext, application, applicationEnvironmentResult!.ManagedEnvironment.Id, microservice, environment);
+                    var microserviceResult = await HandleMicroservice(
+                        executionContext,
+                        application,
+                        applicationEnvironmentResult!.ResourceGroup,
+                        applicationEnvironmentResult!.ManagedEnvironment,
+                        microservice,
+                        environment);
                     microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
                 },
                 environment,
@@ -284,17 +305,35 @@ public class PulumiOperations : IPulumiOperations
             async () =>
             {
                 var resourceGroup = application.GetResourceGroup(environment);
-                var result = GetManagedEnvironment.Invoke(new()
+                var sharedEnvironment = environment with
                 {
-                    EnvironmentName = application.Name.Value,
-                    ResourceGroupName = resourceGroup.Name
-                });
+                    Id = PulumiStackDefinitions.SharedEnvironment.Id,
+                    Name = PulumiStackDefinitions.SharedEnvironment.Name,
+                    DisplayName = PulumiStackDefinitions.SharedEnvironment.DisplayName,
+                    ShortName = PulumiStackDefinitions.SharedEnvironment.ShortName,
+                };
+                var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
+                var containerRegistryResult = await application.GetContainerRegistry(sharedEnvironment, _settings.ServicePrincipal, sharedSubscription);
+                var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+                var managedEnvironment = await application.GetManagedEnvironment(environment, _settings.ServicePrincipal, subscription);
 
-                var managedEnvironmentId = result.Apply(r => r.Id);
+                environment = environment with
+                {
+                    ApplicationResources = environment.ApplicationResources with
+                    {
+                        AzureContainerRegistryLoginServer = containerRegistryResult.LoginServer,
+                        AzureContainerRegistryUserName = containerRegistryResult.UserName,
+                        AzureContainerRegistryPassword = containerRegistryResult.Password,
+                    }
+                };
 
-                var containerApp = await microservice.GetContainerApp(application, environment);
-
-                var microserviceResult = await HandleMicroservice(executionContext, application, managedEnvironmentId, microservice, environment);
+                var microserviceResult = await HandleMicroservice(
+                    executionContext,
+                    application,
+                    resourceGroup,
+                    managedEnvironment,
+                    microservice,
+                    environment);
             },
             environment,
             microservice,
@@ -317,11 +356,7 @@ public class PulumiOperations : IPulumiOperations
 
         PulumiStack? pulumiStack = null;
 
-        var pulumiProgram = PulumiFn.Create(async () =>
-        {
-            _currentStack.Value = pulumiStack!;
-            await program();
-        });
+        var pulumiProgram = PulumiFn.Create(async () => await program());
 
         var args = new InlineProgramArgs(projectName, stackName, pulumiProgram)
         {
@@ -437,11 +472,14 @@ public class PulumiOperations : IPulumiOperations
         await _stacksForMicroservices.Save(application.Id, microservice.Id, environment, deployment);
     }
 
-    async Task<ContainerAppResult> HandleMicroservice(ExecutionContext executionContext, Application application, Output<string> managedEnvironmentId, Microservice microservice, ApplicationEnvironmentWithArtifacts environment)
+    async Task<ContainerAppResult> HandleMicroservice(
+        ExecutionContext executionContext,
+        Application application,
+        ResourceGroup resourceGroup,
+        ManagedEnvironment managedEnvironment,
+        Microservice microservice,
+        ApplicationEnvironmentWithArtifacts environment)
     {
-        var managedEnvironment = ManagedEnvironment.Get(application.Name, managedEnvironmentId);
-
-        var resourceGroup = application.GetResourceGroup(environment);
         return await _stackDefinitions.Microservice(
             executionContext,
             application,

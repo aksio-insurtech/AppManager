@@ -9,6 +9,7 @@ using Aksio.Cratis.Types;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Concepts;
+using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
@@ -106,10 +107,11 @@ public static class Program
             stacksForApplications,
             stacksForMicroservices,
             resourceRenderers,
+            new ApplicationEnvironmentConsolidationLog(),
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
 
-        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment);
+        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment, ApplicationEnvironmentConsolidationId.New());
 
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();

@@ -3,44 +3,32 @@
 
 using Concepts.Applications;
 using Concepts.Applications.Environments;
-using Concepts.Azure;
-using Microsoft.Azure.Management.ResourceManager.Fluent;
+using Pulumi;
+using Pulumi.AzureNative;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationResourceGroupPulumiExtensions
 {
-    public static async Task<ResourceGroup> SetupResourceGroup(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation, AzureServicePrincipal servicePrincipal, AzureSubscription subscription)
+    public static ResourceGroup SetupResourceGroup(
+        this Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        Provider? provider = default)
     {
-        var name = GetResourceGroupName(application, environment, cloudLocation);
-        if (!PulumiOperations.CurrentStack.HasResourceGroup(name))
-        {
-            var credentials = SdkContext.AzureCredentialsFactory.FromServicePrincipal(
-                clientId: servicePrincipal.ClientId,
-                clientSecret: servicePrincipal.ClientSecret,
-                tenantId: subscription.TenantId,
-                environment: AzureEnvironment.AzureGlobalCloud);
-
-            var azure = Microsoft.Azure.Management.Fluent.Azure
-                .Configure()
-                .Authenticate(credentials)
-                .WithSubscription(subscription.SubscriptionId);
-
-            var resourceGroups = await azure.ResourceGroups.ListAsync();
-            var resourceGroup = resourceGroups.FirstOrDefault(_ => _.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            if (resourceGroup is not null)
+        var name = GetResourceGroupName(application, environment, environment.CloudLocation);
+        return new ResourceGroup(
+            name,
+            new()
             {
-                return ResourceGroup.Get(name, resourceGroup.Id);
-            }
-        }
-
-        return new ResourceGroup(name, new()
-        {
-            Location = cloudLocation.Value,
-            ResourceGroupName = name,
-            Tags = application.GetTags(environment)
-        });
+                Location = environment.CloudLocation.Value,
+                ResourceGroupName = name,
+                Tags = application.GetTags(environment)
+            },
+            new CustomResourceOptions
+            {
+                Provider = provider
+            });
     }
 
     public static ResourceGroup GetResourceGroup(this Application application, ApplicationEnvironmentWithArtifacts environment)
@@ -55,7 +43,7 @@ public static class ApplicationResourceGroupPulumiExtensions
         return ResourceGroup.Get(GetResourceGroupName(application, environment, environment.CloudLocation), resourceGroupId);
     }
 
-    static string GetResourceGroupName(Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation)
+    public static string GetResourceGroupName(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation)
     {
         var locationString = () => cloudLocation.Value switch
         {

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts;
-using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Pulumi;
 using Pulumi.AzureNative.App;
@@ -12,12 +11,13 @@ namespace Reactions.Applications.Pulumi;
 
 public interface IPulumiStackDefinitions
 {
-    Task Application(Application application, CloudLocationKey cloudLocation);
+    Task Application(Application application, ApplicationEnvironmentWithArtifacts sharedEnvironment);
 
     Task<ApplicationEnvironmentResult> ApplicationEnvironment(
         ExecutionContext executionContext,
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentWithArtifacts sharedEnvironment,
         SemanticVersion cratisVersion);
 
     Task<IngressResult> Ingress(
@@ -38,12 +38,4 @@ public interface IPulumiStackDefinitions
         bool useContainerRegistry = true,
         ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default);
-
-    Task Deployable(
-        ExecutionContext executionContext,
-        Application application,
-        Microservice microservice,
-        IEnumerable<Deployable> deployables,
-        ManagedEnvironment managedEnvironment,
-        ApplicationEnvironmentWithArtifacts environment);
 }

@@ -29,7 +29,13 @@ public class MicroserviceStorage
         FileStorage = fileStorage;
     }
 
-    public async Task CreateAndUploadCratisJson(MongoDBResult mongoDB, IEnumerable<Tenant> tenants, IEnumerable<Microservice> microservices, string siloHostName, string storageConnectionString, ApplicationMonitoringResult monitoring)
+    public async Task CreateAndUploadCratisJson(
+        MongoDBResult mongoDB,
+        IEnumerable<Tenant> tenants,
+        IEnumerable<Microservice> microservices,
+        string siloHostName,
+        string storageConnectionString,
+        ApplicationMonitoringResult monitoring)
     {
         const string scheme = "mongodb+srv://";
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
