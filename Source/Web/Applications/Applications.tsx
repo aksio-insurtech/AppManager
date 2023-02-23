@@ -85,6 +85,7 @@ export const Applications = () => {
                 const command = new CreateApplication();
                 command.applicationId = Guid.create().toString();
                 command.name = output!.name;
+                command.sharedAzureSubscriptionId = output!.sharedAzureSubscriptionId;
                 await command.execute();
             }
         }

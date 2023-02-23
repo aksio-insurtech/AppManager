@@ -35,6 +35,10 @@ export const AddEnvironmentDialog = (props: IModalProps<{}, AddEnvironmentDialog
         };
     });
 
+    const subscriptionMenuItems = settings.data.azureSubscriptions?.map(_ => (
+        <MenuItem key={_.subscriptionId} value={_.subscriptionId}>{_.name}</MenuItem>
+    ));
+
     return (
         <Stack direction="column" width={400} spacing={1}>
             <TextField label='Name' fullWidth required defaultValue={name} onChange={e => setName(e.currentTarget.value)} />
@@ -49,9 +53,7 @@ export const AddEnvironmentDialog = (props: IModalProps<{}, AddEnvironmentDialog
                 onChange={(ev) => {
                     setAzureSubscription(ev.target.value);
                 }}>
-                {settings.data.azureSubscriptions?.map(_ => (
-                    <MenuItem key={_.subscriptionId} value={_.subscriptionId}>{_.name}</MenuItem>
-                ))}
+                {subscriptionMenuItems}
             </Select>
 
             <InputLabel>Location</InputLabel>

@@ -11,12 +11,14 @@ const routeTemplate = Handlebars.compile('/api/applications');
 export interface ICreateApplication {
     applicationId?: string;
     name?: string;
+    sharedAzureSubscriptionId?: string;
 }
 
 export class CreateApplicationValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         name: new Validator(),
+        sharedAzureSubscriptionId: new Validator(),
     };
 }
 
@@ -27,6 +29,7 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
 
     private _applicationId!: string;
     private _name!: string;
+    private _sharedAzureSubscriptionId!: string;
 
     constructor() {
         super(Object, false);
@@ -41,6 +44,7 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
         return [
             'applicationId',
             'name',
+            'sharedAzureSubscriptionId',
         ];
     }
 
@@ -59,6 +63,14 @@ export class CreateApplication extends Command<ICreateApplication> implements IC
     set name(value: string) {
         this._name = value;
         this.propertyChanged('name');
+    }
+    get sharedAzureSubscriptionId(): string {
+        return this._sharedAzureSubscriptionId;
+    }
+
+    set sharedAzureSubscriptionId(value: string) {
+        this._sharedAzureSubscriptionId = value;
+        this.propertyChanged('sharedAzureSubscriptionId');
     }
 
     static use(initialValues?: ICreateApplication): [CreateApplication, SetCommandValues<ICreateApplication>, ClearCommandValues] {
