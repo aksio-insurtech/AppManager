@@ -1,3 +1,9 @@
+# [v0.5.8] - 2023-2-24 [PR: #133](https://github.com/aksio-insurtech/AppManager/pull/133)
+
+## Summary
+
+Testing out the continuous deployment feature.
+
 # [v0.5.6] - 2023-2-24 [PR: #122](https://github.com/aksio-insurtech/AppManager/pull/122)
 
 ### Added
