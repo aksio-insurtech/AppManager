@@ -4,12 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { MicroserviceOnEnvironmentKey } from './MicroserviceOnEnvironmentKey';
 import { EnvironmentVariable } from './EnvironmentVariable';
 
 export class EnvironmentVariablesForMicroservice {
 
-    @field(String)
-    id!: string;
+    @field(MicroserviceOnEnvironmentKey)
+    id!: MicroserviceOnEnvironmentKey;
 
     @field(EnvironmentVariable, true)
     variables!: EnvironmentVariable[];

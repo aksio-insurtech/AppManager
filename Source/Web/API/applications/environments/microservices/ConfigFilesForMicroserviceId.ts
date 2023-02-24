@@ -6,13 +6,15 @@ import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@a
 import { ConfigFilesForMicroservice } from './ConfigFilesForMicroservice';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/config-files');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/config-files');
 
 export interface ConfigFilesForMicroserviceIdArguments {
+    applicationId: string;
+    environmentId: string;
     microserviceId: string;
 }
 export class ConfigFilesForMicroserviceId extends ObservableQueryFor<ConfigFilesForMicroservice, ConfigFilesForMicroserviceIdArguments> {
-    readonly route: string = '/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/config-files';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/config-files';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: ConfigFilesForMicroservice = {} as any;
 
@@ -22,6 +24,8 @@ export class ConfigFilesForMicroserviceId extends ObservableQueryFor<ConfigFiles
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
+            'environmentId',
             'microserviceId',
         ];
     }

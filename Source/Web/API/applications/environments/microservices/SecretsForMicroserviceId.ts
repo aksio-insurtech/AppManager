@@ -6,13 +6,15 @@ import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@a
 import { SecretsForMicroservice } from './SecretsForMicroservice';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/secrets');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/secrets');
 
 export interface SecretsForMicroserviceIdArguments {
+    applicationId: string;
+    environmentId: string;
     microserviceId: string;
 }
 export class SecretsForMicroserviceId extends ObservableQueryFor<SecretsForMicroservice, SecretsForMicroserviceIdArguments> {
-    readonly route: string = '/api/applications/{applicationId}/environments/{environmentId}/microservices/{{microserviceId}}/secrets';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/secrets';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: SecretsForMicroservice = {} as any;
 
@@ -22,6 +24,8 @@ export class SecretsForMicroserviceId extends ObservableQueryFor<SecretsForMicro
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
+            'environmentId',
             'microserviceId',
         ];
     }

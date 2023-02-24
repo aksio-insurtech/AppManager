@@ -6,5 +6,5 @@ using Concepts.Applications;
 namespace Read.Applications.Environments.Microservices.Deployables;
 
 public record SecretsForDeployable(
-    DeployableId Id,
+    DeployableOnEnvironmentKey Id,
     IEnumerable<Secret> Secrets);

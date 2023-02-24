@@ -7,4 +7,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices;
 
 [EventType("8cfaf97d-8993-4cef-a383-8e2358cb4d60")]
-public record SecretSetForMicroservice(MicroserviceId MicroserviceId, ApplicationEnvironmentId EnvironmentId, SecretKey Key, SecretValue Value);
+public record SecretSetForMicroservice(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, SecretKey Key, SecretValue Value);

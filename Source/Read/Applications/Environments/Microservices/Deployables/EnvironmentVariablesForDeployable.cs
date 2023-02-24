@@ -6,5 +6,5 @@ using Concepts.Applications;
 namespace Read.Applications.Environments.Microservices.Deployables;
 
 public record EnvironmentVariablesForDeployable(
-    DeployableId Id,
+    DeployableOnEnvironmentKey Id,
     IEnumerable<EnvironmentVariable> Variables);

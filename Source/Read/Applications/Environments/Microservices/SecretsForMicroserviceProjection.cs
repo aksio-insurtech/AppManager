@@ -13,6 +13,8 @@ public class SecretsForMicroserviceProjection : IProjectionFor<SecretsForMicrose
         .Children(m => m.Secrets, _ => _
             .IdentifiedBy(m => m.Key)
             .From<SecretSetForMicroservice>(_ => _
-                .UsingKey(e => e.Key)
+                .UsingParentCompositeKey<MicroserviceOnEnvironmentKey>(key => key
+                    .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)
+                    .Set(k => k.EnvironmentId).To(e => e.EnvironmentId))
                 .Set(m => m.Value).To(e => e.Value)));
 }

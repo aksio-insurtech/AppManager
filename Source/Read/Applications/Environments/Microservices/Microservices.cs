@@ -45,14 +45,29 @@ public class Microservices : Controller
             _.Id.MicroserviceId == microserviceId).FirstOrDefaultAsync();
 
     [HttpGet("{microserviceId}/config-files")]
-    public Task<ClientObservable<ConfigFilesForMicroservice>> ConfigFilesForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
-        _configFilesForMicroserviceCollection.ObserveById(microserviceId);
+    public Task<ClientObservable<ConfigFilesForMicroservice>> ConfigFilesForMicroserviceId(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId) =>
+        _configFilesForMicroserviceCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.MicroserviceId == microserviceId);
 
     [HttpGet("{microserviceId}/environment-variables")]
-    public Task<ClientObservable<EnvironmentVariablesForMicroservice>> EnvironmentVariablesForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
-        _environmentVariablesForMicroserviceCollection.ObserveById(microserviceId);
+    public Task<ClientObservable<EnvironmentVariablesForMicroservice>> EnvironmentVariablesForMicroserviceId(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId) =>
+        _environmentVariablesForMicroserviceCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.MicroserviceId == microserviceId);
 
     [HttpGet("{microserviceId}/secrets")]
-    public Task<ClientObservable<SecretsForMicroservice>> SecretsForMicroserviceId([FromRoute] MicroserviceId microserviceId) =>
-        _secretsForMicroserviceCollection.ObserveById(microserviceId);
+    public Task<ClientObservable<SecretsForMicroservice>> SecretsForMicroserviceId(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId) =>
+        _secretsForMicroserviceCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.MicroserviceId == microserviceId);
 }

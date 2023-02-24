@@ -13,6 +13,9 @@ public class SecretsForDeployableProjection : IProjectionFor<SecretsForDeployabl
         .Children(m => m.Secrets, _ => _
             .IdentifiedBy(m => m.Key)
             .From<SecretSetForDeployable>(_ => _
+                .UsingParentCompositeKey<DeployableOnEnvironmentKey>(key => key
+                    .Set(k => k.DeployableId).To(e => e.DeployableId)
+                    .Set(k => k.EnvironmentId).To(e => e.EnvironmentId))
                 .UsingKey(e => e.Key)
                 .Set(m => m.Value).To(e => e.Value)));
 }

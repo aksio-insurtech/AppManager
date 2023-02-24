@@ -4,12 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { DeployableOnEnvironmentKey } from './DeployableOnEnvironmentKey';
 import { EnvironmentVariable } from './EnvironmentVariable';
 
 export class EnvironmentVariablesForDeployable {
 
-    @field(String)
-    id!: string;
+    @field(DeployableOnEnvironmentKey)
+    id!: DeployableOnEnvironmentKey;
 
     @field(EnvironmentVariable, true)
     variables!: EnvironmentVariable[];

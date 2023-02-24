@@ -71,6 +71,7 @@ export const Deployables = () => {
         command.applicationId = context.applicationId;
         command.environmentId = context.environmentId!;
         command.microserviceId = context.microserviceId!;
+        command.deployableId = selectedDeployable!.id.deployableId;
         command.name = file.name;
         command.content = file.content;
         await command.execute();

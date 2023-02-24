@@ -29,9 +29,22 @@ export const Microservice = () => {
         microserviceId: microserviceId!
     });
     const [selectedTab, setSelectedTab] = useState("0");
-    const [environmentVariablesQuery] = EnvironmentVariablesForMicroserviceId.use({ microserviceId: microserviceId! });
-    const [configFilesQuery] = ConfigFilesForMicroserviceId.use({ microserviceId: microserviceId! });
-    const [secretsQuery] = SecretsForMicroserviceId.use({ microserviceId: microserviceId! });
+    const [environmentVariablesQuery] = EnvironmentVariablesForMicroserviceId.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!
+    });
+    const [configFilesQuery] = ConfigFilesForMicroserviceId.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!
+    });
+
+    const [secretsQuery] = SecretsForMicroserviceId.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!
+    });
 
     const configFiles = configFilesQuery.data?.files ?? [];
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
@@ -81,8 +94,8 @@ export const Microservice = () => {
             <TabPanel value="0"><General microservice={microservice.data} /></TabPanel>
             <TabPanel value="1"><Deployables /></TabPanel>
             <TabPanel value="2"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
-            <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables}/></TabPanel>
-            <TabPanel value="4"><Secrets onSecretSet={secretSet} secrets={secrets}/></TabPanel>
+            <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
+            <TabPanel value="4"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
         </TabContext>
     );
 };

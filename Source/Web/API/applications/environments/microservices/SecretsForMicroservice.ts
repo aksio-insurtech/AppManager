@@ -4,12 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { MicroserviceOnEnvironmentKey } from './MicroserviceOnEnvironmentKey';
 import { Secret } from './Secret';
 
 export class SecretsForMicroservice {
 
-    @field(String)
-    id!: string;
+    @field(MicroserviceOnEnvironmentKey)
+    id!: MicroserviceOnEnvironmentKey;
 
     @field(Secret, true)
     secrets!: Secret[];

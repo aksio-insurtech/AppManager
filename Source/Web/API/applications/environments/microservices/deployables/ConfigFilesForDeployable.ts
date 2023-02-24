@@ -4,12 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { DeployableOnEnvironmentKey } from './DeployableOnEnvironmentKey';
 import { ConfigFile } from './ConfigFile';
 
 export class ConfigFilesForDeployable {
 
-    @field(String)
-    id!: string;
+    @field(DeployableOnEnvironmentKey)
+    id!: DeployableOnEnvironmentKey;
 
     @field(ConfigFile, true)
     files!: ConfigFile[];

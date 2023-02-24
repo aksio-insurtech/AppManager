@@ -4,12 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { MicroserviceOnEnvironmentKey } from './MicroserviceOnEnvironmentKey';
 import { ConfigFile } from './ConfigFile';
 
 export class ConfigFilesForMicroservice {
 
-    @field(String)
-    id!: string;
+    @field(MicroserviceOnEnvironmentKey)
+    id!: MicroserviceOnEnvironmentKey;
 
     @field(ConfigFile, true)
     files!: ConfigFile[];

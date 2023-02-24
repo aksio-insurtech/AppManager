@@ -7,4 +7,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices.Deployables;
 
 [EventType("04e77fbb-7149-4848-9b4b-ab3ea07cbd26")]
-public record ConfigFileSetForDeployable(MicroserviceId MicroserviceId, DeployableId DeployableId, ApplicationEnvironmentId EnvironmentId, ConfigFileName Name, ConfigFileContent Content);
+public record ConfigFileSetForDeployable(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId, ConfigFileName Name, ConfigFileContent Content);

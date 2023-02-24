@@ -31,9 +31,9 @@ public class Deployables : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId) =>
-            _deployableCollection.Observe(_ =>
-                _.Id.EnvironmentId == environmentId &&
-                _.Id.MicroserviceId == microserviceId);
+        _deployableCollection.Observe(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.MicroserviceId == microserviceId);
 
     [HttpGet("{deployableId}/config-files")]
     public Task<ClientObservable<ConfigFilesForDeployable>> ConfigFilesForDeployableId(
@@ -41,7 +41,9 @@ public class Deployables : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId) =>
-        _configFilesForDeployableCollection.ObserveById(deployableId);
+        _configFilesForDeployableCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.DeployableId == deployableId);
 
     [HttpGet("{deployableId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForDeployable>> EnvironmentVariablesForDeployableId(
@@ -49,7 +51,9 @@ public class Deployables : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId) =>
-        _environmentVariablesForDeployableCollection.ObserveById(deployableId);
+        _environmentVariablesForDeployableCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.DeployableId == deployableId);
 
     [HttpGet("{deployableId}/secrets")]
     public Task<ClientObservable<SecretsForDeployable>> SecretsForDeployableId(
@@ -57,5 +61,7 @@ public class Deployables : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId) =>
-        _secretsForDeployableCollection.ObserveById(deployableId);
+        _secretsForDeployableCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.DeployableId == deployableId);
 }

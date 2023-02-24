@@ -13,7 +13,9 @@ public class ConfigFilesForMicroserviceProjection : IProjectionFor<ConfigFilesFo
         .Children(m => m.Files, _ => _
             .IdentifiedBy(m => m.Name)
             .From<ConfigFileSetForMicroservice>(_ => _
-                .UsingParentKey(e => e.MicroserviceId)
+                .UsingParentCompositeKey<MicroserviceOnEnvironmentKey>(key => key
+                    .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)
+                    .Set(k => k.EnvironmentId).To(e => e.EnvironmentId))
                 .UsingKey(e => e.Name)
                 .Set(m => m.Content).To(e => e.Content)));
 }

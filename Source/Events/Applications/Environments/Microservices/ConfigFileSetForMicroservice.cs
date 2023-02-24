@@ -7,4 +7,4 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices;
 
 [EventType("3486374d-968e-437c-b142-9d09117932fd")]
-public record ConfigFileSetForMicroservice(MicroserviceId MicroserviceId, ApplicationEnvironmentId EnvironmentId, ConfigFileName Name, ConfigFileContent Content);
+public record ConfigFileSetForMicroservice(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, ConfigFileName Name, ConfigFileContent Content);

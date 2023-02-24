@@ -2,9 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
 
 namespace Read.Applications.Environments.Microservices;
 
-public record ConfigFilesForMicroservice(
-    MicroserviceOnEnvironmentKey Id,
-    IEnumerable<ConfigFile> Files);
+public record MicroserviceOnEnvironmentKey(ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId);
