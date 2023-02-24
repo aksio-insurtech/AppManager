@@ -6,13 +6,16 @@ import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@a
 import { EnvironmentVariablesForDeployable } from './EnvironmentVariablesForDeployable';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/environments/{environmentId}/microservices/{microserviceId}/deployables/{{deployableId}}/environment-variables');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/environment-variables');
 
 export interface EnvironmentVariablesForDeployableIdArguments {
+    applicationId: string;
+    environmentId: string;
+    microserviceId: string;
     deployableId: string;
 }
 export class EnvironmentVariablesForDeployableId extends ObservableQueryFor<EnvironmentVariablesForDeployable, EnvironmentVariablesForDeployableIdArguments> {
-    readonly route: string = '/api/applications/{applicationId}/environments/{environmentId}/microservices/{microserviceId}/deployables/{{deployableId}}/environment-variables';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/environment-variables';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: EnvironmentVariablesForDeployable = {} as any;
 
@@ -22,6 +25,9 @@ export class EnvironmentVariablesForDeployableId extends ObservableQueryFor<Envi
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
+            'environmentId',
+            'microserviceId',
             'deployableId',
         ];
     }

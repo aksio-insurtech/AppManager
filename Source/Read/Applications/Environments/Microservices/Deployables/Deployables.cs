@@ -33,10 +33,18 @@ public class Deployables : Controller
                 _.Id.MicroserviceId == microserviceId);
 
     [HttpGet("{deployableId}/environment-variables")]
-    public Task<ClientObservable<EnvironmentVariablesForDeployable>> EnvironmentVariablesForDeployableId([FromRoute] DeployableId deployableId) =>
+    public Task<ClientObservable<EnvironmentVariablesForDeployable>> EnvironmentVariablesForDeployableId(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromRoute] DeployableId deployableId) =>
         _environmentVariablesForDeployableCollection.ObserveById(deployableId);
 
     [HttpGet("{deployableId}/secrets")]
-    public Task<ClientObservable<SecretsForDeployable>> SecretsForDeployableId([FromRoute] DeployableId deployableId) =>
+    public Task<ClientObservable<SecretsForDeployable>> SecretsForDeployableId(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromRoute] DeployableId deployableId) =>
         _secretsForDeployableCollection.ObserveById(deployableId);
 }

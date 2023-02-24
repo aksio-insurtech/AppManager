@@ -6,13 +6,16 @@ import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@a
 import { SecretsForDeployable } from './SecretsForDeployable';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{applicationId}/environments/{environmentId}/microservices/{microserviceId}/deployables/{{deployableId}}/secrets');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/secrets');
 
 export interface SecretsForDeployableIdArguments {
+    applicationId: string;
+    environmentId: string;
+    microserviceId: string;
     deployableId: string;
 }
 export class SecretsForDeployableId extends ObservableQueryFor<SecretsForDeployable, SecretsForDeployableIdArguments> {
-    readonly route: string = '/api/applications/{applicationId}/environments/{environmentId}/microservices/{microserviceId}/deployables/{{deployableId}}/secrets';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/deployables/{{deployableId}}/secrets';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: SecretsForDeployable = {} as any;
 
@@ -22,6 +25,9 @@ export class SecretsForDeployableId extends ObservableQueryFor<SecretsForDeploya
 
     get requestArguments(): string[] {
         return [
+            'applicationId',
+            'environmentId',
+            'microserviceId',
             'deployableId',
         ];
     }

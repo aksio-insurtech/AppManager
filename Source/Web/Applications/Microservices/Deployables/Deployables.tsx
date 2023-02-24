@@ -39,8 +39,18 @@ export const Deployables = () => {
     });
 
     const [selectedDeployable, setSelectedDeployable] = useState<Deployable | undefined>(undefined);
-    const [environmentVariablesQuery] = EnvironmentVariablesForDeployableId.use({ deployableId: selectedDeployable?.id.deployableId ?? '' });
-    const [secretsQuery] = SecretsForDeployableId.use({ deployableId: selectedDeployable?.id.deployableId ?? '' });
+    const [environmentVariablesQuery] = EnvironmentVariablesForDeployableId.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!,
+        deployableId: selectedDeployable?.id.deployableId ?? undefined!
+    });
+    const [secretsQuery] = SecretsForDeployableId.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!,
+        deployableId: selectedDeployable?.id.deployableId ?? undefined!
+    });
 
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
     const secrets = secretsQuery.data?.secrets ?? [];
