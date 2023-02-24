@@ -1,3 +1,22 @@
+# [v0.5.6] - 2023-2-24 [PR: #122](https://github.com/aksio-insurtech/AppManager/pull/122)
+
+### Added
+
+- Shared resource group for resources shared across environments, such as registry.
+- View of deployments, status and log output
+- Supporting setting image on a deployable
+
+### Fixed
+
+- Environment variables are now possible to add, edit and view across all levels.
+- Secrets are now possible to add, edit and view across all levels.
+- Config files are now possible to add, edit and view across all levels.
+- Adding tags to application insight component
+- Fixing templates
+- Fixed configuration of Cratis after its breaking changes.
+
+
+
 # [v0.5.4] - 2022-12-28 [PR: #120](https://github.com/aksio-insurtech/AppManager/pull/120)
 
 ### Fixed
