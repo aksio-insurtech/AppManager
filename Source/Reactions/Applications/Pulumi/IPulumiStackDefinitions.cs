@@ -11,10 +11,13 @@ namespace Reactions.Applications.Pulumi;
 
 public interface IPulumiStackDefinitions
 {
+    Task Application(Application application, ApplicationEnvironmentWithArtifacts sharedEnvironment);
+
     Task<ApplicationEnvironmentResult> ApplicationEnvironment(
         ExecutionContext executionContext,
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentWithArtifacts sharedEnvironment,
         SemanticVersion cratisVersion);
 
     Task<IngressResult> Ingress(
@@ -30,17 +33,9 @@ public interface IPulumiStackDefinitions
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
+        ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,
         bool useContainerRegistry = true,
-        ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default);
-
-    Task Deployable(
-        ExecutionContext executionContext,
-        Application application,
-        Microservice microservice,
-        IEnumerable<Deployable> deployables,
-        ManagedEnvironment managedEnvironment,
-        ApplicationEnvironmentWithArtifacts environment);
 }

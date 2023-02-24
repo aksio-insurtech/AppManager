@@ -23,19 +23,29 @@ public class Microservice : Controller
         _stacksForMicroservices = stacksForMicroservices;
     }
 
-    [HttpPost("config")]
-    public Task SetConfig(
+    [HttpPost("config-files")]
+    public Task SetConfigFileForMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
-        [FromRoute] MicroserviceId microserviceId) => Task.CompletedTask;
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] ConfigFile configFile) =>
+        _eventLog.Append(environmentId, new ConfigFileSetForMicroservice(applicationId, environmentId, microserviceId, configFile.Name, configFile.Content));
 
-    [HttpPost("environment-variable")]
+    [HttpPost("environment-variables")]
     public Task SetEnvironmentVariableForMicroservice(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromBody] EnvironmentVariable environmentVariable) =>
-        _eventLog.Append(environmentId, new EnvironmentVariableSetForMicroservice(microserviceId, environmentId, environmentVariable.Key, environmentVariable.Value));
+        _eventLog.Append(environmentId, new EnvironmentVariableSetForMicroservice(applicationId, environmentId, microserviceId, environmentVariable.Key, environmentVariable.Value));
+
+    [HttpPost("secrets")]
+    public Task SetSecretForMicroservice(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] Secret secret) =>
+        _eventLog.Append(microserviceId, new SecretSetForMicroservice(applicationId, environmentId, microserviceId, secret.Key, secret.Value));
 
     [HttpPost("stack")]
     public Task SetStack(

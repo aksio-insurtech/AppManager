@@ -1,4 +1,11 @@
 {
+    "Kestrel": {
+        "Endpoints": {
+            "Http": {
+                "Url": "http://+:80"
+            }
+        }
+    }
     "Serilog": {
         "Using": [
             "Serilog.Sinks.Console"
@@ -8,7 +15,7 @@
             "Override": {
                 "Aksio": "Information",
                 "Microsoft": "Warning",
-                "Microsoft.AspNetCore.HttpLogging": "Information",
+                "Microsoft.AspNetCore.HttpLogging": "Warning",
                 "Microsoft.Hosting.Lifetime": "Information",
                 "System": "Warning",
                 "Orleans": "Information"

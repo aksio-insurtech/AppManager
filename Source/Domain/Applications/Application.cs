@@ -16,13 +16,17 @@ public class Application : Controller
         _eventLog = eventLog;
     }
 
-    [HttpPost("config")]
-    public Task SetConfigForApplication([FromRoute] ApplicationId applicationId, ConfigFile configFile) => Task.CompletedTask;
+    [HttpPost("config-files")]
+    public Task SetConfigFileForApplication(
+        [FromRoute] ApplicationId applicationId,
+        [FromBody] ConfigFile configFile) =>
+        _eventLog.Append(applicationId, new ConfigFileSetForApplication(configFile.Name, configFile.Content));
 
-    [HttpPost("environment-variable")]
+    [HttpPost("environment-variables")]
     public Task SetEnvironmentVariableForApplication([FromRoute] ApplicationId applicationId, [FromBody] EnvironmentVariable environmentVariable) =>
         _eventLog.Append(applicationId, new EnvironmentVariableSetForApplication(environmentVariable.Key, environmentVariable.Value));
 
-    [HttpPost("secret")]
-    public Task SetSecretForApplication([FromRoute] ApplicationId applicationId, Secret secret) => Task.CompletedTask;
+    [HttpPost("secrets")]
+    public Task SetSecretForApplication([FromRoute] ApplicationId applicationId, [FromBody] Secret secret) =>
+        _eventLog.Append(applicationId, new SecretSetForApplication(secret.Key, secret.Value));
 }

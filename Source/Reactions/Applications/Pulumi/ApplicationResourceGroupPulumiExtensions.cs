@@ -2,31 +2,50 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Applications.Environments;
+using Pulumi;
+using Pulumi.AzureNative;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationResourceGroupPulumiExtensions
 {
-    public static ResourceGroup SetupResourceGroup(this Application application, ApplicationEnvironmentWithArtifacts environment)
+    public static ResourceGroup SetupResourceGroup(
+        this Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        Provider? provider = default)
     {
-        var name = GetResourceGroupName(application, environment);
-        return new ResourceGroup(name, new()
-        {
-            Location = environment.CloudLocation.Value,
-            ResourceGroupName = name,
-            Tags = application.GetTags(environment)
-        });
+        var name = GetResourceGroupName(application, environment, environment.CloudLocation);
+        return new ResourceGroup(
+            name,
+            new()
+            {
+                Location = environment.CloudLocation.Value,
+                ResourceGroupName = name,
+                Tags = application.GetTags(environment)
+            },
+            new CustomResourceOptions
+            {
+                Provider = provider
+            });
     }
 
     public static ResourceGroup GetResourceGroup(this Application application, ApplicationEnvironmentWithArtifacts environment)
     {
-        return ResourceGroup.Get(GetResourceGroupName(application, environment), environment.ApplicationResources.AzureResourceGroupId.Value);
+        var result = global::Pulumi.AzureNative.Resources.GetResourceGroup.Invoke(new()
+        {
+            ResourceGroupName = GetResourceGroupName(application, environment, environment.CloudLocation)
+        });
+
+        var resourceGroupId = result.Apply(_ => _.Id);
+
+        return ResourceGroup.Get(GetResourceGroupName(application, environment, environment.CloudLocation), resourceGroupId);
     }
 
-    static string GetResourceGroupName(Application application, ApplicationEnvironmentWithArtifacts environment)
+    public static string GetResourceGroupName(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation)
     {
-        var locationString = () => environment.CloudLocation.Value switch
+        var locationString = () => cloudLocation.Value switch
         {
             CloudLocationKey.NorwayEast => "Norway",
             CloudLocationKey.EuropeWest => "Netherlands",

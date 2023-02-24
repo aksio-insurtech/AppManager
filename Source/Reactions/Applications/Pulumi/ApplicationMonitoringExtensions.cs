@@ -39,7 +39,8 @@ public static class ApplicationMonitoringExtensions
             ResourceGroupName = resourceGroup.Name,
             RetentionInDays = 30,
             IngestionMode = IngestionMode.LogAnalytics,
-            WorkspaceResourceId = workspace.Id
+            WorkspaceResourceId = workspace.Id,
+            Tags = tags
         });
 
         return new(workspace, component);

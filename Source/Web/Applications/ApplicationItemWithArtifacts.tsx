@@ -28,6 +28,10 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/settings`);
     };
 
+    const handleDeploymentsClick = () => {
+        navigate(`/applications/${props.application.id}/environments/${props.environmentId}/deployments`);
+    };
+
     const handleTenantsClick = () => {
         navigate(`/applications/${props.application.id}/environments/${props.environmentId}/tenants`);
     };
@@ -56,6 +60,11 @@ export const ApplicationItemWithArtifacts = (props: ApplicationItemWithArtifacts
                         icon={<icons.Settings />}
                         title="Settings"
                         onClick={handleSettingsClick} />
+
+                    <ApplicationArtifactListItem
+                        icon={<icons.Sync />}
+                        title="Deployments"
+                        onClick={handleDeploymentsClick} />
 
                     <ApplicationArtifactListItem
                         icon={<icons.Extension />}

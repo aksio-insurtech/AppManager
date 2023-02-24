@@ -12,10 +12,10 @@
             "onBehalfOf": "{{OnBehalfOf}}",
             "tenantIdClaims": [
             {{#TenantIdClaims}}
-                "{{this}}"
+                "{{this}}"{{#unless @last}},{{/unless}}
             {{/TenantIdClaims}}
             ]
-        }
+        }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
     "identityDetailsUrl": "{{IdentityDetailsUrl}}"

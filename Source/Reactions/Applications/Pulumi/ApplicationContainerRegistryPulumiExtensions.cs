@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications;
+using Concepts.Azure;
+using Microsoft.Azure.Management.ContainerRegistry.Fluent;
+using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Pulumi.AzureNative.ContainerRegistry;
 using Pulumi.AzureNative.ContainerRegistry.Inputs;
 using Pulumi.AzureNative.Resources;
@@ -10,9 +13,12 @@ namespace Reactions.Applications.Pulumi;
 
 public static class ApplicationContainerRegistryPulumiExtensions
 {
-    public static async Task<ContainerRegistryResult> SetupContainerRegistry(this Application application, ResourceGroup resourceGroup, Tags tags)
+    public static void SetupContainerRegistry(
+        this Application application,
+        ResourceGroup resourceGroup,
+        Tags tags)
     {
-        var registry = new Registry(application.Name.Value.ToLowerInvariant(), new RegistryArgs
+        _ = new Registry(application.Name.Value.ToLowerInvariant(), new RegistryArgs
         {
             ResourceGroupName = resourceGroup.Name,
 
@@ -25,20 +31,37 @@ public static class ApplicationContainerRegistryPulumiExtensions
             },
             AdminUserEnabled = true,
         });
+    }
 
-        var registryCredentials = GetRegistryCredentials.Invoke(new()
-        {
-            ResourceGroupName = resourceGroup.Name,
-            RegistryName = registry.Name
-        });
+    public static async Task<ContainerRegistryResult> GetContainerRegistry(
+        this Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        AzureServicePrincipal servicePrincipal,
+        AzureSubscription subscription)
+    {
+        var resourceGroupName = application.GetResourceGroupName(environment, environment.CloudLocation);
 
-        var loginServer = await registry.LoginServer.GetValue();
-        var registryCredentialsResult = await registryCredentials.GetValue();
+        var credentials = SdkContext.AzureCredentialsFactory.FromServicePrincipal(
+            clientId: servicePrincipal.ClientId,
+            clientSecret: servicePrincipal.ClientSecret,
+            tenantId: subscription.TenantId,
+            environment: AzureEnvironment.AzureGlobalCloud);
+
+        var azure = Microsoft.Azure.Management.Fluent.Azure
+            .Configure()
+            .Authenticate(credentials)
+            .WithSubscription(subscription.SubscriptionId);
+        var registryName = application.Name.Value.ToLowerInvariant();
+        var containerRegistries = await azure.ContainerRegistries.ListByResourceGroupAsync(resourceGroupName);
+        var containerRegistry = containerRegistries.First(_ => _.Name.StartsWith(registryName));
+        var registryCredentials = await containerRegistry.GetCredentialsAsync();
+
+        var registry = Registry.Get(registryName, containerRegistry.Id);
 
         return new(
             registry,
-            loginServer,
-            registryCredentialsResult.Username ?? string.Empty,
-            registryCredentialsResult.Password ?? string.Empty);
+            containerRegistry.LoginServerUrl,
+            registryCredentials.Username ?? string.Empty,
+            registryCredentials.AccessKeys[AccessKeyType.Primary] ?? string.Empty);
     }
 }

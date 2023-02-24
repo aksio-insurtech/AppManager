@@ -4,8 +4,8 @@
 using System.Collections.ObjectModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Aksio.Cratis.Configuration;
-using Aksio.Cratis.Extensions.Orleans.Configuration;
+using Aksio.Cratis.Kernel.Configuration;
+using Aksio.Cratis.Kernel.Orleans.Configuration;
 using Common;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Templates;
@@ -29,7 +29,13 @@ public class MicroserviceStorage
         FileStorage = fileStorage;
     }
 
-    public async Task CreateAndUploadCratisJson(MongoDBResult mongoDB, IEnumerable<Tenant> tenants, IEnumerable<Microservice> microservices, string siloHostName, string storageConnectionString, ApplicationMonitoringResult monitoring)
+    public async Task CreateAndUploadCratisJson(
+        MongoDBResult mongoDB,
+        IEnumerable<Tenant> tenants,
+        IEnumerable<Microservice> microservices,
+        string siloHostName,
+        string storageConnectionString,
+        ApplicationMonitoringResult monitoring)
     {
         const string scheme = "mongodb+srv://";
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
@@ -101,7 +107,7 @@ public class MicroserviceStorage
                         }
                     }
                 },
-                Tenants = new StorageForTenants()
+                Tenants = new Aksio.Cratis.Configuration.StorageForTenants()
             };
 
             foreach (var tenant in tenants)
@@ -142,10 +148,30 @@ public class MicroserviceStorage
         FileStorage.Upload("appsettings.json", content);
     }
 
-    public void CreateAndUploadClusterClientConfig(string connectionString)
+    public void CreateAndUploadClientCratisConfig(string connectionString, string advertisedClientEndpoint)
     {
-        var content = TemplateTypes.ClusterClient(new { ConnectionString = connectionString });
-        FileStorage.Upload("cluster.json", content);
+        var config = new Aksio.Cratis.Configuration.ClientConfiguration
+        {
+            Kernel = new()
+            {
+                Type = Aksio.Cratis.Configuration.ClusterTypes.AzureStorage,
+                Options = new Aksio.Cratis.Configuration.AzureStorageClusterOptions
+                {
+                    ConnectionString = connectionString,
+                    Secure = false,
+                    Port = 80
+                },
+                AdvertisedClientEndpoint = new Uri(advertisedClientEndpoint)
+            }
+        };
+
+        var cratisJson = JsonSerializer.Serialize(config, new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        });
+
+        FileStorage.Upload("cratis.json", cratisJson);
     }
 
     string GetFirstPartOf(Guid guid) => guid.ToString().Split('-')[0];

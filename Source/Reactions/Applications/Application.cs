@@ -7,4 +7,5 @@ namespace Reactions.Applications;
 
 public record Application(
     ApplicationId Id,
-    ApplicationName Name);
+    ApplicationName Name,
+    SharedResources Shared);

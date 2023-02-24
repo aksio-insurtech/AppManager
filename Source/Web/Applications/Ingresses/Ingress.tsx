@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Routes } from './Routes/Routes';
 import { IngressById } from 'API/applications/environments/ingresses/IngressById';
 import { useRouteParams } from '../RouteParams';
+import { Authentication } from './Authentication/Authentication';
 
 export const Ingress = () => {
     const { ingressId } = useRouteParams();
@@ -24,8 +25,8 @@ export const Ingress = () => {
                 </TabList>
             </Box>
             <TabPanel value="0"></TabPanel>
-            <TabPanel value="1"></TabPanel>
-            <TabPanel value="2"><Routes ingress={ingress.data}/></TabPanel>
+            <TabPanel value="1"><Authentication /></TabPanel>
+            <TabPanel value="2"><Routes ingress={ingress.data} /></TabPanel>
         </TabContext>
     );
 };

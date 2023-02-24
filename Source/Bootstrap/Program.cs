@@ -9,7 +9,7 @@ using Aksio.Cratis.Types;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Concepts;
-using Concepts.Azure;
+using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
@@ -76,7 +76,7 @@ public static class Program
         var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, serializerOptions)!;
 
         var settings = new Settings(
-            new AzureSubscription[] { config.Azure.Subscription },
+            config.Azure.Subscriptions,
             config.Pulumi.Organization,
             config.Pulumi.AccessToken,
             config.MongoDB.OrganizationId,
@@ -87,7 +87,7 @@ public static class Program
         var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
         var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
         applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(config);
-        var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name);
+        var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name, new(config.Azure.SharedSubscriptionId));
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
@@ -107,10 +107,11 @@ public static class Program
             stacksForApplications,
             stacksForMicroservices,
             resourceRenderers,
+            new ApplicationEnvironmentDeploymentLog(),
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
 
-        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment);
+        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment, ApplicationEnvironmentDeploymentId.New());
 
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();

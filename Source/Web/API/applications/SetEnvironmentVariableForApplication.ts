@@ -6,7 +6,7 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environment-variable');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environment-variables');
 
 export interface ISetEnvironmentVariableForApplication {
     applicationId?: string;
@@ -23,7 +23,7 @@ export class SetEnvironmentVariableForApplicationValidator extends CommandValida
 }
 
 export class SetEnvironmentVariableForApplication extends Command<ISetEnvironmentVariableForApplication> implements ISetEnvironmentVariableForApplication {
-    readonly route: string = '/api/applications/{{applicationId}}/environment-variable';
+    readonly route: string = '/api/applications/{{applicationId}}/environment-variables';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new SetEnvironmentVariableForApplicationValidator();
 

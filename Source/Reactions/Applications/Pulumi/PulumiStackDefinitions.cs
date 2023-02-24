@@ -8,6 +8,7 @@ using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi;
+using Pulumi.AzureNative;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
@@ -18,6 +19,12 @@ namespace Reactions.Applications.Pulumi;
 
 public class PulumiStackDefinitions : IPulumiStackDefinitions
 {
+    public static readonly ApplicationEnvironment SharedEnvironment = new(
+        Guid.Parse("5e4d2c45-4ebb-4bc4-a178-b1d1d5ed44ff"),
+        "Shared",
+        "shared",
+        "S");
+
     readonly ISettings _settings;
     readonly IExecutionContextManager _executionContextManager;
     readonly IEventLog _eventLog;
@@ -35,15 +42,41 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         _fileStorageLogger = fileStorageLogger;
     }
 
-    public async Task<ApplicationEnvironmentResult> ApplicationEnvironment(ExecutionContext executionContext, Application application, ApplicationEnvironmentWithArtifacts environment, SemanticVersion cratisVersion)
+    public Task Application(Application application, ApplicationEnvironmentWithArtifacts sharedEnvironment)
     {
+        var sharedTags = application.GetTags(sharedEnvironment);
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == sharedEnvironment.AzureSubscriptionId);
+        var subscriptionProvider = new Provider("subscription", new ProviderArgs
+        {
+            SubscriptionId = sharedEnvironment.AzureSubscriptionId.ToString()
+        });
+
+        var sharedResourceGroup = application.SetupResourceGroup(
+            sharedEnvironment,
+            subscriptionProvider);
+
+        application.SetupContainerRegistry(sharedResourceGroup, sharedTags);
+
+        return Task.CompletedTask;
+    }
+
+    public async Task<ApplicationEnvironmentResult> ApplicationEnvironment(
+        ExecutionContext executionContext,
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        ApplicationEnvironmentWithArtifacts sharedEnvironment,
+        SemanticVersion cratisVersion)
+    {
+        var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == sharedEnvironment.AzureSubscriptionId);
+        var containerRegistry = await application.GetContainerRegistry(sharedEnvironment, _settings.ServicePrincipal, sharedSubscription);
+
         var tags = application.GetTags(environment);
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
         var resourceGroup = application.SetupResourceGroup(environment);
         var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
         var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
         var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);
         var storage = await application.SetupStorage(environment, resourceGroup, tags);
-        var containerRegistry = await application.SetupContainerRegistry(resourceGroup, tags);
         var mongoDB = await application.SetupMongoDB(_settings, resourceGroup, network.VirtualNetwork, environment, tags);
 
         var microservice = new Microservice(
@@ -111,7 +144,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     {
         var tags = application.GetTags(environment);
         resourceGroup ??= application.GetResourceGroup(environment);
-        var storage = await application.GetStorage(environment, resourceGroup);
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+        var storage = await application.GetStorage(environment, resourceGroup, _settings.ServicePrincipal, subscription);
 
         return await application.SetupIngress(
             environment,
@@ -129,17 +163,16 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
+        ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,
         bool useContainerRegistry = true,
-        ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
     {
         var tags = application.GetTags(environment);
-        resourceGroup ??= application.GetResourceGroup(environment);
-        var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+        var storage = await microservice.SetupFileShare(application, environment, resourceGroup, _settings.ServicePrincipal, subscription, _fileStorageLogger);
         storage.CreateAndUploadAppSettings(_settings);
-        storage.CreateAndUploadClusterClientConfig(storage.FileStorage.ConnectionString);
 
         deployables ??= Array.Empty<Deployable>();
 
@@ -155,36 +188,16 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             tags,
             useContainerRegistry);
 
+        microserviceResult.ContainerApp.Configuration.Apply(_ => _?.Ingress).Apply(_ =>
+        {
+            var url = $"http://{_?.Fqdn}";
+            storage.CreateAndUploadClientCratisConfig(storage.FileStorage.ConnectionString, url);
+            return _?.Fqdn;
+        });
+
         // Todo: Set to actual execution context - might not be the right place for this!
         _executionContextManager.Set(executionContext);
 
         return microserviceResult;
-    }
-
-    public async Task Deployable(
-        ExecutionContext executionContext,
-        Application application,
-        Microservice microservice,
-        IEnumerable<Deployable> deployables,
-        ManagedEnvironment managedEnvironment,
-        ApplicationEnvironmentWithArtifacts environment)
-    {
-        var tags = application.GetTags(environment);
-        var resourceGroup = application.GetResourceGroup(environment);
-        var storage = await microservice.GetStorage(application, environment, resourceGroup, _fileStorageLogger);
-
-        _ = microservice.SetupContainerApp(
-            application,
-            resourceGroup,
-            managedEnvironment,
-            environment.ApplicationResources.AzureContainerRegistryLoginServer,
-            environment.ApplicationResources.AzureContainerRegistryUserName,
-            environment.ApplicationResources.AzureContainerRegistryPassword,
-            storage,
-            deployables,
-            tags);
-
-        // Todo: Set to actual execution context - might not be the right place for this!
-        _executionContextManager.Set(executionContext);
     }
 }

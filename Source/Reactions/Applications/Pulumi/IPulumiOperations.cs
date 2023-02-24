@@ -1,6 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Concepts.Applications;
+using Concepts.Applications.Environments;
 using Pulumi.Automation;
 
 namespace Reactions.Applications.Pulumi;
@@ -17,8 +19,10 @@ public interface IPulumiOperations
     /// <param name="definition">The configuration of a stack to up.</param>
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
+    /// <param name="upOptions">Optional <see cref="UpOptions"/>.</param>
+    /// <param name="refreshOptions">Optional <see cref="RefreshOptions"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Up(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
+    Task Up(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default, UpOptions? upOptions = default, RefreshOptions? refreshOptions = default);
 
     /// <summary>
     /// Down a stack.
@@ -28,7 +32,7 @@ public interface IPulumiOperations
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Down(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
+    Task Down(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
 
     /// <summary>
     /// Completely remove a stack and its history.
@@ -38,7 +42,7 @@ public interface IPulumiOperations
     /// <param name="environment">The <see cref="ApplicationEnvironmentWithArtifacts"/>.</param>
     /// <param name="microservice">Optional <see cref="Microservice"/>.</param>
     /// <returns>Awaitable task.</returns>
-    Task Remove(Application application, PulumiFn definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
+    Task Remove(Application application, Func<Task> definition, ApplicationEnvironmentWithArtifacts environment, Microservice? microservice = default);
 
     /// <summary>
     /// Set a tag for a stack in a project.
@@ -55,6 +59,19 @@ public interface IPulumiOperations
     /// </summary>
     /// <param name="application">Application the environment is for.</param>
     /// <param name="environment">The environment to consolidate.</param>
+    /// <param name="deploymentId">The unique identifier of the deployment.</param>
     /// <returns>Awaitable task.</returns>
-    Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment);
+    Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment, ApplicationEnvironmentDeploymentId deploymentId);
+
+    /// <summary>
+    /// Set the image for a deployable.
+    /// </summary>
+    /// <param name="application">Application the environment is for.</param>
+    /// <param name="environment">The environment to consolidate.</param>
+    /// <param name="microservice">The microservice to set for.</param>
+    /// <param name="deploymentId">The unique identifier of the deployment.</param>
+    /// <param name="deployable">The deployable on the microservice to set for.</param>
+    /// <param name="image">The image to set.</param>
+    /// <returns>Awaitable task.</returns>
+    Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, ApplicationEnvironmentDeploymentId deploymentId, Deployable deployable, DeployableImageName image);
 }

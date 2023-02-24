@@ -3,6 +3,7 @@
 
 using Aksio.Cratis.Execution;
 using Events.Applications.Environments;
+using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications.Pulumi;
 
@@ -39,150 +40,72 @@ public class ApplicationResourcesCoordinator
         _eventLog = eventLog;
     }
 
-    public async Task ConsolidationStarted(ApplicationEnvironmentConsolidationStarted @event, EventContext context)
+    public Task DeploymentStarted(ApplicationEnvironmentDeploymentStarted @event, EventContext context)
     {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(context.EventSourceId);
-
-        Console.WriteLine(application);
-        Console.WriteLine(environment);
-
-        // _logger.ConsolidationStarted(environment.Name, application.Name);
-        await Task.Delay(5000);
-
-        // Todo: Set to actual execution context - might not be the right place for this!
-        _executionContextManager.Set(_executionContext);
-        await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentConsolidationCompleted(@event.ApplicationId, @event.EnvironmentId, @event.ConsolidationId));
-    }
-
-    /*
-    public async Task ApplicationEnvironmentCreated(ApplicationEnvironmentCreated @event, EventContext context)
-    {
-        var application = await _projections.GetInstanceById<Application>(context.EventSourceId);
-        var environment = application.GetEnvironmentById(context.EventSourceId);
-        _logger.CreatingApplicationEnvironment(@event.Name, application.Name);
-
         _ = Task.Run(async () =>
         {
-            var definition = PulumiFn.Create(() => _stackDefinitions.ApplicationEnvironment(_executionContext, application, environment, @event.CratisVersion));
-            await _pulumiOperations.Up(application, application.Name, definition, environment);
-        });
-    }
+            var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+            var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(context.EventSourceId);
 
-    public async Task IngressCreated(IngressCreated @event, EventContext context)
-    {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = application.GetEnvironmentById(@event.EnvironmentId);
-        var ingress = environment.GetIngressById(context.EventSourceId);
-        _logger.CreatingIngress(@event.Name, environment.Name, application.Name);
-        _ = Task.Run(async () =>
-        {
-            var definition = PulumiFn.Create(() => _stackDefinitions.Ingress(_executionContext, application, environment, ingress));
-            await _pulumiOperations.Up(application, application.Name, definition, environment);
-        });
-    }
-
-    public async Task MicroserviceCreated(MicroserviceCreated @event, EventContext context)
-    {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = application.GetEnvironmentById(@event.EnvironmentId);
-        var microservice = environment.GetMicroserviceById(context.EventSourceId);
-        _logger.CreatingMicroservice(@event.Name, environment.Name, application.Name);
-
-        _ = Task.Run(async () =>
-        {
-            var projectName = GetProjectNameFor(application, microservice);
-
-            var definition = PulumiFn.Create(() => _stackDefinitions.Microservice(_executionContext, application, microservice, environment));
-
-            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
-            await _pulumiOperations.SetTag(projectName, environment, "Microservice", @event.Name);
-        });
-    }
-
-    public async Task DeployableCreated(DeployableCreated @event, EventContext context)
-    {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = application.GetEnvironmentById(@event.EnvironmentId);
-        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
-        var deployable = microservice.GetDeployableById(@context.EventSourceId);
-        _logger.DeployableCreated(microservice.Name, environment.Name, application.Name, deployable.Name, deployable.Image);
-
-        _ = Task.Run(async () =>
-        {
-            var projectName = GetProjectNameFor(application, microservice);
-
-            if (string.IsNullOrEmpty(deployable.Image))
+            _logger.DeploymentStarted(environment.Model.Name, application.Model.Name);
+            try
             {
-                deployable = new(deployable.Id, deployable.MicroserviceId, deployable.Name, "nginx", deployable.Ports);
+                await _pulumiOperations.ConsolidateEnvironment(application.Model, environment.Model, @event.DeploymentId);
+
+                // Todo: Set to actual execution context - might not be the right place for this!
+                _executionContextManager.Set(_executionContext);
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentDeploymentCompleted(@event.ApplicationId, @event.EnvironmentId, @event.DeploymentId));
             }
-
-            var definition = PulumiFn.Create(() =>
-                _stackDefinitions.Deployable(
-                    _executionContext,
-                    application,
-                    microservice,
-                    new[]
-                    {
-                        deployable
-                    },
-                    environment));
-
-            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
+            catch (Exception ex)
+            {
+                // Todo: Set to actual execution context - might not be the right place for this!
+                _executionContextManager.Set(_executionContext);
+                var messages = ex.GetAllMessages();
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentDeploymentFailed(@event.ApplicationId, @event.EnvironmentId, @event.DeploymentId, messages, ex.StackTrace ?? string.Empty));
+            }
         });
+
+        return Task.CompletedTask;
     }
 
-    public async Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    public Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
     {
-        var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
-        var environment = application.GetEnvironmentById(@event.EnvironmentId);
-        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
-        var deployable = microservice.GetDeployableById(@context.EventSourceId);
-        _logger.ChangingDeployableImage(microservice.Name, deployable.Name, deployable.Image, environment.Name, application.Name);
-
         _ = Task.Run(async () =>
         {
-            var projectName = GetProjectNameFor(application, microservice);
+            var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
+            var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId);
+            var microservice = environment.Model.GetMicroserviceById(@event.MicroserviceId);
+            var deployable = microservice.GetDeployableById(@event.DeployableId);
 
-            var definition = PulumiFn.Create(() =>
-                _stackDefinitions.Deployable(
-                    _executionContext,
-                    application,
-                    microservice,
-                    new[]
-                    {
-                        deployable
-                    },
-                    environment));
+            _logger.ChangingDeployableImage(
+                microservice.Name,
+                deployable.Name,
+                @event.Image,
+                environment.Model.Name,
+                application.Model.Name);
 
-            await _pulumiOperations.Up(application, projectName, definition, environment, microservice);
-        });
-    }
-
-    public async Task ConsolidateAllForEnvironment(ApplicationId applicationId, ApplicationEnvironmentId environmentId)
-    {
-        var application = await _projections.GetInstanceById<Application>(applicationId);
-        var environment = application.GetEnvironmentById(environmentId);
-
-        // var projectName = GetProjectNameFor(application, microservice);
-        // var definition = PulumiFn.Create(() => _stackDefinitions.ApplicationEnvironment(_executionContext, application, environment, @event.CratisVersion));
-        // await _pulumiOperations.Up(application, application.Name, definition, environment);
-        foreach (var ingress in environment.Ingresses)
-        {
-            Console.WriteLine(ingress);
-        }
-
-        foreach (var microservice in environment.Microservices)
-        {
-            Console.WriteLine(microservice);
-
-            foreach (var deployable in microservice.Deployables)
+            try
             {
-                Console.WriteLine(deployable);
-            }
-        }
-    }
+                await _pulumiOperations.SetImageForDeployable(
+                    application.Model,
+                    environment.Model,
+                    microservice,
+                    @event.DeploymentId,
+                    deployable,
+                    @event.Image);
 
-    string GetProjectNameFor(Application application, Microservice microservice) => $"{application.Name}-{microservice.Name}";
-    */
+                _executionContextManager.Set(_executionContext);
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentDeploymentCompleted(@event.ApplicationId, @event.EnvironmentId, @event.DeploymentId));
+            }
+            catch (Exception ex)
+            {
+                // Todo: Set to actual execution context - might not be the right place for this!
+                _executionContextManager.Set(_executionContext);
+                var messages = ex.GetAllMessages();
+                await _eventLog.Append(context.EventSourceId, new ApplicationEnvironmentDeploymentFailed(@event.ApplicationId, @event.EnvironmentId, @event.DeploymentId, messages, ex.StackTrace ?? string.Empty));
+            }
+        });
+
+        return Task.CompletedTask;
+    }
 }

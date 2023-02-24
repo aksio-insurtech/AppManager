@@ -3,27 +3,38 @@
 
 import { ModalResult } from '@aksio/cratis-mui';
 import { GridColDef } from '@mui/x-data-grid';
-import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { ValueEditorFor } from 'Components';
-import { AddSecretDialog, AddSecretDialogOutput } from './AddSecretDialog';
-import { useRouteParams } from '../RouteParams';
+import { SetSecretDialog, AddSecretDialogOutput } from './SetSecretDialog';
+import { RouteParams, useRouteParams } from '../RouteParams';
+import { Secret } from 'API/applications/Secret';
 
 const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Name', width: 250 },
+    { field: 'key', headerName: 'Key', width: 250 },
     { field: 'value', headerName: 'Value', width: 250 }
 ];
 
-export const Secrets = () => {
-    const { applicationId, environmentId } = useRouteParams();
+export type SecretSet = (secret: Secret, context: RouteParams) => void;
+
+export interface SecretsProps {
+    onSecretSet: SecretSet;
+    secrets: Secret[];
+}
+
+export const Secrets = (props: SecretsProps) => {
+    const context = useRouteParams();
 
     return (
-        <ValueEditorFor<AddSecretDialogOutput, Tenant>
+        <ValueEditorFor<AddSecretDialogOutput, Secret, Secret>
             addTitle="Add Secret"
             columns={columns}
-            data={[]}
-            modalContent={AddSecretDialog}
-            getRowId={(tenant) => tenant.id.tenantId}
+            data={props.secrets}
+            modalContent={SetSecretDialog}
+            getRowId={(secret) => secret.key}
+            onEditItem={(secret) => secret}
             modalClosed={async (result, output) => {
+                if (result == ModalResult.success) {
+                    props.onSecretSet(output as Secret, context);
+                }
             }} />
     );
 };

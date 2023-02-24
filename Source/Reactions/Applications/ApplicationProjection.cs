@@ -12,5 +12,6 @@ public class ApplicationProjection : IImmediateProjectionFor<Application>
     public void Define(IProjectionBuilderFor<Application> builder) => builder
         .From<ApplicationCreated>(_ => _
             .Set(m => m.Id).ToEventSourceId()
-            .Set(m => m.Name).To(e => e.Name));
+            .Set(m => m.Name).To(e => e.Name)
+            .Set(m => m.Shared.AzureSubscriptionId).To(e => e.SharedAzureSubscriptionId));
 }

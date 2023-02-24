@@ -17,8 +17,12 @@ public class ApplicationEnvironment : Controller
         _eventLog = eventLog;
     }
 
-    [HttpPost("config")]
-    public Task SetConfig([FromRoute] ApplicationId applicationId, [FromRoute] ApplicationEnvironmentId environmentId) => Task.CompletedTask;
+    [HttpPost("config-files")]
+    public Task SetConfigFileForApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] ConfigFile configFile) =>
+        _eventLog.Append(environmentId, new ConfigFileSetForApplicationEnvironment(applicationId, environmentId, configFile.Name, configFile.Content));
 
     [HttpPost("environment-variables")]
     public Task SetEnvironmentVariableForApplicationEnvironment(
@@ -26,6 +30,13 @@ public class ApplicationEnvironment : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromBody] EnvironmentVariable environmentVariable) =>
         _eventLog.Append(environmentId, new EnvironmentVariableSetForApplicationEnvironment(applicationId, environmentId, environmentVariable.Key, environmentVariable.Value));
+
+    [HttpPost("secrets")]
+    public Task SetSecretForApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] Secret secret) =>
+        _eventLog.Append(environmentId, new SecretSetForApplicationEnvironment(applicationId, environmentId, secret.Key, secret.Value));
 
     [HttpPost("certificates")]
     public Task AddCertificateToApplicationEnvironment(
@@ -38,5 +49,5 @@ public class ApplicationEnvironment : Controller
     public Task ConsolidateApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId) =>
-        _eventLog.Append(environmentId, new ApplicationEnvironmentConsolidationStarted(applicationId, environmentId, ApplicationEnvironmentConsolidationId.New()));
+        _eventLog.Append(environmentId, new ApplicationEnvironmentDeploymentStarted(applicationId, environmentId, ApplicationEnvironmentDeploymentId.New()));
 }

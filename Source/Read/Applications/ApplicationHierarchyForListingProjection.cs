@@ -6,6 +6,7 @@ using Events.Applications.Environments;
 using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
 using Events.Applications.Environments.Microservices.Deployables;
+using Read.Applications.Environments;
 
 namespace Read.Applications;
 
@@ -22,18 +23,22 @@ public class ApplicationHierarchyForListingProjection : IProjectionFor<Applicati
                 .IncludeChildProjections())
             .IdentifiedBy(m => m.EnvironmentId)
 
-            .From<ApplicationEnvironmentConsolidationStarted>(_ => _
+            .From<ApplicationEnvironmentDeploymentStarted>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
-                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.InProgress)
-                .Set(m => m.LastConsolidationStarted).ToEventContextProperty(c => c.Occurred))
-            .From<ApplicationEnvironmentConsolidationFailed>(_ => _
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.InProgress)
+                .Set(m => m.LastDeploymentStarted).ToEventContextProperty(c => c.Occurred))
+            .From<ApplicationEnvironmentDeploymentFailed>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
-                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Failed)
-                .Set(m => m.LastConsolidation).ToEventContextProperty(c => c.Occurred))
-            .From<ApplicationEnvironmentConsolidationCompleted>(_ => _
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.Failed)
+                .Set(m => m.LastDeployment).ToEventContextProperty(c => c.Occurred))
+            .From<ApplicationEnvironmentDeploymentCompleted>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
-                .Set(m => m.Status).ToValue(ApplicationEnvironmentConsolidationStatus.Completed)
-                .Set(m => m.LastConsolidation).ToEventContextProperty(c => c.Occurred))
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.Completed)
+                .Set(m => m.LastDeployment).ToEventContextProperty(c => c.Occurred))
+            .From<DeployableImageChanged>(_ => _
+                .UsingParentKey(e => e.ApplicationId)
+                .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.InProgress)
+                .Set(m => m.LastDeployment).ToEventContextProperty(c => c.Occurred))
 
             .From<EnvironmentVariableSetForApplicationEnvironment>(_ => _
                 .UsingParentKey(e => e.ApplicationId))

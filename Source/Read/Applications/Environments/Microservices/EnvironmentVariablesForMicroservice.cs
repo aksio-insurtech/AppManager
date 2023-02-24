@@ -6,5 +6,5 @@ using Concepts.Applications;
 namespace Read.Applications.Environments.Microservices;
 
 public record EnvironmentVariablesForMicroservice(
-    MicroserviceId Id,
+    MicroserviceOnEnvironmentKey Id,
     IEnumerable<EnvironmentVariable> Variables);

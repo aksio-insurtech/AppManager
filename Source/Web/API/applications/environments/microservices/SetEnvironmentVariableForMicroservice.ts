@@ -6,7 +6,7 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/environment-variable');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/environment-variables');
 
 export interface ISetEnvironmentVariableForMicroservice {
     applicationId?: string;
@@ -27,7 +27,7 @@ export class SetEnvironmentVariableForMicroserviceValidator extends CommandValid
 }
 
 export class SetEnvironmentVariableForMicroservice extends Command<ISetEnvironmentVariableForMicroservice> implements ISetEnvironmentVariableForMicroservice {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/environment-variable';
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/environment-variables';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly validation: CommandValidator = new SetEnvironmentVariableForMicroserviceValidator();
 
