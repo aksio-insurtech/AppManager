@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { Box, Stack, TextareaAutosize } from '@mui/material';
+import { Box, Stack, TextareaAutosize, useTheme } from '@mui/material';
 import { DataGrid, GridCallbackDetails, GridColDef, GridRowsProp, GridSelectionModel } from '@mui/x-data-grid';
 
 import { useRef, useState } from 'react';
@@ -34,6 +34,7 @@ export const Consolidations = () => {
     const [selectedConsolidation, setSelectedConsolidation] = useState<ApplicationEnvironmentConsolidation | undefined>(undefined);
     const [consolidation] = Consolidation.use({ applicationId, environmentId: environmentId!, consolidationId: selectedConsolidation?.id.consolidationId || undefined! });
     const textArea = useRef<HTMLTextAreaElement>(null);
+    const theme = useTheme();
 
     const handleSelectionChanged = (selectionModel: GridSelectionModel, details: GridCallbackDetails) => {
         const selectedItems = selectionModel.map(id => consolidations.data.find((item) => item.id.consolidationId === id));
@@ -65,8 +66,15 @@ export const Consolidations = () => {
                     rows={consolidations.data as GridRowsProp<any>} />
 
             </Box>
-            <Box sx={{ height: '100%', width: '100%', paddingLeft: '24px', paddingRight: '24px' }}>
-                <textarea style={{ width: '100%', height: '100%', whiteSpace: 'pre-wrap' }} readOnly value={log} ref={textArea} />
+            <Box sx={{ height: '100%', width: '100%', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '100px' }}>
+                <textarea style={{
+                    width: '100%',
+                    height: '100%',
+                    whiteSpace: 'pre-wrap',
+                    backgroundColor: theme.palette.background.default,
+                    color: theme.palette.primary.main,
+                    resize: 'none'
+                }} readOnly value={log} ref={textArea} />
             </Box>
         </Stack>
     );
