@@ -6,8 +6,8 @@ using Concepts.Azure;
 namespace Bootstrap;
 
 public record AzureConfig(
-string TenantId,
-AzureSubscriptionId SharedSubscriptionId,
-AzureSubscriptionId EnvironmentSubscriptionId,
-IEnumerable<AzureSubscription> Subscriptions,
-AzureServicePrincipal ServicePrincipal);
+    string TenantId,
+    AzureSubscriptionId SharedSubscriptionId,
+    AzureSubscriptionId EnvironmentSubscriptionId,
+    IEnumerable<AzureSubscription> Subscriptions,
+    AzureServicePrincipal ServicePrincipal);
