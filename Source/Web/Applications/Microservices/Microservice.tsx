@@ -33,8 +33,8 @@ export const Microservice = () => {
     const [configFilesQuery] = ConfigFilesForMicroserviceId.use({ microserviceId: microserviceId! });
     const [secretsQuery] = SecretsForMicroserviceId.use({ microserviceId: microserviceId! });
 
-    const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
     const configFiles = configFilesQuery.data?.files ?? [];
+    const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
     const secrets = secretsQuery.data?.secrets ?? [];
 
     const variableSet = async (variable: EnvironmentVariable, context: RouteParams) => {

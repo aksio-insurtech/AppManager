@@ -23,6 +23,10 @@ import { SetSecretForDeployable } from 'API/applications/environments/microservi
 import { Secret } from 'API/applications/Secret';
 import { SecretsForDeployableId } from 'API/applications/environments/microservices/deployables/SecretsForDeployableId';
 import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
+import { ConfigFiles } from '../../ConfigFiles/ConfigFiles';
+import { SetConfigFileForDeployable } from 'API/applications/environments/microservices/deployables/SetConfigFileForDeployable';
+import { ConfigFile } from 'API/applications/ConfigFile';
+import { ConfigFilesForDeployableId } from 'API/applications/environments/microservices/deployables/ConfigFilesForDeployableId';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 },
@@ -45,6 +49,12 @@ export const Deployables = () => {
         microserviceId: microserviceId!,
         deployableId: selectedDeployable?.id.deployableId ?? undefined!
     });
+    const [configFilesQuery] = ConfigFilesForDeployableId.use({
+        applicationId: applicationId!,
+        environmentId: environmentId!,
+        microserviceId: microserviceId!,
+        deployableId: selectedDeployable?.id.deployableId ?? undefined!
+    });
     const [secretsQuery] = SecretsForDeployableId.use({
         applicationId: applicationId!,
         environmentId: environmentId!,
@@ -52,8 +62,19 @@ export const Deployables = () => {
         deployableId: selectedDeployable?.id.deployableId ?? undefined!
     });
 
+    const configFiles = configFilesQuery.data?.files ?? [];
     const environmentVariables = environmentVariablesQuery.data?.variables ?? [];
     const secrets = secretsQuery.data?.secrets ?? [];
+
+    const configFileSet = async (file: ConfigFile, context: RouteParams) => {
+        const command = new SetConfigFileForDeployable();
+        command.applicationId = context.applicationId;
+        command.environmentId = context.environmentId!;
+        command.microserviceId = context.microserviceId!;
+        command.name = file.name;
+        command.content = file.content;
+        await command.execute();
+    };
 
     const variableSet = async (variable: EnvironmentVariable, context: RouteParams) => {
         const command = new SetEnvironmentVariableForDeployable();
@@ -128,7 +149,7 @@ export const Deployables = () => {
                         </TabList>
                     </Box>
                     <TabPanel value="0"></TabPanel>
-                    <TabPanel value="1"></TabPanel>
+                    <TabPanel value="1"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
                     <TabPanel value="2"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
                     <TabPanel value="3"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
                 </TabContext>

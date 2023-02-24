@@ -1,0 +1,10 @@
+// Copyright (c) Aksio Insurtech. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using Concepts.Applications;
+using Concepts.Applications.Environments;
+
+namespace Events.Applications.Environments.Microservices.Deployables;
+
+[EventType("04e77fbb-7149-4848-9b4b-ab3ea07cbd26")]
+public record ConfigFileSetForDeployable(MicroserviceId MicroserviceId, DeployableId DeployableId, ApplicationEnvironmentId EnvironmentId, ConfigFileName Name, ConfigFileContent Content);
