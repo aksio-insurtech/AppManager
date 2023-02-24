@@ -16,8 +16,7 @@ const statuses = {
     [ApplicationEnvironmentDeploymentStatus.failed]: 'Failed',
     [ApplicationEnvironmentDeploymentStatus.inProgress]: 'In Progress',
     [ApplicationEnvironmentDeploymentStatus.none]: 'Unknown'
-}
-
+};
 
 const columns: GridColDef[] = [
     {

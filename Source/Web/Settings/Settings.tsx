@@ -60,7 +60,7 @@ export const Settings = () => {
         command.clientId = clientId;
         command.clientSecret = clientSecret;
         await command.execute();
-    }
+    };
 
     const savePulumiSettings = async () => {
         const command = new SetPulumiSettings();
