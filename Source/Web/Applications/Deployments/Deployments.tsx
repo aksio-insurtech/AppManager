@@ -6,42 +6,42 @@ import { DataGrid, GridCallbackDetails, GridColDef, GridRowsProp, GridSelectionM
 
 import { useRef, useState } from 'react';
 import { useRouteParams } from '../RouteParams';
-import { Consolidations as ConsolidationsQuery } from 'API/applications/environments/consolidations/Consolidations';
-import { ApplicationEnvironmentConsolidationStatus } from 'API/applications/environments/consolidations/ApplicationEnvironmentConsolidationStatus';
-import { ApplicationEnvironmentConsolidation } from 'API/applications/environments/consolidations/ApplicationEnvironmentConsolidation';
-import { Consolidation } from 'API/applications/environments/consolidations/Consolidation';
+import { Deployments as DeploymentsQuery } from 'API/applications/environments/deployments/Deployments';
+import { ApplicationEnvironmentDeploymentStatus } from 'API/applications/environments/deployments/ApplicationEnvironmentDeploymentStatus';
+import { ApplicationEnvironmentDeployment } from 'API/applications/environments/deployments/ApplicationEnvironmentDeployment';
+import { Deployment } from 'API/applications/environments/deployments/Deployment';
 
 const statuses = {
-    [ApplicationEnvironmentConsolidationStatus.completed]: 'Completed',
-    [ApplicationEnvironmentConsolidationStatus.failed]: 'Failed',
-    [ApplicationEnvironmentConsolidationStatus.inProgress]: 'In Progress',
-    [ApplicationEnvironmentConsolidationStatus.none]: 'Unknown'
+    [ApplicationEnvironmentDeploymentStatus.completed]: 'Completed',
+    [ApplicationEnvironmentDeploymentStatus.failed]: 'Failed',
+    [ApplicationEnvironmentDeploymentStatus.inProgress]: 'In Progress',
+    [ApplicationEnvironmentDeploymentStatus.none]: 'Unknown'
 }
 
 
 const columns: GridColDef[] = [
     {
         field: 'status', headerName: 'Status', width: 250,
-        valueFormatter: (params) => statuses[params.value as ApplicationEnvironmentConsolidationStatus]
+        valueFormatter: (params) => statuses[params.value as ApplicationEnvironmentDeploymentStatus]
     },
     { field: 'started', headerName: 'Started', width: 250 },
     { field: 'completedOrFailed', headerName: 'Completed', width: 250 },
 ];
 
-export const Consolidations = () => {
+export const Deployments = () => {
     const { applicationId, environmentId } = useRouteParams();
-    const [consolidations] = ConsolidationsQuery.use({ applicationId, environmentId: environmentId! });
-    const [selectedConsolidation, setSelectedConsolidation] = useState<ApplicationEnvironmentConsolidation | undefined>(undefined);
-    const [consolidation] = Consolidation.use({ applicationId, environmentId: environmentId!, consolidationId: selectedConsolidation?.id.consolidationId || undefined! });
+    const [deployments] = DeploymentsQuery.use({ applicationId, environmentId: environmentId! });
+    const [selectedDeployment, setSelectedDeployment] = useState<ApplicationEnvironmentDeployment | undefined>(undefined);
+    const [deployment] = Deployment.use({ applicationId, environmentId: environmentId!, deploymentId: selectedDeployment?.id.deploymentId || undefined! });
     const textArea = useRef<HTMLTextAreaElement>(null);
     const theme = useTheme();
 
     const handleSelectionChanged = (selectionModel: GridSelectionModel, details: GridCallbackDetails) => {
-        const selectedItems = selectionModel.map(id => consolidations.data.find((item) => item.id.consolidationId === id));
-        setSelectedConsolidation(selectedItems[0]);
+        const selectedItems = selectionModel.map(id => deployments.data.find((item) => item.id.deploymentId === id));
+        setSelectedDeployment(selectedItems[0]);
     };
 
-    let log = consolidation.data.message || '';
+    let log = deployment.data.message || '';
     log = log.replace(/\\n/g, '\n');
 
     if (textArea.current) {
@@ -61,9 +61,9 @@ export const Consolidations = () => {
                     filterMode="client"
                     columns={columns}
                     sortingMode="client"
-                    getRowId={(row: ApplicationEnvironmentConsolidation) => row.id.consolidationId}
+                    getRowId={(row: ApplicationEnvironmentDeployment) => row.id.deploymentId}
                     onSelectionModelChange={handleSelectionChanged}
-                    rows={consolidations.data as GridRowsProp<any>} />
+                    rows={deployments.data as GridRowsProp<any>} />
 
             </Box>
             <Box sx={{ height: '100%', width: '100%', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '100px' }}>

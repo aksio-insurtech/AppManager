@@ -34,7 +34,7 @@ public class PulumiOperations : IPulumiOperations
     readonly IStacksForApplications _stacksForApplications;
     readonly IStacksForMicroservices _stacksForMicroservices;
     readonly IResourceRenderers _resourceRenderers;
-    readonly IApplicationEnvironmentConsolidationLog _applicationEnvironmentConsolidationLog;
+    readonly IApplicationEnvironmentDeploymentLog _applicationEnvironmentDeploymentLog;
 
     public PulumiOperations(
         ISettings applicationSettings,
@@ -43,7 +43,7 @@ public class PulumiOperations : IPulumiOperations
         IStacksForApplications stacksForApplications,
         IStacksForMicroservices stacksForMicroservices,
         IResourceRenderers resourceRenderers,
-        IApplicationEnvironmentConsolidationLog applicationEnvironmentConsolidationLog,
+        IApplicationEnvironmentDeploymentLog applicationEnvironmentDeploymentLog,
         ILogger<PulumiOperations> logger,
         ILogger<FileStorage> fileStorageLogger)
     {
@@ -55,7 +55,7 @@ public class PulumiOperations : IPulumiOperations
         _stacksForApplications = stacksForApplications;
         _stacksForMicroservices = stacksForMicroservices;
         _resourceRenderers = resourceRenderers;
-        _applicationEnvironmentConsolidationLog = applicationEnvironmentConsolidationLog;
+        _applicationEnvironmentDeploymentLog = applicationEnvironmentDeploymentLog;
     }
 
     /// <summary>
@@ -186,15 +186,15 @@ public class PulumiOperations : IPulumiOperations
     public async Task ConsolidateEnvironment(
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
-        ApplicationEnvironmentConsolidationId consolidationId)
+        ApplicationEnvironmentDeploymentId deploymentId)
     {
         ApplicationEnvironmentResult? applicationEnvironmentResult = default;
         var executionContext = _executionContextManager.Current;
         var ingressResults = new Dictionary<Ingress, IngressResult>();
         Storage storage = null!;
 
-        var upOptions = GetUpOptionsForConsolidation(application, environment, consolidationId);
-        var refreshOptions = GetRefreshOptionsForConsolidation(application, environment, consolidationId);
+        var upOptions = GetUpOptionsForDeployment(application, environment, deploymentId);
+        var refreshOptions = GetRefreshOptionsForDeployment(application, environment, deploymentId);
 
         var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
         var sharedEnvironment = environment with
@@ -295,12 +295,12 @@ public class PulumiOperations : IPulumiOperations
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
         Microservice microservice,
-        ApplicationEnvironmentConsolidationId consolidationId,
+        ApplicationEnvironmentDeploymentId deploymentId,
         Deployable deployable,
         Concepts.Applications.DeployableImageName image)
     {
-        var upOptions = GetUpOptionsForConsolidation(application, environment, consolidationId);
-        var refreshOptions = GetRefreshOptionsForConsolidation(application, environment, consolidationId);
+        var upOptions = GetUpOptionsForDeployment(application, environment, deploymentId);
+        var refreshOptions = GetRefreshOptionsForDeployment(application, environment, deploymentId);
         var executionContext = _executionContextManager.Current;
 
         await Up(
@@ -496,41 +496,41 @@ public class PulumiOperations : IPulumiOperations
             deployables: microservice.Deployables);
     }
 
-    RefreshOptions GetRefreshOptionsForConsolidation(
+    RefreshOptions GetRefreshOptionsForDeployment(
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
-        ApplicationEnvironmentConsolidationId consolidationId)
+        ApplicationEnvironmentDeploymentId deploymentId)
     {
         var options = new RefreshOptions();
-        SetOptionsForConsolidation(application, environment, consolidationId, options);
+        SetOptionsForDeployment(application, environment, deploymentId, options);
         return options;
     }
 
-    UpOptions GetUpOptionsForConsolidation(
+    UpOptions GetUpOptionsForDeployment(
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
-        ApplicationEnvironmentConsolidationId consolidationId)
+        ApplicationEnvironmentDeploymentId deploymentId)
     {
         var options = new UpOptions();
-        SetOptionsForConsolidation(application, environment, consolidationId, options);
+        SetOptionsForDeployment(application, environment, deploymentId, options);
         return options;
     }
 
-    void SetOptionsForConsolidation(
+    void SetOptionsForDeployment(
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
-        ApplicationEnvironmentConsolidationId consolidationId,
+        ApplicationEnvironmentDeploymentId deploymentId,
         global::Pulumi.Automation.UpdateOptions options)
     {
         options.OnStandardOutput = (message) =>
             {
-                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
+                _applicationEnvironmentDeploymentLog.Append(application.Id, environment.Id, deploymentId, message);
                 Console.WriteLine(message);
             };
 
         options.OnStandardError = (message) =>
             {
-                _applicationEnvironmentConsolidationLog.Append(application.Id, environment.Id, consolidationId, message);
+                _applicationEnvironmentDeploymentLog.Append(application.Id, environment.Id, deploymentId, message);
                 Console.WriteLine(message);
             };
     }

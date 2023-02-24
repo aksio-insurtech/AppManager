@@ -6,15 +6,15 @@ import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@a
 import { LogMessage } from './LogMessage';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/consolidations/{{consolidationId}}');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/deployments/{{deploymentId}}');
 
-export interface ConsolidationArguments {
+export interface DeploymentArguments {
     applicationId: string;
     environmentId: string;
-    consolidationId: string;
+    deploymentId: string;
 }
-export class Consolidation extends ObservableQueryFor<LogMessage, ConsolidationArguments> {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/consolidations/{{consolidationId}}';
+export class Deployment extends ObservableQueryFor<LogMessage, DeploymentArguments> {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/deployments/{{deploymentId}}';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
     readonly defaultValue: LogMessage = {} as any;
 
@@ -26,11 +26,11 @@ export class Consolidation extends ObservableQueryFor<LogMessage, ConsolidationA
         return [
             'applicationId',
             'environmentId',
-            'consolidationId',
+            'deploymentId',
         ];
     }
 
-    static use(args?: ConsolidationArguments): [QueryResultWithState<LogMessage>] {
-        return useObservableQuery<LogMessage, Consolidation, ConsolidationArguments>(Consolidation, args);
+    static use(args?: DeploymentArguments): [QueryResultWithState<LogMessage>] {
+        return useObservableQuery<LogMessage, Deployment, DeploymentArguments>(Deployment, args);
     }
 }

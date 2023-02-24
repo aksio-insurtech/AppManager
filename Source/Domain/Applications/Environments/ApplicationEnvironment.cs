@@ -49,5 +49,5 @@ public class ApplicationEnvironment : Controller
     public Task ConsolidateApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId) =>
-        _eventLog.Append(environmentId, new ApplicationEnvironmentConsolidationStarted(applicationId, environmentId, ApplicationEnvironmentConsolidationId.New()));
+        _eventLog.Append(environmentId, new ApplicationEnvironmentDeploymentStarted(applicationId, environmentId, ApplicationEnvironmentDeploymentId.New()));
 }

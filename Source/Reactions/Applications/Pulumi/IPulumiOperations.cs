@@ -59,9 +59,9 @@ public interface IPulumiOperations
     /// </summary>
     /// <param name="application">Application the environment is for.</param>
     /// <param name="environment">The environment to consolidate.</param>
-    /// <param name="consolidationId">The unique identifier of the consolidation.</param>
+    /// <param name="deploymentId">The unique identifier of the deployment.</param>
     /// <returns>Awaitable task.</returns>
-    Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment, ApplicationEnvironmentConsolidationId consolidationId);
+    Task ConsolidateEnvironment(Application application, ApplicationEnvironmentWithArtifacts environment, ApplicationEnvironmentDeploymentId deploymentId);
 
     /// <summary>
     /// Set the image for a deployable.
@@ -69,9 +69,9 @@ public interface IPulumiOperations
     /// <param name="application">Application the environment is for.</param>
     /// <param name="environment">The environment to consolidate.</param>
     /// <param name="microservice">The microservice to set for.</param>
-    /// <param name="consolidationId">The unique identifier of the consolidation.</param>
+    /// <param name="deploymentId">The unique identifier of the deployment.</param>
     /// <param name="deployable">The deployable on the microservice to set for.</param>
     /// <param name="image">The image to set.</param>
     /// <returns>Awaitable task.</returns>
-    Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, ApplicationEnvironmentConsolidationId consolidationId, Deployable deployable, DeployableImageName image);
+    Task SetImageForDeployable(Application application, ApplicationEnvironmentWithArtifacts environment, Microservice microservice, ApplicationEnvironmentDeploymentId deploymentId, Deployable deployable, DeployableImageName image);
 }

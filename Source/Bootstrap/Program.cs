@@ -107,11 +107,11 @@ public static class Program
             stacksForApplications,
             stacksForMicroservices,
             resourceRenderers,
-            new ApplicationEnvironmentConsolidationLog(),
+            new ApplicationEnvironmentDeploymentLog(),
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
 
-        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment, ApplicationEnvironmentConsolidationId.New());
+        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment, ApplicationEnvironmentDeploymentId.New());
 
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();

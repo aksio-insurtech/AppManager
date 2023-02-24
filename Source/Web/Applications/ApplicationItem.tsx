@@ -14,7 +14,7 @@ import { ActionButtonWithMenu } from './ActionButtonWithMenu';
 import { CreateIngressDialog } from './CreateIngressDialog';
 import { CreateIngress } from 'API/applications/environments/ingresses/CreateIngress';
 import { ConsolidateApplicationEnvironment } from 'API/applications/environments/ConsolidateApplicationEnvironment';
-import { ConsolidationButton } from './ConsolidationButton';
+import { DeploymentButton } from './DeploymentButton';
 
 export interface ApplicationItemProps {
     application: ApplicationHierarchyForListing;
@@ -62,8 +62,6 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
         environmentId: props.environmentId
     });
 
-    console.log(props.environmentId);
-
     const currentEnvironment = props.application.environments?.find(_ => _.environmentId === props.environmentId);
 
     return (
@@ -105,7 +103,7 @@ export const ApplicationItem = (props: ApplicationItemProps) => {
                                     });
                                 }} >Add Microservice</MenuItem>
                             </ActionButtonWithMenu>
-                            <ConsolidationButton environment={currentEnvironment!} consolidateClicked={() => consolidateApplicationEnvironment.execute()} />
+                            <DeploymentButton environment={currentEnvironment!} consolidateClicked={() => consolidateApplicationEnvironment.execute()} />
                         </>
                     }
                 </>

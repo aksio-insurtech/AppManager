@@ -25,7 +25,7 @@ import { Cratis } from './Cratis/Cratis';
 import { EnvironmentForApplication } from 'API/applications/environments/EnvironmentForApplication';
 import { Settings } from './ApplicationEnvironmentSettings/Settings';
 import { Certificates } from './Certificates/Certificates';
-import { Consolidations } from './Consolidations/Consolidations';
+import { Deployments } from './Deployments/Deployments';
 
 export const Applications = () => {
     const [currentApplicationId, setCurrentApplicationId] = useState<string>();
@@ -42,7 +42,7 @@ export const Applications = () => {
         '/applications/:applicationId/environments/:environmentId',
         '/applications/:applicationId/environments/:environmentId/ingresses/:ingressId',
         '/applications/:applicationId/environments/:environmentId/settings',
-        '/applications/:applicationId/environments/:environmentId/consolidations',
+        '/applications/:applicationId/environments/:environmentId/deployments',
         '/applications/:applicationId/environments/:environmentId/cratis',
         '/applications/:applicationId/environments/:environmentId/tenants',
         '/applications/:applicationId/environments/:environmentId/certificates',
@@ -136,7 +136,7 @@ export const Applications = () => {
                             <Route path=':applicationId/environments/:environmentId' element={<Application />} />
                             <Route path=':applicationId/environments/:environmentId/ingresses/:ingressId' element={<Ingress />} />
                             <Route path=':applicationId/environments/:environmentId/settings' element={<Settings />} />
-                            <Route path=':applicationId/environments/:environmentId/consolidations' element={<Consolidations />} />
+                            <Route path=':applicationId/environments/:environmentId/deployments' element={<Deployments />} />
                             <Route path=':applicationId/environments/:environmentId/cratis' element={<Cratis environment={applicationEnvironment.data} />} />
                             <Route path=':applicationId/environments/:environmentId/tenants' element={<Tenants />} />
                             <Route path=':applicationId/environments/:environmentId/certificates' element={<Certificates />} />

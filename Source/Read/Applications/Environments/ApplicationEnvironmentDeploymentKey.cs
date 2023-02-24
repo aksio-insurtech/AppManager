@@ -3,9 +3,9 @@
 
 using Concepts.Applications.Environments;
 
-namespace Read.Applications;
+namespace Read.Applications.Environments;
 
-public record ApplicationEnvironmentConsolidationKey(
+public record ApplicationEnvironmentDeploymentKey(
     ApplicationId ApplicationId,
     ApplicationEnvironmentId EnvironmentId,
-    ApplicationEnvironmentConsolidationId ConsolidationId);
+    ApplicationEnvironmentDeploymentId DeploymentId);

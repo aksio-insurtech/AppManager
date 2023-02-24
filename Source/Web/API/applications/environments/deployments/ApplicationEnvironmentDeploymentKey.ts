@@ -5,7 +5,7 @@
 import { field } from '@aksio/cratis-fundamentals';
 
 
-export class ApplicationEnvironmentConsolidationKey {
+export class ApplicationEnvironmentDeploymentKey {
 
     @field(String)
     applicationId!: string;
@@ -14,5 +14,5 @@ export class ApplicationEnvironmentConsolidationKey {
     environmentId!: string;
 
     @field(String)
-    consolidationId!: string;
+    deploymentId!: string;
 }

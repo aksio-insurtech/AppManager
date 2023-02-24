@@ -5,5 +5,5 @@ using Concepts.Applications.Environments;
 
 namespace Events.Applications.Environments;
 
-[EventType("f8fdbbca-fed0-4c9c-83c9-ba15e2746bf9")]
-public record ApplicationEnvironmentConsolidationStarted(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, ApplicationEnvironmentConsolidationId ConsolidationId);
+[EventType("a3453bdf-b678-4118-b6ac-8b4d30ccee00")]
+public record ApplicationEnvironmentDeploymentCompleted(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, ApplicationEnvironmentDeploymentId DeploymentId);

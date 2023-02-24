@@ -4,13 +4,13 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
-import { ApplicationEnvironmentConsolidationKey } from './ApplicationEnvironmentConsolidationKey';
-import { ApplicationEnvironmentConsolidationStatus } from './ApplicationEnvironmentConsolidationStatus';
+import { ApplicationEnvironmentDeploymentKey } from './ApplicationEnvironmentDeploymentKey';
+import { ApplicationEnvironmentDeploymentStatus } from './ApplicationEnvironmentDeploymentStatus';
 
-export class ApplicationEnvironmentConsolidation {
+export class ApplicationEnvironmentDeployment {
 
-    @field(ApplicationEnvironmentConsolidationKey)
-    id!: ApplicationEnvironmentConsolidationKey;
+    @field(ApplicationEnvironmentDeploymentKey)
+    id!: ApplicationEnvironmentDeploymentKey;
 
     @field(Date)
     started!: Date;
@@ -19,7 +19,7 @@ export class ApplicationEnvironmentConsolidation {
     completedOrFailed!: Date;
 
     @field(Number)
-    status!: ApplicationEnvironmentConsolidationStatus;
+    status!: ApplicationEnvironmentDeploymentStatus;
 
     @field(String, true)
     errors!: String[];
