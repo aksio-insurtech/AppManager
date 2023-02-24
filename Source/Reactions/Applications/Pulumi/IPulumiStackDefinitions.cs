@@ -33,9 +33,9 @@ public interface IPulumiStackDefinitions
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
+        ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,
         bool useContainerRegistry = true,
-        ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default);
 }

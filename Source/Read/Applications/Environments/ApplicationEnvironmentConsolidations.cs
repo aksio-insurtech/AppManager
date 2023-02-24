@@ -24,7 +24,7 @@ public class ApplicationEnvironmentConsolidations : Controller
         [FromRoute] ApplicationId applicationId,
         [FromRoute] ApplicationEnvironmentId environmentId)
     {
-        var sort = new SortDefinitionBuilder<ApplicationEnvironmentConsolidation>().Descending(_ => _.CompletedOrFailed);
+        var sort = new SortDefinitionBuilder<ApplicationEnvironmentConsolidation>().Descending(_ => _.Started);
         return _consolidations.Observe(
             consolidation => consolidation.Id.ApplicationId == applicationId && consolidation.Id.EnvironmentId == environmentId,
             new FindOptions<ApplicationEnvironmentConsolidation, ApplicationEnvironmentConsolidation> { Sort = sort });

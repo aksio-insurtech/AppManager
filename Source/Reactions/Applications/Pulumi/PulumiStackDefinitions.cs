@@ -163,16 +163,15 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
+        ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,
         bool useContainerRegistry = true,
-        ResourceGroup? resourceGroup = default,
         IEnumerable<Deployable>? deployables = default)
     {
         var tags = application.GetTags(environment);
-        resourceGroup ??= application.GetResourceGroup(environment);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
-        var storage = await microservice.GetStorage(application, environment, resourceGroup, _settings.ServicePrincipal, subscription, _fileStorageLogger);
+        var storage = await microservice.SetupFileShare(application, environment, resourceGroup, _settings.ServicePrincipal, subscription, _fileStorageLogger);
         storage.CreateAndUploadAppSettings(_settings);
 
         deployables ??= Array.Empty<Deployable>();

@@ -79,7 +79,7 @@ public static class StoragePulumiExtensions
         return new Storage(storageAccount.Name, keys[0].Value);
     }
 
-    public static async Task<MicroserviceStorage> GetStorage(
+    public static async Task<MicroserviceStorage> SetupFileShare(
         this Microservice microservice,
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
@@ -91,14 +91,13 @@ public static class StoragePulumiExtensions
         var storage = await application.GetStorage(environment, resourceGroup, servicePrincipal, subscription);
 
         var fileShareName = microservice.Name.Value.ToLowerInvariant();
-        var fileShare = GetFileShare.Invoke(new()
+        var fileShare = new FileShare(fileShareName, new()
         {
             AccountName = storage.AccountName,
             ShareName = fileShareName,
             ResourceGroupName = resourceGroup.Name
         });
-        var name = fileShare.Apply(_ => _.Name);
-        fileShareName = await name.GetValue();
+        fileShareName = await fileShare.Name.GetValue();
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
         return new MicroserviceStorage(application, microservice, fileStorage);
     }
