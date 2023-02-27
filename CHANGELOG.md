@@ -1,3 +1,10 @@
+# [v0.6.0] - 2023-2-27 [PR: #134](https://github.com/aksio-insurtech/AppManager/pull/134)
+
+### Added
+
+- Application level endpoint for changing image on a deployable
+
+
 # [v0.5.8] - 2023-2-24 [PR: #133](https://github.com/aksio-insurtech/AppManager/pull/133)
 
 ## Summary
