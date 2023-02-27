@@ -35,7 +35,7 @@ public class ApplicationHierarchyForListingProjection : IProjectionFor<Applicati
                 .UsingParentKey(e => e.ApplicationId)
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.Completed)
                 .Set(m => m.LastDeployment).ToEventContextProperty(c => c.Occurred))
-            .From<DeployableImageChanged>(_ => _
+            .From<DeployableImageChangedInEnvironment>(_ => _
                 .UsingParentKey(e => e.ApplicationId)
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.InProgress)
                 .Set(m => m.LastDeployment).ToEventContextProperty(c => c.Occurred))

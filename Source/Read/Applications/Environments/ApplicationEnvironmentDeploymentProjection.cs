@@ -34,7 +34,7 @@ public class ApplicationEnvironmentDeploymentProjection : IProjectionFor<Applica
                     .Set(k => k.DeploymentId).To(e => e.DeploymentId))
                 .Set(m => m.Status).ToValue(ApplicationEnvironmentDeploymentStatus.Completed)
                 .Set(m => m.CompletedOrFailed).ToEventContextProperty(c => c.Occurred))
-            .From<DeployableImageChanged>(_ => _
+            .From<DeployableImageChangedInEnvironment>(_ => _
                 .UsingCompositeKey<ApplicationEnvironmentDeploymentKey>(key => key
                     .Set(k => k.ApplicationId).To(e => e.ApplicationId)
                     .Set(k => k.EnvironmentId).To(e => e.EnvironmentId)

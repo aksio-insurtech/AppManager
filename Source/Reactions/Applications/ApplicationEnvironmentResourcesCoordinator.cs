@@ -9,33 +9,29 @@ using Reactions.Applications.Pulumi;
 
 namespace Reactions.Applications;
 
-#pragma warning disable IDE0052
-
 [Observer("c2f0e081-6a1a-46e0-bc8c-8a08e0c4dff5")]
-public class ApplicationResourcesCoordinator
+public class ApplicationEnvironmentResourcesCoordinator
 {
-    readonly ILogger<ApplicationResources> _logger;
+    readonly ILogger<ApplicationEnvironmentResourcesCoordinator> _logger;
     readonly IImmediateProjections _projections;
     readonly ExecutionContext _executionContext;
     readonly IExecutionContextManager _executionContextManager;
-    readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IPulumiOperations _pulumiOperations;
     readonly IEventLog _eventLog;
 
-    public ApplicationResourcesCoordinator(
-        ILogger<ApplicationResources> logger,
+    public ApplicationEnvironmentResourcesCoordinator(
         IImmediateProjections projections,
         ExecutionContext executionContext,
         IExecutionContextManager executionContextManager,
         IPulumiStackDefinitions stackDefinitions,
         IPulumiOperations pulumiOperations,
-        IEventLog eventLog)
+        IEventLog eventLog,
+        ILogger<ApplicationEnvironmentResourcesCoordinator> logger)
     {
         _logger = logger;
         _projections = projections;
         _executionContext = executionContext;
         _executionContextManager = executionContextManager;
-        _stackDefinitions = stackDefinitions;
         _pulumiOperations = pulumiOperations;
         _eventLog = eventLog;
     }
@@ -68,7 +64,7 @@ public class ApplicationResourcesCoordinator
         return Task.CompletedTask;
     }
 
-    public Task DeployableImageChanged(DeployableImageChanged @event, EventContext context)
+    public Task DeployableImageChanged(DeployableImageChangedInEnvironment @event, EventContext context)
     {
         _ = Task.Run(async () =>
         {

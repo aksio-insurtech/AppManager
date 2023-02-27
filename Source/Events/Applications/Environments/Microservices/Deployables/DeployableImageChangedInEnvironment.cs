@@ -7,4 +7,10 @@ using Concepts.Applications.Environments;
 namespace Events.Applications.Environments.Microservices.Deployables;
 
 [EventType("e3e55a84-ada3-4147-b048-c178caf19dea")]
-public record DeployableImageChanged(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, ApplicationEnvironmentDeploymentId DeploymentId, DeployableId DeployableId, DeployableImageName Image);
+public record DeployableImageChangedInEnvironment(
+    ApplicationId ApplicationId,
+    ApplicationEnvironmentId EnvironmentId,
+    MicroserviceId MicroserviceId,
+    ApplicationEnvironmentDeploymentId DeploymentId,
+    DeployableId DeployableId,
+    DeployableImageName Image);

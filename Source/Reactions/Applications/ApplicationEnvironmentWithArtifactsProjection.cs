@@ -96,7 +96,7 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                     .UsingKey(e => e.DeployableId)
                     .Set(m => m.MicroserviceId).To(e => e.MicroserviceId)
                     .Set(m => m.Name).To(e => e.Name))
-                .From<DeployableImageChanged>(_ => _
+                .From<DeployableImageChangedInEnvironment>(_ => _
                     .UsingKey(e => e.DeployableId)
                     .Set(m => m.Image).To(e => e.Image))));
 }
