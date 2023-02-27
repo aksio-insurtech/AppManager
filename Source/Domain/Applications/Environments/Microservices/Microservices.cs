@@ -4,7 +4,7 @@
 using Concepts.Applications.Environments;
 using Events.Applications.Environments.Microservices;
 
-namespace Domain.Applications;
+namespace Domain.Applications.Environments.Microservices;
 
 [Route("/api/applications/{applicationId}/environments/{environmentId}/microservices")]
 public class Microservices : Controller

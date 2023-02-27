@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications;
+namespace Domain.Applications.Environments.Microservices;
 
 public record CreateMicroservice(MicroserviceId MicroserviceId, MicroserviceName Name);
