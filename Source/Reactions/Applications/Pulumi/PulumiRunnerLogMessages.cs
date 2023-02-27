@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Reactions.Applications.Pulumi;
 
-public static partial class PulumiRunnerLogMessages
+internal static partial class PulumiRunnerLogMessages
 {
     [LoggerMessage(0, LogLevel.Information, "Exporting stack to look for pending operations")]
-    public static partial void ExportStack(this ILogger logger);
+    internal static partial void ExportStack(this ILogger logger);
 
     [LoggerMessage(1, LogLevel.Information, "Importing stack after removing any pending operations")]
-    public static partial void ImportStack(this ILogger logger);
+    internal static partial void ImportStack(this ILogger logger);
 
     [LoggerMessage(2, LogLevel.Information, "No pending operations in stack")]
-    public static partial void NoPendingOperations(this ILogger logger);
+    internal static partial void NoPendingOperations(this ILogger logger);
 }
