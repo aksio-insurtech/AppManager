@@ -16,7 +16,7 @@ public record DeployablesProjection : IProjectionFor<Deployable>
                 .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)
                 .Set(k => k.DeployableId).To(e => e.DeployableId))
             .Set(m => m.Name).To(e => e.Name))
-        .From<DeployableImageChanged>(_ => _
+        .From<DeployableImageChangedInEnvironment>(_ => _
             .UsingCompositeKey<DeployableKey>(key => key
                 .Set(k => k.EnvironmentId).ToEventSourceId()
                 .Set(k => k.MicroserviceId).To(e => e.MicroserviceId)

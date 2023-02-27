@@ -20,7 +20,7 @@ public class Deployable : Controller
         [FromRoute] ApplicationEnvironmentId environmentId,
         [FromRoute] MicroserviceId microserviceId,
         [FromRoute] DeployableId deployableId,
-        [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(environmentId, new DeployableImageChanged(applicationId, environmentId, microserviceId, ApplicationEnvironmentDeploymentId.New(), deployableId, deployableImageName));
+        [FromBody] DeployableImageName deployableImageName) => _eventLog.Append(environmentId, new DeployableImageChangedInEnvironment(applicationId, environmentId, microserviceId, ApplicationEnvironmentDeploymentId.New(), deployableId, deployableImageName));
 
     [HttpPost("config-files")]
     public Task SetConfigFileForDeployable(
