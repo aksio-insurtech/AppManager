@@ -31,8 +31,4 @@ public class Application : Controller
     [HttpPost("secrets")]
     public Task SetSecretForApplication([FromRoute] ApplicationId applicationId, [FromBody] Secret secret) =>
         _eventLog.Append(applicationId, new SecretSetForApplication(secret.Key, secret.Value));
-
-    [HttpPost("add-environment/{environmentId}")]
-    public Task AddEnvironmentToApplication([FromRoute] ApplicationId applicationId, [FromRoute] ApplicationEnvironmentId environmentId) =>
-        _eventLog.Append(applicationId, new ApplicationEnvironmentAddedToApplication(environmentId));
 }
