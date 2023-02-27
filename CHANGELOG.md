@@ -1,3 +1,10 @@
+# [v0.7.1] - 2023-2-27 [PR: #135](https://github.com/aksio-insurtech/AppManager/pull/135)
+
+### Fixed
+
+- Removed temporary endpoint for associating application environment with application. This was a temporary need to get an event in.
+
+
 # [v0.6.0] - 2023-2-27 [PR: #134](https://github.com/aksio-insurtech/AppManager/pull/134)
 
 ### Added
