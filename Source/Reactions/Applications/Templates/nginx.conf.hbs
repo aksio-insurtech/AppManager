@@ -42,6 +42,10 @@ http {
             proxy_set_header X-Original-URI $request_uri;
         }
 
+        location /.well-known/acme-challenge {
+            root /config;
+        }
+
         location /.aksio {
             rewrite ^/.aksio(/.*)$ $1 break;
             proxy_pass http://localhost:81;
