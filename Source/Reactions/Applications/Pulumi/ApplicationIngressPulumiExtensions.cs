@@ -297,6 +297,11 @@ public static class ApplicationIngressPulumiExtensions
         Ingress ingress,
         Storage storage)
     {
+        if (!ingress.IdentityProviders.Any())
+        {
+            return;
+        }
+
         var identityProviderArgs = new IdentityProvidersArgs
         {
             CustomOpenIdConnectProviders = new Dictionary<string, CustomOpenIdConnectProviderArgs>()
@@ -325,7 +330,8 @@ public static class ApplicationIngressPulumiExtensions
                 RedirectToProvider = redirectToProvider,
                 ExcludedPaths = new[]
                 {
-                    "/.aksio/*"
+                    "/.aksio/*",
+                    "/.well-known/*"
                 }
             },
             Platform = new AuthPlatformArgs
