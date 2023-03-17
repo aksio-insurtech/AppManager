@@ -5,6 +5,8 @@ using Concepts.Applications;
 using Concepts.Azure;
 using Microsoft.Azure.Management.ContainerRegistry.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
+using Pulumi;
+using Pulumi.AzureNative;
 using Pulumi.AzureNative.ContainerRegistry;
 using Pulumi.AzureNative.ContainerRegistry.Inputs;
 using Pulumi.AzureNative.Resources;
@@ -56,7 +58,19 @@ public static class ApplicationContainerRegistryPulumiExtensions
         var containerRegistry = containerRegistries.First(_ => _.Name.StartsWith(registryName));
         var registryCredentials = await containerRegistry.GetCredentialsAsync();
 
-        var registry = Registry.Get(registryName, containerRegistry.Id);
+        var registry = Registry.Get(
+            registryName,
+            containerRegistry.Id,
+            new CustomResourceOptions
+            {
+                Provider = new Provider("subscription", new ProviderArgs
+                {
+                    SubscriptionId = subscription.SubscriptionId.ToString(),
+                    ClientId = servicePrincipal.ClientId.Value,
+                    ClientSecret = servicePrincipal.ClientSecret.Value,
+                    TenantId = subscription.TenantId.Value
+                })
+            });
 
         return new(
             registry,
