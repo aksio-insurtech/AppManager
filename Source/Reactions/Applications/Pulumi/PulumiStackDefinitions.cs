@@ -8,7 +8,6 @@ using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi;
-using Pulumi.AzureNative;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
@@ -45,16 +44,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     public Task Application(Application application, ApplicationEnvironmentWithArtifacts sharedEnvironment)
     {
         var sharedTags = application.GetTags(sharedEnvironment);
-        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == sharedEnvironment.AzureSubscriptionId);
-        var subscriptionProvider = new Provider("subscription", new ProviderArgs
-        {
-            SubscriptionId = sharedEnvironment.AzureSubscriptionId.ToString()
-        });
-
-        var sharedResourceGroup = application.SetupResourceGroup(
-            sharedEnvironment,
-            subscriptionProvider);
-
+        var sharedResourceGroup = application.SetupResourceGroup(sharedEnvironment);
         application.SetupContainerRegistry(sharedResourceGroup, sharedTags);
 
         return Task.CompletedTask;

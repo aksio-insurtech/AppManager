@@ -3,8 +3,6 @@
 
 using Concepts.Applications;
 using Concepts.Applications.Environments;
-using Pulumi;
-using Pulumi.AzureNative;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
@@ -13,8 +11,7 @@ public static class ApplicationResourceGroupPulumiExtensions
 {
     public static ResourceGroup SetupResourceGroup(
         this Application application,
-        ApplicationEnvironmentWithArtifacts environment,
-        Provider? provider = default)
+        ApplicationEnvironmentWithArtifacts environment)
     {
         var name = GetResourceGroupName(application, environment, environment.CloudLocation);
         return new ResourceGroup(
@@ -24,23 +21,21 @@ public static class ApplicationResourceGroupPulumiExtensions
                 Location = environment.CloudLocation.Value,
                 ResourceGroupName = name,
                 Tags = application.GetTags(environment)
-            },
-            new CustomResourceOptions
-            {
-                Provider = provider
             });
     }
 
-    public static ResourceGroup GetResourceGroup(this Application application, ApplicationEnvironmentWithArtifacts environment)
+    public static ResourceGroup GetResourceGroup(
+        this Application application,
+        ApplicationEnvironmentWithArtifacts environment)
     {
         var result = global::Pulumi.AzureNative.Resources.GetResourceGroup.Invoke(new()
         {
             ResourceGroupName = GetResourceGroupName(application, environment, environment.CloudLocation)
         });
-
         var resourceGroupId = result.Apply(_ => _.Id);
-
-        return ResourceGroup.Get(GetResourceGroupName(application, environment, environment.CloudLocation), resourceGroupId);
+        return ResourceGroup.Get(
+            GetResourceGroupName(application, environment, environment.CloudLocation),
+            resourceGroupId);
     }
 
     public static string GetResourceGroupName(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation)
