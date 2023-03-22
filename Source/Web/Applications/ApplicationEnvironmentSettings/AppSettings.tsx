@@ -12,18 +12,21 @@ import { useSnackbar } from 'notistack';
 
 export const AppSettings = () => {
     const { applicationId, environmentId } = useRouteParams();
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const [appSettings] = AppSettingsForApplicationEnvironmentId.use({ environmentId: environmentId! });
     const [saveCommand, setSaveCommandValues] = SetAppSettingsForApplicationEnvironment.use();
 
     const [content, setContent] = useState('{}');
     const [initialContent, setInitialContent] = useState('{}');
     const [isDirty, setIsDirty] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true);
         const actualContent = appSettings.data?.content ?? '{}';
-        setContent(actualContent);
         setInitialContent(actualContent);
+        setContent(actualContent);
+        setIsDirty(false);
     }, [appSettings.data]);
 
     const save = async () => {
@@ -51,8 +54,11 @@ export const AppSettings = () => {
     };
 
     const contentChanged = (json: string) => {
-        setContent(json);
+        setIsLoading(false);
+        if (isLoading) return;
+
         setIsDirty(json !== initialContent);
+        setContent(json);
     };
 
     return (
