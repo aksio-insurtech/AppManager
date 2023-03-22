@@ -5,11 +5,11 @@
 import { field } from '@aksio/cratis-fundamentals';
 
 
-export class MicroserviceAndEnvironmentKey {
+export class AppSettingsForApplicationEnvironment {
 
     @field(String)
-    microserviceId!: string;
+    id!: string;
 
     @field(String)
-    environmentId!: string;
+    content!: string;
 }

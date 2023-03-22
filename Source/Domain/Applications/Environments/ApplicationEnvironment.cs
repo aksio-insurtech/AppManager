@@ -17,6 +17,13 @@ public class ApplicationEnvironment : Controller
         _eventLog = eventLog;
     }
 
+    [HttpPost("app-settings")]
+    public Task SetAppSettingsForApplicationEnvironment(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromBody] AppSettings appSettings) =>
+        _eventLog.Append(environmentId, new AppSettingsSetForApplicationEnvironment(applicationId, environmentId, appSettings.Content));
+
     [HttpPost("config-files")]
     public Task SetConfigFileForApplicationEnvironment(
         [FromRoute] ApplicationId applicationId,

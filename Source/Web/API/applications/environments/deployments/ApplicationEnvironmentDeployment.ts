@@ -22,7 +22,7 @@ export class ApplicationEnvironmentDeployment {
     status!: ApplicationEnvironmentDeploymentStatus;
 
     @field(String, true)
-    errors!: String[];
+    errors!: string[];
 
     @field(String)
     stackTrace!: string;
