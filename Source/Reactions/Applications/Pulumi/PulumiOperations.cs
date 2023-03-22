@@ -221,7 +221,7 @@ public class PulumiOperations : IPulumiOperations
             {
                 applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, sharedEnvironment, environment.CratisVersion);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
-                storage = await application.GetStorage(environment, applicationEnvironmentResult!.ResourceGroup, _settings.ServicePrincipal, subscription);
+                storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
 
                 await _resourceRenderers.Render(
                     new(

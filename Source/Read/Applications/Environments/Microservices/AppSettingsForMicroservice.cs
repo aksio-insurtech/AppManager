@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Reactions.Applications;
+namespace Read.Applications.Environments.Microservices;
 
-public record AppSettingsValues(ApplicationName ApplicationName, MicroserviceName MicroserviceName);
+public record AppSettingsForMicroservice(MicroserviceOnEnvironmentKey Id, AppSettingsContent Content);

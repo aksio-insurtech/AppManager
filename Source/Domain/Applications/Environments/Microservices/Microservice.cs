@@ -23,6 +23,14 @@ public class Microservice : Controller
         _stacksForMicroservices = stacksForMicroservices;
     }
 
+    [HttpPost("app-settings")]
+    public Task SetAppSettingsForMicroservice(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId,
+        [FromBody] AppSettings appSettings) =>
+        _eventLog.Append(environmentId, new AppSettingsSetForMicroservice(applicationId, environmentId, microserviceId, appSettings.Content));
+
     [HttpPost("config-files")]
     public Task SetConfigFileForMicroservice(
         [FromRoute] ApplicationId applicationId,

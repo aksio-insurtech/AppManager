@@ -6,29 +6,32 @@ import { Command, CommandValidator, CommandPropertyValidators, useCommand, SetCo
 import { Validator } from '@aksio/cratis-applications-frontend/validation';
 import Handlebars from 'handlebars';
 
-const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/app-settings');
+const routeTemplate = Handlebars.compile('/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/app-settings');
 
-export interface ISetAppSettingsForApplicationEnvironment {
+export interface ISetAppSettingsForMicroservice {
     applicationId?: string;
     environmentId?: string;
+    microserviceId?: string;
     content?: string;
 }
 
-export class SetAppSettingsForApplicationEnvironmentValidator extends CommandValidator {
+export class SetAppSettingsForMicroserviceValidator extends CommandValidator {
     readonly properties: CommandPropertyValidators = {
         applicationId: new Validator(),
         environmentId: new Validator(),
+        microserviceId: new Validator(),
         content: new Validator(),
     };
 }
 
-export class SetAppSettingsForApplicationEnvironment extends Command<ISetAppSettingsForApplicationEnvironment> implements ISetAppSettingsForApplicationEnvironment {
-    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/app-settings';
+export class SetAppSettingsForMicroservice extends Command<ISetAppSettingsForMicroservice> implements ISetAppSettingsForMicroservice {
+    readonly route: string = '/api/applications/{{applicationId}}/environments/{{environmentId}}/microservices/{{microserviceId}}/app-settings';
     readonly routeTemplate: Handlebars.TemplateDelegate = routeTemplate;
-    readonly validation: CommandValidator = new SetAppSettingsForApplicationEnvironmentValidator();
+    readonly validation: CommandValidator = new SetAppSettingsForMicroserviceValidator();
 
     private _applicationId!: string;
     private _environmentId!: string;
+    private _microserviceId!: string;
     private _content!: string;
 
     constructor() {
@@ -39,6 +42,7 @@ export class SetAppSettingsForApplicationEnvironment extends Command<ISetAppSett
         return [
             'applicationId',
             'environmentId',
+            'microserviceId',
         ];
     }
 
@@ -46,6 +50,7 @@ export class SetAppSettingsForApplicationEnvironment extends Command<ISetAppSett
         return [
             'applicationId',
             'environmentId',
+            'microserviceId',
             'content',
         ];
     }
@@ -66,6 +71,14 @@ export class SetAppSettingsForApplicationEnvironment extends Command<ISetAppSett
         this._environmentId = value;
         this.propertyChanged('environmentId');
     }
+    get microserviceId(): string {
+        return this._microserviceId;
+    }
+
+    set microserviceId(value: string) {
+        this._microserviceId = value;
+        this.propertyChanged('microserviceId');
+    }
     get content(): string {
         return this._content;
     }
@@ -75,7 +88,7 @@ export class SetAppSettingsForApplicationEnvironment extends Command<ISetAppSett
         this.propertyChanged('content');
     }
 
-    static use(initialValues?: ISetAppSettingsForApplicationEnvironment): [SetAppSettingsForApplicationEnvironment, SetCommandValues<ISetAppSettingsForApplicationEnvironment>, ClearCommandValues] {
-        return useCommand<SetAppSettingsForApplicationEnvironment, ISetAppSettingsForApplicationEnvironment>(SetAppSettingsForApplicationEnvironment, initialValues);
+    static use(initialValues?: ISetAppSettingsForMicroservice): [SetAppSettingsForMicroservice, SetCommandValues<ISetAppSettingsForMicroservice>, ClearCommandValues] {
+        return useCommand<SetAppSettingsForMicroservice, ISetAppSettingsForMicroservice>(SetAppSettingsForMicroservice, initialValues);
     }
 }

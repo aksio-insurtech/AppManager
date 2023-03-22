@@ -5,16 +5,20 @@ import Editor from '@monaco-editor/react';
 import { Box, Button, Toolbar } from '@mui/material';
 import { useEffect, useState } from 'react';
 import * as icons from '@mui/icons-material';
-import { AppSettingsForApplicationEnvironmentId } from 'API/applications/environments/AppSettingsForApplicationEnvironmentId';
+import { AppSettingsForMicroserviceId } from 'API/applications/environments/microservices/AppSettingsForMicroserviceId';
+import { SetAppSettingsForMicroservice } from 'API/applications/environments/microservices/SetAppSettingsForMicroservice';
 import { useRouteParams } from '../RouteParams';
-import { SetAppSettingsForApplicationEnvironment } from 'API/applications/environments/SetAppSettingsForApplicationEnvironment';
 import { useSnackbar } from 'notistack';
 
 export const AppSettings = () => {
-    const { applicationId, environmentId } = useRouteParams();
+    const { applicationId, microserviceId, environmentId } = useRouteParams();
     const { enqueueSnackbar } = useSnackbar();
-    const [appSettings] = AppSettingsForApplicationEnvironmentId.use({ environmentId: environmentId! });
-    const [saveCommand, setSaveCommandValues] = SetAppSettingsForApplicationEnvironment.use();
+    const [appSettings] = AppSettingsForMicroserviceId.use({
+        applicationId: applicationId!,
+        microserviceId: microserviceId!,
+        environmentId: environmentId!
+    });
+    const [saveCommand, setSaveCommandValues] = SetAppSettingsForMicroservice.use();
 
     const [content, setContent] = useState('{}');
     const [initialContent, setInitialContent] = useState('{}');
@@ -40,6 +44,7 @@ export const AppSettings = () => {
 
         setSaveCommandValues({
             applicationId: applicationId!,
+            microserviceId: microserviceId!,
             environmentId: environmentId!,
             content
         });

@@ -10,17 +10,20 @@ namespace Read.Applications.Environments.Microservices;
 public class Microservices : Controller
 {
     readonly IMongoCollection<Microservice> _microserviceCollection;
+    readonly IMongoCollection<AppSettingsForMicroservice> _appSettingsForMicroserviceCollection;
     readonly IMongoCollection<ConfigFilesForMicroservice> _configFilesForMicroserviceCollection;
     readonly IMongoCollection<EnvironmentVariablesForMicroservice> _environmentVariablesForMicroserviceCollection;
     readonly IMongoCollection<SecretsForMicroservice> _secretsForMicroserviceCollection;
 
     public Microservices(
         IMongoCollection<Microservice> microserviceCollection,
+        IMongoCollection<AppSettingsForMicroservice> appSettingsForMicroserviceCollection,
         IMongoCollection<ConfigFilesForMicroservice> configFilesForMicroserviceCollection,
         IMongoCollection<EnvironmentVariablesForMicroservice> environmentVariablesForMicroserviceCollection,
         IMongoCollection<SecretsForMicroservice> secretsForMicroserviceCollection)
     {
         _microserviceCollection = microserviceCollection;
+        _appSettingsForMicroserviceCollection = appSettingsForMicroserviceCollection;
         _configFilesForMicroserviceCollection = configFilesForMicroserviceCollection;
         _environmentVariablesForMicroserviceCollection = environmentVariablesForMicroserviceCollection;
         _secretsForMicroserviceCollection = secretsForMicroserviceCollection;
@@ -43,6 +46,15 @@ public class Microservices : Controller
         _microserviceCollection.Find(_ =>
             _.Id.EnvironmentId == environmentId &&
             _.Id.MicroserviceId == microserviceId).FirstOrDefaultAsync();
+
+    [HttpGet("{microserviceId}/app-settings")]
+    public Task<ClientObservable<AppSettingsForMicroservice>> AppSettingsForMicroserviceId(
+        [FromRoute] ApplicationId applicationId,
+        [FromRoute] ApplicationEnvironmentId environmentId,
+        [FromRoute] MicroserviceId microserviceId) =>
+        _appSettingsForMicroserviceCollection.ObserveSingle(_ =>
+            _.Id.EnvironmentId == environmentId &&
+            _.Id.MicroserviceId == microserviceId);
 
     [HttpGet("{microserviceId}/config-files")]
     public Task<ClientObservable<ConfigFilesForMicroservice>> ConfigFilesForMicroserviceId(

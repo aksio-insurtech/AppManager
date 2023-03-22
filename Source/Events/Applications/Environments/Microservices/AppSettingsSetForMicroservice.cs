@@ -4,7 +4,7 @@
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 
-namespace Events.Applications.Environments;
+namespace Events.Applications.Environments.Microservices;
 
 [EventType("9f4e2a05-f1e0-4ccb-ae32-97d952fc5c3b")]
-public record AppSettingsSetForApplicationEnvironment(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, AppSettingsContent Content);
+public record AppSettingsSetForMicroservice(ApplicationId ApplicationId, ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, AppSettingsContent Content);

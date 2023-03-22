@@ -4,11 +4,12 @@
 
 import { field } from '@aksio/cratis-fundamentals';
 
+import { MicroserviceOnEnvironmentKey } from './MicroserviceOnEnvironmentKey';
 
-export class AppSettingsForApplicationEnvironment {
+export class AppSettingsForMicroservice {
 
-    @field(String)
-    id!: string;
+    @field(MicroserviceOnEnvironmentKey)
+    id!: MicroserviceOnEnvironmentKey;
 
     @field(String)
     content!: string;

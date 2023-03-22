@@ -4,17 +4,15 @@
 using System.Collections.ObjectModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Aksio.Cratis.Kernel.Configuration;
 using Aksio.Cratis.Kernel.Orleans.Configuration;
-using Common;
 using Reactions.Applications.Pulumi;
-using Reactions.Applications.Templates;
 
 namespace Reactions.Applications;
 
 public class MicroserviceStorage
 {
-    readonly Application _application;
     readonly Microservice _microservice;
 
     public FileStorage FileStorage { get; }
@@ -24,7 +22,6 @@ public class MicroserviceStorage
         Microservice microservice,
         FileStorage fileStorage)
     {
-        _application = application;
         _microservice = microservice;
         FileStorage = fileStorage;
     }
@@ -141,10 +138,54 @@ public class MicroserviceStorage
         FileStorage.Upload("cratis.json", cratisJson);
     }
 
-    public void CreateAndUploadAppSettings(ISettings settings)
+    public void CreateAndUploadAppSettings()
     {
-        var content = TemplateTypes.AppSettings(
-            new AppSettingsValues(_application.Name, _microservice.Name));
+        var appSettingsJson = _microservice.AppSettingsContent?.Value ?? "{}";
+        var json = JsonNode.Parse(appSettingsJson)!.AsObject();
+        json["Kestrel"] = new JsonObject()
+        {
+            ["Endpoints"] = new JsonObject()
+            {
+                ["Http"] = new JsonObject()
+                {
+                    ["Url"] = "http://+:80"
+                }
+            }
+        };
+
+        json["Serilog"] = new JsonObject()
+        {
+            ["MinimumLevel"] = new JsonObject()
+            {
+                ["Default"] = "Information",
+                ["Override"] = new JsonObject()
+                {
+                    ["Aksio"] = "Information",
+                    ["Microsoft"] = "Warning",
+                    ["Microsoft.AspNetCore.HttpLogging"] = "Warning",
+                    ["System"] = "Warning"
+                }
+            },
+            ["WriteTo"] = new JsonArray()
+            {
+                new JsonObject()
+                {
+                    ["Name"] = "Console",
+                    ["Args"] = new JsonObject()
+                    {
+                        ["formatter"] = "Serilog.Formatting.Json.JsonFormatter, Serilog"
+                    }
+                }
+            }
+        };
+        json["AllowedHosts"] = "*";
+
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            WriteIndented = true
+        };
+        var content = json.ToJsonString(options);
         FileStorage.Upload("appsettings.json", content);
     }
 

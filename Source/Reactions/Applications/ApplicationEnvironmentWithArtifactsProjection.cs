@@ -89,6 +89,10 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                 .UsingKey(e => e.MicroserviceId)
                 .Set(m => m.Name).To(e => e.Name))
 
+            .From<AppSettingsSetForMicroservice>(_ => _
+                .UsingKey(e => e.MicroserviceId)
+                .Set(m => m.AppSettingsContent).To(e => e.Content))
+
             // Deployables
             .Children(m => m.Deployables, _ => _
                 .IdentifiedBy(m => m.Id)

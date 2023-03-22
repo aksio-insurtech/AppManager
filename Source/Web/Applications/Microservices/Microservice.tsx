@@ -20,6 +20,7 @@ import { SetSecretForMicroservice } from 'API/applications/environments/microser
 import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
 import { Secret } from 'API/applications/environments/microservices/Secret';
 import { SecretsForMicroserviceId } from 'API/applications/environments/microservices/SecretsForMicroserviceId';
+import { AppSettings } from './AppSettings';
 
 export const Microservice = () => {
     const { applicationId, environmentId, microserviceId } = useRouteParams();
@@ -85,17 +86,19 @@ export const Microservice = () => {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={(e, value) => setSelectedTab(value)}>
                     <Tab label="General" value="0" />
-                    <Tab label="Deployables" value="1" />
-                    <Tab label="Config Files" value="2" />
-                    <Tab label="Variables" value="3" />
-                    <Tab label="Secrets" value="4" />
+                    <Tab label="AppSettings" value="1" />
+                    <Tab label="Deployables" value="2" />
+                    <Tab label="Config Files" value="3" />
+                    <Tab label="Variables" value="4" />
+                    <Tab label="Secrets" value="5" />
                 </TabList>
             </Box>
             <TabPanel value="0"><General microservice={microservice.data} /></TabPanel>
-            <TabPanel value="1"><Deployables /></TabPanel>
-            <TabPanel value="2"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
-            <TabPanel value="3"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
-            <TabPanel value="4"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
+            <TabPanel value="1"><AppSettings/></TabPanel>
+            <TabPanel value="2"><Deployables /></TabPanel>
+            <TabPanel value="3"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
+            <TabPanel value="4"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
+            <TabPanel value="5"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
         </TabContext>
     );
 };

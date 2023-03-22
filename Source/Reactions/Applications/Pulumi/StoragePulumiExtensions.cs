@@ -56,7 +56,6 @@ public static class StoragePulumiExtensions
     public static async Task<Storage> GetStorage(
         this Application application,
         ApplicationEnvironmentWithArtifacts environment,
-        ResourceGroup resourceGroup,
         AzureServicePrincipal servicePrincipal,
         AzureSubscription subscription)
     {
@@ -88,9 +87,9 @@ public static class StoragePulumiExtensions
         AzureSubscription subscription,
         ILogger<FileStorage> fileStorageLogger)
     {
-        var storage = await application.GetStorage(environment, resourceGroup, servicePrincipal, subscription);
+        var storage = await application.GetStorage(environment, servicePrincipal, subscription);
 
-        var fileShareName = microservice.Name.Value.ToLowerInvariant();
+        var fileShareName = microservice.GetFileShareName();
         var fileShare = new FileShare(fileShareName, new()
         {
             AccountName = storage.AccountName,
@@ -112,4 +111,6 @@ public static class StoragePulumiExtensions
 
         return $"{environment.ShortName}{truncatedName}".ToLowerInvariant();
     }
+
+    public static string GetFileShareName(this Microservice microservice) => microservice.Name.Value.ToLowerInvariant();
 }

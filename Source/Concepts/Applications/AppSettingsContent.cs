@@ -5,5 +5,7 @@ namespace Concepts.Applications;
 
 public record AppSettingsContent(string Name) : ConceptAs<string>(Name)
 {
+    public static readonly AppSettingsContent Empty = "{}";
+
     public static implicit operator AppSettingsContent(string name) => new(name);
 }

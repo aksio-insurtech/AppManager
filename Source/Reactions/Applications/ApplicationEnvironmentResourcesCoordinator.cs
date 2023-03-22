@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Aksio.Cratis.Execution;
+using Common;
 using Events.Applications.Environments;
+using Events.Applications.Environments.Microservices;
 using Events.Applications.Environments.Microservices.Deployables;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications.Pulumi;
@@ -13,11 +15,13 @@ namespace Reactions.Applications;
 public class ApplicationEnvironmentResourcesCoordinator
 {
     readonly ILogger<ApplicationEnvironmentResourcesCoordinator> _logger;
+    readonly ILogger<FileStorage> _fileStorageLogger;
     readonly IImmediateProjections _projections;
     readonly ExecutionContext _executionContext;
     readonly IExecutionContextManager _executionContextManager;
     readonly IPulumiOperations _pulumiOperations;
     readonly IEventLog _eventLog;
+    readonly ISettings _settings;
 
     public ApplicationEnvironmentResourcesCoordinator(
         IImmediateProjections projections,
@@ -26,14 +30,18 @@ public class ApplicationEnvironmentResourcesCoordinator
         IPulumiStackDefinitions stackDefinitions,
         IPulumiOperations pulumiOperations,
         IEventLog eventLog,
-        ILogger<ApplicationEnvironmentResourcesCoordinator> logger)
+        ISettings settings,
+        ILogger<ApplicationEnvironmentResourcesCoordinator> logger,
+        ILogger<FileStorage> fileStorageLogger)
     {
         _logger = logger;
+        _fileStorageLogger = fileStorageLogger;
         _projections = projections;
         _executionContext = executionContext;
         _executionContextManager = executionContextManager;
         _pulumiOperations = pulumiOperations;
         _eventLog = eventLog;
+        _settings = settings;
     }
 
     public Task DeploymentStarted(ApplicationEnvironmentDeploymentStarted @event, EventContext context)
@@ -62,6 +70,19 @@ public class ApplicationEnvironmentResourcesCoordinator
         });
 
         return Task.CompletedTask;
+    }
+
+    public async Task AppSettingsChanged(AppSettingsSetForMicroservice @event, EventContext context)
+    {
+        var application = (await _projections.GetInstanceById<Application>(@event.ApplicationId)).Model;
+        var environment = (await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId)).Model;
+        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+        var storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
+        var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, microservice.GetFileShareName(), _fileStorageLogger);
+        var microserviceStorage = new MicroserviceStorage(application, microservice, fileStorage);
+        microserviceStorage.CreateAndUploadAppSettings();
     }
 
     public Task DeployableImageChanged(DeployableImageChangedInEnvironment @event, EventContext context)

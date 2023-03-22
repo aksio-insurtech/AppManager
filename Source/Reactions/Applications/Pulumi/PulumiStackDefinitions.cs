@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
+using Reactions.Applications.Templates;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
@@ -72,6 +73,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var microservice = new Microservice(
             Guid.Empty,
             "kernel",
+            AppSettingsContent.Empty,
             new Deployable[]
             {
                 new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 }, ConfigPath.Default)
@@ -99,7 +101,9 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             false);
 
         await kernelStorage.CreateAndUploadCratisJson(mongoDB, environment.Tenants, environment.Microservices, kernel.SiloHostName, fileStorage.ConnectionString, applicationMonitoring);
-        kernelStorage.CreateAndUploadAppSettings(_settings);
+
+        var content = TemplateTypes.AppSettings(null!);
+        fileStorage.Upload("appsettings.json", content);
 
         var applicationResult = new ApplicationEnvironmentResult(
             environment,
@@ -135,7 +139,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var tags = application.GetTags(environment);
         resourceGroup ??= application.GetResourceGroup(environment);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
-        var storage = await application.GetStorage(environment, resourceGroup, _settings.ServicePrincipal, subscription);
+        var storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
 
         return await application.SetupIngress(
             environment,
@@ -162,7 +166,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var tags = application.GetTags(environment);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
         var storage = await microservice.SetupFileShare(application, environment, resourceGroup, _settings.ServicePrincipal, subscription, _fileStorageLogger);
-        storage.CreateAndUploadAppSettings(_settings);
+        storage.CreateAndUploadAppSettings();
 
         deployables ??= Array.Empty<Deployable>();
 

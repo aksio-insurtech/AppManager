@@ -17,7 +17,6 @@ import { SetSecretForApplicationEnvironment } from 'API/applications/environment
 import { SecretsForApplicationEnvironmentId } from 'API/applications/environments/SecretsForApplicationEnvironmentId';
 import { EnvironmentVariable } from 'API/applications/EnvironmentVariable';
 import { Secret } from 'API/applications/environments/microservices/Secret';
-import { AppSettings } from './AppSettings';
 
 export const Settings = () => {
     const { applicationId, environmentId, microserviceId } = useRouteParams();
@@ -61,16 +60,14 @@ export const Settings = () => {
         <TabContext value={selectedTab}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={(e, value) => setSelectedTab(value)}>
-                    <Tab label="AppSettings" value="0" />
-                    <Tab label="Config Files" value="1" />
-                    <Tab label="Variables" value="2" />
-                    <Tab label="Secrets" value="3" />
+                    <Tab label="Config Files" value="0" />
+                    <Tab label="Variables" value="1" />
+                    <Tab label="Secrets" value="2" />
                 </TabList>
             </Box>
-            <TabPanel value="0"><AppSettings/></TabPanel>
-            <TabPanel value="1"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
-            <TabPanel value="2"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
-            <TabPanel value="3"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
+            <TabPanel value="0"><ConfigFiles onConfigFileSet={configFileSet} files={configFiles} /></TabPanel>
+            <TabPanel value="1"><Variables onVariableSet={variableSet} variables={environmentVariables} /></TabPanel>
+            <TabPanel value="2"><Secrets onSecretSet={secretSet} secrets={secrets} /></TabPanel>
         </TabContext>
     );
 };

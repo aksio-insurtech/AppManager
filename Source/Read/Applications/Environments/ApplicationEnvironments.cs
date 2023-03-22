@@ -10,7 +10,6 @@ public class ApplicationEnvironments : Controller
 {
     readonly IMongoCollection<ApplicationEnvironment> _applicationEnvironmentCollection;
     readonly IMongoCollection<ApplicationEnvironmentResources> _applicationEnvironmentResourcesCollection;
-    readonly IMongoCollection<AppSettingsForApplicationEnvironment> _appSettingsForApplicationEnvironmentCollection;
     readonly IMongoCollection<ConfigFilesForApplicationEnvironment> _configFilesForApplicationEnvironmentCollection;
     readonly IMongoCollection<EnvironmentVariablesForApplicationEnvironment> _environmentVariablesForApplicationEnvironmentCollection;
     readonly IMongoCollection<CertificatesForApplicationEnvironment> _certificatesForApplicationEnvironmentCollection;
@@ -19,7 +18,6 @@ public class ApplicationEnvironments : Controller
     public ApplicationEnvironments(
         IMongoCollection<ApplicationEnvironment> collection,
         IMongoCollection<ApplicationEnvironmentResources> applicationEnvironmentResourcesCollection,
-        IMongoCollection<AppSettingsForApplicationEnvironment> appSettingsForApplicationEnvironmentCollection,
         IMongoCollection<ConfigFilesForApplicationEnvironment> configFilesForApplicationEnvironmentCollection,
         IMongoCollection<EnvironmentVariablesForApplicationEnvironment> environmentVariablesForApplicationEnvironmentCollection,
         IMongoCollection<CertificatesForApplicationEnvironment> certificatesForApplicationEnvironmentCollection,
@@ -27,7 +25,6 @@ public class ApplicationEnvironments : Controller
     {
         _applicationEnvironmentCollection = collection;
         _applicationEnvironmentResourcesCollection = applicationEnvironmentResourcesCollection;
-        _appSettingsForApplicationEnvironmentCollection = appSettingsForApplicationEnvironmentCollection;
         _configFilesForApplicationEnvironmentCollection = configFilesForApplicationEnvironmentCollection;
         _environmentVariablesForApplicationEnvironmentCollection = environmentVariablesForApplicationEnvironmentCollection;
         _certificatesForApplicationEnvironmentCollection = certificatesForApplicationEnvironmentCollection;
@@ -53,10 +50,6 @@ public class ApplicationEnvironments : Controller
     [HttpGet("{environmentId}/config-files")]
     public Task<ClientObservable<ConfigFilesForApplicationEnvironment>> ConfigFilesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
         _configFilesForApplicationEnvironmentCollection.ObserveById(environmentId);
-
-    [HttpGet("{environmentId}/app-settings")]
-    public Task<ClientObservable<AppSettingsForApplicationEnvironment>> AppSettingsForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
-        _appSettingsForApplicationEnvironmentCollection.ObserveById(environmentId);
 
     [HttpGet("{environmentId}/environment-variables")]
     public Task<ClientObservable<EnvironmentVariablesForApplicationEnvironment>> EnvironmentVariablesForApplicationEnvironmentId([FromRoute] ApplicationEnvironmentId environmentId) =>
