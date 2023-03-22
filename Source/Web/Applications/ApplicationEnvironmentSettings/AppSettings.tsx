@@ -45,6 +45,8 @@ export const AppSettings = () => {
             enqueueSnackbar('Saved', { variant: 'success' });
             setInitialContent(content);
             setIsDirty(false);
+        } else {
+            enqueueSnackbar(`Failed to save - ${result.exceptionMessages}`, { variant: 'error' });
         }
     };
 
