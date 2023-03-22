@@ -15,9 +15,9 @@
     "dependencies": {
         "@aksio/cratis-applications-frontend": "8.9.3",
         "@aksio/cratis-fundamentals": "8.9.3",
+        "@aksio/cratis-mui": "8.9.3",
         "@aksio/cratis-react": "8.9.3",
         "@aksio/cratis-typescript": "8.9.3",
-        "@aksio/cratis-mui": "8.9.3",
         "@emotion/react": "11.10.4",
         "@emotion/styled": "11.10.4",
         "@monaco-editor/react": "^4.4.6",
@@ -25,6 +25,7 @@
         "@mui/lab": "5.0.0-alpha.104",
         "@mui/material": "5.10.10",
         "@mui/x-data-grid": "5.17.7",
+        "notistack": "3.0.1",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-router-dom": "6.4.2"

@@ -3,6 +3,7 @@
 
 import 'reflect-metadata';
 import { createRoot } from 'react-dom/client';
+import { SnackbarProvider } from 'notistack';
 
 import './theme';
 
@@ -19,9 +20,11 @@ root.render(
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <ModalProvider>
-                <Paper elevation={0} sx={{ height: '100%' }}>
-                    <App />
-                </Paper>
+                <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'top' }}>
+                    <Paper elevation={0} sx={{ height: '100%' }}>
+                        <App />
+                    </Paper>
+                </SnackbarProvider>
             </ModalProvider>
         </ThemeProvider>
     </BrowserRouter>

@@ -74,6 +74,7 @@
         "inheritdoc",
         "letsencrypt",
         "Mongodbatlas",
+        "notistack",
         "notnull",
         "Peerings",
         "Porten",

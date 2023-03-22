@@ -8,9 +8,11 @@ import * as icons from '@mui/icons-material';
 import { AppSettingsForApplicationEnvironmentId } from 'API/applications/environments/AppSettingsForApplicationEnvironmentId';
 import { useRouteParams } from '../RouteParams';
 import { SetAppSettingsForApplicationEnvironment } from 'API/applications/environments/SetAppSettingsForApplicationEnvironment';
+import { useSnackbar } from 'notistack';
 
 export const AppSettings = () => {
     const { applicationId, environmentId } = useRouteParams();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [appSettings] = AppSettingsForApplicationEnvironmentId.use({ environmentId: environmentId! });
     const [saveCommand, setSaveCommandValues] = SetAppSettingsForApplicationEnvironment.use();
 
@@ -25,6 +27,14 @@ export const AppSettings = () => {
     }, [appSettings.data]);
 
     const save = async () => {
+        try {
+            JSON.parse(content);
+        }
+        catch (ex) {
+            enqueueSnackbar('Invalid JSON', { variant: 'error' });
+            return;
+        }
+
         setSaveCommandValues({
             applicationId: applicationId!,
             environmentId: environmentId!,
@@ -32,6 +42,7 @@ export const AppSettings = () => {
         });
         const result = await saveCommand.execute();
         if (result.isSuccess) {
+            enqueueSnackbar('Saved', { variant: 'success' });
             setInitialContent(content);
             setIsDirty(false);
         }
