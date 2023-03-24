@@ -338,7 +338,10 @@ public class PulumiOperations : IPulumiOperations
                 var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
 
                 var containerRegistryResult = await application.GetContainerRegistry(sharedEnvironment, _settings.ServicePrincipal, sharedSubscription);
-                results.Register(WellKnownResourceTypes.ContainerRegistry, containerRegistryResult);
+                if (containerRegistryResult is not null)
+                {
+                    results.Register(WellKnownResourceTypes.ContainerRegistry, containerRegistryResult);
+                }
 
                 var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
                 var managedEnvironment = await application.GetManagedEnvironment(environment, _settings.ServicePrincipal, subscription);

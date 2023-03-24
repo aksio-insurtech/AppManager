@@ -13,7 +13,6 @@ public record ApplicationEnvironmentResult(
     ResourceGroup ResourceGroup,
     NetworkResult Network,
     StorageResult Storage,
-    ContainerRegistryResult ContainerRegistry,
     ManagedEnvironment ManagedEnvironment,
     IDictionary<CertificateId, Output<string>> Certificates)
 {

@@ -55,6 +55,10 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
     {
         var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == sharedEnvironment.AzureSubscriptionId);
         var containerRegistry = await application.GetContainerRegistry(sharedEnvironment, _settings.ServicePrincipal, sharedSubscription);
+        if (containerRegistry is not null)
+        {
+            resourceResults.Register(WellKnownResourceTypes.ContainerRegistry, containerRegistry);
+        }
 
         var tags = application.GetTags(environment);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
@@ -78,7 +82,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             resourceGroup,
             network,
             storage,
-            containerRegistry,
             managedEnvironment,
             certificates);
     }
