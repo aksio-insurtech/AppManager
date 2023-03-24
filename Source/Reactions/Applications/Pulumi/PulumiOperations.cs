@@ -33,23 +33,23 @@ public class PulumiOperations : IPulumiOperations
     readonly IPulumiStackDefinitions _stackDefinitions;
     readonly IStacksForApplications _stacksForApplications;
     readonly IStacksForMicroservices _stacksForMicroservices;
-    readonly IResourceRenderers _resourceRenderers;
+    readonly IResourceRendering _resourceRenderers;
     readonly IApplicationEnvironmentDeploymentLog _applicationEnvironmentDeploymentLog;
 
     public PulumiOperations(
-        ISettings applicationSettings,
+        ISettings settings,
         IExecutionContextManager executionContextManager,
         IPulumiStackDefinitions stackDefinitions,
         IStacksForApplications stacksForApplications,
         IStacksForMicroservices stacksForMicroservices,
-        IResourceRenderers resourceRenderers,
+        IResourceRendering resourceRenderers,
         IApplicationEnvironmentDeploymentLog applicationEnvironmentDeploymentLog,
         ILogger<PulumiOperations> logger,
         ILogger<FileStorage> fileStorageLogger)
     {
         _logger = logger;
         _fileStorageLogger = fileStorageLogger;
-        _settings = applicationSettings;
+        _settings = settings;
         _executionContextManager = executionContextManager;
         _stackDefinitions = stackDefinitions;
         _stacksForApplications = stacksForApplications;
@@ -97,6 +97,13 @@ public class PulumiOperations : IPulumiOperations
                 OnStandardOutput = Console.WriteLine,
                 OnStandardError = Console.Error.WriteLine
             };
+
+            // await stack.Stack.PreviewAsync(new PreviewOptions
+            // {
+            //     OnStandardOutput = upOptions.OnStandardOutput,
+            //     OnStandardError = upOptions.OnStandardError,
+            //     Diff = true
+            // });
             await stack.Stack.UpAsync(upOptions);
 
             await (microservice is not null ?
@@ -195,6 +202,7 @@ public class PulumiOperations : IPulumiOperations
 
         var upOptions = GetUpOptionsForDeployment(application, environment, deploymentId);
         var refreshOptions = GetRefreshOptionsForDeployment(application, environment, deploymentId);
+        var resourceScope = new ResourceRenderingScope(environment.Resources);
 
         var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
         var sharedEnvironment = environment with
@@ -212,6 +220,7 @@ public class PulumiOperations : IPulumiOperations
         Task RenderResources(ResourceLevel level, ResourceGroup resourceGroup) => _resourceRenderers.Render(
                 ResourceLevel.Environment,
                 new(
+                    _settings,
                     application,
                     environment,
                     resourceGroup,
@@ -219,7 +228,7 @@ public class PulumiOperations : IPulumiOperations
                     results,
                     environment.Tenants,
                     environment.Microservices),
-                environment.Resources);
+                resourceScope);
 
         await Up(
             application,

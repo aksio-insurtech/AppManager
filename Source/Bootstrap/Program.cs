@@ -59,22 +59,11 @@ public static class Program
             "Semver",
             "SharpCompress");
 
-        var types = new Types();
-        var derivedTypes = new DerivedTypes(types);
-        Globals.Configure(derivedTypes);
-        var containerBuilder = new ContainerBuilder();
-        containerBuilder.RegisterDefaults(types);
-        var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
-
-        var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
         var serializerOptions = Globals.JsonSerializerOptions;
         serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
 
-        // Setup application within cloud environment
-        // Wait till its ready and then append the events that represents the actions done (through commands?)
         var configAsJson = await File.ReadAllTextAsync(args[0]);
         var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, serializerOptions)!;
-
         var settings = new Settings(
             config.Azure.Subscriptions,
             config.Pulumi.Organization,
@@ -83,6 +72,16 @@ public static class Program
             config.MongoDB.PublicKey,
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
+
+        var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
+        var types = new Types();
+        var derivedTypes = new DerivedTypes(types);
+        Globals.Configure(derivedTypes);
+
+        var containerBuilder = new ContainerBuilder();
+        containerBuilder.RegisterInstance(loggerFactory).As<ILoggerFactory>();
+        containerBuilder.RegisterDefaults(types);
+        var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
 
         var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
         var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
@@ -97,7 +96,7 @@ public static class Program
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, logger);
 
-        var resourceRenderers = new ResourceRenderers(types, serviceProvider);
+        var resourceRenderers = new ResourceRendering(types, serviceProvider);
         var stacksForApplications = new BootstrapStacksForApplications();
         var stacksForMicroservices = new BootstrapStacksForMicroservices(application.Id);
         var operations = new PulumiOperations(

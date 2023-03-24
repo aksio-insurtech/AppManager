@@ -13,21 +13,25 @@ namespace Reactions.Applications.Pulumi.Resources.Cratis;
 
 public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
 {
-    readonly DockerHub _dockerHub;
-    readonly ILogger<FileStorage> _fileStorageLogger;
+    readonly IDockerHub _dockerHub;
+    readonly ILoggerFactory _loggerFactory;
 
     public ResourceLevel Level => ResourceLevel.Environment;
     public ResourceTypeId TypeId => "bf7864ab-b28f-4968-882a-3dc7477b9d0c";
     public IEnumerable<ResourceTypeId> Dependencies => Enumerable.Empty<ResourceTypeId>();
 
-    public CratisResourceRenderer(DockerHub dockerHub, ILogger<FileStorage> fileStorageLogger)
+    public CratisResourceRenderer(
+        IDockerHub dockerHub,
+        ILoggerFactory loggerFactory)
     {
         _dockerHub = dockerHub;
-        _fileStorageLogger = fileStorageLogger;
+        _loggerFactory = loggerFactory;
     }
 
     public async Task Render(RenderContextForResource context, CratisConfiguration configuration)
     {
+        var fileStorageLogger = _loggerFactory.CreateLogger<FileStorage>();
+
         var cratisVersion = configuration.Version;
         if (configuration.Version == SemanticVersion.NotSet)
         {
@@ -49,7 +53,7 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
         var applicationMonitoring = context.Results.GetById<ApplicationMonitoringResult>(WellKnownResourceTypes.ApplicationMonitoring);
         var mongoDB = context.Results.GetById<MongoDBResult>(MongoDBResourceRenderer.ResourceTypeId);
 
-        var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, "kernel", _fileStorageLogger);
+        var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, "kernel", fileStorageLogger);
 
         var kernelStorage = new MicroserviceStorage(context.Application, microservice, fileStorage);
 
