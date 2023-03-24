@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 using Concepts.Applications.Environments.Ingresses;
@@ -14,10 +13,9 @@ public record ApplicationEnvironmentWithArtifacts(
     ApplicationEnvironmentName Name,
     ApplicationEnvironmentDisplayName DisplayName,
     ApplicationEnvironmentShortName ShortName,
-    SemanticVersion CratisVersion,
     AzureSubscriptionId AzureSubscriptionId,
     CloudLocationKey CloudLocation,
-    ApplicationResources ApplicationResources,
+    MongoDBResource MongoDB,
     IEnumerable<Certificate> Certificates,
     IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,

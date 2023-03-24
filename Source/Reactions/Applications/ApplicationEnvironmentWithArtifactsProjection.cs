@@ -18,25 +18,14 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
             .Set(m => m.Name).To(e => e.Name)
             .Set(m => m.ShortName).To(e => e.ShortName)
             .Set(m => m.DisplayName).To(e => e.DisplayName)
-            .Set(m => m.CratisVersion).To(e => e.CratisVersion)
             .Set(m => m.AzureSubscriptionId).To(e => e.AzureSubscriptionId)
             .Set(m => m.CloudLocation).To(e => e.CloudLocation))
 
-        .From<AzureResourceGroupCreatedForApplicationEnvironment>(_ => _
-            .Set(m => m.ApplicationResources.AzureResourceGroupId).To(e => e.ResourceGroupId))
-        .From<AzureStorageAccountSetForApplicationEnvironment>(_ => _
-            .Set(m => m.ApplicationResources.AzureStorageAccountName).To(e => e.AccountName))
-        .From<AzureContainerRegistrySetForApplicationEnvironment>(_ => _
-            .Set(m => m.ApplicationResources.AzureContainerRegistryLoginServer).To(e => e.LoginServer)
-            .Set(m => m.ApplicationResources.AzureContainerRegistryUserName).To(e => e.UserName)
-            .Set(m => m.ApplicationResources.AzureContainerRegistryPassword).To(e => e.Password))
         .From<MongoDBConnectionStringChangedForApplicationEnvironment>(_ => _
-            .Set(m => m.ApplicationResources.MongoDB.ConnectionString).To(e => e.ConnectionString))
-        .From<AzureVirtualNetworkIdentifierSetForApplicationEnvironment>(_ => _
-            .Set(m => m.ApplicationResources.AzureVirtualNetworkIdentifier).To(e => e.Identifier))
+            .Set(m => m.MongoDB.ConnectionString).To(e => e.ConnectionString))
 
         // MongoDB Users
-        .Children(m => m.ApplicationResources.MongoDB.Users, cb => cb
+        .Children(m => m.MongoDB.Users, cb => cb
             .IdentifiedBy(m => m.UserName)
             .From<MongoDBUserChanged>(e => e
                 .UsingKey(e => e.UserName)

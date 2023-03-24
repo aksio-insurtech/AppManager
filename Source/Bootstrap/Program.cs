@@ -95,7 +95,7 @@ public static class Program
         executionContextManager.Set(executionContext);
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
-        var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
+        var definitions = new PulumiStackDefinitions(settings, executionContextManager, logger);
 
         var resourceRenderers = new ResourceRenderers(types, serviceProvider);
         var stacksForApplications = new BootstrapStacksForApplications();

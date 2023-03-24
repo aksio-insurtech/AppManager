@@ -207,10 +207,27 @@ public class PulumiOperations : IPulumiOperations
         };
 
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+        var results = new ResourceResultsByType();
+
+        Task RenderResources(ResourceLevel level, ResourceGroup resourceGroup) => _resourceRenderers.Render(
+                ResourceLevel.Environment,
+                new(
+                    application,
+                    environment,
+                    resourceGroup,
+                    application.GetTags(environment),
+                    results,
+                    environment.Tenants,
+                    environment.Microservices),
+                environment.Resources);
 
         await Up(
             application,
-            async () => await _stackDefinitions.Application(application, sharedEnvironment),
+            async () =>
+            {
+                var resourceGroup = await _stackDefinitions.Application(application, sharedEnvironment, results);
+                await RenderResources(ResourceLevel.Shared, resourceGroup);
+            },
             sharedEnvironment,
             upOptions: upOptions,
             refreshOptions: refreshOptions);
@@ -219,19 +236,15 @@ public class PulumiOperations : IPulumiOperations
             application,
             async () =>
             {
-                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, sharedEnvironment, environment.CratisVersion);
+                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, sharedEnvironment, results);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
                 storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
 
-                await _resourceRenderers.Render(
-                    new(
-                        application,
-                        environment,
-                        applicationEnvironmentResult.ResourceGroup,
-                        application.GetTags(environment),
-                        storage,
-                        applicationEnvironmentResult.Network.VirtualNetwork),
-                    environment.Resources);
+                results.Register(WellKnownResourceTypes.ManagedEnvironment, applicationEnvironmentResult.ManagedEnvironment);
+                results.Register(WellKnownResourceTypes.VirtualNetwork, applicationEnvironmentResult.Network.VirtualNetwork);
+                results.Register(WellKnownResourceTypes.Storage, storage);
+
+                await RenderResources(ResourceLevel.Environment, applicationEnvironmentResult.ResourceGroup);
 
                 foreach (var ingress in environment.Ingresses)
                 {
@@ -249,11 +262,6 @@ public class PulumiOperations : IPulumiOperations
             upOptions: upOptions,
             refreshOptions: refreshOptions);
 
-        if (environment.ApplicationResources?.AzureResourceGroupId is null)
-        {
-            return;
-        }
-
         var microserviceContainerApps = new Dictionary<MicroserviceId, ContainerApp>();
         foreach (var microservice in environment.Microservices)
         {
@@ -269,7 +277,8 @@ public class PulumiOperations : IPulumiOperations
                         resourceGroup,
                         managedEnvironment,
                         microservice,
-                        environment);
+                        environment,
+                        results);
                     microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
                 },
                 environment,
@@ -315,22 +324,15 @@ public class PulumiOperations : IPulumiOperations
                     DisplayName = PulumiStackDefinitions.SharedEnvironment.DisplayName,
                     ShortName = PulumiStackDefinitions.SharedEnvironment.ShortName,
                 };
+                var results = new ResourceResultsByType();
+
                 var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
+
                 var containerRegistryResult = await application.GetContainerRegistry(sharedEnvironment, _settings.ServicePrincipal, sharedSubscription);
+                results.Register(WellKnownResourceTypes.ContainerRegistry, containerRegistryResult);
+
                 var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
                 var managedEnvironment = await application.GetManagedEnvironment(environment, _settings.ServicePrincipal, subscription);
-
-                environment = environment with
-                {
-                    ApplicationResources = new(
-                        null!,
-                        null!,
-                        containerRegistryResult.LoginServer,
-                        containerRegistryResult.UserName,
-                        containerRegistryResult.Password,
-                        null!,
-                        null!),
-                };
 
                 var microserviceResult = await HandleMicroservice(
                     executionContext,
@@ -338,7 +340,8 @@ public class PulumiOperations : IPulumiOperations
                     resourceGroup,
                     managedEnvironment,
                     microservice,
-                    environment);
+                    environment,
+                    results);
             },
             environment,
             microservice,
@@ -369,6 +372,9 @@ public class PulumiOperations : IPulumiOperations
             EnvironmentVariables = new Dictionary<string, string?>
             {
                 { "TF_LOG", "TRACE" },
+                { "ARM_CLIENT_ID", _settings.ServicePrincipal.ClientId },
+                { "ARM_CLIENT_SECRET", _settings.ServicePrincipal.ClientSecret },
+                { "ARM_TENANT_ID", _settings.AzureSubscriptions.First().TenantId },
                 { "PULUMI_ACCESS_TOKEN", accessToken.ToString() },
                 { "MONGODB_ATLAS_PUBLIC_KEY", mongoDBPublicKey },
                 { "MONGODB_ATLAS_PRIVATE_KEY", mongoDBPrivateKey }
@@ -483,7 +489,8 @@ public class PulumiOperations : IPulumiOperations
         ResourceGroup resourceGroup,
         ManagedEnvironment managedEnvironment,
         Microservice microservice,
-        ApplicationEnvironmentWithArtifacts environment)
+        ApplicationEnvironmentWithArtifacts environment,
+        ResourceResultsByType results)
     {
         return await _stackDefinitions.Microservice(
             executionContext,
@@ -492,7 +499,7 @@ public class PulumiOperations : IPulumiOperations
             resourceGroup,
             environment,
             managedEnvironment,
-            true,
+            results,
             deployables: microservice.Deployables);
     }
 

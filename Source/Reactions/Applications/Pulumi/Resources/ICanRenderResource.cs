@@ -7,7 +7,9 @@ namespace Reactions.Applications.Pulumi.Resources;
 
 public interface ICanRenderResource
 {
+    ResourceLevel Level { get; }
     ResourceTypeId TypeId { get; }
+    IEnumerable<ResourceTypeId> Dependencies { get; }
 }
 
 public interface ICanRenderResource<TConfiguration> : ICanRenderResource

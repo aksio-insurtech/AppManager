@@ -92,10 +92,10 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var databasePassword = Guid.NewGuid().ToString();
-        if (environment.ApplicationResources?.MongoDB?.Users is not null &&
-            (environment.ApplicationResources?.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
+        if (environment.MongoDB?.Users is not null &&
+            (environment.MongoDB?.Users.Any(_ => _.UserName == "kernel") ?? false))
         {
-            databasePassword = environment.ApplicationResources?.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
+            databasePassword = environment.MongoDB?.Users.First(_ => _.UserName == "kernel").Password ?? databasePassword;
         }
 
         _ = new DatabaseUser("kernel", new()

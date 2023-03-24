@@ -24,13 +24,15 @@ public class ResourceRenderers : IResourceRenderers
         _renderers = renderers.ToDictionary(_ => _.TypeId, _ => _);
     }
 
-    public async Task Render(RenderContext context, IEnumerable<Resource> resources)
+    public async Task Render(ResourceLevel level, RenderContext context, IEnumerable<Resource> resources)
     {
         foreach (var resource in resources)
         {
             if (_renderers.ContainsKey(resource.Type))
             {
                 var renderer = _renderers[resource.Type];
+                if (renderer.Level != level) continue;
+
                 var renderMethod = _rendererMethods[resource.Type];
 
                 var resourceContext = new RenderContextForResource(
@@ -40,8 +42,9 @@ public class ResourceRenderers : IResourceRenderers
                     context.Environment,
                     context.ResourceGroup,
                     context.Tags,
-                    context.Storage,
-                    context.VirtualNetwork);
+                    context.Results,
+                    context.Tenants,
+                    context.Microservices);
                 await (renderMethod.Invoke(renderer, new object[] { resourceContext, resource.Configuration }) as Task)!;
             }
         }

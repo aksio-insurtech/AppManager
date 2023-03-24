@@ -11,7 +11,6 @@ public static class ConfigVariablesExtensions
     public static async Task<ApplicationAndEnvironment> ApplyConfigAndVariables(this ApplicationAndEnvironment applicationAndEnvironment, ManagementConfig config)
     {
         var dockerHub = new DockerHub();
-        var cratisVersion = await dockerHub.GetLastVersionOfCratis();
 
         applicationAndEnvironment = await ApplyLatestMiddlewareVersion(applicationAndEnvironment, dockerHub);
         applicationAndEnvironment = ApplyIdentityProviderValues(applicationAndEnvironment, config);
@@ -22,16 +21,8 @@ public static class ConfigVariablesExtensions
         {
             Environment = applicationAndEnvironment.Environment with
             {
-                CratisVersion = cratisVersion,
                 AzureSubscriptionId = config.Azure.EnvironmentSubscriptionId,
-                ApplicationResources = new(
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })),
+                MongoDB = new(null!, new[] { new MongoDBUser("kernel", config.MongoDB.KernelUserPassword) })
             }
         };
     }
