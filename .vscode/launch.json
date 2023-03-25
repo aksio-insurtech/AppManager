@@ -135,8 +135,8 @@
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
             "args": [
-                "/Users/einari/Projects/Aksio/Cloud/AppManager/Production/AppManager-variables.json",
-                "/Users/einari/Projects/Aksio/Cloud/AppManager/Production/AppManager.json"
+                "/Users/einari/Projects/Aksio/Cloud/AppManager/Development/AppManager-variables.json",
+                "/Users/einari/Projects/Aksio/Cloud/AppManager/Development/AppManager.json"
             ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
