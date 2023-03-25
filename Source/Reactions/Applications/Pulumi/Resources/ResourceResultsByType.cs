@@ -24,7 +24,7 @@ public class ResourceResultsByType : Dictionary<ResourceTypeId, object>
     {
         if (!ContainsKey(type))
         {
-            throw new MissingResourceResultForResourceType($"No resource of type '{type}' was registered");
+            throw new MissingResourceResultForResourceType(type);
         }
     }
 }
