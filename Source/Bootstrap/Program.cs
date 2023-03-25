@@ -59,6 +59,11 @@ public static class Program
             "Semver",
             "SharpCompress");
 
+        var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
+        var types = new Types();
+        var derivedTypes = new DerivedTypes(types);
+        Globals.Configure(derivedTypes);
+
         var serializerOptions = Globals.JsonSerializerOptions;
         serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
 
@@ -72,11 +77,6 @@ public static class Program
             config.MongoDB.PublicKey,
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
-
-        var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
-        var types = new Types();
-        var derivedTypes = new DerivedTypes(types);
-        Globals.Configure(derivedTypes);
 
         var containerBuilder = new ContainerBuilder();
         containerBuilder.RegisterInstance(loggerFactory).As<ILoggerFactory>();
