@@ -220,6 +220,7 @@ public class PulumiOperations : IPulumiOperations
         Task RenderResources(ResourceLevel level, ResourceGroup resourceGroup) => _resourceRenderers.Render(
                 ResourceLevel.Environment,
                 new(
+                    executionContext,
                     _settings,
                     application,
                     environment,

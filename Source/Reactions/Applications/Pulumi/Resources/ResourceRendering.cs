@@ -51,6 +51,7 @@ public class ResourceRendering : IResourceRendering
             var renderMethod = _rendererMethods[resource.Type];
 
             var resourceContext = new RenderContextForResource(
+                context.ExecutionContext,
                 context.Settings,
                 resource.Id,
                 resource.Name,

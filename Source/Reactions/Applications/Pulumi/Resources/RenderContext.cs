@@ -7,6 +7,7 @@ using Pulumi.AzureNative.Resources;
 namespace Reactions.Applications.Pulumi.Resources;
 
 public record RenderContext(
+    ExecutionContext ExecutionContext,
     ISettings Settings,
     Application Application,
     ApplicationEnvironmentWithArtifacts Environment,
