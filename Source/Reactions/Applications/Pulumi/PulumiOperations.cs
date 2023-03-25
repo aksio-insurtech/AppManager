@@ -98,14 +98,15 @@ public class PulumiOperations : IPulumiOperations
                 OnStandardError = Console.Error.WriteLine
             };
 
-            // await stack.Stack.PreviewAsync(new PreviewOptions
-            // {
-            //     OnStandardOutput = upOptions.OnStandardOutput,
-            //     OnStandardError = upOptions.OnStandardError,
-            //     Diff = true
-            // });
-            await stack.Stack.UpAsync(upOptions);
+            await stack.Stack.PreviewAsync(new PreviewOptions
+            {
+                OnStandardOutput = upOptions.OnStandardOutput,
+                OnStandardError = upOptions.OnStandardError,
+                Diff = true,
+                Json = true
+            });
 
+            // await stack.Stack.UpAsync(upOptions);
             await (microservice is not null ?
                 SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
                 SaveStackForApplication(application, environment, stack.Stack));
@@ -218,7 +219,7 @@ public class PulumiOperations : IPulumiOperations
         var results = new ResourceResultsByType();
 
         Task RenderResources(ResourceLevel level, ResourceGroup resourceGroup) => _resourceRenderers.Render(
-                ResourceLevel.Environment,
+                level,
                 new(
                     executionContext,
                     _settings,
