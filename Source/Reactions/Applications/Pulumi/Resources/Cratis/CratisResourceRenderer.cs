@@ -18,7 +18,7 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
 
     public ResourceLevel Level => ResourceLevel.Environment;
     public ResourceTypeId TypeId => "bf7864ab-b28f-4968-882a-3dc7477b9d0c";
-    public IEnumerable<ResourceTypeId> Dependencies => Enumerable.Empty<ResourceTypeId>();
+    public IEnumerable<ResourceTypeId> Dependencies => new ResourceTypeId[] { MongoDBResourceRenderer.ResourceTypeId };
 
     public CratisResourceRenderer(
         IDockerHub dockerHub,
