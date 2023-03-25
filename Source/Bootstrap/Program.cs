@@ -78,7 +78,14 @@ public static class Program
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
 
+        var executionContextManager = new ExecutionContextManager();
+        var eventLog = new InMemoryEventLog();
+        var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
+        executionContextManager.Set(executionContext);
+
         var containerBuilder = new ContainerBuilder();
+        containerBuilder.RegisterInstance(executionContextManager).As<IExecutionContextManager>();
+        containerBuilder.RegisterInstance(eventLog).As<IEventLog>();
         containerBuilder.RegisterInstance(loggerFactory).As<ILoggerFactory>();
         containerBuilder.RegisterDefaults(types);
         var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
@@ -87,11 +94,6 @@ public static class Program
         var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
         applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(config);
         var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name, new(config.Azure.SharedSubscriptionId));
-
-        var executionContextManager = new ExecutionContextManager();
-        var eventLog = new InMemoryEventLog();
-        var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
-        executionContextManager.Set(executionContext);
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
         var definitions = new PulumiStackDefinitions(settings, executionContextManager, logger);
