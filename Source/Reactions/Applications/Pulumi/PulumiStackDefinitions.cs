@@ -66,11 +66,17 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
         var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
         var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);
+        resourceResults.Register(WellKnownResourceTypes.VirtualNetwork, network.VirtualNetwork);
+
         var storage = await application.SetupStorage(environment, resourceGroup, tags);
+        resourceResults.Register(WellKnownResourceTypes.Storage, storage);
 
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);
         var applicationMonitoring = application.SetupApplicationMonitoring(resourceGroup, environment, tags);
+        resourceResults.Register(WellKnownResourceTypes.ApplicationMonitoring, applicationMonitoring);
+
         var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, network, tags);
+        resourceResults.Register(WellKnownResourceTypes.ManagedEnvironment, managedEnvironment);
 
         var certificates = application.SetupCertificates(environment, managedEnvironment, resourceGroup, tags);
 

@@ -98,15 +98,15 @@ public class PulumiOperations : IPulumiOperations
                 OnStandardError = Console.Error.WriteLine
             };
 
-            await stack.Stack.PreviewAsync(new PreviewOptions
-            {
-                OnStandardOutput = upOptions.OnStandardOutput,
-                OnStandardError = upOptions.OnStandardError,
-                Diff = true,
-                Json = true
-            });
+            // await stack.Stack.PreviewAsync(new PreviewOptions
+            // {
+            //     OnStandardOutput = upOptions.OnStandardOutput,
+            //     OnStandardError = upOptions.OnStandardError,
+            //     Diff = true,
+            //     Json = true
+            // });
+            await stack.Stack.UpAsync(upOptions);
 
-            // await stack.Stack.UpAsync(upOptions);
             await (microservice is not null ?
                 SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
                 SaveStackForApplication(application, environment, stack.Stack));
@@ -250,11 +250,6 @@ public class PulumiOperations : IPulumiOperations
                 applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, sharedEnvironment, results);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
                 storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
-
-                results.Register(WellKnownResourceTypes.ManagedEnvironment, applicationEnvironmentResult.ManagedEnvironment);
-                results.Register(WellKnownResourceTypes.VirtualNetwork, applicationEnvironmentResult.Network.VirtualNetwork);
-                results.Register(WellKnownResourceTypes.Storage, storage);
-
                 await RenderResources(ResourceLevel.Environment, applicationEnvironmentResult.ResourceGroup);
 
                 foreach (var ingress in environment.Ingresses)
