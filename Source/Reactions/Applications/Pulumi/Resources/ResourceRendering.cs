@@ -39,6 +39,11 @@ public class ResourceRendering : IResourceRendering
             var renderer = _renderers[resource.Type];
             if (renderer.Level != level) return;
 
+            if (scope.HasRendered(resource.Type))
+            {
+                return;
+            }
+
             foreach (var dependency in renderer.Dependencies)
             {
                 if (!scope.HasRendered(dependency))
