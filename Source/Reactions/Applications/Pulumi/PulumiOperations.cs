@@ -374,8 +374,9 @@ public class PulumiOperations : IPulumiOperations
         PulumiStack? pulumiStack = null;
 
         var pulumiProgram = PulumiFn.Create(async () => await program());
+        var fullyQualifiedProjectName = $"{_settings.PulumiOrganization}/{projectName}";
 
-        var args = new InlineProgramArgs(projectName, stackName, pulumiProgram)
+        var args = new InlineProgramArgs(fullyQualifiedProjectName, stackName, pulumiProgram)
         {
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
             EnvironmentVariables = new Dictionary<string, string?>
