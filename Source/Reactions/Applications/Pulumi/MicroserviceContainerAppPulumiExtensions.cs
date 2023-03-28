@@ -49,7 +49,7 @@ public static class MicroserviceContainerAppPulumiExtensions
             {
                 AzureFile = new AzureFilePropertiesArgs
                 {
-                    AccessMode = "ReadOnly",
+                    AccessMode = AccessMode.ReadWrite,
                     AccountKey = storage.FileStorage.AccessKey,
                     AccountName = storage.FileStorage.AccountName,
                     ShareName = storage.FileStorage.ShareName
