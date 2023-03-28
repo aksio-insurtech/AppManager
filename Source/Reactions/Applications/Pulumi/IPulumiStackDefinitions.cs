@@ -1,24 +1,27 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Concepts;
 using Concepts.Applications.Environments;
 using Pulumi;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
+using Reactions.Applications.Pulumi.Resources;
 
 namespace Reactions.Applications.Pulumi;
 
 public interface IPulumiStackDefinitions
 {
-    Task Application(Application application, ApplicationEnvironmentWithArtifacts sharedEnvironment);
+    Task<ResourceGroup> Application(
+        Application application,
+        ApplicationEnvironmentWithArtifacts sharedEnvironment,
+        ResourceResultsByType resourceResults);
 
     Task<ApplicationEnvironmentResult> ApplicationEnvironment(
         ExecutionContext executionContext,
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
         ApplicationEnvironmentWithArtifacts sharedEnvironment,
-        SemanticVersion cratisVersion);
+        ResourceResultsByType resourceResults);
 
     Task<IngressResult> Ingress(
         ExecutionContext executionContext,
@@ -36,6 +39,6 @@ public interface IPulumiStackDefinitions
         ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,
-        bool useContainerRegistry = true,
+        ResourceResultsByType resourceResults,
         IEnumerable<Deployable>? deployables = default);
 }

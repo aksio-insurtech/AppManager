@@ -7,6 +7,8 @@ namespace Concepts;
 
 public record SemanticVersion(int Major, int Minor, int Patch, string PreRelease = "", string Metadata = "")
 {
+    public static SemanticVersion NotSet => new(0, 0, 0);
+
     public override string ToString()
     {
         var stringBuilder = new StringBuilder();

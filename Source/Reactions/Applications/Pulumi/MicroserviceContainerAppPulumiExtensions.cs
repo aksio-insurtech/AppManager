@@ -29,13 +29,10 @@ public static class MicroserviceContainerAppPulumiExtensions
         Application application,
         ResourceGroup resourceGroup,
         ManagedEnvironment managedEnvironment,
-        string containerRegistryLoginServer,
-        string containerRegistryUsername,
-        string containerRegistryPassword,
+        ContainerRegistryResult? containerRegistry,
         MicroserviceStorage storage,
         IEnumerable<Deployable> deployables,
-        Tags tags,
-        bool useContainerRegistry = true)
+        Tags tags)
     {
         var microserviceTags = tags.Clone();
         microserviceTags["MicroserviceId"] = microservice.Id.ToString();
@@ -52,7 +49,7 @@ public static class MicroserviceContainerAppPulumiExtensions
             {
                 AzureFile = new AzureFilePropertiesArgs
                 {
-                    AccessMode = "ReadOnly",
+                    AccessMode = AccessMode.ReadWrite,
                     AccountKey = storage.FileStorage.AccessKey,
                     AccountName = storage.FileStorage.AccountName,
                     ShareName = storage.FileStorage.ShareName
@@ -75,24 +72,24 @@ public static class MicroserviceContainerAppPulumiExtensions
                     Transport = IngressTransportMethod.Http,
                     AllowInsecure = true
                 },
-                Secrets = !useContainerRegistry ? new InputList<SecretArgs>()
+                Secrets = containerRegistry is null ? new InputList<SecretArgs>()
                     : new InputList<SecretArgs>()
                     {
                         new SecretArgs()
                         {
                             Name = "container-registry",
-                            Value = containerRegistryPassword
+                            Value = containerRegistry.Password
                         }
                     },
-                Registries = !useContainerRegistry ?
+                Registries = containerRegistry is null ?
                     new InputList<RegistryCredentialsArgs>()
                     :
                     new InputList<RegistryCredentialsArgs>()
                     {
                         new RegistryCredentialsArgs()
                         {
-                            Server = containerRegistryLoginServer,
-                            Username = containerRegistryUsername,
+                            Server = containerRegistry.LoginServer,
+                            Username = containerRegistry.UserName,
                             PasswordSecretRef = "container-registry"
                         }
                     }
@@ -111,13 +108,13 @@ public static class MicroserviceContainerAppPulumiExtensions
                 Containers = deployables.Select(deployable => new ContainerArgs
                 {
                     Name = deployable.Name.Value.ToLowerInvariant(),
-                    Image = GetDeployableImageName(deployable, containerRegistryLoginServer),
+                    Image = GetDeployableImageName(deployable, containerRegistry),
 
                     VolumeMounts = new VolumeMountArgs[]
                     {
                         new()
                         {
-                            MountPath = deployable.ConfigPath?.Value ?? ConfigPath.Default.Value,
+                            MountPath = deployable.MountPath?.Value ?? MountPath.Default.Value,
                             VolumeName = storageName
                         }
                     },
@@ -141,11 +138,11 @@ public static class MicroserviceContainerAppPulumiExtensions
         return new ContainerAppResult(containerApp, configuration!.Ingress!.Fqdn);
     }
 
-    static string GetDeployableImageName(Deployable deployable, string containerRegistryLoginServer)
+    static string GetDeployableImageName(Deployable deployable, ContainerRegistryResult? containerRegistry)
     {
-        if (!deployable.Image.Contains('/'))
+        if (!deployable.Image.Contains('/') && containerRegistry is not null)
         {
-            return $"{containerRegistryLoginServer}/{deployable.Image}";
+            return $"{containerRegistry.LoginServer}/{deployable.Image}";
         }
         return deployable.Image;
     }

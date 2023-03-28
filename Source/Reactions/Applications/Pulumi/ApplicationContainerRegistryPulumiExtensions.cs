@@ -35,7 +35,7 @@ public static class ApplicationContainerRegistryPulumiExtensions
         });
     }
 
-    public static async Task<ContainerRegistryResult> GetContainerRegistry(
+    public static async Task<ContainerRegistryResult?> GetContainerRegistry(
         this Application application,
         ApplicationEnvironmentWithArtifacts environment,
         AzureServicePrincipal servicePrincipal,
@@ -55,6 +55,12 @@ public static class ApplicationContainerRegistryPulumiExtensions
             .WithSubscription(subscription.SubscriptionId);
         var registryName = application.Name.Value.ToLowerInvariant();
         var containerRegistries = await azure.ContainerRegistries.ListByResourceGroupAsync(resourceGroupName);
+
+        if (!containerRegistries.Any())
+        {
+            return null;
+        }
+
         var containerRegistry = containerRegistries.First(_ => _.Name.StartsWith(registryName));
         var registryCredentials = await containerRegistry.GetCredentialsAsync();
 

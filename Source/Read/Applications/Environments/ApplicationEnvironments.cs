@@ -9,7 +9,6 @@ namespace Read.Applications.Environments;
 public class ApplicationEnvironments : Controller
 {
     readonly IMongoCollection<ApplicationEnvironment> _applicationEnvironmentCollection;
-    readonly IMongoCollection<ApplicationEnvironmentResources> _applicationEnvironmentResourcesCollection;
     readonly IMongoCollection<ConfigFilesForApplicationEnvironment> _configFilesForApplicationEnvironmentCollection;
     readonly IMongoCollection<EnvironmentVariablesForApplicationEnvironment> _environmentVariablesForApplicationEnvironmentCollection;
     readonly IMongoCollection<CertificatesForApplicationEnvironment> _certificatesForApplicationEnvironmentCollection;
@@ -17,14 +16,12 @@ public class ApplicationEnvironments : Controller
 
     public ApplicationEnvironments(
         IMongoCollection<ApplicationEnvironment> collection,
-        IMongoCollection<ApplicationEnvironmentResources> applicationEnvironmentResourcesCollection,
         IMongoCollection<ConfigFilesForApplicationEnvironment> configFilesForApplicationEnvironmentCollection,
         IMongoCollection<EnvironmentVariablesForApplicationEnvironment> environmentVariablesForApplicationEnvironmentCollection,
         IMongoCollection<CertificatesForApplicationEnvironment> certificatesForApplicationEnvironmentCollection,
         IMongoCollection<SecretsForApplicationEnvironment> secretsForApplicationEnvironmentCollection)
     {
         _applicationEnvironmentCollection = collection;
-        _applicationEnvironmentResourcesCollection = applicationEnvironmentResourcesCollection;
         _configFilesForApplicationEnvironmentCollection = configFilesForApplicationEnvironmentCollection;
         _environmentVariablesForApplicationEnvironmentCollection = environmentVariablesForApplicationEnvironmentCollection;
         _certificatesForApplicationEnvironmentCollection = certificatesForApplicationEnvironmentCollection;
@@ -39,9 +36,6 @@ public class ApplicationEnvironments : Controller
         var result = await _applicationEnvironmentCollection.FindAsync(_ => _.Id.ApplicationId == applicationId && _.Id.EnvironmentId == environmentId);
         return result.FirstOrDefault();
     }
-
-    [HttpGet("{environmentId}/resources")]
-    public Task<ApplicationEnvironmentResources> ResourcesForApplication([FromRoute] ApplicationId applicationId) => _applicationEnvironmentResourcesCollection.FindById(applicationId).FirstOrDefaultAsync();
 
     [HttpGet("environments-for-application")]
     public Task<ClientObservable<IEnumerable<ApplicationEnvironment>>> EnvironmentsForApplication([FromRoute] ApplicationId applicationId) =>

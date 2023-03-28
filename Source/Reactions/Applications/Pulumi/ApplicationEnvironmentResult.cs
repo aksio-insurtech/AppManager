@@ -13,42 +13,23 @@ public record ApplicationEnvironmentResult(
     ResourceGroup ResourceGroup,
     NetworkResult Network,
     StorageResult Storage,
-    ContainerRegistryResult ContainerRegistry,
-    MongoDBResult MongoDB,
     ManagedEnvironment ManagedEnvironment,
-    IDictionary<CertificateId, Output<string>> Certificates,
-    ContainerAppResult Kernel)
+    IDictionary<CertificateId, Output<string>> Certificates)
 {
-    public async Task<ApplicationEnvironmentWithArtifacts> MergeWithApplicationEnvironment(ApplicationEnvironmentWithArtifacts environment)
+    public Task<ApplicationEnvironmentWithArtifacts> MergeWithApplicationEnvironment(ApplicationEnvironmentWithArtifacts environment)
     {
-        var subnets = await Network.VirtualNetwork.Subnets.GetValue();
-        return new(
+        return Task.FromResult<ApplicationEnvironmentWithArtifacts>(new(
             environment.Id,
             environment.Name,
             environment.DisplayName,
             environment.ShortName,
-            environment.CratisVersion,
             environment.AzureSubscriptionId,
             environment.CloudLocation,
-            new(
-                subnets[0].Id!,
-                Storage.AccountName,
-                ContainerRegistry.LoginServer,
-                ContainerRegistry.UserName,
-                ContainerRegistry.Password,
-                await ResourceGroup.Id.GetValue(),
-                new(
-                    MongoDB.ConnectionString,
-                    new MongoDBUser[]
-                    {
-                        new("kernel", MongoDB.Password)
-                    }
-                )
-            ),
+            environment.MongoDB,
             environment.Certificates,
             environment.Tenants,
             environment.Ingresses,
             environment.Microservices,
-            environment.Resources);
+            environment.Resources));
     }
 }

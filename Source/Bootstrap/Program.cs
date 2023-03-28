@@ -59,22 +59,16 @@ public static class Program
             "Semver",
             "SharpCompress");
 
+        var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
         var types = new Types();
         var derivedTypes = new DerivedTypes(types);
         Globals.Configure(derivedTypes);
-        var containerBuilder = new ContainerBuilder();
-        containerBuilder.RegisterDefaults(types);
-        var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
 
-        var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
         var serializerOptions = Globals.JsonSerializerOptions;
         serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
 
-        // Setup application within cloud environment
-        // Wait till its ready and then append the events that represents the actions done (through commands?)
         var configAsJson = await File.ReadAllTextAsync(args[0]);
         var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, serializerOptions)!;
-
         var settings = new Settings(
             config.Azure.Subscriptions,
             config.Pulumi.Organization,
@@ -84,20 +78,27 @@ public static class Program
             config.MongoDB.PrivateKey,
             config.Azure.ServicePrincipal);
 
-        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
-        var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
-        applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(config);
-        var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name, new(config.Azure.SharedSubscriptionId));
-
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
         var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
         executionContextManager.Set(executionContext);
 
-        var logger = loggerFactory.CreateLogger<FileStorage>();
-        var definitions = new PulumiStackDefinitions(settings, executionContextManager, eventLog, logger);
+        var containerBuilder = new ContainerBuilder();
+        containerBuilder.RegisterInstance(executionContextManager).As<IExecutionContextManager>();
+        containerBuilder.RegisterInstance(eventLog).As<IEventLog>();
+        containerBuilder.RegisterInstance(loggerFactory).As<ILoggerFactory>();
+        containerBuilder.RegisterDefaults(types);
+        var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
 
-        var resourceRenderers = new ResourceRenderers(types, serviceProvider);
+        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
+        var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
+        applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(config);
+        var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name, new(config.Azure.SharedSubscriptionId));
+
+        var logger = loggerFactory.CreateLogger<FileStorage>();
+        var definitions = new PulumiStackDefinitions(settings, executionContextManager, logger);
+
+        var resourceRenderers = new ResourceRendering(types, serviceProvider);
         var stacksForApplications = new BootstrapStacksForApplications();
         var stacksForMicroservices = new BootstrapStacksForMicroservices(application.Id);
         var operations = new PulumiOperations(

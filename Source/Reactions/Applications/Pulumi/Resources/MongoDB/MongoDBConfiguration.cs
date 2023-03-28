@@ -3,7 +3,7 @@
 
 using Aksio.Cratis.Serialization;
 
-namespace Reactions.Applications.Pulumi.Resources;
+namespace Reactions.Applications.Pulumi.Resources.MongoDB;
 
-[DerivedType("ad902744-ac13-4149-a0a8-cb728cf1d681")]
-public record ServiceBusConfiguration() : IResourceConfiguration;
+[DerivedType("263c9094-2956-4dee-9289-e8b32a9eb048")]
+public record MongoDBConfiguration() : IResourceConfiguration;

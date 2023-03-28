@@ -16,8 +16,7 @@
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
-            "sourceFileMap": {
-            }
+            "sourceFileMap": {}
         },
         {
             "name": ".NET Core Launch (Main - not just my code)",
@@ -49,13 +48,13 @@
             "request": "launch",
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
-            "args": ["/Users/einari/Projects/Aksio/aksio-management.json"],
+            "args": [
+                "/Users/einari/Projects/Aksio/aksio-management.json"
+            ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
-            "env": {
-            },
-            "sourceFileMap": {
-            }
+            "env": {},
+            "sourceFileMap": {}
         },
         {
             "name": ".NET Core Launch (Bootstrap - OPensjon)",
@@ -63,13 +62,14 @@
             "request": "launch",
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
-            "args": ["/Users/einari/Projects/Aksio/opensjon-variables.json", "/Users/einari/Projects/Aksio/opensjon.json"],
+            "args": [
+                "/Users/einari/Projects/Aksio/opensjon-variables.json",
+                "/Users/einari/Projects/Aksio/opensjon.json"
+            ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
-            "env": {
-            },
-            "sourceFileMap": {
-            }
+            "env": {},
+            "sourceFileMap": {}
         },
         {
             "name": ".NET Core Launch (Bootstrap - OPensjon - Production)",
@@ -77,13 +77,14 @@
             "request": "launch",
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
-            "args": ["/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon-variables.json", "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon.json"],
+            "args": [
+                "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon-variables.json",
+                "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon.json"
+            ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
-            "env": {
-            },
-            "sourceFileMap": {
-            }
+            "env": {},
+            "sourceFileMap": {}
         },
         {
             "name": ".NET Core Launch (Bootstrap - OPensjon) - not just my code",
@@ -91,7 +92,10 @@
             "request": "launch",
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
-            "args": ["/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon-variables.json", "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon.json"],
+            "args": [
+                "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon-variables.json",
+                "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon.json"
+            ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
             "justMyCode": false,
@@ -115,13 +119,14 @@
             "request": "launch",
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
-            "args": ["/Users/einari/Projects/Aksio/Cloud/Innmeldt/QA/innmeldt-variables.json", "/Users/einari/Projects/Aksio/Cloud/Innmeldt/QA/innmeldt.json"],
+            "args": [
+                "/Users/einari/Projects/Aksio/Cloud/Innmeldt/QA/innmeldt-variables.json",
+                "/Users/einari/Projects/Aksio/Cloud/Innmeldt/QA/innmeldt.json"
+            ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
-            "env": {
-            },
-            "sourceFileMap": {
-            }
+            "env": {},
+            "sourceFileMap": {}
         },
         {
             "name": ".NET Core Launch (Bootstrap - AppManager - Dev)",
@@ -129,13 +134,29 @@
             "request": "launch",
             "preLaunchTask": "build bootstrap",
             "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
-            "args": ["/Users/einari/Projects/Aksio/Cloud/AppManager/Production/AppManager-variables.json", "/Users/einari/Projects/Aksio/Cloud/AppManager/Production/AppManager.json"],
+            "args": [
+                "/Users/einari/Projects/Aksio/Cloud/AppManager/Development/AppManager-variables.json",
+                "/Users/einari/Projects/Aksio/Cloud/AppManager/Development/AppManager.json"
+            ],
             "cwd": "${workspaceFolder}/Source/Bootstrap",
             "stopAtEntry": false,
-            "env": {
-            },
-            "sourceFileMap": {
-            }
+            "env": {},
+            "sourceFileMap": {}
+        },
+        {
+            "name": ".NET Core Launch (Bootstrap - AppSmith - Prod)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build bootstrap",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "args": [
+                "/Users/einari/Projects/Aksio/Cloud/AppSmith/Production/appsmith-variables.json",
+                "/Users/einari/Projects/Aksio/Cloud/AppSmith/Production/appsmith.json"
+            ],
+            "cwd": "${workspaceFolder}/Source/Bootstrap",
+            "stopAtEntry": false,
+            "env": {},
+            "sourceFileMap": {}
         },
         {
             "name": ".NET Core Attach",

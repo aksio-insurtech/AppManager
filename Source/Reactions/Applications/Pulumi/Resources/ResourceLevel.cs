@@ -3,7 +3,10 @@
 
 namespace Reactions.Applications.Pulumi.Resources;
 
-public interface IResourceRenderers
+public enum ResourceLevel
 {
-    Task Render(RenderContext context, IEnumerable<Resource> resources);
+    Unknown = 0,
+    Shared = 1,
+    Application = 2,
+    Environment = 3
 }

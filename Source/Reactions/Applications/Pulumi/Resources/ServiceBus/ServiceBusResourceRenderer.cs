@@ -6,11 +6,14 @@ using Pulumi;
 using Pulumi.AzureNative.ServiceBus;
 using Pulumi.AzureNative.ServiceBus.Inputs;
 
-namespace Reactions.Applications.Pulumi.Resources;
+namespace Reactions.Applications.Pulumi.Resources.ServiceBus;
 
 public class ServiceBusResourceRenderer : ICanRenderResource<ServiceBusConfiguration>
 {
     public ResourceTypeId TypeId => "ad902744-ac13-4149-a0a8-cb728cf1d681";
+
+    public ResourceLevel Level => ResourceLevel.Environment;
+    public IEnumerable<ResourceTypeId> Dependencies => Enumerable.Empty<ResourceTypeId>();
 
     public async Task Render(RenderContextForResource context, ServiceBusConfiguration configuration)
     {
