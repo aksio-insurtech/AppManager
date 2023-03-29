@@ -102,11 +102,10 @@ public class PulumiOperations : IPulumiOperations
             // {
             //     OnStandardOutput = upOptions.OnStandardOutput,
             //     OnStandardError = upOptions.OnStandardError,
+            //     Json = true,
             //     Diff = true,
-            //     Json = true
             // });
             await stack.Stack.UpAsync(upOptions);
-
             await (microservice is not null ?
                 SaveStackForMicroservice(application, microservice, environment, stack.Stack) :
                 SaveStackForApplication(application, environment, stack.Stack));

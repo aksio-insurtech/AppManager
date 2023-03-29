@@ -141,52 +141,7 @@ public class MicroserviceStorage
     public void CreateAndUploadAppSettings()
     {
         var appSettingsJson = _microservice.AppSettingsContent?.Value ?? "{}";
-        var json = JsonNode.Parse(appSettingsJson)!.AsObject();
-        json["Kestrel"] = new JsonObject()
-        {
-            ["Endpoints"] = new JsonObject()
-            {
-                ["Http"] = new JsonObject()
-                {
-                    ["Url"] = "http://+:80"
-                }
-            }
-        };
-
-        json["Serilog"] = new JsonObject()
-        {
-            ["MinimumLevel"] = new JsonObject()
-            {
-                ["Default"] = "Information",
-                ["Override"] = new JsonObject()
-                {
-                    ["Aksio"] = "Information",
-                    ["Microsoft"] = "Warning",
-                    ["Microsoft.AspNetCore.HttpLogging"] = "Warning",
-                    ["System"] = "Warning"
-                }
-            },
-            ["WriteTo"] = new JsonArray()
-            {
-                new JsonObject()
-                {
-                    ["Name"] = "Console",
-                    ["Args"] = new JsonObject()
-                    {
-                        ["formatter"] = "Serilog.Formatting.Json.JsonFormatter, Serilog"
-                    }
-                }
-            }
-        };
-        json["AllowedHosts"] = "*";
-
-        var options = new JsonSerializerOptions
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            WriteIndented = true
-        };
-        var content = json.ToJsonString(options);
-        FileStorage.Upload("appsettings.json", content);
+        FileStorage.Upload("appsettings.json", AppSettingsUtils.OverrideLogging(appSettingsJson));
     }
 
     public void CreateAndUploadClientCratisConfig(string connectionString, string advertisedClientEndpoint)

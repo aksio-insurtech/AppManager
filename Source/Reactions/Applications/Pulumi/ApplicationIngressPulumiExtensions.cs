@@ -24,6 +24,7 @@ public static class ApplicationIngressPulumiExtensions
 {
     const string AuthConfigFile = "nginx.conf";
     const string MiddlewareConfigFile = "config.json";
+    const string AppSettingsFile = "appsettings.json";
     const string OpenIDConfigurationBlobName = "openid-configuration";
 
     public static async Task ConfigureIngress(
@@ -100,6 +101,9 @@ public static class ApplicationIngressPulumiExtensions
             tenantConfigs);
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
+
+        var appSettings = AppSettingsUtils.OverrideLogging("{}");
+        nginxFileStorage.Upload(AppSettingsFile, appSettings);
     }
 
     public static async Task<IngressResult> SetupIngress(
