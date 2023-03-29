@@ -9,7 +9,6 @@ namespace Reactions.Applications;
 
 public static class AppSettingsUtils
 {
-
     public static string OverrideLogging(string existing)
     {
         var json = JsonNode.Parse(existing)!.AsObject();
