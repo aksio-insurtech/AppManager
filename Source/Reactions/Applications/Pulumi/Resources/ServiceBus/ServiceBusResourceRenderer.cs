@@ -50,6 +50,5 @@ public class ServiceBusResourceRenderer : ICanRenderResource<ServiceBusConfigura
                 ResourceGroupName = context.ResourceGroup.GetResourceName()
             }));
         var namespaceKeysValue = await namespaceKeys.GetValue();
-        Console.WriteLine(namespaceKeysValue.PrimaryConnectionString);
     }
 }
