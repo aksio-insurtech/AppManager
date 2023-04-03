@@ -13,11 +13,11 @@
         "up": "ncu -u"
     },
     "dependencies": {
-        "@aksio/cratis-applications-frontend": "8.10.0",
-        "@aksio/cratis-fundamentals": "8.10.0",
-        "@aksio/cratis-mui": "8.10.0",
-        "@aksio/cratis-react": "8.10.0",
-        "@aksio/cratis-typescript": "8.10.0",
+        "@aksio/cratis-applications-frontend": "8.11.1",
+        "@aksio/cratis-fundamentals": "8.11.1",
+        "@aksio/cratis-mui": "8.11.1",
+        "@aksio/cratis-react": "8.11.1",
+        "@aksio/cratis-typescript": "8.11.1",
         "@emotion/react": "11.10.4",
         "@emotion/styled": "11.10.4",
         "@monaco-editor/react": "^4.4.6",
@@ -31,7 +31,7 @@
         "react-router-dom": "6.4.2"
     },
     "devDependencies": {
-        "@aksio/cratis-webpack": "8.10.0",
+        "@aksio/cratis-webpack": "8.11.1",
         "@types/chai": "4.3.3",
         "@types/chai-as-promised": "7.1.5",
         "@types/mocha": "10.0.0",
