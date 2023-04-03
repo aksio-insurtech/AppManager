@@ -1,6 +1,10 @@
 events { worker_connections 1024; }
+error_log /dev/stderr info;
 
 http {
+    log_format logger-json escape=json '{"source": "nginx", "time": $msec, "resp_body_size": $body_bytes_sent, "host": "$http_host", "address": "$remote_addr", "request_length": $request_length, "method": "$request_method", "uri": "$request_uri", "status": $status,  "user_agent": "$http_user_agent", "resp_time": $request_time, "upstream_addr": "$upstream_addr"}';
+    access_log /dev/stdout logger-json;
+
     map $http_upgrade $connection_upgrade {
         default upgrade;
         ''      close;

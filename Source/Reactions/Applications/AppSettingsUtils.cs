@@ -32,7 +32,7 @@ public static class AppSettingsUtils
                 {
                     ["Aksio"] = "Information",
                     ["Microsoft"] = "Warning",
-                    ["Microsoft.AspNetCore.HttpLogging"] = "Warning",
+                    ["Microsoft.AspNetCore.HttpLogging"] = "Information",
                     ["System"] = "Warning"
                 }
             },

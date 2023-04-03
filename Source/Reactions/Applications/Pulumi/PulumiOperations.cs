@@ -373,14 +373,13 @@ public class PulumiOperations : IPulumiOperations
         PulumiStack? pulumiStack = null;
 
         var pulumiProgram = PulumiFn.Create(async () => await program());
-        var fullyQualifiedProjectName = $"{_settings.PulumiOrganization}/{projectName}";
-
-        var args = new InlineProgramArgs(fullyQualifiedProjectName, stackName, pulumiProgram)
+        var args = new InlineProgramArgs(projectName, stackName, pulumiProgram)
         {
             ProjectSettings = new(projectName, ProjectRuntimeName.Dotnet),
             EnvironmentVariables = new Dictionary<string, string?>
             {
                 { "TF_LOG", "TRACE" },
+                { "PULUMI_ORG", _settings.PulumiOrganization },
                 { "ARM_CLIENT_ID", _settings.ServicePrincipal.ClientId },
                 { "ARM_CLIENT_SECRET", _settings.ServicePrincipal.ClientSecret },
                 { "ARM_TENANT_ID", _settings.AzureSubscriptions.First().TenantId },
