@@ -1,3 +1,16 @@
+# [v0.10.0] - 2023-4-13 [PR: #174](https://github.com/aksio-insurtech/AppManager/pull/174)
+
+### Added
+
+- Made it possible to target the Cratis Kernel as a route
+
+### Changed
+
+- Setting default JSON formatter for logging to Serilogs compact formatter.
+- Upgraded Cratis
+
+
+
 # [v0.8.0] - 2023-4-3 [PR: #173](https://github.com/aksio-insurtech/AppManager/pull/173)
 
 ### Added
