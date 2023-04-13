@@ -114,7 +114,6 @@ public static class ApplicationIngressPulumiExtensions
         ManagedEnvironment managedEnvironment,
         IDictionary<CertificateId, Output<string>> certificates,
         Ingress ingress,
-        IDictionary<MicroserviceId, ContainerApp> microservices,
         Tags tags,
         ILogger<FileStorage> fileStorageLogger)
     {
@@ -161,7 +160,7 @@ public static class ApplicationIngressPulumiExtensions
         var authIngressConfig = await containerApp.Configuration.GetValue();
         await application.ConfigureIngress(
             environment,
-            microservices,
+            new Dictionary<MicroserviceId, ContainerApp>(),
             ingress,
             storage,
             ingressFileShareName,
