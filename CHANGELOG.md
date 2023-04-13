@@ -1,3 +1,25 @@
+# [v0.8.0] - 2023-4-3 [PR: #173](https://github.com/aksio-insurtech/AppManager/pull/173)
+
+### Added
+
+- Made Cratis optional and is now a resource that can be added
+- Made MongoDB optional and is now a resource that can be added
+- Made Azure Container registry optional and is now a resource that can be added
+
+### Changed
+
+- Changed `ConfigPath` to be `MountPath`
+
+### Fixed
+
+- Azure Files mounted storage for container apps was read only, made them writable.
+- Setting HTTP logging to default information
+- Explicitly setting Pulumi Organization to use
+- Removing unwanted `Console.WriteLine()` in service bus renderer
+- Adding JSON access log output for Nginx Ingresses
+- Removing the `WriteTo` section for Serilog in `AppSettings.json` so that we get to override it.
+
+
 # [v0.7.1] - 2023-2-27 [PR: #135](https://github.com/aksio-insurtech/AppManager/pull/135)
 
 ### Fixed
