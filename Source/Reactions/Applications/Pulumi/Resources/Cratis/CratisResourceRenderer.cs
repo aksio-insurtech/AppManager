@@ -13,11 +13,12 @@ namespace Reactions.Applications.Pulumi.Resources.Cratis;
 
 public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
 {
+    public const string ResourceTypeId = "bf7864ab-b28f-4968-882a-3dc7477b9d0c";
     readonly IDockerHub _dockerHub;
     readonly ILoggerFactory _loggerFactory;
 
     public ResourceLevel Level => ResourceLevel.Environment;
-    public ResourceTypeId TypeId => "bf7864ab-b28f-4968-882a-3dc7477b9d0c";
+    public ResourceTypeId TypeId => ResourceTypeId;
     public IEnumerable<ResourceTypeId> Dependencies => new ResourceTypeId[] { MongoDBResourceRenderer.ResourceTypeId };
 
     public CratisResourceRenderer(
@@ -65,6 +66,8 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
             kernelStorage,
             microservice.Deployables,
             context.Tags);
+
+        context.Results.Register(TypeId, kernel.ContainerApp);
 
         await kernelStorage.CreateAndUploadCratisJson(
             mongoDB,

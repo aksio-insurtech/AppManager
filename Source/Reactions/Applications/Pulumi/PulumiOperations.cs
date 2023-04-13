@@ -16,6 +16,7 @@ using Pulumi.Automation;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
+using Reactions.Applications.Pulumi.Resources.Cratis;
 using Read.Applications.Environments;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
 
@@ -217,9 +218,9 @@ public class PulumiOperations : IPulumiOperations
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
         var results = new ResourceResultsByType();
 
-        Task RenderResources(ResourceLevel level, ResourceGroup resourceGroup) => _resourceRenderers.Render(
-                level,
-                new(
+        async Task<RenderContext> RenderResources(ResourceLevel level, ResourceGroup resourceGroup)
+        {
+            var context = new RenderContext(
                     executionContext,
                     _settings,
                     application,
@@ -228,15 +229,24 @@ public class PulumiOperations : IPulumiOperations
                     application.GetTags(environment),
                     results,
                     environment.Tenants,
-                    environment.Microservices),
+                    environment.Microservices);
+
+            await _resourceRenderers.Render(
+                level,
+                context,
                 resourceScope);
+
+            return context;
+        }
+
+        RenderContext? sharedContext = default;
 
         await Up(
             application,
             async () =>
             {
                 var resourceGroup = await _stackDefinitions.Application(application, sharedEnvironment, results);
-                await RenderResources(ResourceLevel.Shared, resourceGroup);
+                sharedContext = await RenderResources(ResourceLevel.Shared, resourceGroup);
             },
             sharedEnvironment,
             upOptions: upOptions,
@@ -290,6 +300,11 @@ public class PulumiOperations : IPulumiOperations
                 microservice,
                 upOptions,
                 refreshOptions);
+        }
+
+        if (sharedContext!.Results.ContainsKey(CratisResourceRenderer.ResourceTypeId))
+        {
+            microserviceContainerApps[CratisResourceRenderer.ResourceTypeId] = (sharedContext.Results[CratisResourceRenderer.ResourceTypeId] as ContainerApp)!;
         }
 
         foreach (var (ingress, result) in ingressResults)

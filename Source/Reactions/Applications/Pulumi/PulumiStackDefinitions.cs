@@ -10,7 +10,6 @@ using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Templates;
-using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
 
@@ -113,7 +112,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             managedEnvironment,
             certificates,
             ingress,
-            new Dictionary<MicroserviceId, ContainerApp>(),
             tags,
             _fileStorageLogger);
     }
