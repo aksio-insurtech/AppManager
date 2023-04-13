@@ -1,3 +1,10 @@
+# [v0.11.1] - 2023-4-13 [PR: #175](https://github.com/aksio-insurtech/AppManager/pull/175)
+
+### Fixed
+
+- Cratis upgraded to 8.13.2
+
+
 # [v0.10.0] - 2023-4-13 [PR: #174](https://github.com/aksio-insurtech/AppManager/pull/174)
 
 ### Added
