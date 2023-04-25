@@ -5,9 +5,10 @@ namespace Concepts.Applications;
 
 public record CloudLocationKey(string Value) : ConceptAs<string>(Value)
 {
-    public const string NorwayEast = "norwayeast";
-    public const string EuropeWest = "westeurope";
-    public const string EuropeNorth = "northeurope";
+    public static readonly CloudLocationKey NorwayEast = "norwayeast";
+    public static readonly CloudLocationKey NorwayWest = "norwaywest";
+    public static readonly CloudLocationKey EuropeWest = "westeurope";
+    public static readonly CloudLocationKey EuropeNorth = "northeurope";
 
     public static implicit operator CloudLocationKey(string value) => new(value);
 }

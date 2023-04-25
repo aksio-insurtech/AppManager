@@ -20,6 +20,7 @@ public record ApplicationEnvironmentWithArtifacts(
     IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,
     IEnumerable<Microservice> Microservices,
+    bool BackupEnabled,
     IEnumerable<Resource> Resources) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
 {
     public Ingress GetIngressById(IngressId id) => Ingresses.Single(_ => _.Id == id);

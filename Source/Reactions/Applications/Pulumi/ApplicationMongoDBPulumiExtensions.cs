@@ -30,7 +30,7 @@ public static class ApplicationMongoDBPulumiExtensions
             OrgId = mongoDBOrganizationId.Value
         });
 
-        var region = GetRegionName(environment.CloudLocation);
+        var region = environment.CloudLocation.ToAtlas();
 
         var privateLinkEndpoint = new PrivateLinkEndpoint(application.Name, new()
         {
@@ -88,6 +88,8 @@ public static class ApplicationMongoDBPulumiExtensions
             ProviderName = "AZURE",
             ProviderInstanceSizeName = "M10",
             ProviderRegionName = region,
+            CloudBackup = environment.BackupEnabled,
+            PitEnabled = environment.BackupEnabled,
             Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
         });
 
@@ -114,16 +116,63 @@ public static class ApplicationMongoDBPulumiExtensions
             }
         });
 
+        if (environment.BackupEnabled)
+        {
+            var replicationSpecId = cluster.ReplicationSpecs.Apply(_ => _[0].Id!);
+
+            _ = new CloudBackupSchedule("backup", new()
+            {
+                ProjectId = cluster.ProjectId,
+                ClusterName = cluster.Name,
+                ReferenceHourOfDay = 3,
+                ReferenceMinuteOfHour = 45,
+                RestoreWindowDays = 7,
+                CopySettings = new CloudBackupScheduleCopySettingArgs[]
+                {
+                    new ()
+                    {
+                        CloudProvider = "AZURE",
+                        Frequencies = "DAILY",
+                        RegionName = CloudLocationKey.NorwayWest.ToAtlas(),
+                        ShouldCopyOplogs = true,
+                        ReplicationSpecId = replicationSpecId
+                    }
+                },
+                PolicyItemHourly = new CloudBackupSchedulePolicyItemHourlyArgs
+                {
+                    FrequencyInterval = 1,
+                    RetentionUnit = "days",
+                    RetentionValue = 7 // Keep 7 days of hourly backups, value can't be less than the `RestoreWindowDays` value
+                },
+                PolicyItemDaily = new CloudBackupSchedulePolicyItemDailyArgs
+                {
+                    FrequencyInterval = 1,
+                    RetentionUnit = "days",
+                    RetentionValue = 7
+                },
+                PolicyItemWeeklies = new CloudBackupSchedulePolicyItemWeeklyArgs[]
+                {
+                    new ()
+                    {
+                        FrequencyInterval = 7,  // Sunday
+                        RetentionUnit = "weeks",
+                        RetentionValue = 4
+                    }
+                },
+                PolicyItemMonthlies = new CloudBackupSchedulePolicyItemMonthlyArgs[]
+                {
+                    new ()
+                    {
+                        FrequencyInterval = 1,  // First day of month
+                        RetentionUnit = "months",
+                        RetentionValue = 12
+                    }
+                }
+            });
+        }
+
         var connectionStrings = await cluster.ConnectionStrings.GetValue();
         var connectionString = connectionStrings[0].PrivateEndpoints[0].SrvConnectionString ?? string.Empty;
         return new(cluster, connectionString, databasePassword);
     }
-
-    static string GetRegionName(CloudLocationKey cloudLocation) => cloudLocation.Value switch
-    {
-        CloudLocationKey.NorwayEast => "NORWAY_EAST",
-        CloudLocationKey.EuropeWest => "EUROPE_WEST",
-        CloudLocationKey.EuropeNorth => "EUROPE_NORTH",
-        _ => string.Empty
-    };
 }

@@ -38,16 +38,6 @@ public static class ApplicationResourceGroupPulumiExtensions
             resourceGroupId);
     }
 
-    public static string GetResourceGroupName(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation)
-    {
-        var locationString = () => cloudLocation.Value switch
-        {
-            CloudLocationKey.NorwayEast => "Norway",
-            CloudLocationKey.EuropeWest => "Netherlands",
-            CloudLocationKey.EuropeNorth => "Ireland",
-            _ => "NA"
-        };
-
-        return $"{application.Name}-{environment.ShortName}-{locationString()}-RG";
-    }
+    public static string GetResourceGroupName(this Application application, ApplicationEnvironment environment, CloudLocationKey cloudLocation) =>
+        $"{application.Name}-{environment.ShortName}-{cloudLocation.ToCountryName()}-RG";
 }

@@ -30,6 +30,7 @@ public record ApplicationEnvironmentResult(
             environment.Tenants,
             environment.Ingresses,
             environment.Microservices,
+            environment.BackupEnabled,
             environment.Resources));
     }
 }

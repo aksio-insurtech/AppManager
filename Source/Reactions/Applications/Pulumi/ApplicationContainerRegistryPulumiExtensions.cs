@@ -25,7 +25,7 @@ public static class ApplicationContainerRegistryPulumiExtensions
             ResourceGroupName = resourceGroup.Name,
 
             // Todo: We force this, due to Norway not supporting the GetRegistryCredentials API for some reason.
-            Location = CloudLocationKey.EuropeWest,
+            Location = CloudLocationKey.EuropeWest.Value,
             Tags = tags,
             Sku = new SkuArgs
             {
