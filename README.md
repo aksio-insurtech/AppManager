@@ -30,6 +30,17 @@ packages. In addition to this, we programmatically tell Pulumi to install the ne
 Container Apps Vnet, follow this:
 https://github.com/microsoft/azure-container-apps/issues/227
 
+## Things to keep in mind
+
+### MongoDB Atlas
+
+#### API Keys
+
+API keys are created by navigating to **Organization -> Access Manager -> API Keys**.
+Backup configuration requires the IP address where Pulumi is running its automation from to be added to the access list of the API key.
+This means that running AppManager in a cloud environment, the environments public IP address needs to be added to the API key.
+Also, if you're testing from a local computer during development the public IP address for the site needs to be added as well.
+
 ## Tips & Tricks
 
 To figure out what the public IP of something is:
