@@ -15,4 +15,5 @@ public record Ingress(
     Domain? Domain,
     Domain? AuthDomain,
     IEnumerable<Route> Routes,
-    IEnumerable<IdentityProvider> IdentityProviders);
+    IEnumerable<IdentityProvider> IdentityProviders,
+    OAuthBearerTokenProvider? OAuthBearerTokenProvider);

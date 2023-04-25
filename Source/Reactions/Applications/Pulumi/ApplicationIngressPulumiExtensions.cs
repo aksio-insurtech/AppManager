@@ -98,7 +98,8 @@ public static class ApplicationIngressPulumiExtensions
             idPortenProvider is not null,
             idPortenConfig,
             identityDetailsUrl,
-            tenantConfigs);
+            tenantConfigs,
+            ingress.OAuthBearerTokenProvider);
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
 

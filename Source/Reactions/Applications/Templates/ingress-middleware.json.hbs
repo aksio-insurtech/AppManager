@@ -18,5 +18,10 @@
         }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
+{{#if OAuthBearerTokenProvider }}
+    "OAuthBearerTokenProvider": {
+        "authority": "{{OAuthBearerTokenProvider.Authority}}",
+    }
+{{/if}}
     "identityDetailsUrl": "{{IdentityDetailsUrl}}"
 }
