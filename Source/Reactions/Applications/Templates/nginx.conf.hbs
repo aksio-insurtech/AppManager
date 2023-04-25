@@ -47,6 +47,7 @@ http {
         }
 
         location /.well-known/acme-challenge {
+            auth_request off;
             root /config;
         }
 
