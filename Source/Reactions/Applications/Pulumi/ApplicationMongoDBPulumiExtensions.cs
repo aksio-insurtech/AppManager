@@ -133,7 +133,7 @@ public static class ApplicationMongoDBPulumiExtensions
                     {
                         CloudProvider = "AZURE",
                         Frequencies = "DAILY",
-                        RegionName = CloudLocationKey.NorwayWest.ToAtlas(),
+                        RegionName = environment.BackupCopyRegion.ToAtlas(),
                         ShouldCopyOplogs = true,
                         ReplicationSpecId = replicationSpecId
                     }
