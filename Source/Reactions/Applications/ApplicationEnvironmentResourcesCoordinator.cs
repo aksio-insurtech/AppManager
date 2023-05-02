@@ -5,7 +5,7 @@ using Aksio.Cratis.Execution;
 using Common;
 using Events.Applications.Environments;
 using Events.Applications.Environments.Microservices;
-using Events.Applications.Environments.Microservices.Deployables;
+using Events.Applications.Environments.Microservices.Modules.Deployables;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications.Pulumi;
 

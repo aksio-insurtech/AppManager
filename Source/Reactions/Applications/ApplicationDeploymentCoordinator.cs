@@ -2,8 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications.Environments;
-using Events.Applications.Environments.Microservices.Deployables;
-using Events.Applications.Microservices.Deployables;
+using Events.Applications.Environments.Microservices.Modules.Deployables;
+using Events.Applications.Microservices.Modules.Deployables;
 using Microsoft.Extensions.Logging;
 
 namespace Reactions.Applications;
@@ -36,6 +36,7 @@ public class ApplicationDeploymentCoordinator
                 context.EventSourceId,
                 environment.Id,
                 @event.MicroserviceId,
+                @event.ModuleId,
                 ApplicationEnvironmentDeploymentId.New(),
                 @event.DeployableId,
                 @event.Image));

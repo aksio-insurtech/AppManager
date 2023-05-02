@@ -4,7 +4,7 @@
 using Events.Applications.Environments;
 using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
-using Events.Applications.Environments.Microservices.Deployables;
+using Events.Applications.Environments.Microservices.Modules.Deployables;
 
 namespace Reactions.Applications;
 

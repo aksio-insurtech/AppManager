@@ -5,7 +5,8 @@ using Events.Applications;
 using Events.Applications.Environments;
 using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
-using Events.Applications.Environments.Microservices.Deployables;
+using Events.Applications.Environments.Microservices.Modules;
+using Events.Applications.Environments.Microservices.Modules.Deployables;
 using Read.Applications.Environments;
 
 namespace Read.Applications;
@@ -62,10 +63,16 @@ public class ApplicationHierarchyForListingProjection : IProjectionFor<Applicati
                     .UsingKey(e => e.MicroserviceId)
                     .Set(m => m.Name).To(e => e.Name))
                 .RemovedWith<MicroserviceRemoved>()
-                .Children(_ => _.Deployables, _ => _
-                    .IdentifiedBy(m => m.DeployableId)
-                    .From<DeployableCreated>(_ => _
-                        .UsingKey(e => e.DeployableId)
-                        .Set(m => m.Name).To(e => e.Name))))
+                .Children(m => m.Modules, _ => _
+                    .IdentifiedBy(m => m.ModuleId)
+                    .From<ModuleCreated>(_ => _
+                        .UsingKey(e => e.ModuleId)
+                        .Set(m => m.Name).To(e => e.Name))
+                    .RemovedWith<ModuleRemoved>()
+                    .Children(m => m.Deployables, _ => _
+                        .IdentifiedBy(m => m.DeployableId)
+                        .From<DeployableCreated>(_ => _
+                            .UsingKey(e => e.DeployableId)
+                            .Set(m => m.Name).To(e => e.Name)))))
         .RemovedWith<ApplicationRemoved>());
 }

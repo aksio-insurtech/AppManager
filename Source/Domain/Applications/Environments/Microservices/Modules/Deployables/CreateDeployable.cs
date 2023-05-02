@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications.Environments.Microservices.Deployables;
+namespace Domain.Applications.Environments.Microservices.Modules.Deployables;
 
 public record CreateDeployable(DeployableId DeployableId, DeployableName Name);

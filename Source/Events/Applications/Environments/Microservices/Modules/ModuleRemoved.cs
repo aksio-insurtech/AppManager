@@ -3,6 +3,7 @@
 
 using Concepts.Applications;
 
-namespace Domain.Applications.Environments.Microservices.Deployables;
+namespace Events.Applications.Environments.Microservices.Modules;
 
-public record CreateDeployableWithImage(DeployableId DeployableId, DeployableName Name, DeployableImageName Image);
+[EventType("e3e0e2ec-c417-481a-97cb-063d825c2066")]
+public record ModuleRemoved(ModuleId ModuleId);

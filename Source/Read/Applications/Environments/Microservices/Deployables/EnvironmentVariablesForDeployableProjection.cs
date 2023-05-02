@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Events.Applications.Environments.Microservices.Deployables;
+using Events.Applications.Environments.Microservices.Modules.Deployables;
 
 namespace Read.Applications.Environments.Microservices.Deployables;
 

@@ -4,7 +4,12 @@
 using Concepts.Applications;
 using Concepts.Applications.Environments;
 
-namespace Events.Applications.Environments.Microservices.Deployables;
+namespace Events.Applications.Environments.Microservices.Modules.Deployables;
 
 [EventType("12e6d722-1e91-4802-86db-00ff3d61d798")]
-public record DeployableCreated(ApplicationEnvironmentId EnvironmentId, MicroserviceId MicroserviceId, DeployableId DeployableId, DeployableName Name);
+public record DeployableCreated(
+    ApplicationEnvironmentId EnvironmentId,
+    MicroserviceId MicroserviceId,
+    ModuleId ModuleId,
+    DeployableId DeployableId,
+    DeployableName Name);

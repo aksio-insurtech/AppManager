@@ -3,6 +3,6 @@
 
 using Concepts.Applications;
 
-namespace Read.Applications;
+namespace Domain.Applications.Environments.Microservices.Modules;
 
-public record MicroserviceInEnvironment(MicroserviceId MicroserviceId, MicroserviceName Name, IEnumerable<ModuleInEnvironment> Modules);
+public record CreateModule(ModuleId ModuleId, ModuleName Name);
