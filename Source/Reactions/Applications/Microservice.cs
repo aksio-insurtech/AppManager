@@ -9,8 +9,8 @@ public record Microservice(
     MicroserviceId Id,
     MicroserviceName Name,
     AppSettingsContent AppSettingsContent,
-    IEnumerable<Deployable> Deployables,
+    IEnumerable<Module> Modules,
     IEnumerable<MicroserviceId> ConnectedWith)
 {
-    public Deployable GetDeployableById(DeployableId id) => Deployables.Single(_ => _.Id == id);
+    public Module GetModuleById(ModuleId id) => Modules.Single(_ => _.Id == id);
 }

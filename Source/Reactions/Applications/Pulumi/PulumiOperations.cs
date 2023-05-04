@@ -280,26 +280,30 @@ public class PulumiOperations : IPulumiOperations
         var microserviceContainerApps = new Dictionary<MicroserviceId, ContainerApp>();
         foreach (var microservice in environment.Microservices)
         {
-            await Up(
-                application,
-                async () =>
-                {
-                    var resourceGroup = application.GetResourceGroup(environment);
-                    var managedEnvironment = await application.GetManagedEnvironment(environment, _settings.ServicePrincipal, subscription);
-                    var microserviceResult = await HandleMicroservice(
-                        executionContext,
-                        application,
-                        resourceGroup,
-                        managedEnvironment,
-                        microservice,
-                        environment,
-                        results);
-                    microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
-                },
-                environment,
-                microservice,
-                upOptions,
-                refreshOptions);
+            foreach (var module in microservice.Modules)
+            {
+                await Up(
+                    application,
+                    async () =>
+                    {
+                        var resourceGroup = application.GetResourceGroup(environment);
+                        var managedEnvironment = await application.GetManagedEnvironment(environment, _settings.ServicePrincipal, subscription);
+                        var microserviceResult = await HandleMicroservice(
+                            executionContext,
+                            application,
+                            resourceGroup,
+                            managedEnvironment,
+                            microservice,
+                            module,
+                            environment,
+                            results);
+                        microserviceContainerApps[microservice.Id] = microserviceResult.ContainerApp;
+                    },
+                    environment,
+                    microservice,
+                    upOptions,
+                    refreshOptions);
+            }
         }
 
         if (sharedContext!.Results.ContainsKey(CratisResourceRenderer.ResourceTypeId))
@@ -324,6 +328,7 @@ public class PulumiOperations : IPulumiOperations
         Application application,
         ApplicationEnvironmentWithArtifacts environment,
         Microservice microservice,
+        Module module,
         ApplicationEnvironmentDeploymentId deploymentId,
         Deployable deployable,
         Concepts.Applications.DeployableImageName image)
@@ -363,6 +368,7 @@ public class PulumiOperations : IPulumiOperations
                     resourceGroup,
                     managedEnvironment,
                     microservice,
+                    module,
                     environment,
                     results);
             },
@@ -512,18 +518,20 @@ public class PulumiOperations : IPulumiOperations
         ResourceGroup resourceGroup,
         ManagedEnvironment managedEnvironment,
         Microservice microservice,
+        Module module,
         ApplicationEnvironmentWithArtifacts environment,
         ResourceResultsByType results)
     {
-        return await _stackDefinitions.Microservice(
+        return await _stackDefinitions.Module(
             executionContext,
             application,
             microservice,
+            module,
             resourceGroup,
             environment,
             managedEnvironment,
             results,
-            deployables: microservice.Deployables);
+            deployables: module.Deployables);
     }
 
     RefreshOptions GetRefreshOptionsForDeployment(

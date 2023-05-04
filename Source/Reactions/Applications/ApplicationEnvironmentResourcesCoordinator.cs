@@ -92,7 +92,8 @@ public class ApplicationEnvironmentResourcesCoordinator
             var application = await _projections.GetInstanceById<Application>(@event.ApplicationId);
             var environment = await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId);
             var microservice = environment.Model.GetMicroserviceById(@event.MicroserviceId);
-            var deployable = microservice.GetDeployableById(@event.DeployableId);
+            var module = microservice.GetModuleById(@event.ModuleId);
+            var deployable = module.GetDeployableById(@event.DeployableId);
 
             _logger.ChangingDeployableImage(
                 microservice.Name,
@@ -107,6 +108,7 @@ public class ApplicationEnvironmentResourcesCoordinator
                     application.Model,
                     environment.Model,
                     microservice,
+                    module,
                     @event.DeploymentId,
                     deployable,
                     @event.Image);

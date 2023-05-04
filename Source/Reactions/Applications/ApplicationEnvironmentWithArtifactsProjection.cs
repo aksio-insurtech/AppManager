@@ -4,6 +4,7 @@
 using Events.Applications.Environments;
 using Events.Applications.Environments.Ingresses;
 using Events.Applications.Environments.Microservices;
+using Events.Applications.Environments.Microservices.Modules;
 using Events.Applications.Environments.Microservices.Modules.Deployables;
 
 namespace Reactions.Applications;
@@ -82,14 +83,24 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                 .UsingKey(e => e.MicroserviceId)
                 .Set(m => m.AppSettingsContent).To(e => e.Content))
 
-            // Deployables
-            .Children(m => m.Deployables, _ => _
+            // Modules
+            .Children(m => m.Modules, _ => _
                 .IdentifiedBy(m => m.Id)
-                .From<DeployableCreated>(_ => _
-                    .UsingKey(e => e.DeployableId)
+                .From<ModuleCreated>(_ => _
+                    .UsingKey(e => e.ModuleId)
                     .Set(m => m.MicroserviceId).To(e => e.MicroserviceId)
                     .Set(m => m.Name).To(e => e.Name))
-                .From<DeployableImageChangedInEnvironment>(_ => _
+                .RemovedWith<ModuleRemoved>()
+
+                // Deployables
+                .Children(m => m.Deployables, _ => _
+                    .IdentifiedBy(m => m.Id)
+                    .From<DeployableCreated>(_ => _
+                        .UsingKey(e => e.DeployableId)
+                        .Set(m => m.MicroserviceId).To(e => e.MicroserviceId)
+                        .Set(m => m.ModuleId).To(e => e.ModuleId)
+                        .Set(m => m.Name).To(e => e.Name))
+                    .From<DeployableImageChangedInEnvironment>(_ => _
                     .UsingKey(e => e.DeployableId)
-                    .Set(m => m.Image).To(e => e.Image))));
+                    .Set(m => m.Image).To(e => e.Image)))));
 }

@@ -43,9 +43,12 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
             Guid.Empty,
             "kernel",
             AppSettingsContent.Empty,
-            new Deployable[]
+            new Module[]
             {
-                new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 }, MountPath.Default)
+                new Module(Guid.Empty, Guid.Empty, "kernel", new Deployable[]
+                    {
+                        new Deployable(Guid.Empty, Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 }, MountPath.Default)
+                    })
             },
             Enumerable.Empty<MicroserviceId>());
 
@@ -64,7 +67,7 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
             managedEnvironment,
             null,
             kernelStorage,
-            microservice.Deployables,
+            microservice.Modules.SelectMany(_ => _.Deployables),
             context.Tags);
 
         context.Results.Register(TypeId, kernel.ContainerApp);

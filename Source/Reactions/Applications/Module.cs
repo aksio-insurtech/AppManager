@@ -5,11 +5,11 @@ using Concepts.Applications;
 
 namespace Reactions.Applications;
 
-public record Deployable(
+public record Module(
     MicroserviceId MicroserviceId,
-    ModuleId ModuleId,
-    DeployableId Id,
-    DeployableName Name,
-    string Image,
-    IEnumerable<int> Ports,
-    MountPath MountPath);
+    ModuleId Id,
+    ModuleName Name,
+    IEnumerable<Deployable> Deployables)
+{
+    public Deployable GetDeployableById(DeployableId id) => Deployables.Single(_ => _.Id == id);
+}

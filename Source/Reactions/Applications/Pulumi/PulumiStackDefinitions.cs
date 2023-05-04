@@ -116,10 +116,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
             _fileStorageLogger);
     }
 
-    public async Task<ContainerAppResult> Microservice(
+    public async Task<ContainerAppResult> Module(
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
+        Module module,
         ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,

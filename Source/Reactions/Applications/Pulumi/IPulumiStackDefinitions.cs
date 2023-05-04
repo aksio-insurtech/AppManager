@@ -32,10 +32,11 @@ public interface IPulumiStackDefinitions
         IDictionary<CertificateId, Output<string>> certificates,
         ResourceGroup? resourceGroup = default);
 
-    Task<ContainerAppResult> Microservice(
+    Task<ContainerAppResult> Module(
         ExecutionContext executionContext,
         Application application,
         Microservice microservice,
+        Module module,
         ResourceGroup resourceGroup,
         ApplicationEnvironmentWithArtifacts environment,
         ManagedEnvironment managedEnvironment,
