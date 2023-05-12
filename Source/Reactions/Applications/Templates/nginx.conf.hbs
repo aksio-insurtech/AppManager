@@ -10,6 +10,11 @@ http {
         ''      close;
     }
 
+    map $upstream_http_x_ms_client_principal $x_principal {
+        default upstream_http_x_ms_client_principal;
+        "" $http_x_ms_client_principal;
+    }
+
     # We are limited by the Container App ingress, but keeping the limits here anyways
     # Read more here: https://learn.microsoft.com/en-us/azure/container-apps/ingress
     client_max_body_size        2048m;
@@ -23,6 +28,8 @@ http {
     fastcgi_read_timeout        7200;
     fastcgi_buffers             8 128k;
     fastcgi_buffer_size         128k;
+
+    add_header Cache-Control "no-cache";
 
     server {
         listen 80;
@@ -68,6 +75,9 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header accept-encoding deflate;
+
+            auth_request_set $auth_resp_x_ms_client_principal $upstream_http_x_ms_client_principal;
+            proxy_set_header x-ms-client-principal $x_principal;
 
             auth_request_set $auth_resp_tenant_id $upstream_http_tenant_id;
             proxy_set_header Tenant-ID $auth_resp_tenant_id;
