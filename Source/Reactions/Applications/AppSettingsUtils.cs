@@ -32,7 +32,7 @@ public static class AppSettingsUtils
                 {
                     ["Aksio"] = "Information",
                     ["Microsoft"] = "Warning",
-                    ["Microsoft.AspNetCore.HttpLogging"] = "Information",
+                    ["Microsoft.AspNetCore.HttpLogging"] = "Warning",
                     ["System"] = "Warning"
                 }
             },
@@ -43,7 +43,7 @@ public static class AppSettingsUtils
                     ["Name"] = "Console",
                     ["Args"] = new JsonObject()
                     {
-                        ["formatter"] = "Serilog.Formatting.Json.JsonFormatter, Serilog"
+                        ["formatter"] = "Aksio.Cratis.Applications.Logging.RenderedCompactJsonFormatter, Aksio.Cratis.Applications"
                     }
                 }
             }
