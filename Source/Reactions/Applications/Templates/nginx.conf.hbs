@@ -53,6 +53,10 @@ http {
             proxy_set_header X-Original-URI $request_uri;
         }
 
+		location /.cratis {
+			return 403;
+		}
+
         location /.well-known/acme-challenge {
             auth_request off;
             root /config;
