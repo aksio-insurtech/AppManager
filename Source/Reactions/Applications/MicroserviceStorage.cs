@@ -37,6 +37,7 @@ public class MicroserviceStorage
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
 
         var appInsightsInstrumentationKey = await monitoring.ApplicationInsight.InstrumentationKey.GetValue();
+        var appInsightsConnectionString = await monitoring.ApplicationInsight.ConnectionString.GetValue();
 
         var config = new KernelConfiguration()
         {
@@ -58,7 +59,8 @@ public class MicroserviceStorage
                 Type = TelemetryTypes.AppInsights,
                 Options = new AppInsightsTelemetryOptions
                 {
-                    Key = appInsightsInstrumentationKey
+                    Key = appInsightsInstrumentationKey,
+                    ConnectionString = appInsightsConnectionString
                 }
             },
             Storage = new()
