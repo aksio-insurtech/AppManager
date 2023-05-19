@@ -323,6 +323,11 @@ public static class ApplicationIngressPulumiExtensions
         Ingress ingress,
         Storage storage)
     {
+        if (!ingress.IdentityProviders.Any())
+        {
+            return;
+        }
+
         var identityProviderArgs = new IdentityProvidersArgs
         {
             CustomOpenIdConnectProviders = new Dictionary<string, CustomOpenIdConnectProviderArgs>()
