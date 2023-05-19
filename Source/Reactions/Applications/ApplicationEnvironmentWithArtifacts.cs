@@ -22,7 +22,8 @@ public record ApplicationEnvironmentWithArtifacts(
     IEnumerable<Microservice> Microservices,
     bool BackupEnabled,
     CloudLocationKey BackupCopyRegion,
-    IEnumerable<Resource> Resources) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
+    IEnumerable<Resource> Resources,
+    StorageConfig? Storage) : ApplicationEnvironment(Id, Name, DisplayName, ShortName)
 {
     public Ingress GetIngressById(IngressId id) => Ingresses.Single(_ => _.Id == id);
     public Microservice GetMicroserviceById(MicroserviceId id) => Microservices.Single(_ => _.Id == id);

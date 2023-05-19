@@ -18,21 +18,38 @@ public static class StoragePulumiExtensions
 {
     public static async Task<StorageResult> SetupStorage(
         this Application application,
-        ApplicationEnvironment environment,
+        ApplicationEnvironmentWithArtifacts environment,
+        NetworkResult vnet,
         ResourceGroup resourceGroup,
         Tags tags)
     {
         var name = application.GetStorageAccountName(environment);
-        var storageAccount = new StorageAccount(name, new StorageAccountArgs
-        {
-            ResourceGroupName = resourceGroup.Name,
-            Tags = tags,
-            Sku = new SkuArgs
+        var storageAccount = new StorageAccount(
+            name,
+            new StorageAccountArgs
             {
-                Name = SkuName.Standard_LRS
-            },
-            Kind = Kind.StorageV2
-        });
+                ResourceGroupName = resourceGroup.Name,
+                Tags = tags,
+                Sku = new SkuArgs
+                {
+                    Name = SkuName.Standard_LRS
+                },
+                Kind = Kind.StorageV2,
+                NetworkRuleSet = new NetworkRuleSetArgs
+                {
+                    Bypass = Bypass.AzureServices,
+                    DefaultAction = DefaultAction.Deny,
+                    VirtualNetworkRules = new List<VirtualNetworkRuleArgs>
+                    {
+                        new()
+                        {
+                            VirtualNetworkResourceId = vnet.GetInfrastructureSubnetId()
+                        }
+                    },
+                    IpRules = environment.Storage?.AccessList.Select(al => new IPRuleArgs { IPAddressOrRange = al.Address.Value })
+                        .ToList() ?? new()
+                }
+            });
 
         var fileShare = new FileShare("kernel", new()
         {

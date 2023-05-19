@@ -32,6 +32,7 @@ public record ApplicationEnvironmentResult(
             environment.Microservices,
             environment.BackupEnabled,
             environment.BackupCopyRegion,
-            environment.Resources));
+            environment.Resources,
+            environment.Storage));
     }
 }

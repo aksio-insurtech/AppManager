@@ -63,11 +63,11 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
         var resourceGroup = application.SetupResourceGroup(environment);
         var identity = application.SetupUserAssignedIdentity(environment, resourceGroup, tags);
-        var vault = application.SetupKeyVault(environment, identity, resourceGroup, tags);
-        var network = application.SetupNetwork(environment, identity, vault, resourceGroup, tags);
+        var network = application.SetupNetwork(environment, identity, resourceGroup, tags);
+        var vault = application.SetupKeyVault(environment, network, identity, resourceGroup, tags);
         resourceResults.Register(WellKnownResourceTypes.VirtualNetwork, network.VirtualNetwork);
 
-        var storage = await application.SetupStorage(environment, resourceGroup, tags);
+        var storage = await application.SetupStorage(environment, network, resourceGroup, tags);
         resourceResults.Register(WellKnownResourceTypes.Storage, storage);
 
         var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, storage.FileShare, _fileStorageLogger);

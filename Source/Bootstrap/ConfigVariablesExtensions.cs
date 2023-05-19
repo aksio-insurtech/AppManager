@@ -105,6 +105,7 @@ public static class ConfigVariablesExtensions
         foreach (var ingress in applicationAndEnvironment.Environment.Ingresses)
         {
             var providers = new List<IdentityProvider>();
+
             foreach (var identityProviderConfig in config.IdentityProviders)
             {
                 var provider = ingress.IdentityProviders.FirstOrDefault(_ => _.Id == identityProviderConfig.Id);

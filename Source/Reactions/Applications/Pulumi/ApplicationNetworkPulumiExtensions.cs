@@ -1,7 +1,6 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Pulumi.AzureNative.KeyVault;
 using Pulumi.AzureNative.ManagedIdentity;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
@@ -13,7 +12,7 @@ public static class ApplicationNetworkPulumiExtensions
 {
     public static string GetPrivateZoneName(this Application application) => $"{application.Name}.local".ToLowerInvariant();
 
-    public static NetworkResult SetupNetwork(this Application application, ApplicationEnvironmentWithArtifacts environment, UserAssignedIdentity identity, Vault vault, ResourceGroup resourceGroup, Tags tags)
+    public static NetworkResult SetupNetwork(this Application application, ApplicationEnvironmentWithArtifacts environment, UserAssignedIdentity identity, ResourceGroup resourceGroup, Tags tags)
     {
         var virtualNetwork = new VirtualNetwork(application.Name, new()
         {

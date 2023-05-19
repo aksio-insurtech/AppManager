@@ -38,13 +38,14 @@ public static class ApplicationIngressPulumiExtensions
     {
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
         var routes = new List<IngressTemplateRouteContent>();
+
         foreach (var route in ingress.Routes)
         {
             if (microservices.ContainsKey(route.TargetMicroservice))
             {
                 var configuration = await microservices[route.TargetMicroservice].Configuration!.GetValue();
                 var url = $"http://{configuration!.Ingress!.Fqdn}{route.TargetPath}";
-                routes.Add(new IngressTemplateRouteContent(route.Path, url));
+                routes.Add(new IngressTemplateRouteContent(route.Path, url, route.UseResolver ? ingress.Resolver!.Value : null));
             }
         }
 
@@ -301,11 +302,6 @@ public static class ApplicationIngressPulumiExtensions
         Ingress ingress,
         Storage storage)
     {
-        if (!ingress.IdentityProviders.Any())
-        {
-            return;
-        }
-
         var identityProviderArgs = new IdentityProvidersArgs
         {
             CustomOpenIdConnectProviders = new Dictionary<string, CustomOpenIdConnectProviderArgs>()
