@@ -10,8 +10,8 @@ http {
         ''      close;
     }
 
-    map $upstream_http_x_ms_client_principal $x_principal {
-        default upstream_http_x_ms_client_principal;
+    map $auth_resp_x_ms_client_principal $x_principal {
+        default $auth_resp_x_ms_client_principal;
         "" $http_x_ms_client_principal;
     }
 

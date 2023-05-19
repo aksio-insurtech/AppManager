@@ -3,4 +3,4 @@
 
 namespace Reactions.Applications.Templates;
 
-public record TenantConfig(string TenantId, string Domain, string OnBehalfOf, IEnumerable<string> SourceIdentifiers);
+public record TenantResolutionConfig(string Strategy, string Options);

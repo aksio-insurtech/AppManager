@@ -10,18 +10,24 @@
         "{{TenantId}}": {
             "domain": "{{Domain}}",
             "onBehalfOf": "{{OnBehalfOf}}",
-            "tenantIdClaims": [
-            {{#TenantIdClaims}}
+            "sourceIdentifiers": [
+            {{#SourceIdentifiers}}
                 "{{this}}"{{#unless @last}},{{/unless}}
-            {{/TenantIdClaims}}
+            {{/SourceIdentifiers}}
             ]
         }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
+{{#if TenantResolution }}
+    "tenantResolution": {
+        "strategy": "{{TenantResolution.Strategy}}",
+        "options": {{{TenantResolution.Options}}}
+    },
+{{/if}}
 {{#if OAuthBearerTokenProvider }}
     "OAuthBearerTokens": {
-        "authority": "{{OAuthBearerTokenProvider.Authority}}",
-    }
+        "authority": "{{OAuthBearerTokenProvider.Authority}}"
+    },
 {{/if}}
     "identityDetailsUrl": "{{IdentityDetailsUrl}}"
 }
