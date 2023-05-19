@@ -6,4 +6,4 @@ using Concepts.Applications.Tenants;
 
 namespace Reactions.Applications;
 
-public record TenantIdentityProviderConfig(IdentityProviderId Id, Domain? Domain, OnBehalfOf? OnBehalfOf, IEnumerable<string>? TenantIdClaims);
+public record TenantIdentityProviderConfig(IdentityProviderId Id, Domain? Domain, OnBehalfOf? OnBehalfOf, IEnumerable<string>? SourceIdentifiers);

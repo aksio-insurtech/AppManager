@@ -1,6 +1,8 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -55,6 +57,7 @@ public static class ApplicationIngressPulumiExtensions
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
         var tenantConfigs = Enumerable.Empty<TenantConfig>();
+        TenantResolutionConfig? tenantResolutionConfig = null;
         if (idPortenProvider is not null)
         {
             idPortenConfig = new(
@@ -75,6 +78,7 @@ public static class ApplicationIngressPulumiExtensions
             var aadPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
             if (aadPortenProvider is not null)
             {
+                tenantResolutionConfig = new TenantResolutionConfig("claim", "{}");
                 tenantConfigs = environment.Tenants.Select(tenant =>
                 {
                     var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadPortenProvider.Id);
@@ -82,9 +86,25 @@ public static class ApplicationIngressPulumiExtensions
                         tenant.Id.ToString(),
                         string.Empty,
                         string.Empty,
-                        providerConfig?.TenantIdClaims ?? Enumerable.Empty<string>());
+                        providerConfig?.SourceIdentifiers ?? Enumerable.Empty<string>());
                 });
             }
+            else
+            {
+                tenantConfigs = environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), string.Empty, string.Empty, tenant.SourceIdentifiers ?? Enumerable.Empty<string>()));
+            }
+        }
+
+        if (ingress.RouteTenantResolution is not null)
+        {
+            var options = new RouteTenantResolutionOptions(ingress.RouteTenantResolution.RegularExpression);
+            var optionsAsJsonString = JsonSerializer.Serialize(options, new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            tenantResolutionConfig = new TenantResolutionConfig("route", optionsAsJsonString);
         }
 
         var identityDetailsUrl = string.Empty;
@@ -100,6 +120,7 @@ public static class ApplicationIngressPulumiExtensions
             idPortenConfig,
             identityDetailsUrl,
             tenantConfigs,
+            tenantResolutionConfig,
             ingress.OAuthBearerTokenProvider);
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);

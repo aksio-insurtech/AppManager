@@ -9,4 +9,5 @@ namespace Reactions.Applications;
 public record Tenant(
     TenantId Id,
     TenantName Name,
-    IEnumerable<TenantIdentityProviderConfig> IdentityProviders);
+    IEnumerable<TenantIdentityProviderConfig> IdentityProviders,
+    IEnumerable<string>? SourceIdentifiers);
