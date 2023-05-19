@@ -20,6 +20,7 @@ namespace Reactions.Applications;
 /// <param name="AuthDomain">AuthDomain.</param>
 /// <param name="Routes">List of routes for this ingress.</param>
 /// <param name="IdentityProviders">List of identity providers.</param>
+/// <param name="RouteTenantResolution">Route tenant resolution.</param>
 /// <param name="OAuthBearerTokenProvider">The OAuth bearer tokenprovider, if applicable.</param>
 /// <param name="AccessList">An list of IP addresses that should have access, used for the least secure authentication.</param>
 public record Ingress(
