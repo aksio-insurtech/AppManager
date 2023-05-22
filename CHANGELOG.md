@@ -1,3 +1,67 @@
+# [v0.12.0] - 2023-5-22 [PR: #179](https://github.com/aksio-insurtech/AppManager/pull/179)
+
+## Summary
+
+- This PR enforces more security in some of the resources the appmanager sets up.
+
+### Fixes
+
+Fixed a bug ingress-middleware template, OAuthBearerTokens was not camelcase and didn't work.
+
+### Security
+
+- Key vaults now only accepts traffic from the application environment vnet.
+- Storage accounts now only accepts traffic from the application environment vnet, with the option to add external ip-adresses to storage account accesslist. 
+  This is used like this in the configuration json:
+```json
+"environment": {
+    (...)
+    "storage": {
+        "accessList": [
+            { 
+                "name": "Main office",
+                "address": "1.2.3.4"
+            },
+            { 
+                "name": "Secondary office", 
+                "address": "2.4.6.8"
+            }
+        ]
+    }
+}
+```
+
+- Changed nginx logging to include the "x-fowarded-for" header, as it holds the actual originating IP of the request.
+- Rejects any ingress definitions that do not have any identity solution defined (identity provider, oauth bearertoken or accesslist).
+- Extended ingress configuration options to work with a regexp-style ingress path. 
+  - This requires a dns resolver to be set as well on the ingress, and a flag on the route hinting that it should be used.
+  - This allows us to basically accesslist paths even with variable components, having a 404 fallback.
+  - Here is an example ingress definition that accepts calls to "/swagger" and "/###/prefixedroute/#####", which then requires the use of useResolver (or nginx will fail):
+```json
+{
+    "id": "06519d43-7f1f-4f99-8f5a-3b4162dd913c",
+    "name": "someapp-ingress",
+    "resolver": "8.8.8.8",
+    "domain": {
+        "name": "someapp.qa.mydomain.com",
+        "certificateId": "83ce7060-5e48-48b6-b9b6-f72ce96c768a"
+    },
+    "routes": [
+        {
+            "path": "/swagger",
+            "targetMicroservice": "bc31e022-fcbc-4341-a2dc-a8ad49fd6c12",
+            "targetPath": "/swagger"
+        },
+        {
+            "path": "~ '^/([\\d]{3})/prefixedroute/([\\d]{5})'",
+            "targetMicroservice": "bc31e022-fcbc-4341-a2dc-a8ad49fd6c12",
+            "targetPath": "/$1/prefixedroute/$2",
+            "useResolver": true
+        }
+    ]
+}
+```
+
 # [v0.11.1] - 2023-4-13 [PR: #175](https://github.com/aksio-insurtech/AppManager/pull/175)
 
 ### Fixed
