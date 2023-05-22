@@ -27,7 +27,7 @@ public static class IngressExtensions
             return true;
         }
 
-        // Whitelisted list of IP addresses?
+        // Any IP addresses in the access list?
         if (ingress.AccessList.Any())
         {
             return true;
