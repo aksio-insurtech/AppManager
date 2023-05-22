@@ -3,4 +3,10 @@
 
 namespace Reactions.Applications.Templates;
 
-public record IngressTemplateRouteContent(string Path, string TargetUrl);
+/// <summary>
+/// Ingress handlebar template parameters.
+/// </summary>
+/// <param name="Path">Location path.</param>
+/// <param name="TargetUrl">Target path.</param>
+/// <param name="Resolver">If path is a regular expression, you need to specify a (dns) resolver. For eaxmple google's 8.8.8.8.</param>
+public record IngressTemplateRouteContent(string Path, string TargetUrl, string? Resolver);

@@ -65,6 +65,7 @@ public static class Program
         Globals.Configure(derivedTypes);
 
         var serializerOptions = Globals.JsonSerializerOptions;
+        serializerOptions.PropertyNameCaseInsensitive = true;
         serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
 
         var configAsJson = await File.ReadAllTextAsync(args[0]);
@@ -93,6 +94,10 @@ public static class Program
         var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
         var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
         applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(config);
+
+        // Do some validation, this throws exceptions if a problem is detected.
+        applicationAndEnvironment.Environment.ValidateConfiguration();
+
         var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name, new(config.Azure.SharedSubscriptionId));
 
         var logger = loggerFactory.CreateLogger<FileStorage>();
