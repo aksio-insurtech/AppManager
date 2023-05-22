@@ -22,7 +22,7 @@ public class IngressIsMissingResolver : Exception
     public IngressName Name { get; }
 
     public IngressIsMissingResolver(Ingress ingress)
-        : base($"Missing requirement: Ingress {ingress.Name} (id {ingress.Id}) has a route that requries a resolver, but none is defined for this ingress")
+        : base($"Missing requirement: Ingress {ingress.Name} (id {ingress.Id}) has a route that requires a resolver, but none is defined for this ingress")
     {
         Id = ingress.Id;
         Name = ingress.Name;
