@@ -4,8 +4,8 @@
 namespace Concepts.Applications.Environments.AccessList;
 
 /// <summary>
-/// An accesslist entry.
-/// </summary>
+/// An entry for the access list.
+/// /// </summary>
 /// <param name="Name">The name.</param>
 /// <param name="Address">The IP-address.</param>
 public record AccessListEntry(AccessListName Name, AccessListAddress Address);

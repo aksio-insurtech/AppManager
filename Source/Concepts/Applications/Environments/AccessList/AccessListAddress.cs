@@ -4,8 +4,8 @@
 namespace Concepts.Applications.Environments.AccessList;
 
 /// <summary>
-/// An IP-address.
-/// </summary>
+/// Represents an IP-address used in access lists.
+/// /// </summary>
 /// <param name="Value">The IP address.</param>
 public record AccessListAddress(string Value) : ConceptAs<string>(Value)
 {
