@@ -93,7 +93,7 @@ public static class Program
 
         var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
         var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
-        applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(config);
+        applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(Path.GetDirectoryName(filename)!, config);
 
         // Do some validation, this throws exceptions if a problem is detected.
         applicationAndEnvironment.Environment.ValidateConfiguration();
