@@ -8,13 +8,13 @@ namespace Bootstrap;
 
 public static class ConfigVariablesExtensions
 {
-    public static async Task<ApplicationAndEnvironment> ApplyConfigAndVariables(this ApplicationAndEnvironment applicationAndEnvironment, ManagementConfig config)
+    public static async Task<ApplicationAndEnvironment> ApplyConfigAndVariables(this ApplicationAndEnvironment applicationAndEnvironment, string basePath, ManagementConfig config)
     {
         var dockerHub = new DockerHub();
 
         applicationAndEnvironment = await ApplyLatestMiddlewareVersion(applicationAndEnvironment, dockerHub);
         applicationAndEnvironment = ApplyIdentityProviderValues(applicationAndEnvironment, config);
-        applicationAndEnvironment = await ApplyCertificateValues(applicationAndEnvironment, config);
+        applicationAndEnvironment = await ApplyCertificateValues(applicationAndEnvironment, basePath, config);
         applicationAndEnvironment = await ApplyGammaVersionIfGammaIsThere(applicationAndEnvironment, dockerHub);
 
         return applicationAndEnvironment with
@@ -73,7 +73,7 @@ public static class ConfigVariablesExtensions
         };
     }
 
-    static async Task<ApplicationAndEnvironment> ApplyCertificateValues(ApplicationAndEnvironment applicationAndEnvironment, ManagementConfig config)
+    static async Task<ApplicationAndEnvironment> ApplyCertificateValues(ApplicationAndEnvironment applicationAndEnvironment, string basePath, ManagementConfig config)
     {
         var certificates = new List<Certificate>();
         foreach (var certificateConfig in config.Certificates)
@@ -81,7 +81,8 @@ public static class ConfigVariablesExtensions
             var certificate = applicationAndEnvironment.Environment.Certificates.FirstOrDefault(_ => _.Id == certificateConfig.Id);
             if (certificate is not null)
             {
-                var certificateValue = await File.ReadAllBytesAsync(certificateConfig.File);
+                var fullPath = Path.Combine(basePath, certificateConfig.File);
+                var certificateValue = await File.ReadAllBytesAsync(fullPath);
                 certificates.Add(certificate with
                 {
                     Value = Convert.ToBase64String(certificateValue),
