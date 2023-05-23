@@ -1,3 +1,10 @@
+# [v0.14.0] - 2023-5-23 [PR: #180](https://github.com/aksio-insurtech/AppManager/pull/180)
+
+### Added
+
+- Adds support for relative paths for certificates when using JSON files with the Bootstrapper. This assumes relative path based on the variables file.
+
+
 # [v0.12.0] - 2023-5-22 [PR: #179](https://github.com/aksio-insurtech/AppManager/pull/179)
 
 ## Summary
