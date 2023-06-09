@@ -34,35 +34,34 @@
     "impersonation": {
         "identityProviders": [
 {{#IdentityProviders}}
-            "aad"
+            "{{this}}"
 {{/IdentityProviders}}
         ],
         "authorization": {
             "tenants": [
 {{#Tenants}}
-                "eb681eb3-f7ca-4c0b-b309-92625bff5a59"
+                "{{this}}"
 {{/Tenants}}
             ],
             "roles": [
 {{#Roles}}
-                "Administrator"
+                "{{this}}"
 {{/Roles}}
             ],
             "groups": [
 {{#Groups}}
-                "e3e8b1e0-1b7a-4b0a-9b0a-1b7a4b0a9b0a"
+                "{{this}}"
 {{/Groups}}
             ],
             "claims": [
 {{#Claims}}
                 {
-                    "type": "name",
-                    "value": "Einar Ingebrigtsen"
-                }
+                    "type": "{{this.Type}}",
+                    "value": "{{this.Value}}"
+                }{{#unless @last}},{{/unless}}
 {{/Claims}}
             ]
         }
     }
 {{/if}}
-
 }
