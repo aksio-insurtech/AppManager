@@ -9,4 +9,5 @@ public record IngressMiddlewareTemplateContent(
     string IdentityDetailsUrl,
     IEnumerable<TenantConfig> Tenants,
     TenantResolutionConfig? TenantResolution,
-    OAuthBearerTokenProvider? OAuthBearerTokenProvider);
+    OAuthBearerTokenProvider? OAuthBearerTokenProvider,
+    Impersonation? Impersonation);

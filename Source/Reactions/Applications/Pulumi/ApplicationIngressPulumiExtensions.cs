@@ -51,7 +51,7 @@ public static class ApplicationIngressPulumiExtensions
             }
         }
 
-        var nginxContent = TemplateTypes.IngressConfig(new IngressTemplateContent(routes));
+        var nginxContent = TemplateTypes.IngressConfig(new IngressTemplateContent(routes, ingress.IsImpersonationEnabled));
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
 
         var idPortenConfig = OpenIDConnectConfig.Empty;
@@ -75,13 +75,13 @@ public static class ApplicationIngressPulumiExtensions
         }
         else
         {
-            var aadPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
-            if (aadPortenProvider is not null)
+            var aadProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
+            if (aadProvider is not null)
             {
                 tenantResolutionConfig = new TenantResolutionConfig("claim", "{}");
                 tenantConfigs = environment.Tenants.Select(tenant =>
                 {
-                    var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadPortenProvider.Id);
+                    var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
                     return new TenantConfig(
                         tenant.Id.ToString(),
                         string.Empty,
@@ -121,7 +121,8 @@ public static class ApplicationIngressPulumiExtensions
             identityDetailsUrl,
             tenantConfigs,
             tenantResolutionConfig,
-            ingress.OAuthBearerTokenProvider);
+            ingress.OAuthBearerTokenProvider,
+            ingress.GetImpersonationTemplateContent(environment));
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
 

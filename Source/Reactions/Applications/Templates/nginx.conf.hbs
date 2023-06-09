@@ -28,12 +28,22 @@ http {
     fastcgi_read_timeout        7200;
     fastcgi_buffers             8 128k;
     fastcgi_buffer_size         128k;
+    proxy_buffers               8 16k;
+    proxy_buffer_size           32k;
 
     add_header Cache-Control "no-cache";
 
     server {
         listen 80;
         auth_request /auth;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header accept-encoding deflate;
 
         gzip on;
         gzip_vary on;
@@ -42,6 +52,7 @@ http {
         gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml;
         gzip_disable "MSIE [1-6]\.";
 
+        # Main auth endpoint for regular requests
         location = /auth {
             internal;
             rewrite /validate / break;
@@ -62,6 +73,37 @@ http {
             root /config;
         }
 
+        location @auth_redirect {
+            if ($auth_x_aksio_impersonation_redirect) {
+                return 302 $scheme://$http_host$auth_x_aksio_impersonation_redirect;
+            }
+
+            return 401;
+        }
+
+{{#if ImpersonationEnabled}}
+        # Auth endpoint for authorizing an impersonation
+        location = /auth/impersonation {
+            internal;
+            rewrite /validate / break;
+            proxy_pass http://host.docker.internal:5000/.aksio/impersonate/auth;
+            proxy_set_header Host $http_host;
+
+            proxy_pass_request_body off;
+            proxy_set_header Content-Length "";
+        }
+
+        location /.aksio/impersonate {
+            auth_request /auth/impersonation;
+            proxy_pass {{TargetUrl}};
+        }
+
+        location /.aksio/impersonate/perform {
+            auth_request /auth/impersonation;
+            proxy_pass http://localhost:81;
+        }
+{{/if}}
+
         location /.aksio {
             rewrite ^/.aksio(/.*)$ $1 break;
             proxy_pass http://localhost:81;
@@ -70,20 +112,14 @@ http {
 
 {{#Routes}}
         location {{Path}} {
+            error_page 401 = @auth_redirect;
+
             {{#if Resolver}}
             # Specifies DNS server (this becomes necessary when doing regexp location to proxy_pass in nginx as the target-host lookup changes from startup to runtime)
             resolver {{Resolver}};
             {{/if}}
-        
-            proxy_pass {{TargetUrl}};
 
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection $connection_upgrade;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header accept-encoding deflate;
+            proxy_pass {{TargetUrl}};
 
             auth_request_set $auth_resp_x_ms_client_principal $upstream_http_x_ms_client_principal;
             proxy_set_header x-ms-client-principal $x_principal;
@@ -95,7 +131,7 @@ http {
             auth_request_set $auth_resp_cookie $sent_http_set_cookie;
             add_header Set-Cookie $auth_resp_cookie;
         }
-        
+
 {{/Routes}}
     }
 }

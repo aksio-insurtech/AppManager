@@ -29,5 +29,40 @@
         "authority": "{{OAuthBearerTokenProvider.Authority}}"
     },
 {{/if}}
-    "identityDetailsUrl": "{{IdentityDetailsUrl}}"
+    "identityDetailsUrl": "{{IdentityDetailsUrl}}",
+{{if Impersonation }}
+    "impersonation": {
+        "identityProviders": [
+{{#IdentityProviders}}
+            "aad"
+{{/IdentityProviders}}
+        ],
+        "authorization": {
+            "tenants": [
+{{#Tenants}}
+                "eb681eb3-f7ca-4c0b-b309-92625bff5a59"
+{{/Tenants}}
+            ],
+            "roles": [
+{{#Roles}}
+                "Administrator"
+{{/Roles}}
+            ],
+            "groups": [
+{{#Groups}}
+                "e3e8b1e0-1b7a-4b0a-9b0a-1b7a4b0a9b0a"
+{{/Groups}}
+            ],
+            "claims": [
+{{#Claims}}
+                {
+                    "type": "name",
+                    "value": "Einar Ingebrigtsen"
+                }
+{{/Claims}}
+            ]
+        }
+    }
+{{/if}}
+
 }
