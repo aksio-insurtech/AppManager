@@ -29,28 +29,27 @@
         "authority": "{{OAuthBearerTokenProvider.Authority}}"
     },
 {{/if}}
-
-{{#if Impersonation }}
+{{#with Impersonation}}
     "impersonation": {
         "identityProviders": [
 {{#IdentityProviders}}
-            "{{this}}"
+            "{{this}}"{{#unless @last}},{{/unless}}
 {{/IdentityProviders}}
         ],
         "authorization": {
             "tenants": [
 {{#Tenants}}
-                "{{this}}"
+                "{{this}}"{{#unless @last}},{{/unless}}
 {{/Tenants}}
             ],
             "roles": [
 {{#Roles}}
-                "{{this}}"
+                "{{this}}"{{#unless @last}},{{/unless}}
 {{/Roles}}
             ],
             "groups": [
 {{#Groups}}
-                "{{this}}"
+                "{{this}}"{{#unless @last}},{{/unless}}
 {{/Groups}}
             ],
             "claims": [
@@ -63,6 +62,6 @@
             ]
         }
     },
-{{/if}}
+{{/with}}
     "identityDetailsUrl": "{{IdentityDetailsUrl}}"
 }
