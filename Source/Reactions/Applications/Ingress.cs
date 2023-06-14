@@ -41,6 +41,9 @@ public record Ingress(
 {
     public bool IsImpersonationEnabled => IdentityProviders.Any(identityProvider => identityProvider.Impersonation is not null);
 
+    public MicroserviceId? GetTargetMicroserviceIdForImpersonation(ApplicationEnvironmentWithArtifacts environment) => IsImpersonationEnabled ?
+        IdentityProviders.First(_ => _.Impersonation is not null).Impersonation!.TargetMicroservice : null;
+
     public ImpersonationMiddlewareConfig? GetImpersonationTemplateContent(ApplicationEnvironmentWithArtifacts environment) => IsImpersonationEnabled ?
             new ImpersonationMiddlewareConfig(
                 IdentityProviders.Select(_ => _.Name.Value),
