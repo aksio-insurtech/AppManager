@@ -14,4 +14,5 @@ public record IdentityProvider(
     IdentityProviderIssuerURL Issuer,
     IdentityProviderAuthorizationEndpoint AuthorizationEndpoint,
     IdentityProviderTokenEndpoint TokenEndpoint,
-    IdentityProviderCertificationURL CertificationUri);
+    IdentityProviderCertificationURL CertificationUri,
+    IdentityProviderImpersonation? Impersonation);
