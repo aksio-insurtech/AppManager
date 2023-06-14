@@ -1,3 +1,10 @@
+# [v0.16.0] - 2023-6-14 [PR: #182](https://github.com/aksio-insurtech/AppManager/pull/182)
+
+### Added
+
+- Adding support for impersonation.
+
+
 # [v0.14.0] - 2023-5-23 [PR: #180](https://github.com/aksio-insurtech/AppManager/pull/180)
 
 ### Added
