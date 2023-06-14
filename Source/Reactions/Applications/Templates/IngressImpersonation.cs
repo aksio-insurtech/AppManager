@@ -3,4 +3,4 @@
 
 namespace Reactions.Applications.Templates;
 
-public record IngressTemplateContent(IEnumerable<IngressTemplateRouteContent> Routes, IngressImpersonation? Impersonation);
+public record IngressImpersonation(string TargetUrl);

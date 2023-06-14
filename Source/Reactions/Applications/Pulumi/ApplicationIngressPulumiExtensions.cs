@@ -40,18 +40,27 @@ public static class ApplicationIngressPulumiExtensions
     {
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
         var routes = new List<IngressTemplateRouteContent>();
+        var microserviceTargets = new Dictionary<MicroserviceId, string>();
+
+        var targetMicroserviceForImpersonation = ingress.GetTargetMicroserviceIdForImpersonation(environment);
+        var hasTargetMicroserviceForImpersonation = targetMicroserviceForImpersonation is not null && microservices.ContainsKey(targetMicroserviceForImpersonation);
 
         foreach (var route in ingress.Routes)
         {
             if (microservices.ContainsKey(route.TargetMicroservice))
             {
                 var configuration = await microservices[route.TargetMicroservice].Configuration!.GetValue();
-                var url = $"http://{configuration!.Ingress!.Fqdn}{route.TargetPath}";
+                var targetUrl = $"http://{configuration!.Ingress!.Fqdn}";
+                var url = $"{targetUrl}{route.TargetPath}";
+                microserviceTargets[route.TargetMicroservice] = targetUrl;
                 routes.Add(new IngressTemplateRouteContent(route.Path, url, route.UseResolver ? ingress.Resolver!.Value : null));
             }
         }
 
-        var nginxContent = TemplateTypes.IngressConfig(new IngressTemplateContent(routes, ingress.IsImpersonationEnabled));
+        var nginxContent = TemplateTypes.IngressConfig(
+            new IngressTemplateContent(
+                routes,
+                hasTargetMicroserviceForImpersonation ? new(microserviceTargets[targetMicroserviceForImpersonation!]) : null));
         nginxFileStorage.Upload(AuthConfigFile, nginxContent);
 
         var idPortenConfig = OpenIDConnectConfig.Empty;
@@ -123,6 +132,7 @@ public static class ApplicationIngressPulumiExtensions
             tenantResolutionConfig,
             ingress.OAuthBearerTokenProvider,
             ingress.GetImpersonationTemplateContent(environment));
+
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
 
@@ -357,7 +367,6 @@ public static class ApplicationIngressPulumiExtensions
                 RedirectToProvider = redirectToProvider,
                 ExcludedPaths = new[]
                 {
-                    "/.aksio/*",
                     "/.well-known/*"
                 }
             },

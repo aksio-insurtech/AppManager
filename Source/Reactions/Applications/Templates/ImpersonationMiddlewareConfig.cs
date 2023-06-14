@@ -5,7 +5,7 @@ using Concepts.Security;
 
 namespace Reactions.Applications.Templates;
 
-public record Impersonation(
+public record ImpersonationMiddlewareConfig(
     IEnumerable<string> IdentityProviders,
     IEnumerable<string> Tenants,
     IEnumerable<string> Roles,

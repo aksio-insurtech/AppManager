@@ -32,9 +32,7 @@
 {{#with Impersonation}}
     "impersonation": {
         "identityProviders": [
-{{#IdentityProviders}}
-            "{{this}}"{{#unless @last}},{{/unless}}
-{{/IdentityProviders}}
+            "aad"
         ],
         "authorization": {
             "tenants": [

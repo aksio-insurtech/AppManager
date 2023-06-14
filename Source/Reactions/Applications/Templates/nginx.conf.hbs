@@ -58,10 +58,10 @@ http {
             rewrite /validate / break;
             proxy_pass http://localhost:81/;
             proxy_set_header Host $http_host;
+            proxy_set_header X-Original-URI $request_uri;
 
             proxy_pass_request_body off;
             proxy_set_header Content-Length "";
-            proxy_set_header X-Original-URI $request_uri;
         }
 
 		location /.cratis {
@@ -81,13 +81,14 @@ http {
             return 401;
         }
 
-{{#if ImpersonationEnabled}}
+{{#with Impersonation}}
         # Auth endpoint for authorizing an impersonation
         location = /auth/impersonation {
             internal;
             rewrite /validate / break;
-            proxy_pass http://host.docker.internal:5000/.aksio/impersonate/auth;
+            proxy_pass http://localhost:81/.aksio/impersonate/auth;
             proxy_set_header Host $http_host;
+            proxy_set_header X-Original-URI $request_uri;
 
             proxy_pass_request_body off;
             proxy_set_header Content-Length "";
@@ -102,7 +103,7 @@ http {
             auth_request /auth/impersonation;
             proxy_pass http://localhost:81;
         }
-{{/if}}
+{{/with}}
 
         location /.aksio {
             rewrite ^/.aksio(/.*)$ $1 break;
