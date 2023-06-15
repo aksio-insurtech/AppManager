@@ -102,6 +102,7 @@ http {
         location /.aksio/impersonate/perform {
             auth_request /auth/impersonation;
             proxy_pass http://localhost:81;
+            proxy_set_header Host $http_host;
         }
 {{/with}}
 
