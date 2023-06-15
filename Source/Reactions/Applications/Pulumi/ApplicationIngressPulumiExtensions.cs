@@ -367,6 +367,7 @@ public static class ApplicationIngressPulumiExtensions
                 RedirectToProvider = redirectToProvider,
                 ExcludedPaths = new[]
                 {
+                    "/.aksio/id-porten/*",
                     "/.well-known/*"
                 }
             },
