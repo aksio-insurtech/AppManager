@@ -5,7 +5,7 @@
 	<ItemGroup>
 		<PackageReference Include="pulumi.automation" Version="3.54.1" />
 		<PackageReference Include="pulumi.azuread" Version="5.35.0" />
-		<PackageReference Include="pulumi.azurenative" Version="1.96.0" />
+		<PackageReference Include="pulumi.azurenative" Version="1.103.0" />
 		<PackageReference Include="Pulumi.Mongodbatlas" Version="3.7.0" />
         <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
 	</ItemGroup>
