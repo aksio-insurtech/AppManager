@@ -43,7 +43,7 @@ public static class AppSettingsUtils
                     ["Name"] = "Console",
                     ["Args"] = new JsonObject()
                     {
-                        ["formatter"] = "Aksio.Cratis.Applications.Logging.RenderedCompactJsonFormatter, Aksio.Cratis.Applications"
+                        ["formatter"] = "Aksio.Applications.Serilog.RenderedCompactJsonFormatter, Aksio.Applications.Serilog@"
                     }
                 }
             }
