@@ -3,17 +3,15 @@
 
 #pragma warning disable IDE0005, CS8019
 
-global using Aksio.Cratis.Applications.Commands;
-global using Aksio.Cratis.Applications.Queries;
-global using Aksio.Cratis.Applications.Queries.MongoDB;
-global using Aksio.Cratis.Concepts;
+global using Aksio.Applications.Commands;
+global using Aksio.Applications.Queries;
+global using Aksio.Applications.Queries.MongoDB;
+global using Aksio.Concepts;
 global using Aksio.Cratis.Events;
 global using Aksio.Cratis.EventSequences;
-global using Aksio.Cratis.Integration;
 global using Aksio.Cratis.Observation;
 global using Aksio.Cratis.Projections;
-global using AutoMapper;
 global using Microsoft.AspNetCore.Mvc;
 global using MongoDB.Driver;
 global using ApplicationId = Concepts.Applications.ApplicationId;
-global using ExecutionContext = Aksio.Cratis.Execution.ExecutionContext;
+global using ExecutionContext = Aksio.Execution.ExecutionContext;

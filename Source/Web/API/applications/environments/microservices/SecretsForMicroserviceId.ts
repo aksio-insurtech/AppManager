@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@aksio/cratis-applications-frontend/queries';
+import { ObservableQueryFor, QueryResultWithState, useObservableQuery } from '@aksio/applications/queries';
 import { SecretsForMicroservice } from './SecretsForMicroservice';
 import Handlebars from 'handlebars';
 

@@ -2,7 +2,7 @@
  *  **DO NOT EDIT** - This file is an automatically generated file.
  *--------------------------------------------------------------------------------------------*/
 
-import { field } from '@aksio/cratis-fundamentals';
+import { field } from '@aksio/fundamentals';
 
 import { DeployableOnEnvironmentKey } from './DeployableOnEnvironmentKey';
 import { EnvironmentVariable } from './EnvironmentVariable';

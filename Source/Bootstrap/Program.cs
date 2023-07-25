@@ -2,10 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text.Json;
-using Aksio.Cratis.Execution;
+using Aksio.Execution;
 using Aksio.Cratis.Json;
-using Aksio.Cratis.Serialization;
-using Aksio.Cratis.Types;
+using Aksio.Serialization;
+using Aksio.Types;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Concepts;
