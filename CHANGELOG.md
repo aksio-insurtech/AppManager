@@ -1,3 +1,10 @@
+# [v0.17.1] - 2023-7-25 [PR: #184](https://github.com/aksio-insurtech/AppManager/pull/184)
+
+### Fixed
+
+- Fixing the fully qualified name for the custom Serilog formatter we use. This has moved into a different repository.
+
+
 # [v0.16.0] - 2023-6-14 [PR: #182](https://github.com/aksio-insurtech/AppManager/pull/182)
 
 ### Added
