@@ -3,7 +3,7 @@
 
 using System.Text.Json;
 using Aksio.Execution;
-using Aksio.Cratis.Json;
+using Aksio.Json;
 using Aksio.Serialization;
 using Aksio.Types;
 using Autofac;
@@ -34,32 +34,9 @@ public static class Program
             filename = args[1];
         }
 
-        Types.AddAssemblyPrefixesToExclude(
-            "AutoMapper",
-            "Autofac",
-            "Azure",
-            "Elasticsearch",
-            "FluentValidation",
-            "Handlebars",
-            "Humanizer",
-            "NJsonSchema",
-            "MongoDB",
-            "Orleans",
-            "Serilog",
-            "Swashbuckle",
-            "Pulumi",
-            "Grpc",
-            "Namotion",
-            "YamlDotNet",
-            "OneOf",
-            "Azure",
-            "Ben",
-            "CliWrap",
-            "DnsClient",
-            "Semver",
-            "SharpCompress");
-
+#pragma warning disable CA2000 // Dispose objects before losing scope - LoggerFactory will stay with us
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
+#pragma warning restore CA2000 // Dispose objects before losing scope
         var types = new Types();
         var derivedTypes = new DerivedTypes(types);
         Globals.Configure(derivedTypes);

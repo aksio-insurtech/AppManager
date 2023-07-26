@@ -9,7 +9,7 @@ namespace Bootstrap;
 
 public class BootstrapStacksForApplications : IStacksForApplications
 {
-    record StackForSaving(ApplicationId ApplicationId, ApplicationEnvironment Environment, string Deployment);
+    sealed record StackForSaving(ApplicationId ApplicationId, ApplicationEnvironment Environment, string Deployment);
     #pragma warning disable CS0649
     internal AppManagerApi? AppManagerApi;
     readonly List<StackForSaving> _stacksForSaving = new();

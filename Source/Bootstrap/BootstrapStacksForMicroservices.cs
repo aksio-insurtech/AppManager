@@ -10,7 +10,7 @@ namespace Bootstrap;
 
 public class BootstrapStacksForMicroservices : IStacksForMicroservices
 {
-    record StackForSaving(ApplicationId ApplicationId, MicroserviceId microserviceId, ApplicationEnvironment Environment, string Deployment);
+    sealed record StackForSaving(ApplicationId ApplicationId, MicroserviceId microserviceId, ApplicationEnvironment Environment, string Deployment);
     #pragma warning disable CS0649
     internal AppManagerApi? AppManagerApi;
     readonly ApplicationId _applicationId;
