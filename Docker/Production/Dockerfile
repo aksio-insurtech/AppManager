@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0-focal
+FROM mcr.microsoft.com/dotnet/runtime:7.0.8-bullseye-slim
 ARG CONFIGURATION=Release
 ARG VERSION
 
