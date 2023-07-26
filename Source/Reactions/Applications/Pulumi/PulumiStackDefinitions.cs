@@ -129,7 +129,6 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var tags = application.GetTags(environment);
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
         var storage = await microservice.SetupFileShare(application, environment, resourceGroup, _settings.ServicePrincipal, subscription, _fileStorageLogger);
-        storage.CreateAndUploadAppSettings();
 
         deployables ??= Array.Empty<Deployable>();
 
@@ -151,7 +150,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         microserviceResult.ContainerApp.Configuration.Apply(_ => _?.Ingress).Apply(_ =>
         {
             var url = $"http://{_?.Fqdn}";
-            storage.CreateAndUploadClientCratisConfig(storage.FileStorage.ConnectionString, url);
+            storage.CreateAndUploadClientAppSettings(storage.FileStorage.ConnectionString, url);
             return _?.Fqdn;
         });
 

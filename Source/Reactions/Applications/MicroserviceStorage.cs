@@ -4,6 +4,7 @@
 using System.Collections.ObjectModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Aksio.Cratis.Kernel.Configuration;
 using Aksio.Cratis.Kernel.Orleans.Configuration;
 using Reactions.Applications.Pulumi;
@@ -139,36 +140,16 @@ public class MicroserviceStorage
         FileStorage.Upload("cratis.json", cratisJson);
     }
 
-    public void CreateAndUploadAppSettings()
+    public void CreateAndUploadClientAppSettings(string connectionString, string advertisedClientEndpoint)
     {
         var appSettingsJson = _microservice.AppSettingsContent?.Value ?? "{}";
-        FileStorage.Upload("appsettings.json", AppSettingsUtils.OverrideLogging(appSettingsJson));
-    }
+        var appSettings = JsonNode.Parse(appSettingsJson)!
+                            .AsObject()
+                            .ConfigureKestrel()
+                            .ConfigureLogging()
+                            .ConfigureCratisCluster(connectionString, advertisedClientEndpoint);
 
-    public void CreateAndUploadClientCratisConfig(string connectionString, string advertisedClientEndpoint)
-    {
-        var config = new Aksio.Cratis.Configuration.ClientConfiguration
-        {
-            Kernel = new()
-            {
-                Type = Aksio.Cratis.Configuration.ClusterTypes.AzureStorage,
-                Options = new Aksio.Cratis.Configuration.AzureStorageClusterOptions
-                {
-                    ConnectionString = connectionString,
-                    Secure = false,
-                    Port = 80
-                },
-                AdvertisedClientEndpoint = new Uri(advertisedClientEndpoint)
-            }
-        };
-
-        var cratisJson = JsonSerializer.Serialize(config, new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        });
-
-        FileStorage.Upload("cratis.json", cratisJson);
+        FileStorage.Upload("appsettings.json", appSettings);
     }
 
     string GetFirstPartOf(Guid guid) => guid.ToString().Split('-')[0];

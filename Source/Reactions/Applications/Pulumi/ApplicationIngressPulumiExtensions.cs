@@ -136,7 +136,10 @@ public static class ApplicationIngressPulumiExtensions
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
 
-        var appSettings = AppSettingsUtils.OverrideLogging("{}");
+        var appSettings = new JsonObject()
+                            .ConfigureKestrel()
+                            .ConfigureLogging();
+
         nginxFileStorage.Upload(AppSettingsFile, appSettings);
     }
 

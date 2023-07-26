@@ -72,17 +72,19 @@ public class ApplicationEnvironmentResourcesCoordinator
         return Task.CompletedTask;
     }
 
-    public async Task AppSettingsChanged(AppSettingsSetForMicroservice @event, EventContext context)
+    public Task AppSettingsChanged(AppSettingsSetForMicroservice @event, EventContext context)
     {
-        var application = (await _projections.GetInstanceById<Application>(@event.ApplicationId)).Model;
-        var environment = (await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId)).Model;
-        var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+        // var application = (await _projections.GetInstanceById<Application>(@event.ApplicationId)).Model;
+        // var environment = (await _projections.GetInstanceById<ApplicationEnvironmentWithArtifacts>(@event.EnvironmentId)).Model;
+        // var microservice = environment.GetMicroserviceById(@event.MicroserviceId);
+        // var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+        // var storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
+        // var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, microservice.GetFileShareName(), _fileStorageLogger);
+        // var microserviceStorage = new MicroserviceStorage(application, microservice, fileStorage);
+        // microserviceStorage.CreateAndUploadAppSettings();
 
-        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
-        var storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
-        var fileStorage = new FileStorage(storage.AccountName, storage.AccountKey, microservice.GetFileShareName(), _fileStorageLogger);
-        var microserviceStorage = new MicroserviceStorage(application, microservice, fileStorage);
-        microserviceStorage.CreateAndUploadAppSettings();
+        // TODO: Need to store information to be able to set the Azure Storage account connection string for AppSettings
+        throw new NotImplementedException();
     }
 
     public Task DeployableImageChanged(DeployableImageChangedInEnvironment @event, EventContext context)
