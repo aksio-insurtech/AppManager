@@ -2,11 +2,14 @@
 	<PropertyGroup>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <ApplicationModel>1.1.12</ApplicationModel>
+        <Cratis>9.0.2</Cratis>
 	</PropertyGroup>
 	<ItemGroup>
         <PackageVersion Include="Aksio.Defaults" Version="1.6.10"/>
-        <PackageVersion Include="Aksio.Cratis" Version="9.0.1"/>
-        <PackageVersion Include="Aksio.Cratis.Kernel.Common" Version="9.0.1"/>
+        <PackageVersion Include="Aksio.Cratis" Version="$(Cratis)"/>
+        <PackageVersion Include="Aksio.Cratis.AspNetCore" Version="$(Cratis)"/>
+        <PackageVersion Include="Aksio.Cratis.MongoDB" Version="$(Cratis)"/>
+        <PackageVersion Include="Aksio.Cratis.Kernel.Common" Version="$(Cratis)"/>
         <PackageVersion Include="Aksio.Applications" Version="$(ApplicationModel)"/>
         <PackageVersion Include="Aksio.Applications.CQRS" Version="$(ApplicationModel)"/>
         <PackageVersion Include="Aksio.Applications.CQRS.MongoDB" Version="$(ApplicationModel)"/>

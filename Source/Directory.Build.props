@@ -21,6 +21,8 @@
         <PackageReference Include="Aksio.Applications.CQRS.MongoDB" />
         <PackageReference Include="Aksio.Applications.ProxyGenerator" />
         <PackageReference Include="Aksio.Cratis" />
+        <PackageReference Include="Aksio.Cratis.AspNetCore" />
+        <PackageReference Include="Aksio.Cratis.MongoDB" />
         <PackageReference Include="Aksio.MongoDB" />
         <PackageReference Include="Aksio.Cratis.Kernel.Common" />
     </ItemGroup>
