@@ -7,12 +7,12 @@
 		<ProjectReference Include="../Infrastructure/Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="handlebars.net" Version="2.1.2" />
-		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.12.1" />
-		<PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
-		<PackageReference Include="Microsoft.Azure.Management.Fluent" Version="1.38.1" />
-		<PackageReference Include="Microsoft.Azure.Management.ResourceManager.Fluent" Version="1.38.1" />
-		<PackageReference Include="semver" Version="2.2.0" />
+		<PackageReference Include="handlebars.net" />
+		<PackageReference Include="Azure.Storage.Files.Shares" />
+		<PackageReference Include="Azure.Storage.Blobs" />
+		<PackageReference Include="Microsoft.Azure.Management.Fluent" />
+		<PackageReference Include="Microsoft.Azure.Management.ResourceManager.Fluent" />
+		<PackageReference Include="semver" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="$(MSBuildThisFileDirectory)/Applications/Templates/**/*" />

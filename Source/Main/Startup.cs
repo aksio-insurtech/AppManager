@@ -5,9 +5,16 @@ namespace Sample;
 
 public class Startup
 {
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMongoDBReadModels();
+    }
+
     public void Configure(IApplicationBuilder app)
     {
         app.UseRouting();
+        app.UseWebSockets();
+        app.UseCratis();
         app.UseAksio();
     }
 }

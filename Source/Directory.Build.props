@@ -1,11 +1,10 @@
 <Project>
-    <Import Project="$(MSBuildThisFileDirectory)/../Versions.props"/>
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <ImplicitUsings>true</ImplicitUsings>
-        <NoWarn>$(NoWarn);SA1600;SA1601;SA1602;CS1591;IDE0060</NoWarn>
+        <NoWarn>$(NoWarn);SA1600;SA1601;SA1602;CS1591;IDE0060;NU1507</NoWarn>
 
         <AksioProxyOutput>$(MSBuildThisFileDirectory)/Web/API</AksioProxyOutput>
         <AksioUseRouteAsPath>true</AksioUseRouteAsPath>
@@ -16,11 +15,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aksio.Defaults" Version="$(AksioDefaults)" />
-        <PackageReference Include="Aksio.Cratis.Applications" Version="$(AksioCratis)" />
-        <PackageReference Include="Aksio.Cratis.Applications.CQRS" Version="$(AksioCratis)" />
-        <PackageReference Include="Aksio.Cratis.Applications.CQRS.MongoDB" Version="$(AksioCratis)" />
-        <PackageReference Include="Aksio.Cratis.Applications.ProxyGenerator" Version="$(AksioCratis)" />
-        <PackageReference Include="Aksio.Cratis.Kernel.Common" Version="$(AksioCratis)" />
+        <PackageReference Include="Aksio.Defaults" />
+        <PackageReference Include="Aksio.Applications" />
+        <PackageReference Include="Aksio.Applications.CQRS" />
+        <PackageReference Include="Aksio.Applications.CQRS.MongoDB" />
+        <PackageReference Include="Aksio.Applications.ProxyGenerator" />
+        <PackageReference Include="Aksio.Cratis" />
+        <PackageReference Include="Aksio.Cratis.AspNetCore" />
+        <PackageReference Include="Aksio.Cratis.MongoDB" />
+        <PackageReference Include="Aksio.MongoDB" />
+        <PackageReference Include="Aksio.Cratis.Kernel.Common" />
     </ItemGroup>
 </Project>

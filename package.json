@@ -3,6 +3,25 @@
     "workspaces": [
         "Source/**/*"
     ],
+    "scripts": {
+        "g:dev": "cd $INIT_CWD && tsc -b && vite serve",
+        "g:preview": "cd $INIT_CWD && vite preview",
+        "g:web-build": "cd $INIT_CWD && tsc -b && vite build",
+        "g:clean": "cd $INIT_CWD && tsc -b --clean",
+        "g:build": "cd $INIT_CWD && tsc -b",
+        "g:lint": "cd $INIT_CWD && eslint --cache . --ext .ts,.tsx --quiet --fix",
+        "g:lint:ci": "cd $INIT_CWD && eslint --cache . --ext .ts,.tsx --quiet",
+        "g:test": "cd $INIT_CWD && env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha --config ${PROJECT_CWD}/.mocharc.js",
+        "g:ci": "cd $INIT_CWD && yarn clean && yarn lint:ci && yarn test && yarn build",
+        "g:up": "cd $INIT_CWD && ncu -u \\!'@aksio/*'",
+        "clean": "node ./run-task-on-workspaces.js clean",
+        "build": "node ./run-task-on-workspaces.js build",
+        "lint": "node ./run-task-on-workspaces.js lint",
+        "test": "node ./run-task-on-workspaces.js test",
+        "ci": "node ./run-task-on-workspaces.js ci",
+        "publish-version": "node ./run-task-on-workspaces.js publish-version $*",
+        "up": "node ./run-task-on-workspaces.js up"
+    },
     "license": "MIT",
     "version": "0.0.0"
 }

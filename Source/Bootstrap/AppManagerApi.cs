@@ -3,7 +3,7 @@
 
 using System.Net.Http.Json;
 using System.Text.Json;
-using Aksio.Cratis.Execution;
+using Aksio.Execution;
 using Concepts.Applications.Environments;
 using Concepts.Applications.Environments.Ingresses;
 using Concepts.Applications.Tenants;
@@ -28,7 +28,7 @@ public class AppManagerApi : IDisposable
 
     public async Task Authenticate()
     {
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        using var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             { "grant_type", "client_credentials" },
             { "client_id", _config.IdentityProviders.First().ClientId },
@@ -36,7 +36,7 @@ public class AppManagerApi : IDisposable
             { "scope", $"api://{_config.IdentityProviders.First().ClientId}/.default" }
         });
 
-        var client = new HttpClient();
+        using var client = new HttpClient();
         var response = await client.PostAsync($"https://login.microsoftonline.com/{_config.Azure.TenantId}/oauth2/v2.0/token", content);
         var result = await response.Content.ReadAsStringAsync();
         var document = JsonDocument.Parse(result);
@@ -69,7 +69,7 @@ public class AppManagerApi : IDisposable
     async Task Perform(string route, object body)
     {
         Console.WriteLine($"Calling : {route}");
-        var content = JsonContent.Create(body, options: _jsonSerializerOptions);
+        using var content = JsonContent.Create(body, options: _jsonSerializerOptions);
         var response = await _client.PostAsync(route, content);
         var result = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)

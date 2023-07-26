@@ -2,12 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { GridColDef } from '@mui/x-data-grid';
-import { ModalResult } from '@aksio/cratis-mui';
+import { ModalResult } from '@aksio/applications-mui';
 import { AddEnvironmentDialog, AddEnvironmentDialogOutput } from './AddEnvironmentDialog';
 import { EnvironmentsForApplication } from 'API/applications/environments/EnvironmentsForApplication';
 import { ApplicationEnvironment } from 'API/applications/environments/ApplicationEnvironment';
 import { CreateApplicationEnvironment } from 'API/applications/environments/CreateApplicationEnvironment';
-import { Guid } from '@aksio/cratis-fundamentals';
+import { Guid } from '@aksio/fundamentals';
 import { ValueEditorFor } from 'Components';
 import { useRouteParams } from '../RouteParams';
 

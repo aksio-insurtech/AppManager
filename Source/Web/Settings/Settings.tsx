@@ -10,7 +10,7 @@ import { SetMongoDBSettings } from 'API/settings/SetMongoDBSettings';
 import { SetPulumiSettings } from 'API/settings/SetPulumiSettings';
 import { Box, Button, Stack, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { useModal, ModalButtons, ModalResult } from '@aksio/cratis-mui';
+import { useModal, ModalButtons, ModalResult } from '@aksio/applications-mui';
 import { SetAzureServicePrincipal } from 'API/settings/SetAzureServicePrincipal';
 
 const columns: GridColDef[] = [

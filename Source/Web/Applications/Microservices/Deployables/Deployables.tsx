@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { ModalResult } from '@aksio/cratis-mui';
+import { ModalResult } from '@aksio/applications-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
 import { AddDeployableDialog, AddDeployableDialogOutput } from './AddDeployableDialog';
@@ -13,7 +13,7 @@ import { Secrets } from '../../Secrets/Secrets';
 import { Variables } from '../../Variables/Variables';
 import { CreateDeployable } from 'API/applications/environments/microservices/deployables/CreateDeployable';
 import { CreateDeployableWithImage } from 'API/applications/environments/microservices/deployables/CreateDeployableWithImage';
-import { Guid } from '@aksio/cratis-fundamentals';
+import { Guid } from '@aksio/fundamentals';
 import { DeployablesForMicroservice } from 'API/applications/environments/microservices/deployables/DeployablesForMicroservice';
 import { Deployable } from 'API/applications/environments/microservices/deployables/Deployable';
 import { RouteParams, useRouteParams } from '../../RouteParams';

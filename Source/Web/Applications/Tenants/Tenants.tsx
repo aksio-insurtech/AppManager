@@ -1,11 +1,11 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { ModalResult, useModal, ModalButtons } from '@aksio/cratis-mui';
+import { ModalResult, useModal, ModalButtons } from '@aksio/applications-mui';
 import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { TenantsForEnvironment } from 'API/applications/environments/tenants/TenantsForEnvironment';
 import { AddTenantDialog, AddTenantDialogOutput } from './AddTenant';
-import { Guid } from '@aksio/cratis-fundamentals';
+import { Guid } from '@aksio/fundamentals';
 import { Tenant } from 'API/applications/environments/tenants/Tenant';
 import { AddTenant } from 'API/applications/environments/tenants/AddTenant';
 import { ValueEditorFor } from 'Components';

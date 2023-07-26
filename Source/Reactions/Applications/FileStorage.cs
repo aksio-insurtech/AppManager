@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Azure.Storage.Files.Shares;
 using Microsoft.Extensions.Logging;
 
@@ -31,6 +34,17 @@ public class FileStorage
         ShareName = shareName;
 
         _logger = logger;
+    }
+
+    public void Upload(string fileName, JsonNode content)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            WriteIndented = true
+        };
+
+        Upload(fileName, content.ToJsonString(options));
     }
 
     public void Upload(string fileName, string content)

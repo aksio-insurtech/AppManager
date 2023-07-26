@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { TextField, Stack, MenuItem, Select } from '@mui/material';
-import { IModalProps } from '@aksio/cratis-mui';
+import { IModalProps } from '@aksio/applications-mui';
 import { AllSettings } from 'API/settings/AllSettings';
 
 export interface CreateApplicationDialogOutput {

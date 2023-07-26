@@ -291,3 +291,14 @@ dist
 wwwroot
 **/out/arm64
 **/out/x64
+
+.pnp.*
+**/.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+.DS_Store
+

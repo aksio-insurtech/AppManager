@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { ModalResult } from '@aksio/cratis-mui';
+import { ModalResult } from '@aksio/applications-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
 import { SetVariableDialog, AddVariableDialogOutput } from './SetVariableDialog';

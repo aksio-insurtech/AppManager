@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-focal
+FROM mcr.microsoft.com/dotnet/runtime:7.0.8-bullseye-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

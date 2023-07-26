@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { CreateApplication } from 'API/applications/CreateApplication';
-import { Guid } from '@aksio/cratis-fundamentals';
+import { Guid } from '@aksio/fundamentals';
 import { ApplicationsHierarchy } from 'API/applications/ApplicationsHierarchy';
 import { Application } from './Application';
 
@@ -13,7 +13,7 @@ import * as icons from '@mui/icons-material';
 import { Microservice } from './Microservices/Microservice';
 import { Deployable } from './Microservices/Deployables/Deployable';
 import { Box, Divider, Grid, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Menu, MenuItem } from '@mui/material';
-import { ModalButtons, ModalResult, useModal } from '@aksio/cratis-mui';
+import { ModalButtons, ModalResult, useModal } from '@aksio/applications-mui';
 import { ApplicationsNav } from './ApplicationsNav';
 import { ListItemActionButton } from './ListItemActionButton';
 import { ApplicationItem } from './ApplicationItem';
