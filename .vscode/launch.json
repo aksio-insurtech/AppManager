@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Source/Main/bin/Debug/net6.0/Main.dll",
+            "program": "${workspaceFolder}/Source/Main/bin/Debug/net7.0/Main.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Source/Main",
             "stopAtEntry": false,
@@ -23,7 +23,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Source/Main/bin/Debug/net6.0/Main.dll",
+            "program": "${workspaceFolder}/Source/Main/bin/Debug/net7.0/Main.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Source/Main",
             "stopAtEntry": false,
@@ -47,7 +47,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/aksio-management.json"
             ],
@@ -61,7 +61,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/Cloud/Opensjon/Development/opensjon-variables.json",
                 "/Users/einari/Projects/Aksio/Cloud/Opensjon/Development/opensjon.json"
@@ -76,7 +76,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon-variables.json",
                 "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon.json"
@@ -91,7 +91,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon-variables.json",
                 "/Users/einari/Projects/Aksio/Cloud/Opensjon/Production/opensjon.json"
@@ -118,7 +118,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/Cloud/Innmeldt/QA/innmeldt-variables.json",
                 "/Users/einari/Projects/Aksio/Cloud/Innmeldt/QA/innmeldt.json"
@@ -133,7 +133,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/Cloud/AppManager/Development/AppManager-variables.json",
                 "/Users/einari/Projects/Aksio/Cloud/AppManager/Development/AppManager.json"
@@ -148,7 +148,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build bootstrap",
-            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net6.0/Bootstrap.dll",
+            "program": "${workspaceFolder}/Source/Bootstrap/bin/Debug/net7.0/Bootstrap.dll",
             "args": [
                 "/Users/einari/Projects/Aksio/Cloud/AppSmith/Production/appsmith-variables.json",
                 "/Users/einari/Projects/Aksio/Cloud/AppSmith/Production/appsmith.json"
