@@ -11,7 +11,7 @@ public class DockerHub : IDockerHub
 {
     public async Task<IEnumerable<SemanticVersion>> GetVersionsOfImage(string organization, string image, int numberOfVersions)
     {
-        var client = new HttpClient();
+        using var client = new HttpClient();
         var response = await client.GetStringAsync($"https://hub.docker.com/v2/repositories/{organization}/{image}/tags/?page_size={numberOfVersions}&page=1");
         var document = JsonDocument.Parse(response);
         return document.RootElement
