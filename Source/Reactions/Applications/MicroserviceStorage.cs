@@ -34,6 +34,7 @@ public class MicroserviceStorage
         string storageConnectionString,
         ApplicationMonitoringResult monitoring)
     {
+#pragma warning disable CA1851 // Possible multiple enumerations of IEnumerable
         const string scheme = "mongodb+srv://";
         var mongoDBConnectionString = mongoDB.ConnectionString.Insert(scheme.Length, $"kernel:{mongoDB.Password}@");
 
@@ -138,6 +139,7 @@ public class MicroserviceStorage
         });
 
         FileStorage.Upload("cratis.json", cratisJson);
+#pragma warning restore // Possible multiple enumerations of IEnumerable
     }
 
     public void CreateAndUploadClientAppSettings(string connectionString, string advertisedClientEndpoint)

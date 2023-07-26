@@ -20,8 +20,10 @@ public class ResourceRendering : IResourceRendering
             .FindMultiple(typeof(ICanRenderResource<>))
             .Select(_ => (serviceProvider.GetService(_) as ICanRenderResource)!);
 
+#pragma warning disable CA1851 // Possible multiple enumerations of IEnumerable
         _rendererMethods = renderers.ToDictionary(_ => _.TypeId, _ => _.GetType().GetMethod(nameof(ICanRenderResource<IResourceConfiguration>.Render), BindingFlags.Instance | BindingFlags.Public)!);
         _renderers = renderers.ToDictionary(_ => _.TypeId, _ => _);
+#pragma warning restore CA1851 // Possible multiple enumerations of IEnumerable
     }
 
     public async Task Render(ResourceLevel level, RenderContext context, ResourceRenderingScope scope)
@@ -34,9 +36,8 @@ public class ResourceRendering : IResourceRendering
 
     async Task RenderResource(ResourceLevel level, RenderContext context, Resource resource, ResourceRenderingScope scope)
     {
-        if (_renderers.ContainsKey(resource.Type))
+        if (_renderers.TryGetValue(resource.Type, out var renderer))
         {
-            var renderer = _renderers[resource.Type];
             if (renderer.Level != level) return;
 
             if (scope.HasRendered(resource.Type))

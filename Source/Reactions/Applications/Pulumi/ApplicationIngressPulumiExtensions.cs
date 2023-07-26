@@ -47,9 +47,9 @@ public static class ApplicationIngressPulumiExtensions
 
         foreach (var route in ingress.Routes)
         {
-            if (microservices.ContainsKey(route.TargetMicroservice))
+            if (microservices.TryGetValue(route.TargetMicroservice, out var microservice))
             {
-                var configuration = await microservices[route.TargetMicroservice].Configuration!.GetValue();
+                var configuration = await microservice.Configuration!.GetValue();
                 var targetUrl = $"http://{configuration!.Ingress!.Fqdn}";
                 var url = $"{targetUrl}{route.TargetPath}";
                 microserviceTargets[route.TargetMicroservice] = targetUrl;
@@ -118,9 +118,9 @@ public static class ApplicationIngressPulumiExtensions
 
         var identityDetailsUrl = string.Empty;
         if (ingress.IdentityDetailsProvider is not null &&
-            microservices.ContainsKey(ingress.IdentityDetailsProvider))
+            microservices.TryGetValue(ingress.IdentityDetailsProvider, out var identityDetailsProviderMicroservice))
         {
-            var configuration = await microservices[ingress.IdentityDetailsProvider].Configuration!.GetValue();
+            var configuration = await identityDetailsProviderMicroservice.Configuration!.GetValue();
             identityDetailsUrl = $"http://{configuration!.Ingress!.Fqdn}/.aksio/me";
         }
 
@@ -413,47 +413,49 @@ public static class ApplicationIngressPulumiExtensions
 
             case IdentityProviderType.IdPorten:
                 var proxyAuthorizationEndpoint = $"https://{ingress.AuthDomain!.Name}/.aksio/id-porten/authorize";
-                var client = new HttpClient();
-                var url = $"{identityProvider.Issuer}/.well-known/openid-configuration";
-                var result = await client.GetAsync(url);
-                var json = await result.Content.ReadAsStringAsync();
+                using (var client = new HttpClient())
+                {
+                    var url = $"{identityProvider.Issuer}/.well-known/openid-configuration";
+                    var result = await client.GetAsync(url);
+                    var json = await result.Content.ReadAsStringAsync();
 
-                var document = (JsonNode.Parse(json) as JsonObject)!;
-                document["authorization_endpoint"] = proxyAuthorizationEndpoint;
+                    var document = (JsonNode.Parse(json) as JsonObject)!;
+                    document["authorization_endpoint"] = proxyAuthorizationEndpoint;
 
-                var blobContainerClient = new BlobContainerClient(storage.ConnectionString, $"{ingress.Name}-ingress");
-                await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+                    var blobContainerClient = new BlobContainerClient(storage.ConnectionString, $"{ingress.Name}-ingress");
+                    await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
-                var blobClient = blobContainerClient.GetBlobClient(OpenIDConfigurationBlobName);
-                await blobClient.DeleteIfExistsAsync();
-                await blobContainerClient.UploadBlobAsync(OpenIDConfigurationBlobName, new BinaryData(document.ToJsonString()));
+                    var blobClient = blobContainerClient.GetBlobClient(OpenIDConfigurationBlobName);
+                    await blobClient.DeleteIfExistsAsync();
+                    await blobContainerClient.UploadBlobAsync(OpenIDConfigurationBlobName, new BinaryData(document.ToJsonString()));
 
-                args.CustomOpenIdConnectProviders[identityProvider.Name.Value] =
-                    new CustomOpenIdConnectProviderArgs
-                    {
-                        Enabled = true,
-                        Login = new OpenIdConnectLoginArgs
+                    args.CustomOpenIdConnectProviders[identityProvider.Name.Value] =
+                        new CustomOpenIdConnectProviderArgs
                         {
-                            Scopes = new string[]
+                            Enabled = true,
+                            Login = new OpenIdConnectLoginArgs
                             {
+                                Scopes = new string[]
+                                {
                                 "openid",
                                 "profile"
-                            }
-                        },
-                        Registration = new OpenIdConnectRegistrationArgs
-                        {
-                            ClientId = identityProvider.ClientId.Value,
-                            ClientCredential = new OpenIdConnectClientCredentialArgs
-                            {
-                                ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
-                                Method = ClientCredentialMethod.ClientSecretPost
+                                }
                             },
-                            OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
+                            Registration = new OpenIdConnectRegistrationArgs
                             {
-                                WellKnownOpenIdConfiguration = blobClient.Uri.ToString()
+                                ClientId = identityProvider.ClientId.Value,
+                                ClientCredential = new OpenIdConnectClientCredentialArgs
+                                {
+                                    ClientSecretSettingName = GetSecretNameForIdentityProvider(identityProvider),
+                                    Method = ClientCredentialMethod.ClientSecretPost
+                                },
+                                OpenIdConnectConfiguration = new OpenIdConnectConfigArgs
+                                {
+                                    WellKnownOpenIdConfiguration = blobClient.Uri.ToString()
+                                }
                             }
-                        }
-                    };
+                        };
+                }
                 break;
 
             case IdentityProviderType.OpenIDConnect:

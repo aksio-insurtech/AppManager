@@ -182,7 +182,7 @@ public class PulumiOperations : IPulumiOperations
         };
         var projectName = GetProjectNameFor(application);
         var url = $"https://api.pulumi.com/api/stacks/{_settings.PulumiOrganization}/{projectName}/{stackName}/tags";
-        var client = new HttpClient();
+        using var client = new HttpClient();
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.pulumi+8"));
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -302,9 +302,9 @@ public class PulumiOperations : IPulumiOperations
                 refreshOptions);
         }
 
-        if (sharedContext!.Results.ContainsKey(CratisResourceRenderer.ResourceTypeId))
+        if (sharedContext!.Results.TryGetValue(CratisResourceRenderer.ResourceTypeId, out var sharedCratisResult))
         {
-            microserviceContainerApps[CratisResourceRenderer.ResourceTypeId] = (sharedContext.Results[CratisResourceRenderer.ResourceTypeId] as ContainerApp)!;
+            microserviceContainerApps[CratisResourceRenderer.ResourceTypeId] = (sharedCratisResult as ContainerApp)!;
         }
 
         foreach (var (ingress, result) in ingressResults)
