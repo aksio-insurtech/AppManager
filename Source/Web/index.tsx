@@ -10,7 +10,7 @@ import './theme';
 import { App } from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline, Paper, ThemeProvider } from '@mui/material';
-import { ModalProvider } from '@aksio/cratis-mui';
+import { ModalProvider } from '@aksio/applications-mui';
 
 import { theme } from './theme';
 

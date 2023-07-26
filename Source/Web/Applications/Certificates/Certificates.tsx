@@ -1,7 +1,7 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { ModalResult } from '@aksio/cratis-mui';
+import { ModalResult } from '@aksio/applications-mui';
 import { GridColDef } from '@mui/x-data-grid';
 import { ValueEditorFor } from 'Components';
 import { AddCertificateToApplicationEnvironment } from 'API/applications/environments/AddCertificateToApplicationEnvironment';
@@ -9,7 +9,7 @@ import { CertificatesForApplicationEnvironmentId } from 'API/applications/enviro
 import { AddCertificateDialog, AdCertificateDialogOutput } from './AddCertificateDialog';
 import { useRouteParams } from '../RouteParams';
 import { Certificate } from 'API/applications/environments/Certificate';
-import { Guid } from '@aksio/cratis-fundamentals';
+import { Guid } from '@aksio/fundamentals';
 
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 250 }

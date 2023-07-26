@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import { Box, Stack, TextareaAutosize, useTheme } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridRowsProp, GridSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridRowsProp, GridRowSelectionModel } from '@mui/x-data-grid';
 
 import { useRef, useState } from 'react';
 import { useRouteParams } from '../RouteParams';
@@ -35,7 +35,7 @@ export const Deployments = () => {
     const textArea = useRef<HTMLTextAreaElement>(null);
     const theme = useTheme();
 
-    const handleSelectionChanged = (selectionModel: GridSelectionModel, details: GridCallbackDetails) => {
+    const handleSelectionChanged = (selectionModel: GridRowSelectionModel, details: GridCallbackDetails) => {
         const selectedItems = selectionModel.map(id => deployments.data.find((item) => item.id.deploymentId === id));
         setSelectedDeployment(selectedItems[0]);
     };
@@ -61,7 +61,7 @@ export const Deployments = () => {
                     columns={columns}
                     sortingMode="client"
                     getRowId={(row: ApplicationEnvironmentDeployment) => row.id.deploymentId}
-                    onSelectionModelChange={handleSelectionChanged}
+                    onRowSelectionModelChange={handleSelectionChanged}
                     rows={deployments.data as GridRowsProp<any>} />
 
             </Box>

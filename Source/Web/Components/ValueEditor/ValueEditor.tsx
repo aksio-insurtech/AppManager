@@ -1,9 +1,9 @@
 // Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { Content, ModalButtons, ModalClosed, useModal } from '@aksio/cratis-mui';
+import { Content, ModalButtons, ModalClosed, useModal } from '@aksio/applications-mui';
 import { Box, Button, Toolbar } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridRowId, GridRowIdGetter, GridRowsProp, GridSelectionModel, GridValidRowModel, GridCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridRowIdGetter, GridRowsProp, GridRowSelectionModel, GridValidRowModel, GridCellParams } from '@mui/x-data-grid';
 import * as icons from '@mui/icons-material';
 
 export type SelectionChanged<TModel> = (rows: TModel[]) => void;
@@ -31,7 +31,7 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
         props.modalContent,
         props.modalClosed);
 
-    const handleSelectionChanged = (selectionModel: GridSelectionModel, details: GridCallbackDetails) => {
+    const handleSelectionChanged = (selectionModel: GridRowSelectionModel, details: GridCallbackDetails) => {
         const selectedItems = selectionModel.map((id => props.data.find(item => props.getRowId(item) == id))) as TModel[];
         props.onSelectionChanged?.(selectedItems);
     };
@@ -58,7 +58,7 @@ export const ValueEditorFor = <TOutput, TModel extends GridValidRowModel = GridV
                 sortingMode="client"
                 getRowId={props.getRowId}
                 onCellDoubleClick={handleEditItem}
-                onSelectionModelChange={handleSelectionChanged}
+                onRowSelectionModelChange={handleSelectionChanged}
                 rows={props.data as GridRowsProp<any>} />
         </Box>
     );

@@ -66,8 +66,8 @@ try {
         const content = fs.readFileSync(file).toString();
         const npmPackages = [
             '@aksio/cratis-react',
-            '@aksio/cratis-fundamentals',
-            '@aksio/cratis-applications-frontend',
+            '@aksio/fundamentals',
+            '@aksio/applications',
             '@aksio/cratis-webpack',
             '@aksio/cratis-typescript'
         ];

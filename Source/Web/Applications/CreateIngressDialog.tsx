@@ -3,7 +3,7 @@
 
 import { TextField } from '@mui/material';
 import React, { useState } from 'react';
-import { IModalProps } from '@aksio/cratis-mui';
+import { IModalProps } from '@aksio/applications-mui';
 
 
 export interface CreateIngressDialogInput {
