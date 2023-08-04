@@ -138,20 +138,21 @@ public class MicroserviceStorage
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
 
-        FileStorage.Upload("cratis.json", cratisJson);
+        await FileStorage.Upload("cratis.json", cratisJson);
 #pragma warning restore // Possible multiple enumerations of IEnumerable
     }
 
-    public void CreateAndUploadClientAppSettings(string connectionString, string advertisedClientEndpoint)
+    public async Task CreateAndUploadClientAppSettings(string connectionString, string advertisedClientEndpoint)
     {
         var appSettingsJson = _microservice.AppSettingsContent?.Value ?? "{}";
         var appSettings = JsonNode.Parse(appSettingsJson)!
                             .AsObject()
+                            .ConfigureAppSettingsHint()
                             .ConfigureKestrel()
                             .ConfigureLogging()
                             .ConfigureCratisCluster(connectionString, advertisedClientEndpoint);
 
-        FileStorage.Upload("appsettings.json", appSettings);
+        await FileStorage.Upload("appsettings.json", appSettings);
     }
 
     string GetFirstPartOf(Guid guid) => guid.ToString().Split('-')[0];

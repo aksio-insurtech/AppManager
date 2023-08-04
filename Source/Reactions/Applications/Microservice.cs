@@ -10,7 +10,8 @@ public record Microservice(
     MicroserviceName Name,
     AppSettingsContent AppSettingsContent,
     IEnumerable<Deployable> Deployables,
-    IEnumerable<MicroserviceId> ConnectedWith)
+    IEnumerable<MicroserviceId> ConnectedWith,
+    int Port = 80)
 {
     public Deployable GetDeployableById(DeployableId id) => Deployables.Single(_ => _.Id == id);
 }

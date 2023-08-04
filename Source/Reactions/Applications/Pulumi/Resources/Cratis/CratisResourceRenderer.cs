@@ -6,7 +6,7 @@ using Concepts.Applications;
 using Concepts.Resources;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
-using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.V20221001;
 using Reactions.Applications.Pulumi.Resources.MongoDB;
 
 namespace Reactions.Applications.Pulumi.Resources.Cratis;
@@ -45,7 +45,7 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
             AppSettingsContent.Empty,
             new Deployable[]
             {
-                new Deployable(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", new[] { 80 }, MountPath.Default)
+                new(Guid.Empty, Guid.Empty, "kernel", $"docker.io/aksioinsurtech/cratis:{cratisVersion}", MountPath.Default)
             },
             Enumerable.Empty<MicroserviceId>());
 

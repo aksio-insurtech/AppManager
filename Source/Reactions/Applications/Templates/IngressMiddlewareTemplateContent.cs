@@ -10,4 +10,5 @@ public record IngressMiddlewareTemplateContent(
     IEnumerable<TenantConfig> Tenants,
     TenantResolutionConfig? TenantResolution,
     OAuthBearerTokenProvider? OAuthBearerTokenProvider,
-    ImpersonationMiddlewareConfig? Impersonation);
+    ImpersonationMiddlewareConfig? Impersonation,
+    MutualTLS? MutualTLS);

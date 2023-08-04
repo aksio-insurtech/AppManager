@@ -6,7 +6,7 @@ using Common;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi;
-using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.V20221001;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Templates;
@@ -80,7 +80,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var certificates = application.SetupCertificates(environment, managedEnvironment, resourceGroup, tags);
 
         var content = TemplateTypes.AppSettings(null!);
-        fileStorage.Upload("appsettings.json", content);
+        await fileStorage.Upload("appsettings.json", content);
 
         return new ApplicationEnvironmentResult(
             environment,
@@ -149,8 +149,10 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
 
         microserviceResult.ContainerApp.Configuration.Apply(_ => _?.Ingress).Apply(_ =>
         {
-            var url = $"http://{_?.Fqdn}";
-            storage.CreateAndUploadClientAppSettings(storage.FileStorage.ConnectionString, url);
+            var url = $"http://{_?.Fqdn}:{microservice.Port}";
+
+            // Not sure if I can do async stuff here, so manually waiting.
+            storage.CreateAndUploadClientAppSettings(storage.FileStorage.ConnectionString, url).GetAwaiter().GetResult();
             return _?.Fqdn;
         });
 

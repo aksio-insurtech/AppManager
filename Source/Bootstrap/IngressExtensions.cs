@@ -27,8 +27,15 @@ public static class IngressExtensions
             return true;
         }
 
+        // Are client certificates required?
+        if (!string.IsNullOrWhiteSpace(ingress.MutualTLS?.AuthorityCertificate) &&
+            (ingress.MutualTLS?.AcceptedSerialNumbers.Any() ?? false))
+        {
+            return true;
+        }
+
         // Any IP addresses in the access list?
-        if (ingress.AccessList.Any())
+        if (ingress.AccessList?.Any() ?? false)
         {
             return true;
         }

@@ -22,21 +22,20 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        if (args.Length == 0)
+        var (variableFile, environmentFile) = DetermineConfigFiles(args);
+        if (string.IsNullOrEmpty(variableFile))
         {
-            Console.WriteLine("Missing config file as parameter");
             return;
         }
 
-        var filename = "./AppManager.json";
-        if (args.Length == 2)
-        {
-            filename = args[1];
-        }
+        // Help user to not accidentally deploy the wrong environment.
+        Console.WriteLine($"Applying environment {environmentFile} with variables from {variableFile}.");
+        Console.WriteLine("Press enter to continue");
+        Console.ReadLine();
 
-#pragma warning disable CA2000 // Dispose objects before losing scope - LoggerFactory will stay with us
+#pragma warning disable CA2000// Dispose objects before losing scope - LoggerFactory will stay with us
         var loggerFactory = LoggerFactory.Create(_ => _.AddConsole());
-#pragma warning restore CA2000 // Dispose objects before losing scope
+#pragma warning restore CA2000// Dispose objects before losing scope
         var types = new Types();
         var derivedTypes = new DerivedTypes(types);
         Globals.Configure(derivedTypes);
@@ -45,7 +44,7 @@ public static class Program
         serializerOptions.PropertyNameCaseInsensitive = true;
         serializerOptions.Converters.Add(new SemanticVersionJsonConverter());
 
-        var configAsJson = await File.ReadAllTextAsync(args[0]);
+        var configAsJson = await File.ReadAllTextAsync(variableFile);
         var config = JsonSerializer.Deserialize<ManagementConfig>(configAsJson, serializerOptions)!;
         var settings = new Settings(
             config.Azure.Subscriptions,
@@ -58,7 +57,12 @@ public static class Program
 
         var executionContextManager = new ExecutionContextManager();
         var eventLog = new InMemoryEventLog();
-        var executionContext = new ExecutionContext(MicroserviceId.Unspecified, TenantId.Development, CorrelationId.New(), CausationId.System, CausedBy.System);
+        var executionContext = new ExecutionContext(
+            MicroserviceId.Unspecified,
+            TenantId.Development,
+            CorrelationId.New(),
+            CausationId.System,
+            CausedBy.System);
         executionContextManager.Set(executionContext);
 
         var containerBuilder = new ContainerBuilder();
@@ -68,17 +72,26 @@ public static class Program
         containerBuilder.RegisterDefaults(types);
         var serviceProvider = new AutofacServiceProviderFactory().CreateServiceProvider(containerBuilder);
 
-        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(filename);
-        var applicationAndEnvironment = JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
-        applicationAndEnvironment = await applicationAndEnvironment.ApplyConfigAndVariables(Path.GetDirectoryName(filename)!, config);
+        var applicationAndEnvironmentAsJson = await File.ReadAllTextAsync(environmentFile);
+
+        var applicationAndEnvironment =
+            JsonSerializer.Deserialize<ApplicationAndEnvironment>(applicationAndEnvironmentAsJson, serializerOptions)!;
+        applicationAndEnvironment =
+            await applicationAndEnvironment.ApplyConfigAndVariables(Path.GetDirectoryName(environmentFile)!, config);
 
         // Do some validation, this throws exceptions if a problem is detected.
         applicationAndEnvironment.Environment.ValidateConfiguration();
 
-        var application = new Application(applicationAndEnvironment.Id, applicationAndEnvironment.Name, new(config.Azure.SharedSubscriptionId));
+        var application = new Application(
+            applicationAndEnvironment.Id,
+            applicationAndEnvironment.Name,
+            new(config.Azure.SharedSubscriptionId));
 
-        var logger = loggerFactory.CreateLogger<FileStorage>();
-        var definitions = new PulumiStackDefinitions(settings, executionContextManager, logger);
+        var fileStorageLogger = loggerFactory.CreateLogger<FileStorage>();
+        var definitions = new PulumiStackDefinitions(
+            settings,
+            executionContextManager,
+            fileStorageLogger);
 
         var resourceRenderers = new ResourceRendering(types, serviceProvider);
         var stacksForApplications = new BootstrapStacksForApplications();
@@ -94,7 +107,10 @@ public static class Program
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
 
-        await operations.ConsolidateEnvironment(application, applicationAndEnvironment.Environment, ApplicationEnvironmentDeploymentId.New());
+        await operations.ConsolidateEnvironment(
+            application,
+            applicationAndEnvironment.Environment,
+            ApplicationEnvironmentDeploymentId.New());
 
         // await stacksForApplications.SaveAllQueued();
         // await stacksForMicroservices.SaveAllQueued();
@@ -121,5 +137,27 @@ public static class Program
         // }
         Console.WriteLine("Done... Hit any key..");
         Console.ReadLine();
+    }
+
+    /// <summary>
+    /// Figure out which input files to use.
+    /// Will terminate application if none are available.
+    /// </summary>
+    /// <param name="args">Commandline args.</param>
+    static (string VariableFile, string EnvironmentFile) DetermineConfigFiles(string[] args)
+    {
+        if (args.Length == 1)
+        {
+            return (args[0], "./AppManager.json");
+        }
+
+        if (args.Length == 2)
+        {
+            return (args[0], args[1]);
+        }
+
+        Console.WriteLine($"Usage: {AppDomain.CurrentDomain.FriendlyName} variablefile.json [configfile.json]");
+        Console.WriteLine("This app must be called with zero, one or two arguments.");
+        return (string.Empty, string.Empty);
     }
 }

@@ -1,33 +1,33 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <ApplicationModel>1.1.12</ApplicationModel>
-        <Cratis>9.0.2</Cratis>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="Aksio.Defaults" Version="1.6.10"/>
-        <PackageVersion Include="Aksio.Cratis" Version="$(Cratis)"/>
-        <PackageVersion Include="Aksio.Cratis.AspNetCore" Version="$(Cratis)"/>
-        <PackageVersion Include="Aksio.Cratis.MongoDB" Version="$(Cratis)"/>
-        <PackageVersion Include="Aksio.Cratis.Kernel.Common" Version="$(Cratis)"/>
-        <PackageVersion Include="Aksio.Applications" Version="$(ApplicationModel)"/>
-        <PackageVersion Include="Aksio.Applications.CQRS" Version="$(ApplicationModel)"/>
-        <PackageVersion Include="Aksio.Applications.CQRS.MongoDB" Version="$(ApplicationModel)"/>
-        <PackageVersion Include="Aksio.Applications.ProxyGenerator" Version="$(ApplicationModel)"/>
-        <PackageVersion Include="Aksio.MongoDB" Version="1.0.18"/>
-        <PackageVersion Include="Azure.Storage.Files.Shares" Version="12.12.1" />
-        <PackageVersion Include="Azure.Storage.Blobs" Version="12.14.1" />
-        <PackageVersion Include="Microsoft.Azure.Management.Fluent" Version="1.38.1" />
-        <PackageVersion Include="Microsoft.Azure.Management.ResourceManager.Fluent" Version="1.38.1" />
-        <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-
-        <PackageVersion Include="semver" Version="2.2.0" />
-        <PackageVersion Include="System.Text.Encoding.Extensions" Version="4.3.0" />
-        <PackageVersion Include="handlebars.net" Version="2.1.2" />
-
-        <PackageVersion Include="pulumi.automation" Version="3.54.1" />
-        <PackageVersion Include="pulumi.azuread" Version="5.35.0" />
-        <PackageVersion Include="pulumi.azurenative" Version="1.103.0" />
-        <PackageVersion Include="Pulumi.Mongodbatlas" Version="3.7.0" />
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ApplicationModel>1.1.12</ApplicationModel>
+    <Cratis>9.0.2</Cratis>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Aksio.Defaults" Version="1.6.10" />
+    <PackageVersion Include="Aksio.Cratis" Version="$(Cratis)" />
+    <PackageVersion Include="Aksio.Cratis.AspNetCore" Version="$(Cratis)" />
+    <PackageVersion Include="Aksio.Cratis.MongoDB" Version="$(Cratis)" />
+    <PackageVersion Include="Aksio.Cratis.Kernel.Common" Version="$(Cratis)" />
+    <PackageVersion Include="Aksio.Applications" Version="$(ApplicationModel)" />
+    <PackageVersion Include="Aksio.Applications.CQRS" Version="$(ApplicationModel)" />
+    <PackageVersion Include="Aksio.Applications.CQRS.MongoDB" Version="$(ApplicationModel)" />
+    <PackageVersion Include="Aksio.Applications.ProxyGenerator" Version="$(ApplicationModel)" />
+    <PackageVersion Include="Aksio.MongoDB" Version="1.0.18" />
+    <PackageVersion Include="Azure.Identity" Version="1.9.0" />
+    <PackageVersion Include="Azure.ResourceManager.AppContainers" Version="1.0.3" />
+    <PackageVersion Include="Azure.Storage.Files.Shares" Version="12.12.1" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.14.1" />
+    <PackageVersion Include="Microsoft.Azure.Management.Fluent" Version="1.38.1" />
+    <PackageVersion Include="Microsoft.Azure.Management.ResourceManager.Fluent" Version="1.38.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    <PackageVersion Include="semver" Version="2.2.0" />
+    <PackageVersion Include="System.Text.Encoding.Extensions" Version="4.3.0" />
+    <PackageVersion Include="handlebars.net" Version="2.1.2" />
+    <PackageVersion Include="pulumi.automation" Version="3.54.1" />
+    <PackageVersion Include="pulumi.azuread" Version="5.35.0" />
+    <PackageVersion Include="pulumi.azurenative" Version="1.104.0" />
+    <PackageVersion Include="Pulumi.Mongodbatlas" Version="3.7.0" />
+  </ItemGroup>
 </Project>
