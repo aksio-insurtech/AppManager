@@ -15,7 +15,7 @@ using Concepts.Applications.Environments;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi.Automation;
-using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Pulumi.Resources.Cratis;

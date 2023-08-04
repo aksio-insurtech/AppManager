@@ -12,8 +12,8 @@ using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi;
-using Pulumi.AzureNative.App.V20221001;
-using Pulumi.AzureNative.App.V20221001.Inputs;
+using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Templates;
 using FileShare = Pulumi.AzureNative.Storage.FileShare;
@@ -175,8 +175,7 @@ public static class ApplicationIngressPulumiExtensions
         ManagedEnvironment managedEnvironment,
         IDictionary<CertificateId, Output<string>> certificates,
         Ingress ingress,
-        Tags tags,
-        ILogger<FileStorage> fileStorageLogger)
+        Tags tags)
     {
         var ingressFileShareName = $"{ingress.Name}-ingress";
         var storageName = $"{ingress.Name}-ingress-storage";

@@ -29,16 +29,14 @@ public class ServiceBusResourceRenderer : ICanRenderResource<ServiceBusConfigura
             Tags = context.Tags
         });
 
-        var namespaceRule = new NamespaceAuthorizationRule("all", new()
-        {
-            NamespaceName = @namespace.Name,
-            ResourceGroupName = context.ResourceGroup.Name,
-            Rights = new[]
+        var namespaceRule = new NamespaceAuthorizationRule(
+            "all",
+            new()
             {
-                AccessRights.Listen,
-                AccessRights.Send
-            }
-        });
+                NamespaceName = @namespace.Name,
+                ResourceGroupName = context.ResourceGroup.Name,
+                Rights = { AccessRights.Listen, AccessRights.Send }
+            });
 
         // TODO: Register connection string result
         var namespaceKeys = Output

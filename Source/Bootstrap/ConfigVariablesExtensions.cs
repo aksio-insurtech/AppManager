@@ -14,7 +14,6 @@ public static class ConfigVariablesExtensions
 
         applicationAndEnvironment = await ApplyLatestMiddlewareVersion(applicationAndEnvironment, dockerHub);
         applicationAndEnvironment = ApplyIdentityProviderValues(applicationAndEnvironment, config);
-        applicationAndEnvironment = await ApplyCertificateValues(applicationAndEnvironment, basePath, config);
         applicationAndEnvironment = await ApplyGammaVersionIfGammaIsThere(applicationAndEnvironment, dockerHub);
 
         return applicationAndEnvironment with
@@ -69,33 +68,6 @@ public static class ConfigVariablesExtensions
                 {
                     MiddlewareVersion = ingressMiddlewareVersion
                 })
-            }
-        };
-    }
-
-    static async Task<ApplicationAndEnvironment> ApplyCertificateValues(ApplicationAndEnvironment applicationAndEnvironment, string basePath, ManagementConfig config)
-    {
-        var certificates = new List<Certificate>();
-        foreach (var certificateConfig in config.Certificates)
-        {
-            var certificate = applicationAndEnvironment.Environment.Certificates.FirstOrDefault(_ => _.Id == certificateConfig.Id);
-            if (certificate is not null)
-            {
-                var fullPath = Path.Combine(basePath, certificateConfig.File);
-                var certificateValue = await File.ReadAllBytesAsync(fullPath);
-                certificates.Add(certificate with
-                {
-                    Value = Convert.ToBase64String(certificateValue),
-                    Password = certificateConfig.Password
-                });
-            }
-        }
-        certificates.AddRange(applicationAndEnvironment.Environment.Certificates.Where(_ => !certificates.Any(c => c.Id == _.Id)));
-        return applicationAndEnvironment with
-        {
-            Environment = applicationAndEnvironment.Environment with
-            {
-                Certificates = certificates
             }
         };
     }

@@ -6,7 +6,7 @@ using Common;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
 using Pulumi;
-using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Templates;
@@ -105,15 +105,7 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
         var storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
 
-        return await application.SetupIngress(
-            environment,
-            resourceGroup,
-            storage,
-            managedEnvironment,
-            certificates,
-            ingress,
-            tags,
-            _fileStorageLogger);
+        return await application.SetupIngress(environment, resourceGroup, storage, managedEnvironment, certificates, ingress, tags);
     }
 
     public async Task<ContainerAppResult> Microservice(

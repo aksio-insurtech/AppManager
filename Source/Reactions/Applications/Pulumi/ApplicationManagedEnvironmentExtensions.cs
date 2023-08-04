@@ -3,7 +3,7 @@
 
 using Concepts.Azure;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
-using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App;
 
 namespace Reactions.Applications.Pulumi;
 
