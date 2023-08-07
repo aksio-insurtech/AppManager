@@ -7,11 +7,14 @@
 		<ProjectReference Include="../Infrastructure/Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Azure.Identity" />
+		<PackageReference Include="Azure.ResourceManager.AppContainers" />
 		<PackageReference Include="handlebars.net" />
 		<PackageReference Include="Azure.Storage.Files.Shares" />
 		<PackageReference Include="Azure.Storage.Blobs" />
 		<PackageReference Include="Microsoft.Azure.Management.Fluent" />
 		<PackageReference Include="Microsoft.Azure.Management.ResourceManager.Fluent" />
+		<PackageReference Include="pulumi.azurenative" />
 		<PackageReference Include="semver" />
 	</ItemGroup>
 	<ItemGroup>

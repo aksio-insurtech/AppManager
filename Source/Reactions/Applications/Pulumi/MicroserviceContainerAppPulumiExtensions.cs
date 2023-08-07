@@ -3,8 +3,8 @@
 
 using Concepts.Applications;
 using Pulumi;
-using Pulumi.AzureNative.App;
-using Pulumi.AzureNative.App.Inputs;
+using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App.V20221001.Inputs;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
@@ -68,7 +68,7 @@ public static class MicroserviceContainerAppPulumiExtensions
                 Ingress = new IngressArgs
                 {
                     External = false,
-                    TargetPort = 80,
+                    TargetPort = microservice.Port,
                     Transport = IngressTransportMethod.Http,
                     AllowInsecure = true
                 },

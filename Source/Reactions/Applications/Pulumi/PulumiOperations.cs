@@ -7,13 +7,15 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Aksio.Execution;
+using Azure.Identity;
+using Azure.ResourceManager;
+using Azure.ResourceManager.AppContainers;
 using Common;
 using Concepts.Applications.Environments;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
-using Pulumi;
 using Pulumi.Automation;
-using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.V20221001;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Pulumi.Resources.Cratis;
@@ -205,7 +207,8 @@ public class PulumiOperations : IPulumiOperations
         var refreshOptions = GetRefreshOptionsForDeployment(application, environment, deploymentId);
         var resourceScope = new ResourceRenderingScope(environment.Resources);
 
-        var sharedSubscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
+        var sharedSubscription =
+            _settings.AzureSubscriptions.First(_ => _.SubscriptionId == application.Shared.AzureSubscriptionId);
         var sharedEnvironment = environment with
         {
             Id = PulumiStackDefinitions.SharedEnvironment.Id,
@@ -221,20 +224,17 @@ public class PulumiOperations : IPulumiOperations
         async Task<RenderContext> RenderResources(ResourceLevel level, ResourceGroup resourceGroup)
         {
             var context = new RenderContext(
-                    executionContext,
-                    _settings,
-                    application,
-                    environment,
-                    resourceGroup,
-                    application.GetTags(environment),
-                    results,
-                    environment.Tenants,
-                    environment.Microservices);
+                executionContext,
+                _settings,
+                application,
+                environment,
+                resourceGroup,
+                application.GetTags(environment),
+                results,
+                environment.Tenants,
+                environment.Microservices);
 
-            await _resourceRenderers.Render(
-                level,
-                context,
-                resourceScope);
+            await _resourceRenderers.Render(level, context, resourceScope);
 
             return context;
         }
@@ -256,7 +256,12 @@ public class PulumiOperations : IPulumiOperations
             application,
             async () =>
             {
-                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(executionContext, application, environment, sharedEnvironment, results);
+                applicationEnvironmentResult = await _stackDefinitions.ApplicationEnvironment(
+                    executionContext,
+                    application,
+                    environment,
+                    sharedEnvironment,
+                    results);
                 environment = await applicationEnvironmentResult.MergeWithApplicationEnvironment(environment);
                 storage = await application.GetStorage(environment, _settings.ServicePrincipal, subscription);
                 await RenderResources(ResourceLevel.Environment, applicationEnvironmentResult.ResourceGroup);
@@ -285,7 +290,10 @@ public class PulumiOperations : IPulumiOperations
                 async () =>
                 {
                     var resourceGroup = application.GetResourceGroup(environment);
-                    var managedEnvironment = await application.GetManagedEnvironment(environment, _settings.ServicePrincipal, subscription);
+                    var managedEnvironment = await application.GetManagedEnvironment(
+                        environment,
+                        _settings.ServicePrincipal,
+                        subscription);
                     var microserviceResult = await HandleMicroservice(
                         executionContext,
                         application,
@@ -309,13 +317,19 @@ public class PulumiOperations : IPulumiOperations
 
         foreach (var (ingress, result) in ingressResults)
         {
-            await application.ConfigureIngress(
+            var configChanged = await application.ConfigureIngress(
                 environment,
                 microserviceContainerApps,
                 ingress,
                 storage,
                 result.FileShareName,
                 _fileStorageLogger);
+
+            // And finally restart the ingress, this must be done after uploading the configfiles.
+            if (configChanged)
+            {
+                await RestartIngress(application, environment, result.ContainerApp);
+            }
         }
     }
 
@@ -370,6 +384,46 @@ public class PulumiOperations : IPulumiOperations
             microservice,
             upOptions,
             refreshOptions);
+    }
+
+    /// <summary>
+    /// Restart all revisions for an ingress, this is necessary after the config is updated (which we do after provisioning the actual ingress container).
+    /// </summary>
+    /// <param name="application">Application the environment is for.</param>
+    /// <param name="environment">The environment to consolidate.</param>
+    /// <param name="containerApp">The ingress container app.</param>
+    async Task RestartIngress(
+        Application application,
+        ApplicationEnvironmentWithArtifacts environment,
+        ContainerApp containerApp)
+    {
+        var subscription = _settings.AzureSubscriptions.First(_ => _.SubscriptionId == environment.AzureSubscriptionId);
+
+        var cred = new ClientSecretCredential(
+            subscription.TenantId,
+            _settings.ServicePrincipal.ClientId,
+            _settings.ServicePrincipal.ClientSecret);
+
+        string subscriptionId = subscription.SubscriptionId;
+        var resourceGroupName = application.GetResourceGroupName(environment, environment.CloudLocation);
+        var containerAppName = await containerApp.Name.GetValue();
+        var revisionName = await containerApp.LatestRevisionName.GetValue();
+
+        _logger.RestartingIngressRevision(containerAppName, revisionName);
+
+        var client = new ArmClient(cred);
+        var containerAppResourceId =
+            ContainerAppResource.CreateResourceIdentifier(subscriptionId, resourceGroupName, containerAppName);
+        var containerAppResource = client.GetContainerAppResource(containerAppResourceId);
+
+        var revisions = containerAppResource.GetContainerAppRevisions();
+        await foreach (var revision in revisions.GetAllAsync())
+        {
+            if (revision.Id.Name == revisionName)
+            {
+                await revision.RestartRevisionAsync();
+            }
+        }
     }
 
     async Task<PulumiStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, Func<Task> program, Microservice? microservice = default)

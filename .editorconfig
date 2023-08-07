@@ -75,6 +75,7 @@ dotnet_naming_symbols.public_symbols.applicable_accessibilities = public
 dotnet_naming_symbols.public_symbols.required_modifiers = readonly
 
 ## Specific rule suppression
+dotnet_diagnostic.SA1204.severity = none
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
 # CA2016: Forward the CancellationToken parameter to methods that take one
@@ -106,6 +107,13 @@ dotnet_diagnostic.CA1000.severity = none
 dotnet_diagnostic.RCS1018.severity = none
 # RCS1194: Implement exception constructors
 dotnet_diagnostic.RCS1194.severity = none
+
+# Can be sealed, really?
+dotnet_diagnostic.CA1852.severity = none
+
+# Disable obsolete warning to get code merged.
+dotnet_diagnostic.CS0618.severity = none
+
 
 #### C# Coding Conventions ####
 

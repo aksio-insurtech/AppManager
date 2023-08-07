@@ -3,7 +3,6 @@
 
 using Common;
 using Concepts.Applications;
-using Pulumi;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
 using Pulumi.AzureNative.Resources;

@@ -12,8 +12,8 @@ using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Pulumi;
-using Pulumi.AzureNative.App;
-using Pulumi.AzureNative.App.Inputs;
+using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App.V20221001.Inputs;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Templates;
 using FileShare = Pulumi.AzureNative.Storage.FileShare;
@@ -29,7 +29,18 @@ public static class ApplicationIngressPulumiExtensions
     const string AppSettingsFile = "appsettings.json";
     const string OpenIDConfigurationBlobName = "openid-configuration";
 
-    public static async Task ConfigureIngress(
+    /// <summary>
+    /// Configure the ingress, returns true if any config files where in fact changed.
+    /// </summary>
+    /// <param name="application">Application.</param>
+    /// <param name="environment">The environment.</param>
+    /// <param name="microservices">Microservices.</param>
+    /// <param name="ingress">Ingress.</param>
+    /// <param name="storage">Storage.</param>
+    /// <param name="fileShareName">File share name.</param>
+    /// <param name="fileStorageLogger">File storage logger.</param>
+    /// <returns>True if any config files are changed, false if they are not changed.</returns>
+    public static async Task<bool> ConfigureIngress(
         this Application application,
         ApplicationEnvironmentWithArtifacts environment,
         IDictionary<MicroserviceId, ContainerApp> microservices,
@@ -38,12 +49,15 @@ public static class ApplicationIngressPulumiExtensions
         string fileShareName,
         ILogger<FileStorage> fileStorageLogger)
     {
+        var configChanged = false;
+
         var nginxFileStorage = new FileStorage(storage.AccountName, storage.AccountKey, fileShareName, fileStorageLogger);
         var routes = new List<IngressTemplateRouteContent>();
         var microserviceTargets = new Dictionary<MicroserviceId, string>();
 
         var targetMicroserviceForImpersonation = ingress.GetTargetMicroserviceIdForImpersonation(environment);
-        var hasTargetMicroserviceForImpersonation = targetMicroserviceForImpersonation is not null && microservices.ContainsKey(targetMicroserviceForImpersonation);
+        var hasTargetMicroserviceForImpersonation = targetMicroserviceForImpersonation is not null &&
+                                                    microservices.ContainsKey(targetMicroserviceForImpersonation);
 
         foreach (var route in ingress.Routes)
         {
@@ -61,7 +75,7 @@ public static class ApplicationIngressPulumiExtensions
             new IngressTemplateContent(
                 routes,
                 hasTargetMicroserviceForImpersonation ? new(microserviceTargets[targetMicroserviceForImpersonation!]) : null));
-        nginxFileStorage.Upload(AuthConfigFile, nginxContent);
+        configChanged |= await nginxFileStorage.Upload(AuthConfigFile, nginxContent) == FileStorageResult.FileUploaded;
 
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
@@ -69,18 +83,17 @@ public static class ApplicationIngressPulumiExtensions
         TenantResolutionConfig? tenantResolutionConfig = null;
         if (idPortenProvider is not null)
         {
-            idPortenConfig = new(
-                idPortenProvider.Issuer,
-                idPortenProvider.AuthorizationEndpoint);
-            tenantConfigs = environment.Tenants.Select(tenant =>
-            {
-                var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == idPortenProvider.Id);
-                return new TenantConfig(
-                    tenant.Id.ToString(),
-                    providerConfig?.Domain?.Name ?? string.Empty,
-                    providerConfig?.OnBehalfOf ?? string.Empty,
-                    Enumerable.Empty<string>());
-            });
+            idPortenConfig = new(idPortenProvider.Issuer, idPortenProvider.AuthorizationEndpoint);
+            tenantConfigs = environment.Tenants.Select(
+                tenant =>
+                {
+                    var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == idPortenProvider.Id);
+                    return new TenantConfig(
+                        tenant.Id.ToString(),
+                        providerConfig?.Domain?.Name ?? string.Empty,
+                        providerConfig?.OnBehalfOf ?? string.Empty,
+                        Enumerable.Empty<string>());
+                });
         }
         else
         {
@@ -88,37 +101,46 @@ public static class ApplicationIngressPulumiExtensions
             if (aadProvider is not null)
             {
                 tenantResolutionConfig = new TenantResolutionConfig("claim", "{}");
-                tenantConfigs = environment.Tenants.Select(tenant =>
-                {
-                    var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
-                    return new TenantConfig(
-                        tenant.Id.ToString(),
-                        string.Empty,
-                        string.Empty,
-                        providerConfig?.SourceIdentifiers ?? Enumerable.Empty<string>());
-                });
+                tenantConfigs = environment.Tenants.Select(
+                    tenant =>
+                    {
+                        var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
+                        return new TenantConfig(
+                            tenant.Id.ToString(),
+                            string.Empty,
+                            string.Empty,
+                            providerConfig?.SourceIdentifiers ?? Enumerable.Empty<string>());
+                    });
             }
             else
             {
-                tenantConfigs = environment.Tenants.Select(tenant => new TenantConfig(tenant.Id.ToString(), string.Empty, string.Empty, tenant.SourceIdentifiers ?? Enumerable.Empty<string>()));
+                tenantConfigs = environment.Tenants.Select(
+                    tenant => new TenantConfig(
+                        tenant.Id.ToString(),
+                        string.Empty,
+                        string.Empty,
+                        tenant.SourceIdentifiers ?? Enumerable.Empty<string>()));
             }
         }
 
         if (ingress.RouteTenantResolution is not null)
         {
             var options = new RouteTenantResolutionOptions(ingress.RouteTenantResolution.RegularExpression);
-            var optionsAsJsonString = JsonSerializer.Serialize(options, new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var optionsAsJsonString = JsonSerializer.Serialize(
+                options,
+                new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
 
             tenantResolutionConfig = new TenantResolutionConfig("route", optionsAsJsonString);
         }
 
         var identityDetailsUrl = string.Empty;
-        if (ingress.IdentityDetailsProvider is not null &&
-            microservices.TryGetValue(ingress.IdentityDetailsProvider, out var identityDetailsProviderMicroservice))
+        if (ingress.IdentityDetailsProvider is not null && microservices.TryGetValue(
+                ingress.IdentityDetailsProvider,
+                out var identityDetailsProviderMicroservice))
         {
             var configuration = await identityDetailsProviderMicroservice.Configuration!.GetValue();
             identityDetailsUrl = $"http://{configuration!.Ingress!.Fqdn}/.aksio/me";
@@ -131,16 +153,18 @@ public static class ApplicationIngressPulumiExtensions
             tenantConfigs,
             tenantResolutionConfig,
             ingress.OAuthBearerTokenProvider,
-            ingress.GetImpersonationTemplateContent(environment));
+            ingress.GetImpersonationTemplateContent(environment),
+            ingress.MutualTLS);
 
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
-        nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate);
+        configChanged |= await nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate) ==
+                         FileStorageResult.FileUploaded;
 
-        var appSettings = new JsonObject()
-                            .ConfigureKestrel()
-                            .ConfigureLogging();
+        var appSettings = new JsonObject().ConfigureAppSettingsHint().ConfigureKestrel().ConfigureLogging();
 
-        nginxFileStorage.Upload(AppSettingsFile, appSettings);
+        configChanged |= await nginxFileStorage.Upload(AppSettingsFile, appSettings) == FileStorageResult.FileUploaded;
+
+        return configChanged;
     }
 
     public static async Task<IngressResult> SetupIngress(
@@ -157,28 +181,32 @@ public static class ApplicationIngressPulumiExtensions
         var ingressFileShareName = $"{ingress.Name}-ingress";
         var storageName = $"{ingress.Name}-ingress-storage";
 
-        var nginxFileShare = new FileShare(ingressFileShareName, new()
-        {
-            AccountName = storage.AccountName,
-            ResourceGroupName = resourceGroup.Name,
-        });
-
-        var managedEnvironmentStorage = new ManagedEnvironmentsStorage(storageName, new()
-        {
-            ResourceGroupName = resourceGroup.Name,
-            EnvironmentName = managedEnvironment.Name,
-            StorageName = storageName,
-            Properties = new ManagedEnvironmentStoragePropertiesArgs
+        var nginxFileShare = new FileShare(
+            ingressFileShareName,
+            new()
             {
-                AzureFile = new AzureFilePropertiesArgs
+                AccountName = storage.AccountName,
+                ResourceGroupName = resourceGroup.Name,
+            });
+
+        var managedEnvironmentStorage = new ManagedEnvironmentsStorage(
+            storageName,
+            new()
+            {
+                ResourceGroupName = resourceGroup.Name,
+                EnvironmentName = managedEnvironment.Name,
+                StorageName = storageName,
+                Properties = new ManagedEnvironmentStoragePropertiesArgs
                 {
-                    AccessMode = "ReadOnly",
-                    AccountKey = storage.AccountKey,
-                    AccountName = storage.AccountName,
-                    ShareName = nginxFileShare.Name
+                    AzureFile = new AzureFilePropertiesArgs
+                    {
+                        AccessMode = "ReadOnly",
+                        AccountKey = storage.AccountKey,
+                        AccountName = storage.AccountName,
+                        ShareName = nginxFileShare.Name
+                    }
                 }
-            }
-        });
+            });
 
         var fileShareId = await nginxFileShare.Id.GetValue();
 
@@ -193,16 +221,11 @@ public static class ApplicationIngressPulumiExtensions
             managedEnvironmentStorage,
             domains,
             certificates);
-        await SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress, storage);
-        var authIngressConfig = await containerApp.Configuration.GetValue();
-        await application.ConfigureIngress(
-            environment,
-            new Dictionary<MicroserviceId, ContainerApp>(),
-            ingress,
-            storage,
-            ingressFileShareName,
-            fileStorageLogger);
 
+        // Set Container App Authentication, if applicable.
+        await SetupAuthenticationForIngress(environment, resourceGroup, containerApp, ingress, storage);
+
+        var authIngressConfig = await containerApp.Configuration.GetValue();
         return new($"https://{authIngressConfig!.Ingress!.Fqdn}", fileShareId, ingressFileShareName, containerApp);
     }
 
@@ -213,15 +236,18 @@ public static class ApplicationIngressPulumiExtensions
         {
             domains.Add(ingress.Domain);
         }
+
         if (ingress.AuthDomain is not null)
         {
             domains.Add(ingress.AuthDomain);
         }
+
         var tenantDomains = environment.Tenants.SelectMany(_ => _.IdentityProviders
             .Where(i => ingress.IdentityProviders.Any(idp => idp.Id == i.Id))
             .Select(i => i.Domain!))
             .Where(_ => _ is not null)
             .ToArray();
+
         if (tenantDomains?.Length > 0)
         {
             domains.AddRange(tenantDomains);
@@ -238,51 +264,63 @@ public static class ApplicationIngressPulumiExtensions
         ManagedEnvironmentsStorage storage,
         IEnumerable<Domain> domains,
         IDictionary<CertificateId, Output<string>> certificates) =>
-        new($"{ingress.Name}-ingress", new()
-        {
-            Location = resourceGroup.Location,
-            Tags = tags,
-            ResourceGroupName = resourceGroup.Name,
-            ManagedEnvironmentId = managedEnvironment.Id,
-            Configuration = new ConfigurationArgs
+        new(
+            $"{ingress.Name}-ingress",
+            new()
             {
-                Ingress = new IngressArgs
+                Location = resourceGroup.Location,
+                Tags = tags,
+                ResourceGroupName = resourceGroup.Name,
+                ManagedEnvironmentId = managedEnvironment.Id,
+                Configuration = new ConfigurationArgs
                 {
-                    External = true,
-                    TargetPort = 80,
-                    Transport = IngressTransportMethod.Http,
-
-                    CustomDomains = domains.Select(domain => new CustomDomainArgs
+                    Ingress = new IngressArgs
                     {
-                        BindingType = BindingType.SniEnabled,
-                        CertificateId = certificates[domain.CertificateId],
-                        Name = domain.Name.Value
-                    }).ToArray()
-                },
-                Secrets = ingress.IdentityProviders.Select(idp => new SecretArgs
-                {
-                    Name = GetSecretNameForIdentityProvider(idp),
-                    Value = idp.ClientSecret?.Value ?? string.Empty
-                }).ToList()
-            },
-            Template = new TemplateArgs
-            {
-                Volumes = new VolumeArgs[]
-                        {
-                            new ()
+                        External = true,
+                        TargetPort = 80,
+                        Transport = IngressTransportMethod.Http,
+                        ClientCertificateMode = ingress.MutualTLS != null
+                            ? IngressClientCertificateMode.Require
+                            : IngressClientCertificateMode.Ignore,
+                        CustomDomains = domains.Select(
+                                domain => new CustomDomainArgs
+                                {
+                                    BindingType = BindingType.SniEnabled,
+                                    CertificateId = certificates[domain.CertificateId],
+                                    Name = domain.Name.Value
+                                })
+                            .ToArray(),
+                        IpSecurityRestrictions = ingress.AccessList?.Select(
+                                acl => new IpSecurityRestrictionRuleArgs()
+                                    { Action = "Allow", Name = acl.Name.Value, IpAddressRange = acl.Address.Value })
+                            .ToList() ?? new()
+                    },
+                    Secrets = ingress.IdentityProviders.Select(
+                            idp => new SecretArgs
                             {
-                                Name = storage.Name,
-                                StorageName = storage.Name,
-                                StorageType = StorageType.AzureFile
-                            }
-                        },
-                Containers = new ContainerArgs[]
+                                Name = GetSecretNameForIdentityProvider(idp),
+                                Value = idp.ClientSecret?.Value ?? string.Empty
+                            })
+                        .ToList()
+                },
+                Template = new TemplateArgs
                 {
-                    new ContainerArgs
+                    Volumes = new VolumeArgs[]
                     {
-                        Name = "nginx",
-                        Image = "nginx",
-                        Command =
+                        new()
+                        {
+                            Name = storage.Name,
+                            StorageName = storage.Name,
+                            StorageType = StorageType.AzureFile
+                        }
+                    },
+                    Containers = new ContainerArgs[]
+                    {
+                        new ContainerArgs
+                        {
+                            Name = "nginx",
+                            Image = "nginx",
+                            Command =
                             {
                                 "nginx",
                                 "-c",
@@ -290,43 +328,44 @@ public static class ApplicationIngressPulumiExtensions
                                 "-g",
                                 "daemon off;"
                             },
-                        VolumeMounts = new VolumeMountArgs[]
+                            VolumeMounts = new VolumeMountArgs[]
+                            {
+                                new()
                                 {
-                                    new()
-                                    {
-                                        MountPath = "/config",
-                                        VolumeName = storage.Name
-                                    }
+                                    MountPath = "/config",
+                                    VolumeName = storage.Name
                                 }
-                    },
-                    new ContainerArgs
-                    {
-                        Name = "middleware",
-                        Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
-                        Command =
+                            }
+                        },
+                        new ContainerArgs
+                        {
+                            Name = "middleware",
+                            Image =
+                                $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
+                            Command =
                             {
                                 "./IngressMiddleware",
                                 "--urls",
                                 "http://*:81"
                             },
 
-                        VolumeMounts = new VolumeMountArgs[]
+                            VolumeMounts = new VolumeMountArgs[]
+                            {
+                                new()
                                 {
-                                    new()
-                                    {
-                                        MountPath = "/app/config",
-                                        VolumeName = storage.Name
-                                    }
+                                    MountPath = "/app/config",
+                                    VolumeName = storage.Name
                                 }
+                            }
+                        }
+                    },
+                    Scale = new ScaleArgs
+                    {
+                        MaxReplicas = 1,
+                        MinReplicas = 1,
                     }
-                },
-                Scale = new ScaleArgs
-                {
-                    MaxReplicas = 1,
-                    MinReplicas = 1,
                 }
-            },
-        });
+            });
 
     static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name.Value.Replace(' ', '-')}-authentication-secret".ToLowerInvariant();
 

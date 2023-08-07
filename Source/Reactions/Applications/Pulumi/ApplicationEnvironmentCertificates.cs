@@ -3,8 +3,8 @@
 
 using Concepts.Applications.Environments;
 using Pulumi;
-using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
+using Pulumi.AzureNative.App.V20221001;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;

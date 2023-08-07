@@ -7,26 +7,36 @@
 {{/if}}
     "tenants": {
 {{#Tenants}}
-        "{{TenantId}}": {
-            "domain": "{{Domain}}",
-            "onBehalfOf": "{{OnBehalfOf}}",
-            "sourceIdentifiers": [
-            {{#SourceIdentifiers}}
-                "{{this}}"{{#unless @last}},{{/unless}}
-            {{/SourceIdentifiers}}
-            ]
-        }{{#unless @last}},{{/unless}}
+    "{{TenantId}}": {
+        "domain": "{{Domain}}",
+        "onBehalfOf": "{{OnBehalfOf}}",
+        "sourceIdentifiers": [
+        {{#SourceIdentifiers}}
+            "{{this}}"{{#unless @last}},{{/unless}}
+        {{/SourceIdentifiers}}
+        ]
+    }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
 {{#if TenantResolution }}
     "tenantResolution": {
-        "strategy": "{{TenantResolution.Strategy}}",
-        "options": {{{TenantResolution.Options}}}
-    },
+    "strategy": "{{TenantResolution.Strategy}}",
+    "options": {{{TenantResolution.Options}}}
+},
 {{/if}}
 {{#if OAuthBearerTokenProvider }}
     "oAuthBearerTokens": {
-        "authority": "{{OAuthBearerTokenProvider.Authority}}"
+      "authority": "{{OAuthBearerTokenProvider.Authority}}"
+    },
+{{/if}}
+{{#if MutualTLS }}
+    "mutualTLS": {
+        "authorityCertificate": "{{MutualTLS.AuthorityCertificate}}",
+        "acceptedSerialNumbers": [
+        {{#MutualTLS.AcceptedSerialNumbers}}
+            "{{this}}"{{#unless @last}},{{/unless}}
+        {{/MutualTLS.AcceptedSerialNumbers}}
+        ]
     },
 {{/if}}
 {{#with Impersonation}}
@@ -36,27 +46,27 @@
         ],
         "authorization": {
             "tenants": [
-{{#Tenants}}
+            {{#Tenants}}
                 "{{this}}"{{#unless @last}},{{/unless}}
-{{/Tenants}}
+            {{/Tenants}}
             ],
             "roles": [
-{{#Roles}}
+            {{#Roles}}
                 "{{this}}"{{#unless @last}},{{/unless}}
-{{/Roles}}
+            {{/Roles}}
             ],
             "groups": [
-{{#Groups}}
+            {{#Groups}}
                 "{{this}}"{{#unless @last}},{{/unless}}
-{{/Groups}}
+            {{/Groups}}
             ],
             "claims": [
-{{#Claims}}
+            {{#Claims}}
                 {
-                    "type": "{{this.Type}}",
-                    "value": "{{this.Value}}"
+                "type": "{{this.Type}}",
+                "value": "{{this.Value}}"
                 }{{#unless @last}},{{/unless}}
-{{/Claims}}
+            {{/Claims}}
             ]
         }
     },
