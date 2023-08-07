@@ -16,7 +16,6 @@ public record ApplicationEnvironmentWithArtifacts(
     AzureSubscriptionId AzureSubscriptionId,
     CloudLocationKey CloudLocation,
     MongoDBResource MongoDB,
-    IEnumerable<Certificate> Certificates,
     IEnumerable<Tenant> Tenants,
     IEnumerable<Ingress> Ingresses,
     IEnumerable<Microservice> Microservices,

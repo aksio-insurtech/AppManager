@@ -6,7 +6,7 @@ using Concepts.Applications;
 using Concepts.Resources;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
-using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App;
 using Reactions.Applications.Pulumi.Resources.MongoDB;
 
 namespace Reactions.Applications.Pulumi.Resources.Cratis;

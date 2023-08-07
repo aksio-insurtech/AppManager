@@ -25,9 +25,9 @@
     <PackageVersion Include="semver" Version="2.2.0" />
     <PackageVersion Include="System.Text.Encoding.Extensions" Version="4.3.0" />
     <PackageVersion Include="handlebars.net" Version="2.1.2" />
-    <PackageVersion Include="pulumi.automation" Version="3.54.1" />
-    <PackageVersion Include="pulumi.azuread" Version="5.35.0" />
-    <PackageVersion Include="pulumi.azurenative" Version="1.104.0" />
-    <PackageVersion Include="Pulumi.Mongodbatlas" Version="3.7.0" />
+    <PackageVersion Include="pulumi.automation" Version="3.55.2" />
+    <PackageVersion Include="pulumi.azuread" Version="5.40.0" />
+    <PackageVersion Include="pulumi.azurenative" Version="2.2.0" />
+    <PackageVersion Include="Pulumi.Mongodbatlas" Version="3.9.2" />
   </ItemGroup>
 </Project>

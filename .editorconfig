@@ -111,8 +111,8 @@ dotnet_diagnostic.RCS1194.severity = none
 # Can be sealed, really?
 dotnet_diagnostic.CA1852.severity = none
 
-# Disable obsolete warning to get code merged.
-dotnet_diagnostic.CS0618.severity = none
+# "Use 'Count' property instead of 'Any' method". Makes code harder to read, ignore.
+dotnet_diagnostic.RCS1080.severity = none
 
 
 #### C# Coding Conventions ####
