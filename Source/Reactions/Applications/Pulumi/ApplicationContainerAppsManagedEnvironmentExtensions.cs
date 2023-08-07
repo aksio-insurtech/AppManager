@@ -2,8 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications.Environments;
-using Pulumi.AzureNative.App.V20221001;
-using Pulumi.AzureNative.App.V20221001.Inputs;
+using Pulumi.AzureNative.App;
+using Pulumi.AzureNative.App.Inputs;
 using Pulumi.AzureNative.OperationalInsights;
 using Pulumi.AzureNative.Resources;
 

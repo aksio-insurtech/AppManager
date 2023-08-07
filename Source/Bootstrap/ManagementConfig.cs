@@ -13,5 +13,4 @@ public record ManagementConfig(
     AzureConfig Azure,
     PulumiConfig Pulumi,
     MongoDBConfig MongoDB,
-    IEnumerable<IdentityProviderConfig> IdentityProviders,
-    IEnumerable<CertificateFileReference> Certificates);
+    IEnumerable<IdentityProviderConfig> IdentityProviders);

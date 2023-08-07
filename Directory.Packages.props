@@ -15,19 +15,19 @@
     <PackageVersion Include="Aksio.Applications.CQRS.MongoDB" Version="$(ApplicationModel)" />
     <PackageVersion Include="Aksio.Applications.ProxyGenerator" Version="$(ApplicationModel)" />
     <PackageVersion Include="Aksio.MongoDB" Version="1.0.18" />
-    <PackageVersion Include="Azure.Identity" Version="1.9.0" />
-    <PackageVersion Include="Azure.ResourceManager.AppContainers" Version="1.0.3" />
-    <PackageVersion Include="Azure.Storage.Files.Shares" Version="12.12.1" />
-    <PackageVersion Include="Azure.Storage.Blobs" Version="12.14.1" />
+    <PackageVersion Include="Azure.Identity" Version="1.10.0" />
+    <PackageVersion Include="Azure.ResourceManager.AppContainers" Version="1.1.0" />
+    <PackageVersion Include="Azure.Storage.Files.Shares" Version="12.15.0" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.17.0" />
     <PackageVersion Include="Microsoft.Azure.Management.Fluent" Version="1.38.1" />
     <PackageVersion Include="Microsoft.Azure.Management.ResourceManager.Fluent" Version="1.38.1" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    <PackageVersion Include="semver" Version="2.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+    <PackageVersion Include="semver" Version="2.3.0" />
     <PackageVersion Include="System.Text.Encoding.Extensions" Version="4.3.0" />
-    <PackageVersion Include="handlebars.net" Version="2.1.2" />
-    <PackageVersion Include="pulumi.automation" Version="3.54.1" />
-    <PackageVersion Include="pulumi.azuread" Version="5.35.0" />
-    <PackageVersion Include="pulumi.azurenative" Version="1.104.0" />
-    <PackageVersion Include="Pulumi.Mongodbatlas" Version="3.7.0" />
+    <PackageVersion Include="handlebars.net" Version="2.1.4" />
+    <PackageVersion Include="pulumi.automation" Version="3.56.0" />
+    <PackageVersion Include="pulumi.azuread" Version="5.40.0" />
+    <PackageVersion Include="pulumi.azurenative" Version="2.3.0" />
+    <PackageVersion Include="Pulumi.Mongodbatlas" Version="3.10.0" />
   </ItemGroup>
 </Project>

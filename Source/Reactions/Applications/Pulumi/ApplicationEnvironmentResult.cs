@@ -3,7 +3,7 @@
 
 using Concepts.Applications.Environments;
 using Pulumi;
-using Pulumi.AzureNative.App.V20221001;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
@@ -26,7 +26,6 @@ public record ApplicationEnvironmentResult(
             environment.AzureSubscriptionId,
             environment.CloudLocation,
             environment.MongoDB,
-            environment.Certificates,
             environment.Tenants,
             environment.Ingresses,
             environment.Microservices,

@@ -3,8 +3,8 @@
 
 using Concepts.Applications.Environments;
 using Pulumi;
+using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.App.Inputs;
-using Pulumi.AzureNative.App.V20221001;
 using Pulumi.AzureNative.Resources;
 
 namespace Reactions.Applications.Pulumi;
@@ -21,20 +21,40 @@ public static class ApplicationEnvironmentCertificates
         Tags tags)
     {
         var certificateResourceIdentifiers = new Dictionary<CertificateId, Output<string>>();
-        foreach (var certificate in environment.Certificates)
+
+        // Aggregate all domains for dupe-check before we configure.
+        var domains = new List<Domain>();
+
+        // Set up the ingress domain certificates.
+        domains.AddRange(environment.Ingresses.Select(i => i.Domain).Where(d => d != null)!);
+
+        // Set up the auth domain certificates.
+        domains.AddRange(environment.Ingresses.Select(i => i.AuthDomain).Where(d => d != null)!);
+
+        // Identityprovider domain certificates
+        domains.AddRange(environment.Tenants.SelectMany(t => t.IdentityProviders.Select(ip => ip.Domain)).Where(d => d != null)!);
+        var dupes = domains.GroupBy(c => c.CertificateId).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        if (dupes.Any())
         {
-            var certificateResult = new global::Pulumi.AzureNative.App.Certificate(certificate.Name, new()
-            {
-                ResourceGroupName = resourceGroup.Name,
-                Tags = tags,
-                EnvironmentName = managedEnvironment.Name,
-                Properties = new CertificatePropertiesArgs()
+            throw new DuplicateCertificateIdsUsedInConfiguration(dupes);
+        }
+
+        foreach (var domain in domains)
+        {
+            var certificateResult = new ManagedCertificate(
+                domain!.Name,
+                new ManagedCertificateArgs()
                 {
-                    Value = certificate.Value.Value,
-                    Password = certificate.Password.Value
-                }
-            });
-            certificateResourceIdentifiers[certificate.Id] = certificateResult.Id;
+                    ResourceGroupName = resourceGroup.Name,
+                    Tags = tags,
+                    EnvironmentName = managedEnvironment.Name,
+                    Properties = new ManagedCertificatePropertiesArgs()
+                    {
+                        SubjectName = domain.Name.Value,
+                        DomainControlValidation = ManagedCertificateDomainControlValidation.HTTP
+                    }
+                });
+            certificateResourceIdentifiers[domain.CertificateId] = certificateResult.Id;
         }
 
         return certificateResourceIdentifiers;

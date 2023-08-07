@@ -32,14 +32,6 @@ public class ApplicationEnvironmentWithArtifactsProjection : IImmediateProjectio
                 .Set(m => m.UserName).To(e => e.UserName)
                 .Set(m => m.Password).To(e => e.Password)))
 
-        // Certificates
-        .Children(m => m.Certificates, _ => _
-            .IdentifiedBy(m => m.Id)
-            .From<CertificateAddedToApplicationEnvironment>(_ => _
-                .UsingKey(e => e.CertificateId)
-                .Set(m => m.Name).To(e => e.Name)
-                .Set(m => m.Value).To(e => e.Value)))
-
         // Tenants
         .Children(m => m.Tenants, _ => _
             .IdentifiedBy(m => m.Id)
