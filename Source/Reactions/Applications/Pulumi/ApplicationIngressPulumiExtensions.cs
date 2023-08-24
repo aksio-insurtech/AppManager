@@ -285,7 +285,11 @@ public static class ApplicationIngressPulumiExtensions
                                 domain => new CustomDomainArgs
                                 {
                                     BindingType = BindingType.SniEnabled,
-                                    CertificateId = certificates[domain.CertificateId],
+
+                                    // If the certificate is not available yet, pick a random one.. You then need to rerun this (TODO: in future code this needs to be automatically handled).
+#pragma warning disable CS8604 // Possible null reference argument.
+                                    CertificateId = domain.CertificateId != null ? certificates[domain.CertificateId] : certificates.Values.FirstOrDefault(),
+#pragma warning restore CS8604 // Possible null reference argument.
                                     Name = domain.Name.Value
                                 })
                             .ToArray(),
