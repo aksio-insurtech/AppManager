@@ -48,3 +48,84 @@ To figure out what the public IP of something is:
 ```shell
 curl api.ipify.org
 ```
+
+If the Entra ID (AAD) service principal has changed, you currently need to manually set the passord in all the stacks.
+First, export the stacks, manually change the passord from old to new and then import.
+
+Below are the export and import commands for the current (as of 24.08.2023) stacks. You will need to log in with pulumi cli first, with an account that has the proper access (or use the pulumi PAT which can be found in the relevant variable.json file in the cloud-setup repo, under pulumi.accessToken).
+
+### EXPORT
+```sh
+pulumi stack export --stack aksio/OPensjon/shared --show-secrets --file opensjon_shared_dev.yml
+pulumi stack export --stack aksio/OPensjon-CaseWorkers/dev --show-secrets --file opensjon_caseworkers_dev.yml
+pulumi stack export --stack aksio/OPensjon-Employees/dev --show-secrets --file opensjon_employees_dev.yml
+pulumi stack export --stack aksio/OPensjon-Employers/dev --show-secrets --file opensjon_employers_dev.yml
+pulumi stack export --stack aksio/OPensjon-FREG/dev --show-secrets --file opensjon_freg_dev.yml
+pulumi stack export --stack aksio/OPensjon-KRR/dev --show-secrets --file opensjon_krr_dev.yml
+pulumi stack export --stack aksio/OPensjon-Members/dev --show-secrets --file opensjon_members_dev.yml
+pulumi stack export --stack aksio/OPensjon-NAV/dev --show-secrets --file opensjon_nav_dev.yml
+pulumi stack export --stack aksio/OPensjon-NAVSoapProxy/dev --show-secrets --file opensjon_navsoapproxy_dev.yml
+pulumi stack export --stack aksio/OPensjon-OFA/dev --show-secrets --file opensjon_ofa_dev.yml
+pulumi stack export --stack aksio/OPensjon-SvarUT/dev --show-secrets --file opensjon_svarut_dev.yml
+pulumi stack export --stack aksio/OPensjon/dev --show-secrets --file opensjon_shared_dev_dev.yml
+pulumi stack export --stack aksio/OPensjon-CaseWorkers/qa --show-secrets --file opensjon_caseworkers_qa.yml
+#pulumi stack export --stack aksio/OPensjon-Employees/qa --show-secrets --file opensjon_employees_qa.yml
+pulumi stack export --stack aksio/OPensjon-Employers/qa --show-secrets --file opensjon_employers_qa.yml
+pulumi stack export --stack aksio/OPensjon-FREG/qa --show-secrets --file opensjon_freg_qa.yml
+pulumi stack export --stack aksio/OPensjon-KRR/qa --show-secrets --file opensjon_krr_qa.yml
+pulumi stack export --stack aksio/OPensjon-Members/qa --show-secrets --file opensjon_members_qa.yml
+pulumi stack export --stack aksio/OPensjon-NAV/qa --show-secrets --file opensjon_nav_qa.yml
+pulumi stack export --stack aksio/OPensjon-NAVSoapProxy/qa --show-secrets --file opensjon_navsoapproxy_qa.yml
+pulumi stack export --stack aksio/OPensjon-OFA/qa --show-secrets --file opensjon_ofa_qa.yml
+pulumi stack export --stack aksio/OPensjon-SvarUT/qa --show-secrets --file opensjon_svarut_qa.yml
+pulumi stack export --stack aksio/OPensjon/qa --show-secrets --file opensjon_shared_qa_qa.yml
+pulumi stack export --stack aksio/OPensjon-CaseWorkers/prod --show-secrets --file opensjon_caseworkers_prod.yml
+pulumi stack export --stack aksio/OPensjon-Employees/prod --show-secrets --file opensjon_employees_prod.yml
+pulumi stack export --stack aksio/OPensjon-Employers/prod --show-secrets --file opensjon_employers_prod.yml
+pulumi stack export --stack aksio/OPensjon-FREG/prod --show-secrets --file opensjon_freg_prod.yml
+pulumi stack export --stack aksio/OPensjon-KRR/prod --show-secrets --file opensjon_krr_prod.yml
+pulumi stack export --stack aksio/OPensjon-Members/prod --show-secrets --file opensjon_members_prod.yml
+pulumi stack export --stack aksio/OPensjon-NAV/prod --show-secrets --file opensjon_nav_prod.yml
+pulumi stack export --stack aksio/OPensjon-NAVSoapProxy/prod --show-secrets --file opensjon_navsoapproxy_prod.yml
+pulumi stack export --stack aksio/OPensjon-OFA/prod --show-secrets --file opensjon_ofa_prod.yml
+pulumi stack export --stack aksio/OPensjon-SvarUT/prod --show-secrets --file opensjon_svarut_prod.yml
+pulumi stack export --stack aksio/OPensjon/prod --show-secrets --file opensjon_shared_prod_prod.yml
+```
+
+### IMPORT
+```sh
+pulumi stack import --stack aksio/OPensjon/shared --file opensjon_shared_dev.yml
+pulumi stack import --stack aksio/OPensjon-CaseWorkers/dev --file opensjon_caseworkers_dev.yml
+pulumi stack import --stack aksio/OPensjon-Employees/dev  --file opensjon_employees_dev.yml
+pulumi stack import --stack aksio/OPensjon-Employers/dev --file opensjon_employers_dev.yml
+pulumi stack import --stack aksio/OPensjon-FREG/dev  --file opensjon_freg_dev.yml
+pulumi stack import --stack aksio/OPensjon-KRR/dev --file opensjon_krr_dev.yml
+pulumi stack import --stack aksio/OPensjon-Members/dev --file opensjon_members_dev.yml
+pulumi stack import --stack aksio/OPensjon-NAV/dev --file opensjon_nav_dev.yml
+pulumi stack import --stack aksio/OPensjon-NAVSoapProxy/dev --file opensjon_navsoapproxy_dev.yml
+pulumi stack import --stack aksio/OPensjon-OFA/dev  --file opensjon_ofa_dev.yml
+pulumi stack import --stack aksio/OPensjon-SvarUT/dev  --file opensjon_svarut_dev.yml
+pulumi stack import --stack aksio/OPensjon/dev --file opensjon_shared_dev_dev.yml
+pulumi stack import --stack aksio/OPensjon-CaseWorkers/qa --file opensjon_caseworkers_qa.yml
+#pulumi stack import --stack aksio/OPensjon-Employees/qa  --file opensjon_employees_qa.yml
+pulumi stack import --stack aksio/OPensjon-Employers/qa --file opensjon_employers_qa.yml
+pulumi stack import --stack aksio/OPensjon-FREG/qa  --file opensjon_freg_qa.yml
+pulumi stack import --stack aksio/OPensjon-KRR/qa --file opensjon_krr_qa.yml
+pulumi stack import --stack aksio/OPensjon-Members/qa --file opensjon_members_qa.yml
+pulumi stack import --stack aksio/OPensjon-NAV/qa --file opensjon_nav_qa.yml
+pulumi stack import --stack aksio/OPensjon-NAVSoapProxy/qa --file opensjon_navsoapproxy_qa.yml
+pulumi stack import --stack aksio/OPensjon-OFA/qa  --file opensjon_ofa_qa.yml
+pulumi stack import --stack aksio/OPensjon-SvarUT/qa  --file opensjon_svarut_qa.yml
+pulumi stack import --stack aksio/OPensjon/qa --file opensjon_shared_qa_qa.yml
+pulumi stack import --stack aksio/OPensjon-CaseWorkers/prod --file opensjon_caseworkers_prod.yml
+pulumi stack import --stack aksio/OPensjon-Employees/prod  --file opensjon_employees_prod.yml
+pulumi stack import --stack aksio/OPensjon-Employers/prod --file opensjon_employers_prod.yml
+pulumi stack import --stack aksio/OPensjon-FREG/prod  --file opensjon_freg_prod.yml
+pulumi stack import --stack aksio/OPensjon-KRR/prod --file opensjon_krr_prod.yml
+pulumi stack import --stack aksio/OPensjon-Members/prod --file opensjon_members_prod.yml
+pulumi stack import --stack aksio/OPensjon-NAV/prod --file opensjon_nav_prod.yml
+pulumi stack import --stack aksio/OPensjon-NAVSoapProxy/prod --file opensjon_navsoapproxy_prod.yml
+pulumi stack import --stack aksio/OPensjon-OFA/prod  --file opensjon_ofa_prod.yml
+pulumi stack import --stack aksio/OPensjon-SvarUT/prod  --file opensjon_svarut_prod.yml
+pulumi stack import --stack aksio/OPensjon/prod --file opensjon_shared_prod_prod.yml
+```

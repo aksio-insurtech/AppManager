@@ -14,12 +14,14 @@ using Common;
 using Concepts.Applications.Environments;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
+using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Pulumi.Resources.Cratis;
 using Read.Applications.Environments;
+using Deployment = Pulumi.Deployment;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
@@ -429,8 +431,8 @@ public class PulumiOperations : IPulumiOperations
     async Task<PulumiStack> CreateStack(Application application, ApplicationEnvironmentWithArtifacts environment, Func<Task> program, Microservice? microservice = default)
     {
         _logger.CreatingStack(application.Name);
-        var stackName = environment.DisplayName;
-
+        var stackName = $"{_settings.PulumiOrganization}/{environment.DisplayName}";
+        
         var accessToken = _settings.PulumiAccessToken;
         _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
 
@@ -448,7 +450,8 @@ public class PulumiOperations : IPulumiOperations
             EnvironmentVariables = new Dictionary<string, string?>
             {
                 { "TF_LOG", "TRACE" },
-                { "PULUMI_ORG", _settings.PulumiOrganization },
+                // PULUMI_ORG blir ikke hensyntatt, du må kjøre dette i konsoll på maskinen dette kjøres på: pulumi org set-default aksio
+                //{ "PULUMI_ORG", _settings.PulumiOrganization },
                 { "ARM_CLIENT_ID", _settings.ServicePrincipal.ClientId },
                 { "ARM_CLIENT_SECRET", _settings.ServicePrincipal.ClientSecret },
                 { "ARM_TENANT_ID", _settings.AzureSubscriptions.First().TenantId },
@@ -460,7 +463,7 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
-
+        
         var hasStack = await (microservice is not null ?
             _stacksForMicroservices.HasFor(application.Id, microservice.Id, environment) :
             _stacksForApplications.HasFor(application.Id, environment));
@@ -490,9 +493,9 @@ public class PulumiOperations : IPulumiOperations
         await RemovePendingOperations(stack, stackAsJson);
 
         _logger.InstallingPlugins();
-        await stack.Workspace.InstallPluginAsync("azure-native", "1.103.0");
-        await stack.Workspace.InstallPluginAsync("azuread", "5.35.0");
-        await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.7.0");
+        await stack.Workspace.InstallPluginAsync("azure-native", "2.3.0");
+        await stack.Workspace.InstallPluginAsync("azuread", "5.40.0");
+        await stack.Workspace.InstallPluginAsync("mongodbatlas", "3.10.0");
 
         _logger.SettingAllConfig();
         await stack.SetAllConfigAsync(new Dictionary<string, ConfigValue>
@@ -503,11 +506,11 @@ public class PulumiOperations : IPulumiOperations
                 { "azure-native:clientSecret", new ConfigValue(_settings.ServicePrincipal.ClientSecret, true) },
                 { "azure-native:tenantId", new ConfigValue(_settings.AzureSubscriptions.First().TenantId) }
             });
-
+        
         await SetTag(application, environment, "application", application.Name);
-        await SetTag(application, environment, "environment", stackName);
+        await SetTag(application, environment, "environment", environment.DisplayName);
 
-        return pulumiStack = new(stack, stackAsJson);
+        return new(stack, stackAsJson);
     }
 
     async Task RemovePendingOperations(WorkspaceStack stack, JsonNode stackAsJson)
@@ -539,8 +542,11 @@ public class PulumiOperations : IPulumiOperations
             OnStandardOutput = Console.WriteLine,
             OnStandardError = Console.Error.WriteLine
         };
-
+        
         _logger.RefreshingStack();
+
+        // If refresh fails after a little while with "AADSTS7000215: Invalid client secret provided." after an update to the Entra ID service principal, you need to manually set the secret.
+        // This is described in the solution README.md.
         await stack.RefreshAsync(options);
     }
 
