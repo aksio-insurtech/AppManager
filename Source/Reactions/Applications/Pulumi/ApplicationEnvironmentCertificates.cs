@@ -26,7 +26,11 @@ public static class ApplicationEnvironmentCertificates
         var domains = new List<Domain>();
 
         // Set up the ingress domain certificates.
-        domains.AddRange(environment.Ingresses.Select(i => i.Domain).Where(d => d != null)!);
+        // If you get an ingress setup error stating that the manged certificate cannot be configured since no container app listens to it, the current procedure is this:
+        //  #1: in your environment json file (e.g. "OPensjon.json"), for the ingress in question: do not define the "certificateId" value and then run.
+        //  #2: after the one run, you can set the certificateId value and run this again to get it properly set up.
+        // Yes, it kind of sucks. But until we rewrite this it is what it is.
+        domains.AddRange(environment.Ingresses.Select(i => i.Domain).Where(d => d?.CertificateId != null)!);
 
         // Set up the auth domain certificates.
         domains.AddRange(environment.Ingresses.Select(i => i.AuthDomain).Where(d => d != null)!);
