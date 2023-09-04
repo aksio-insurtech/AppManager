@@ -77,6 +77,8 @@ public class PulumiStackDefinitions : IPulumiStackDefinitions
         var managedEnvironment = application.SetupContainerAppManagedEnvironment(resourceGroup, environment, applicationMonitoring.Workspace, network, tags);
         resourceResults.Register(WellKnownResourceTypes.ManagedEnvironment, managedEnvironment);
 
+        // TODO: we cannot set up a managed certificate for a domain/hostname that is now yet registered to a container app.
+        // So this needs to be rewritten to first define the continer apps with their hostnames before we set up the certificates (and then finally assosiate them with the container).
         var certificates = application.SetupCertificates(environment, managedEnvironment, resourceGroup, tags);
 
         var content = TemplateTypes.AppSettings(null!);

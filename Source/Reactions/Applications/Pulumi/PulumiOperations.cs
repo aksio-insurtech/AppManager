@@ -14,14 +14,12 @@ using Common;
 using Concepts.Applications.Environments;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
-using Pulumi;
 using Pulumi.Automation;
 using Pulumi.AzureNative.App;
 using Pulumi.AzureNative.Resources;
 using Reactions.Applications.Pulumi.Resources;
 using Reactions.Applications.Pulumi.Resources.Cratis;
 using Read.Applications.Environments;
-using Deployment = Pulumi.Deployment;
 using MicroserviceId = Concepts.Applications.MicroserviceId;
 
 namespace Reactions.Applications.Pulumi;
@@ -432,7 +430,7 @@ public class PulumiOperations : IPulumiOperations
     {
         _logger.CreatingStack(application.Name);
         var stackName = $"{_settings.PulumiOrganization}/{environment.DisplayName}";
-        
+
         var accessToken = _settings.PulumiAccessToken;
         _logger.PulumiInformation($"{accessToken.Value.Substring(0, 4)}*****");
 
@@ -441,8 +439,6 @@ public class PulumiOperations : IPulumiOperations
 
         var projectName = GetProjectNameFor(application, microservice);
 
-        PulumiStack? pulumiStack = null;
-
         var pulumiProgram = PulumiFn.Create(async () => await program());
         var args = new InlineProgramArgs(projectName, stackName, pulumiProgram)
         {
@@ -450,8 +446,6 @@ public class PulumiOperations : IPulumiOperations
             EnvironmentVariables = new Dictionary<string, string?>
             {
                 { "TF_LOG", "TRACE" },
-                // PULUMI_ORG blir ikke hensyntatt, du må kjøre dette i konsoll på maskinen dette kjøres på: pulumi org set-default aksio
-                //{ "PULUMI_ORG", _settings.PulumiOrganization },
                 { "ARM_CLIENT_ID", _settings.ServicePrincipal.ClientId },
                 { "ARM_CLIENT_SECRET", _settings.ServicePrincipal.ClientSecret },
                 { "ARM_TENANT_ID", _settings.AzureSubscriptions.First().TenantId },
@@ -463,7 +457,7 @@ public class PulumiOperations : IPulumiOperations
 
         _logger.CreatingOrSelectingStack();
         var stack = await LocalWorkspace.CreateOrSelectStackAsync(args);
-        
+
         var hasStack = await (microservice is not null ?
             _stacksForMicroservices.HasFor(application.Id, microservice.Id, environment) :
             _stacksForApplications.HasFor(application.Id, environment));
@@ -506,7 +500,7 @@ public class PulumiOperations : IPulumiOperations
                 { "azure-native:clientSecret", new ConfigValue(_settings.ServicePrincipal.ClientSecret, true) },
                 { "azure-native:tenantId", new ConfigValue(_settings.AzureSubscriptions.First().TenantId) }
             });
-        
+
         await SetTag(application, environment, "application", application.Name);
         await SetTag(application, environment, "environment", environment.DisplayName);
 
@@ -542,7 +536,7 @@ public class PulumiOperations : IPulumiOperations
             OnStandardOutput = Console.WriteLine,
             OnStandardError = Console.Error.WriteLine
         };
-        
+
         _logger.RefreshingStack();
 
         // If refresh fails after a little while with "AADSTS7000215: Invalid client secret provided." after an update to the Entra ID service principal, you need to manually set the secret.
