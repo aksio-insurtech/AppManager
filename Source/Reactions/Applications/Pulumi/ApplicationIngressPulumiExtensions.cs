@@ -123,9 +123,12 @@ public static class ApplicationIngressPulumiExtensions
             }
         }
 
-        if (ingress.RouteTenantResolution is not null)
+        if (ingress.RouteTenantResolution is not null || ingress.SpecifiedTenantResolution is not null)
         {
-            var options = new RouteTenantResolutionOptions(ingress.RouteTenantResolution.RegularExpression);
+            object options = (ingress.RouteTenantResolution is not null) ?
+                new RouteTenantResolutionOptions(ingress.RouteTenantResolution.RegularExpression) :
+                new SpecifiedTenantResolutionOptions(ingress.SpecifiedTenantResolution!.TenantId);
+
             var optionsAsJsonString = JsonSerializer.Serialize(
                 options,
                 new JsonSerializerOptions
@@ -134,7 +137,9 @@ public static class ApplicationIngressPulumiExtensions
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
-            tenantResolutionConfig = new TenantResolutionConfig("route", optionsAsJsonString);
+            tenantResolutionConfig = new TenantResolutionConfig(
+                ingress.RouteTenantResolution is not null ? "route" : "specified",
+                optionsAsJsonString);
         }
 
         var identityDetailsUrl = string.Empty;
@@ -295,7 +300,7 @@ public static class ApplicationIngressPulumiExtensions
                             .ToArray(),
                         IpSecurityRestrictions = ingress.AccessList?.Select(
                                 acl => new IpSecurityRestrictionRuleArgs()
-                                    { Action = "Allow", Name = acl.Name.Value, IpAddressRange = acl.Address.Value })
+                                { Action = "Allow", Name = acl.Name.Value, IpAddressRange = acl.Address.Value })
                             .ToList() ?? new()
                     },
                     Secrets = ingress.IdentityProviders.Select(
