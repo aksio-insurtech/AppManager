@@ -22,7 +22,8 @@ namespace Reactions.Applications;
 /// <param name="AuthDomain">AuthDomain.</param>
 /// <param name="Routes">List of routes for this ingress.</param>
 /// <param name="IdentityProviders">List of identity providers.</param>
-/// <param name="RouteTenantResolution">Route tenant resolution.</param>
+/// <param name="RouteTenantResolution">Optional Route tenant resolution to use.</param>
+/// <param name="SpecifiedTenantResolution">Optional <see cref="SpecifiedTenantResolution"/> to use.</param>
 /// <param name="OAuthBearerTokenProvider">The OAuth bearer tokenprovider, if applicable.</param>
 /// <param name="AccessList">An list of IP addresses that should have access, used for the least secure authentication.</param>
 /// <param name="MutualTLS">Mutual TLS / Client Certificate mode, if applicable. If accepted, this will relay any given certificate to the web application after vaildating it in the IngressMiddleware. If required the client must present a certificate with a valid serialnumber.</param>
@@ -37,6 +38,7 @@ public record Ingress(
     IEnumerable<Route> Routes,
     IEnumerable<IdentityProvider> IdentityProviders,
     RouteTenantResolution? RouteTenantResolution,
+    SpecifiedTenantResolution? SpecifiedTenantResolution,
     OAuthBearerTokenProvider? OAuthBearerTokenProvider,
     IEnumerable<AccessListEntry>? AccessList,
     MutualTLS? MutualTLS)

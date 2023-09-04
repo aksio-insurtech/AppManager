@@ -87,5 +87,6 @@
         "vnet",
         "Xunit",
         "zumo"
-    ]
+    ],
+    "dotnet.defaultSolution": "Management.sln"
 }
