@@ -83,6 +83,7 @@ public static class ApplicationIngressPulumiExtensions
         TenantResolutionConfig? tenantResolutionConfig = null;
         if (idPortenProvider is not null)
         {
+            tenantResolutionConfig = new TenantResolutionConfig("claim", "{}");
             idPortenConfig = new(idPortenProvider.Issuer, idPortenProvider.AuthorizationEndpoint);
             tenantConfigs = environment.Tenants.Select(
                 tenant =>
@@ -123,6 +124,12 @@ public static class ApplicationIngressPulumiExtensions
             }
         }
 
+        // Mutual tls does not require the tenant resolution strategy (as its not a relevant use-case at the moment).
+        if (!string.IsNullOrEmpty(ingress.MutualTLS?.AuthorityCertificate) && ingress.MutualTLS.AcceptedSerialNumbers.Any())
+        {
+            tenantResolutionConfig = new TenantResolutionConfig("none", "{}");
+        }
+
         if (ingress.RouteTenantResolution is not null || ingress.SpecifiedTenantResolution is not null)
         {
             object options = (ingress.RouteTenantResolution is not null) ?
@@ -149,6 +156,13 @@ public static class ApplicationIngressPulumiExtensions
         {
             var configuration = await identityDetailsProviderMicroservice.Configuration!.GetValue();
             identityDetailsUrl = $"http://{configuration!.Ingress!.Fqdn}/.aksio/me";
+        }
+
+        if (tenantResolutionConfig == null)
+        {
+#pragma warning disable CA2201, AS0008
+            throw new Exception("Code or configuration error! A tenant resolution must be defined for the ingress to work!");
+#pragma warning restore CA2201, AS0008
         }
 
         var middlewareContent = new IngressMiddlewareTemplateContent(
