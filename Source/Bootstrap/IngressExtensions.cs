@@ -55,7 +55,7 @@ public static class IngressExtensions
         if (ingress.IdentityProviders.Any() && !string.IsNullOrWhiteSpace(ingress.OAuthBearerTokenProvider?.Authority?.Value))
         {
             throw new InvalidAuthentication(
-                "You cannot have both IdentityProvider AND OaiuthBearerTokenProvider, if you need both you will have to create two ingresses");
+                "You cannot have both IdentityProvider AND OAuthBearerTokenProvider, if you need both you will have to create two ingresses");
         }
     }
 }

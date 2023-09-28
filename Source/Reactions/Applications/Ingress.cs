@@ -5,6 +5,7 @@ using Concepts;
 using Concepts.Applications;
 using Concepts.Applications.Environments.AccessList;
 using Concepts.Applications.Environments.Ingresses;
+using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Concepts.Security;
 using Reactions.Applications.Templates;
 
@@ -48,11 +49,17 @@ public record Ingress(
     public MicroserviceId? GetTargetMicroserviceIdForImpersonation(ApplicationEnvironmentWithArtifacts environment) => IsImpersonationEnabled ?
         IdentityProviders.First(_ => _.Impersonation is not null).Impersonation!.TargetMicroservice : null;
 
-    public ImpersonationMiddlewareConfig? GetImpersonationTemplateContent(ApplicationEnvironmentWithArtifacts environment) => IsImpersonationEnabled ?
-            new ImpersonationMiddlewareConfig(
+    public ImpersonationMiddlewareConfig? GetImpersonationTemplateContent(ApplicationEnvironmentWithArtifacts environment) =>
+        IsImpersonationEnabled
+            ? new ImpersonationMiddlewareConfig(
                 IdentityProviders.Select(_ => _.Name.Value),
                 environment.Tenants.Select(_ => _.Id.ToString()),
                 IdentityProviders.SelectMany(_ => _.Impersonation?.Roles ?? Enumerable.Empty<Role>()).Select(_ => _.Value),
                 IdentityProviders.SelectMany(_ => _.Impersonation?.Groups ?? Enumerable.Empty<Group>()).Select(_ => _.Value),
-                IdentityProviders.SelectMany(_ => _.Impersonation?.Claims ?? Enumerable.Empty<Claim>())) : null;
+                IdentityProviders.SelectMany(_ => _.Impersonation?.Claims ?? Enumerable.Empty<Claim>())
+                    .Union(
+                        IdentityProviders.Where(ip => ip.Type == IdentityProviderType.Azure)
+                            .SelectMany(
+                                _ => _.Authorization?.Roles.Select(role => new Claim("roles", role.Role)) ?? Array.Empty<Claim>())))
+            : null;
 }

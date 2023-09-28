@@ -7,22 +7,22 @@
 {{/if}}
     "tenants": {
 {{#Tenants}}
-    "{{TenantId}}": {
-        "domain": "{{Domain}}",
-        "onBehalfOf": "{{OnBehalfOf}}",
-        "sourceIdentifiers": [
-        {{#SourceIdentifiers}}
-            "{{this}}"{{#unless @last}},{{/unless}}
-        {{/SourceIdentifiers}}
-        ]
-    }{{#unless @last}},{{/unless}}
+        "{{TenantId}}": {
+            "domain": "{{Domain}}",
+            "onBehalfOf": "{{OnBehalfOf}}",
+            "sourceIdentifiers": [
+            {{#SourceIdentifiers}}
+                "{{this}}"{{#unless @last}},{{/unless}}
+            {{/SourceIdentifiers}}
+            ]
+        }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
 {{#if TenantResolution }}
     "tenantResolution": {
-    "strategy": "{{TenantResolution.Strategy}}",
-    "options": {{{TenantResolution.Options}}}
-},
+        "strategy": "{{TenantResolution.Strategy}}",
+        "options": {{{TenantResolution.Options}}}
+    },
 {{/if}}
 {{#if OAuthBearerTokenProvider }}
     "oAuthBearerTokens": {
@@ -39,6 +39,20 @@
         ]
     },
 {{/if}}
+    "authorization": {
+    {{#Authorization}}
+        "{{ClientId}}": {
+        {{#if NoAuthorizationRequired }}
+            "noAuthorizationRequired": true,
+        {{/if}}
+            "roles": [
+            {{#Roles}}
+                "{{this}}"{{#unless @last}},{{/unless}}
+            {{/Roles}}
+            ]
+        }{{#unless @last}},{{/unless}}
+    {{/Authorization}}
+    },
 {{#with Impersonation}}
     "impersonation": {
         "identityProviders": [
