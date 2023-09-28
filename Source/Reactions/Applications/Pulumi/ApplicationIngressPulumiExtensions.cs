@@ -173,7 +173,8 @@ public static class ApplicationIngressPulumiExtensions
             tenantResolutionConfig,
             ingress.OAuthBearerTokenProvider,
             ingress.GetImpersonationTemplateContent(environment),
-            ingress.MutualTLS);
+            ingress.MutualTLS,
+            ingress.IdentityProviders.SelectMany(ip => ip.IngressMiddlewareAuthorizationConfig()).Distinct());
 
         var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
         configChanged |= await nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate) ==
@@ -218,7 +219,7 @@ public static class ApplicationIngressPulumiExtensions
                 {
                     AzureFile = new AzureFilePropertiesArgs
                     {
-                        AccessMode = "ReadOnly",
+                        AccessMode = AccessMode.ReadOnly,
                         AccountKey = storage.AccountKey,
                         AccountName = storage.AccountName,
                         ShareName = nginxFileShare.Name
@@ -362,8 +363,7 @@ public static class ApplicationIngressPulumiExtensions
                         new ContainerArgs
                         {
                             Name = "middleware",
-                            Image =
-                                $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
+                            Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
                             Command =
                             {
                                 "./IngressMiddleware",
