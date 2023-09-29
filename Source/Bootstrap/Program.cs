@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Aksio Insurtech. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Concurrent;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using Aksio.Execution;
 using Aksio.Json;
@@ -12,12 +10,10 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Concepts;
 using Concepts.Applications.Environments;
-using Concepts.Applications.Environments.Ingresses.IdentityProviders;
 using Microsoft.Extensions.Logging;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Pulumi.Resources;
-using Reactions.Applications.Templates;
 using Read.Settings;
 
 namespace Bootstrap;
