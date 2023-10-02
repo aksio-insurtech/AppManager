@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Concepts.Applications.Environments.Ingresses.IdentityProviders;
+using Reactions.Applications.Templates;
 
 namespace Reactions.Applications;
 
@@ -15,4 +16,5 @@ public record IdentityProvider(
     IdentityProviderAuthorizationEndpoint AuthorizationEndpoint,
     IdentityProviderTokenEndpoint TokenEndpoint,
     IdentityProviderCertificationURL CertificationUri,
-    IdentityProviderImpersonation? Impersonation);
+    IdentityProviderImpersonation? Impersonation,
+    AuthorizationConfig? Authorization);
