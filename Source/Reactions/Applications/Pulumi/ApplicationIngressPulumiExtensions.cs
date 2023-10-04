@@ -77,14 +77,30 @@ public static class ApplicationIngressPulumiExtensions
                 hasTargetMicroserviceForImpersonation ? new(microserviceTargets[targetMicroserviceForImpersonation!]) : null));
         configChanged |= await nginxFileStorage.Upload(AuthConfigFile, nginxContent) == FileStorageResult.FileUploaded;
 
+        var middlewareTemplate = await ingress.RenderMiddlewareTemplate(environment, microservices);
+        configChanged |= await nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate) ==
+                         FileStorageResult.FileUploaded;
+
+        var appSettings = new JsonObject().ConfigureAppSettingsHint().ConfigureKestrel().ConfigureLogging();
+
+        configChanged |= await nginxFileStorage.Upload(AppSettingsFile, appSettings) == FileStorageResult.FileUploaded;
+
+        return configChanged;
+    }
+
+    public static async Task<string> RenderMiddlewareTemplate(
+        this Ingress ingress,
+        ApplicationEnvironmentWithArtifacts environment,
+        IDictionary<MicroserviceId, ContainerApp> microservices)
+    {
         var tenantConfigs = new List<TenantConfig>();
         var tenantResolutionConfigs = new List<TenantResolutionConfig>();
 
         if (ingress.RouteTenantResolution is not null || ingress.SpecifiedTenantResolution is not null)
         {
-            object options = (ingress.RouteTenantResolution is not null) ?
-                new RouteTenantResolutionOptions(ingress.RouteTenantResolution.RegularExpression) :
-                new SpecifiedTenantResolutionOptions(ingress.SpecifiedTenantResolution!.TenantId);
+            object options = (ingress.RouteTenantResolution is not null)
+                ? new RouteTenantResolutionOptions(ingress.RouteTenantResolution.RegularExpression)
+                : new SpecifiedTenantResolutionOptions(ingress.SpecifiedTenantResolution!.TenantId);
 
             var optionsAsJsonString = JsonSerializer.Serialize(
                 options,
@@ -94,12 +110,9 @@ public static class ApplicationIngressPulumiExtensions
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
-            tenantResolutionConfigs.Add(
-                new(
-                    ingress.RouteTenantResolution is not null ? "route" : "specified",
-                    optionsAsJsonString));
+            tenantResolutionConfigs.Add(new(ingress.RouteTenantResolution is not null ? "route" : "specified", optionsAsJsonString));
         }
-        
+
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
         if (idPortenProvider is not null)
@@ -107,21 +120,22 @@ public static class ApplicationIngressPulumiExtensions
             tenantResolutionConfigs.Add(new("claim", "{}"));
             idPortenConfig = new(idPortenProvider.Issuer, idPortenProvider.AuthorizationEndpoint);
             tenantConfigs = environment.Tenants.Select(
-                tenant =>
-                {
-                    var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == idPortenProvider.Id);
-                    var sourceIdentifiers = new List<string>();
-                    if (!string.IsNullOrWhiteSpace(providerConfig?.Domain?.Name))
+                    tenant =>
                     {
-                        sourceIdentifiers.Add(providerConfig.Domain.Name.Value);
-                    }
+                        var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == idPortenProvider.Id);
+                        var sourceIdentifiers = new List<string>();
+                        if (!string.IsNullOrWhiteSpace(providerConfig?.Domain?.Name?.Value))
+                        {
+                            sourceIdentifiers.Add(providerConfig.Domain.Name.Value);
+                        }
 
-                    return new TenantConfig(
-                        tenant.Id.ToString(),
-                        providerConfig?.Domain?.Name ?? string.Empty,
-                        providerConfig?.OnBehalfOf ?? string.Empty,
-                        sourceIdentifiers);
-                }).ToList();
+                        return new TenantConfig(
+                            tenant.Id.ToString(),
+                            providerConfig?.Domain?.Name ?? string.Empty,
+                            providerConfig?.OnBehalfOf ?? string.Empty,
+                            sourceIdentifiers);
+                    })
+                .ToList();
         }
         else
         {
@@ -130,15 +144,16 @@ public static class ApplicationIngressPulumiExtensions
             {
                 tenantResolutionConfigs.Add(new("claim", "{}"));
                 tenantConfigs = environment.Tenants.Select(
-                    tenant =>
-                    {
-                        var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
-                        return new TenantConfig(
-                            tenant.Id.ToString(),
-                            string.Empty,
-                            string.Empty,
-                            providerConfig?.SourceIdentifiers?.ToList() ?? new List<string>());
-                    }).ToList();
+                        tenant =>
+                        {
+                            var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
+                            return new TenantConfig(
+                                tenant.Id.ToString(),
+                                string.Empty,
+                                string.Empty,
+                                providerConfig?.SourceIdentifiers?.ToList() ?? new List<string>());
+                        })
+                    .ToList();
             }
         }
 
@@ -151,9 +166,14 @@ public static class ApplicationIngressPulumiExtensions
             }
 
             var tenantConfig = tenantConfigs.SingleOrDefault(t => t.TenantId == tenant.Id.ToString());
-            tenantConfig ??= new(tenant.Id.ToString(), string.Empty, string.Empty, new());
-
-            tenantConfig.SourceIdentifiers.AddRange(tenant.SourceIdentifiers);
+            if (tenantConfig != null)
+            {
+                tenantConfig.SourceIdentifiers.AddRange(tenant.SourceIdentifiers);
+            }
+            else
+            {
+                tenantConfigs.Add(new(tenant.Id.ToString(), string.Empty, string.Empty, tenant.SourceIdentifiers.ToList()));
+            }
         }
 
         var identityDetailsUrl = string.Empty;
@@ -171,15 +191,16 @@ public static class ApplicationIngressPulumiExtensions
         {
             tenantResolutionConfigs.Add(new("none", "{}"));
         }
-        
+
         if (!tenantResolutionConfigs.Any())
         {
 #pragma warning disable CA2201, AS0008
             throw new("Code or configuration error! A tenant resolution must be defined for the ingress to work!");
 #pragma warning restore CA2201, AS0008
         }
-        
-#error !! Husk at jeg også må oppdatere sourceIdentifiers med hostnavn, samt legge på host resolver typen der det er relevant (=members) 
+
+        // Finally add the hostname tenancy resolver, which may or may not be in use (but does not hurt to include).
+        tenantResolutionConfigs.Add(new("host", "{}"));
 
         var middlewareContent = new IngressMiddlewareTemplateContent(
             idPortenProvider is not null,
@@ -192,15 +213,7 @@ public static class ApplicationIngressPulumiExtensions
             ingress.MutualTLS,
             ingress.IdentityProviders.SelectMany(ip => ip.IngressMiddlewareAuthorizationConfig()).Distinct());
 
-        var middlewareTemplate = TemplateTypes.IngressMiddlewareConfig(middlewareContent);
-        configChanged |= await nginxFileStorage.Upload(MiddlewareConfigFile, middlewareTemplate) ==
-                         FileStorageResult.FileUploaded;
-
-        var appSettings = new JsonObject().ConfigureAppSettingsHint().ConfigureKestrel().ConfigureLogging();
-
-        configChanged |= await nginxFileStorage.Upload(AppSettingsFile, appSettings) == FileStorageResult.FileUploaded;
-
-        return configChanged;
+        return TemplateTypes.IngressMiddlewareConfig(middlewareContent);
     }
 
     public static async Task<IngressResult> SetupIngress(

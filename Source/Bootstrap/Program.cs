@@ -112,31 +112,8 @@ public static class Program
             applicationAndEnvironment.Environment,
             ApplicationEnvironmentDeploymentId.New());
 
-        // await stacksForApplications.SaveAllQueued();
-        // await stacksForMicroservices.SaveAllQueued();
-        // try
-        // {
-        //     var appManagerApi = new AppManagerApi(config, "https://ingress832b7458.livelyglacier-aba45b93.norwayeast.azurecontainerapps.io", _jsonSerializerOptions);
-        //     await appManagerApi.Authenticate();
-        //
-        //     await appManagerApi.AddAzureSubscription(config.Azure.Subscription.SubscriptionId.ToString(), config.Azure.Subscription.Name, config.Azure.Subscription.TenantId, config.Azure.Subscription.TenantName);
-        //     await appManagerApi.SetAzureServicePrincipal(config.Azure.ServicePrincipal.ClientId, config.Azure.ServicePrincipal.ClientSecret);
-        //     await appManagerApi.SetPulumiSettings(config.Pulumi.Organization, config.Pulumi.AccessToken);
-        //     await appManagerApi.SetMongoDBSettings(config.MongoDB.OrganizationId, config.MongoDB.PublicKey, config.MongoDB.PrivateKey);
-        //
-        //     await appManagerApi.CreateApplication(application.Id, application.Name, application.AzureSubscriptionId, application.CloudLocation);
-        //     await appManagerApi.CreateEnvironment(application.Id, development);
-        //
-        //     await appManagerApi.CreateMicroservice(application.Id, development, microservice.Id, microservice.Name);
-        //     await appManagerApi.CreateDeployable(application.Id, development, microservice.Id, microservice.Deployables.Single().Id, microservice.Deployables.Single().Name);
-        //     await appManagerApi.SetDeployableImage(application.Id, development, microservice.Id, microservice.Deployables.Single().Id, microservice.Deployables.Single().Image);
-        // }
-        // catch (Exception ex)
-        // {
-        //     Console.WriteLine($"Errors with calling API - {ex.Message}");
-        // }
-        Console.WriteLine("Done... Hit any key..");
-        Console.ReadLine();
+        Console.WriteLine("Done. Hit any key.");
+        Console.ReadKey();
     }
 
     /// <summary>
