@@ -8,7 +8,7 @@ public record IngressMiddlewareTemplateContent(
     OpenIDConnectConfig IdPortenConfig,
     string IdentityDetailsUrl,
     IEnumerable<TenantConfig> Tenants,
-    TenantResolutionConfig? TenantResolution,
+    IEnumerable<TenantResolutionConfig> TenantResolutions,
     OAuthBearerTokenProvider? OAuthBearerTokenProvider,
     ImpersonationMiddlewareConfig? Impersonation,
     MutualTLS? MutualTLS,
