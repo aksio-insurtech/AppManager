@@ -117,7 +117,6 @@ public static class ApplicationIngressPulumiExtensions
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
         if (idPortenProvider is not null)
         {
-            tenantResolutionConfigs.Add(new("claim", "{}"));
             idPortenConfig = new(idPortenProvider.Issuer, idPortenProvider.AuthorizationEndpoint);
             tenantConfigs = environment.Tenants.Select(
                     tenant =>
@@ -137,24 +136,31 @@ public static class ApplicationIngressPulumiExtensions
                     })
                 .ToList();
         }
-        else
+        
+        var aadProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
+        if (aadProvider is not null)
         {
-            var aadProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
-            if (aadProvider is not null)
+            // Add or update tenant configs.
+            foreach (var tenant in environment.Tenants)
             {
-                tenantResolutionConfigs.Add(new("claim", "{}"));
-                tenantConfigs = environment.Tenants.Select(
-                        tenant =>
-                        {
-                            var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
-                            return new TenantConfig(
-                                tenant.Id.ToString(),
-                                string.Empty,
-                                string.Empty,
-                                providerConfig?.SourceIdentifiers?.ToList() ?? new List<string>());
-                        })
-                    .ToList();
+                var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
+                var sourceIdentifiers = providerConfig?.SourceIdentifiers?.ToList() ?? new List<string>();
+                
+                var tenantConfig = tenantConfigs.SingleOrDefault(t => t.TenantId == tenant.Id.ToString());
+                if (tenantConfig != null)
+                {
+                    tenantConfig.SourceIdentifiers.AddRange(sourceIdentifiers);
+                }
+                else
+                {
+                    tenantConfigs.Add(new(tenant.Id.ToString(), string.Empty, string.Empty, sourceIdentifiers));
+                }
             }
+        }
+
+        if (idPortenProvider is not null || aadProvider is not null)
+        {
+            tenantResolutionConfigs.Add(new("claim", "{}"));
         }
 
         // Add sourceIdentifiers that are set on the tenant level (outside identity providers).
@@ -201,7 +207,7 @@ public static class ApplicationIngressPulumiExtensions
 
         // Finally add the hostname tenancy resolver, which may or may not be in use (but does not hurt to include).
         tenantResolutionConfigs.Add(new("host", "{}"));
-
+        
         var middlewareContent = new IngressMiddlewareTemplateContent(
             idPortenProvider is not null,
             idPortenConfig,
@@ -392,7 +398,8 @@ public static class ApplicationIngressPulumiExtensions
                         new()
                         {
                             Name = "middleware",
-                            Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
+                            Image = "ghcr.io/aksio-insurtech/ingressmiddleware:5.1.0-pr75.cc5b118",
+                                //$"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
                             Command =
                             {
                                 "./IngressMiddleware",
