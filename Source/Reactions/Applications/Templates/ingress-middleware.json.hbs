@@ -18,12 +18,14 @@
         }{{#unless @last}},{{/unless}}
 {{/Tenants}}
     },
-{{#if TenantResolution }}
-    "tenantResolution": {
-        "strategy": "{{TenantResolution.Strategy}}",
-        "options": {{{TenantResolution.Options}}}
-    },
-{{/if}}
+    "tenantResolutions": [
+{{#TenantResolutions}}
+        {
+            "strategy": "{{Strategy}}",
+            "options": {{{Options}}}
+        }{{#unless @last}},{{/unless}}
+{{/TenantResolutions}}
+    ],
 {{#if OAuthBearerTokenProvider }}
     "oAuthBearerTokens": {
       "authority": "{{OAuthBearerTokenProvider.Authority}}"
