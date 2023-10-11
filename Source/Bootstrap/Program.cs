@@ -11,6 +11,7 @@ using Autofac.Extensions.DependencyInjection;
 using Concepts;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
+using Pulumi.AzureNative.App;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Pulumi.Resources;
@@ -106,6 +107,14 @@ public static class Program
             new ApplicationEnvironmentDeploymentLog(),
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
+
+        // // Helper to debug ingress config builders
+        // foreach (var ingress in applicationAndEnvironment.Environment.Ingresses)
+        // {
+        //     var ingressConfig = await ingress.RenderMiddlewareTemplate(
+        //         applicationAndEnvironment.Environment,
+        //         new Dictionary<Concepts.Applications.MicroserviceId, ContainerApp>());
+        // }
 
         await operations.ConsolidateEnvironment(
             application,
