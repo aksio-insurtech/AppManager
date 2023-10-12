@@ -4,7 +4,6 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Aksio.Cratis.Changes;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Concepts.Applications;
@@ -20,6 +19,8 @@ using Reactions.Applications.Templates;
 using FileShare = Pulumi.AzureNative.Storage.FileShare;
 
 namespace Reactions.Applications.Pulumi;
+
+#pragma warning disable RCS1077, MA0020 // "Optimize LINQ method call" / "Use Find() instead of FirstOrDefault()"
 
 #pragma warning disable RCS1175
 
@@ -117,7 +118,7 @@ public static class ApplicationIngressPulumiExtensions
 
         // A map of domain names from (currently only) idporten, and the source identifier they should resolve to.
         var domainResolutionHostnames = new Dictionary<string, string>();
-       
+
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
         if (idPortenProvider is not null)
@@ -138,13 +139,13 @@ public static class ApplicationIngressPulumiExtensions
                         {
                             if (domainResolutionHostnames.ContainsKey(providerConfig.Domain.Name.Value))
                             {
-                                throw new("Error: More than one idporten provider has the same domain name defined!");
+                                throw new ConfigurationError("Error: More than one idporten provider has the same domain name defined!");
                             }
 
                             var tenantSourceIdentifier = tenant.SourceIdentifiers?.FirstOrDefault() ?? string.Empty;
                             if (string.IsNullOrWhiteSpace(tenantSourceIdentifier))
                             {
-                                throw new(
+                                throw new ConfigurationError(
                                     "Error: a tenant with a idPorten provider with a domain name must have at least one sourceIdentifier configured!");
                             }
 
@@ -160,7 +161,7 @@ public static class ApplicationIngressPulumiExtensions
                 .ToList();
         }
 
-        var hasAadProvider = ingress.IdentityProviders.Any(_ => _.Type == IdentityProviderType.Azure); 
+        var hasAadProvider = ingress.IdentityProviders.Any(_ => _.Type == IdentityProviderType.Azure);
         foreach (var aadProvider in ingress.IdentityProviders.Where(_ => _.Type == IdentityProviderType.Azure))
         {
             // Add or update tenant configs.
@@ -245,7 +246,6 @@ public static class ApplicationIngressPulumiExtensions
         foreach (var ip in ingress.IdentityProviders.SelectMany(ip => ip.IngressMiddlewareAuthorizationConfig()))
         {
             var existing = authConfigs.FirstOrDefault(c => c.ClientId == ip.ClientId);
-            
             if (existing == default)
             {
                 authConfigs.Add(ip);
@@ -258,24 +258,23 @@ public static class ApplicationIngressPulumiExtensions
                 authConfigs.Add(ip);
                 continue;
             }
-            
+
             // Basic compare of the lists
             if (string.Join(",", existing.Roles.Order()) != string.Join(",", ip.Roles.Order()))
             {
                 // Diff, so add. This is likely to fail as the json becomes invalid.
                 authConfigs.Add(ip);
-                continue;
             }
         }
-        
+
         // Catch any obvious configuration errors here
         var duplicateIdentityProviders = authConfigs.GroupBy(_ => _.ClientId).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
         if (duplicateIdentityProviders.Any())
         {
-            throw new(
+            throw new ConfigurationError(
                 $"Duplicate identity providers, you must correct config or code for this: {string.Join(", ", duplicateIdentityProviders)}");
         }
-        
+
         var middlewareContent = new IngressMiddlewareTemplateContent(
             alwaysApproveUris,
             idPortenProvider is not null,
