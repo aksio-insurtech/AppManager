@@ -96,6 +96,7 @@ public static class ApplicationIngressPulumiExtensions
     {
         var tenantConfigs = new List<TenantConfig>();
         var tenantResolutionConfigs = new List<TenantResolutionConfig>();
+        var alwaysApproveUris = new List<string>();
 
         if (ingress.RouteTenantResolution is not null || ingress.SpecifiedTenantResolution is not null)
         {
@@ -116,11 +117,17 @@ public static class ApplicationIngressPulumiExtensions
 
         // A map of domain names from (currently only) idporten, and the source identifier they should resolve to.
         var domainResolutionHostnames = new Dictionary<string, string>();
-        
+       
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
         if (idPortenProvider is not null)
         {
+            // When using idporten we need to pre-approve this request, as the nginx ingress will ask us if it is allowed to call this.
+            if (!string.IsNullOrEmpty(ingress.AuthDomain?.Name!))
+            {
+                alwaysApproveUris.Add($"{ingress.AuthDomain.Name}/.aksio/id-porten/authorize");
+            }
+
             idPortenConfig = new(idPortenProvider.Issuer, idPortenProvider.AuthorizationEndpoint);
             tenantConfigs = environment.Tenants.Select(
                     tenant =>
@@ -270,6 +277,7 @@ public static class ApplicationIngressPulumiExtensions
         }
         
         var middlewareContent = new IngressMiddlewareTemplateContent(
+            alwaysApproveUris,
             idPortenProvider is not null,
             idPortenConfig,
             identityDetailsUrl,
@@ -510,10 +518,10 @@ public static class ApplicationIngressPulumiExtensions
         }
 
         var redirectToProvider = "Microsoft";
-        var firstProvider = ingress.IdentityProviders.FirstOrDefault();
-        if (firstProvider?.Type == IdentityProviderType.IdPorten)
+        var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(ip => ip.Type == IdentityProviderType.IdPorten);
+        if (idPortenProvider != default)
         {
-            redirectToProvider = firstProvider.Name;
+            redirectToProvider = idPortenProvider.Name;
         }
 
         _ = new ContainerAppsAuthConfig(ingress.Name, new()

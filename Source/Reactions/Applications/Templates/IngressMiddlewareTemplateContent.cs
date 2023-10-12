@@ -4,6 +4,7 @@
 namespace Reactions.Applications.Templates;
 
 public record IngressMiddlewareTemplateContent(
+    IEnumerable<string> AlwaysApproveUris,
     bool IdPorten,
     OpenIDConnectConfig IdPortenConfig,
     string IdentityDetailsUrl,

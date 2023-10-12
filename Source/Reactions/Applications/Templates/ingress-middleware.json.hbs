@@ -1,4 +1,9 @@
 {
+{{#AlwaysApproveUris}}
+    "alwaysApproveUris": [
+        "{{this}}"{{#unless @last}},{{/unless}}
+    ],
+{{/AlwaysApproveUris}}    
 {{#if IdPorten }}
     "idPorten": {
         "issuer": "{{IdPortenConfig.Issuer}}",
