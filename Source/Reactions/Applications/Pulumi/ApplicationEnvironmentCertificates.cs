@@ -33,10 +33,10 @@ public static class ApplicationEnvironmentCertificates
         domains.AddRange(environment.Ingresses.Select(i => i.Domain).Where(d => d?.CertificateId != null)!);
 
         // Set up the auth domain certificates.
-        domains.AddRange(environment.Ingresses.Select(i => i.AuthDomain).Where(d => d != null)!);
+        domains.AddRange(environment.Ingresses.Select(i => i.AuthDomain).Where(d => d?.CertificateId != null)!);
 
         // Identityprovider domain certificates
-        domains.AddRange(environment.Tenants.SelectMany(t => t.IdentityProviders.Select(ip => ip.Domain)).Where(d => d != null)!);
+        domains.AddRange(environment.Tenants.SelectMany(t => t.IdentityProviders.Select(ip => ip.Domain)).Where(d => d?.CertificateId != null)!);
         var dupes = domains.GroupBy(c => c.CertificateId).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
         if (dupes.Any())
         {

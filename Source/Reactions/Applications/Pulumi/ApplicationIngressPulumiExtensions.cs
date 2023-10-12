@@ -20,6 +20,8 @@ using FileShare = Pulumi.AzureNative.Storage.FileShare;
 
 namespace Reactions.Applications.Pulumi;
 
+#pragma warning disable RCS1077, MA0020 // "Optimize LINQ method call" / "Use Find() instead of FirstOrDefault()"
+
 #pragma warning disable RCS1175
 
 public static class ApplicationIngressPulumiExtensions
@@ -95,6 +97,7 @@ public static class ApplicationIngressPulumiExtensions
     {
         var tenantConfigs = new List<TenantConfig>();
         var tenantResolutionConfigs = new List<TenantResolutionConfig>();
+        var alwaysApproveUris = new List<string>();
 
         if (ingress.RouteTenantResolution is not null || ingress.SpecifiedTenantResolution is not null)
         {
@@ -113,10 +116,19 @@ public static class ApplicationIngressPulumiExtensions
             tenantResolutionConfigs.Add(new(ingress.RouteTenantResolution is not null ? "route" : "specified", optionsAsJsonString));
         }
 
+        // A map of domain names from (currently only) idporten, and the source identifier they should resolve to.
+        var domainResolutionHostnames = new Dictionary<string, string>();
+
         var idPortenConfig = OpenIDConnectConfig.Empty;
         var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.IdPorten);
         if (idPortenProvider is not null)
         {
+            // When using idporten we need to pre-approve this request, as the nginx ingress will ask us if it is allowed to call this.
+            if (!string.IsNullOrEmpty(ingress.AuthDomain?.Name!))
+            {
+                alwaysApproveUris.Add($"{ingress.AuthDomain.Name}/.aksio/id-porten/authorize");
+            }
+
             idPortenConfig = new(idPortenProvider.Issuer, idPortenProvider.AuthorizationEndpoint);
             tenantConfigs = environment.Tenants.Select(
                     tenant =>
@@ -125,7 +137,19 @@ public static class ApplicationIngressPulumiExtensions
                         var sourceIdentifiers = new List<string>();
                         if (!string.IsNullOrWhiteSpace(providerConfig?.Domain?.Name?.Value))
                         {
-                            sourceIdentifiers.Add(providerConfig.Domain.Name.Value);
+                            if (domainResolutionHostnames.ContainsKey(providerConfig.Domain.Name.Value))
+                            {
+                                throw new ConfigurationError("Error: More than one idporten provider has the same domain name defined!");
+                            }
+
+                            var tenantSourceIdentifier = tenant.SourceIdentifiers?.FirstOrDefault() ?? string.Empty;
+                            if (string.IsNullOrWhiteSpace(tenantSourceIdentifier))
+                            {
+                                throw new ConfigurationError(
+                                    "Error: a tenant with a idPorten provider with a domain name must have at least one sourceIdentifier configured!");
+                            }
+
+                            domainResolutionHostnames.Add(providerConfig.Domain.Name.Value, tenantSourceIdentifier);
                         }
 
                         return new TenantConfig(
@@ -137,14 +161,18 @@ public static class ApplicationIngressPulumiExtensions
                 .ToList();
         }
 
-        var aadProvider = ingress.IdentityProviders.FirstOrDefault(_ => _.Type == IdentityProviderType.Azure);
-        if (aadProvider is not null)
+        var hasAadProvider = ingress.IdentityProviders.Any(_ => _.Type == IdentityProviderType.Azure);
+        foreach (var aadProvider in ingress.IdentityProviders.Where(_ => _.Type == IdentityProviderType.Azure))
         {
             // Add or update tenant configs.
             foreach (var tenant in environment.Tenants)
             {
                 var providerConfig = tenant.IdentityProviders.FirstOrDefault(_ => _.Id == aadProvider.Id);
                 var sourceIdentifiers = providerConfig?.SourceIdentifiers?.ToList() ?? new List<string>();
+                if (!sourceIdentifiers.Any())
+                {
+                    continue;
+                }
 
                 var tenantConfig = tenantConfigs.SingleOrDefault(t => t.TenantId == tenant.Id.ToString());
                 if (tenantConfig != null)
@@ -158,7 +186,7 @@ public static class ApplicationIngressPulumiExtensions
             }
         }
 
-        if (idPortenProvider is not null || aadProvider is not null)
+        if (idPortenProvider is not null || hasAadProvider)
         {
             tenantResolutionConfigs.Add(new("claim", "{}"));
         }
@@ -205,10 +233,50 @@ public static class ApplicationIngressPulumiExtensions
 #pragma warning restore CA2201, AS0008
         }
 
-        // Finally add the hostname tenancy resolver, which may or may not be in use (but does not hurt to include).
-        tenantResolutionConfigs.Add(new("host", "{}"));
+        // Finally add the hostname tenancy resolver, if we have any extra domain names that need resolving.
+        if (domainResolutionHostnames.Any())
+        {
+            var hostCfg = new { Hostnames = domainResolutionHostnames };
+            var hostConfigAsJson = JsonSerializer.Serialize(hostCfg, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+            tenantResolutionConfigs.Insert(0, new("host", hostConfigAsJson));
+        }
+
+        // Cannot distinct a record with an array, so do it manually
+        List<IngressMiddlewareAuthorizationConfig> authConfigs = new();
+        foreach (var ip in ingress.IdentityProviders.SelectMany(ip => ip.IngressMiddlewareAuthorizationConfig()))
+        {
+            var existing = authConfigs.FirstOrDefault(c => c.ClientId == ip.ClientId);
+            if (existing == default)
+            {
+                authConfigs.Add(ip);
+                continue;
+            }
+
+            if (existing.NoAuthorizationRequired != ip.NoAuthorizationRequired)
+            {
+                // Diff, so add. This is likely to fail as the json becomes invalid.
+                authConfigs.Add(ip);
+                continue;
+            }
+
+            // Basic compare of the lists
+            if (string.Join(",", existing.Roles.Order()) != string.Join(",", ip.Roles.Order()))
+            {
+                // Diff, so add. This is likely to fail as the json becomes invalid.
+                authConfigs.Add(ip);
+            }
+        }
+
+        // Catch any obvious configuration errors here
+        var duplicateIdentityProviders = authConfigs.GroupBy(_ => _.ClientId).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        if (duplicateIdentityProviders.Any())
+        {
+            throw new ConfigurationError(
+                $"Duplicate identity providers, you must correct config or code for this: {string.Join(", ", duplicateIdentityProviders)}");
+        }
 
         var middlewareContent = new IngressMiddlewareTemplateContent(
+            alwaysApproveUris,
             idPortenProvider is not null,
             idPortenConfig,
             identityDetailsUrl,
@@ -217,7 +285,7 @@ public static class ApplicationIngressPulumiExtensions
             ingress.OAuthBearerTokenProvider,
             ingress.GetImpersonationTemplateContent(environment),
             ingress.MutualTLS,
-            ingress.IdentityProviders.SelectMany(ip => ip.IngressMiddlewareAuthorizationConfig()).Distinct());
+            authConfigs);
 
         return TemplateTypes.IngressMiddlewareConfig(middlewareContent);
     }
@@ -449,10 +517,10 @@ public static class ApplicationIngressPulumiExtensions
         }
 
         var redirectToProvider = "Microsoft";
-        var firstProvider = ingress.IdentityProviders.FirstOrDefault();
-        if (firstProvider?.Type == IdentityProviderType.IdPorten)
+        var idPortenProvider = ingress.IdentityProviders.FirstOrDefault(ip => ip.Type == IdentityProviderType.IdPorten);
+        if (idPortenProvider != default)
         {
-            redirectToProvider = firstProvider.Name;
+            redirectToProvider = idPortenProvider.Name;
         }
 
         _ = new ContainerAppsAuthConfig(ingress.Name, new()

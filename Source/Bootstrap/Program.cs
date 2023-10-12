@@ -107,6 +107,16 @@ public static class Program
             loggerFactory.CreateLogger<PulumiOperations>(),
             loggerFactory.CreateLogger<FileStorage>());
 
+        /*
+        // Helper to debug ingress config builders
+        foreach (var ingress in applicationAndEnvironment.Environment.Ingresses)
+        {
+            var ingressConfig = await ingress.RenderMiddlewareTemplate(
+                applicationAndEnvironment.Environment,
+                new Dictionary<Concepts.Applications.MicroserviceId, ContainerApp>());
+        }
+        */
+
         await operations.ConsolidateEnvironment(
             application,
             applicationAndEnvironment.Environment,
