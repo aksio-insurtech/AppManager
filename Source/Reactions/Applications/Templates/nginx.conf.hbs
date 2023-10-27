@@ -122,6 +122,8 @@ http {
         location {{Path}} {
             error_page 401 = @auth_redirect;
 
+            add_header Cache-Control no-store;
+
             {{#if Resolver}}
             # Specifies DNS server (this becomes necessary when doing regexp location to proxy_pass in nginx as the target-host lookup changes from startup to runtime)
             resolver {{Resolver}};
