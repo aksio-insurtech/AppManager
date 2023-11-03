@@ -3,4 +3,4 @@
 
 namespace Reactions.Applications.Templates;
 
-public record SpecifiedTenantResolutionOptions(string TenantId);
+public record SpecifiedTenantResolutionOptions(string SourceIdentifier);
