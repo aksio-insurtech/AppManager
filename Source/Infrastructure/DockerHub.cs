@@ -27,7 +27,7 @@ public class DockerHub : IDockerHub
 
     public async Task<SemanticVersion> GetLatestVersionOfImage(string organization, string image)
     {
-        var versions = await GetVersionsOfImage(organization, image, 25);
+        var versions = await GetVersionsOfImage(organization, image, 50);
         return versions.FirstOrDefault() ?? new SemanticVersion(0, 0, 0, string.Empty, string.Empty);
     }
 }
