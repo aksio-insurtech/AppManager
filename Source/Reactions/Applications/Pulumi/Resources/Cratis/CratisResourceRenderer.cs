@@ -65,7 +65,8 @@ public class CratisResourceRenderer : ICanRenderResource<CratisConfiguration>
             null,
             kernelStorage,
             microservice.Deployables,
-            context.Tags);
+            context.Tags,
+            true);
 
         context.Results.Register(TypeId, kernel.ContainerApp);
 

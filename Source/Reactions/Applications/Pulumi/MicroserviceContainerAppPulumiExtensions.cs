@@ -32,7 +32,8 @@ public static class MicroserviceContainerAppPulumiExtensions
         ContainerRegistryResult? containerRegistry,
         MicroserviceStorage storage,
         IEnumerable<Deployable> deployables,
-        Tags tags)
+        Tags tags,
+        bool kernelResource = false)
     {
         var microserviceTags = tags.Clone();
         microserviceTags["MicroserviceId"] = microservice.Id.ToString();
@@ -121,8 +122,8 @@ public static class MicroserviceContainerAppPulumiExtensions
 
                     Resources = new ContainerResourcesArgs
                     {
-                        Cpu = 1,
-                        Memory = "2.0Gi"
+                        Cpu = kernelResource ? 2 : 1,
+                        Memory = kernelResource ? "4.0Gi" : "2.0Gi"
                     }
                 }).ToArray(),
 
