@@ -11,6 +11,7 @@ using Autofac.Extensions.DependencyInjection;
 using Concepts;
 using Concepts.Applications.Environments;
 using Microsoft.Extensions.Logging;
+using Pulumi.AzureNative.App;
 using Reactions.Applications;
 using Reactions.Applications.Pulumi;
 using Reactions.Applications.Pulumi.Resources;

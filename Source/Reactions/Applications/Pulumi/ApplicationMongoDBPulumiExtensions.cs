@@ -81,16 +81,18 @@ public static class ApplicationMongoDBPulumiExtensions
         });
 
         var clusterName = $"{application.Name}-{environment.DisplayName}".ToLowerInvariant();
-        var cluster = new Cluster(clusterName, new ClusterArgs
-        {
-            ProjectId = project.Id,
-            ProviderName = "AZURE",
-            ProviderInstanceSizeName = "M10",
-            ProviderRegionName = region,
-            CloudBackup = environment.BackupEnabled,
-            PitEnabled = environment.BackupEnabled,
-            Labels = tags.Select((kvp) => new ClusterLabelArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
-        });
+        var cluster = new Cluster(
+            clusterName,
+            new ClusterArgs
+            {
+                ProjectId = project.Id,
+                ProviderName = "AZURE",
+                ProviderInstanceSizeName = "M10",
+                ProviderRegionName = region,
+                CloudBackup = environment.BackupEnabled,
+                PitEnabled = environment.BackupEnabled,
+                Tags = tags.Select((kvp) => new ClusterTagArgs { Key = kvp.Key, Value = kvp.Value }).ToArray()
+            });
 
         var databasePassword = Guid.NewGuid().ToString();
         if (environment.MongoDB?.Users is not null &&
@@ -104,7 +106,7 @@ public static class ApplicationMongoDBPulumiExtensions
             Username = "kernel",
             ProjectId = cluster.ProjectId,
             Password = databasePassword,
-            DatabaseName = "admin",
+            AuthDatabaseName = "admin",
             Roles = new DatabaseUserRoleArgs[]
             {
                 new ()

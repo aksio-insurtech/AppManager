@@ -385,8 +385,32 @@ public static class ApplicationIngressPulumiExtensions
         Tags tags,
         ManagedEnvironmentsStorage storage,
         IEnumerable<Domain> domains,
-        IDictionary<CertificateId, Output<string>> certificates) =>
-        new(
+        IDictionary<CertificateId, Output<string>> certificates)
+    {
+        var failoverCertificate = certificates?.Values?.FirstOrDefault();
+
+        var domainArgs = new List<CustomDomainArgs>();
+        foreach (var domain in domains)
+        {
+            var arg = new CustomDomainArgs()
+            {
+                Name = domain.Name.Value
+            };
+                
+            if (domain.CertificateId != null && certificates!.TryGetValue(domain.CertificateId, out var cert))
+            {
+                arg.BindingType = BindingType.SniEnabled;
+                arg.CertificateId = cert;
+            }
+            else
+            {
+                arg.BindingType = BindingType.Disabled;
+            }
+
+            domainArgs.Add(arg);
+        }
+
+        var containerApp = new ContainerApp(
             $"{ingress.Name}-ingress",
             new()
             {
@@ -404,21 +428,10 @@ public static class ApplicationIngressPulumiExtensions
                         ClientCertificateMode = ingress.MutualTLS != null
                             ? IngressClientCertificateMode.Require
                             : IngressClientCertificateMode.Ignore,
-                        CustomDomains = domains.Select(
-                                domain => new CustomDomainArgs
-                                {
-                                    BindingType = BindingType.SniEnabled,
-
-                                    // If the certificate is not available yet, pick a random one.. You then need to rerun this (TODO: in future code this needs to be automatically handled).
-#pragma warning disable CS8604 // Possible null reference argument.
-                                    CertificateId = domain.CertificateId != null ? certificates[domain.CertificateId] : certificates.Values.FirstOrDefault(),
-#pragma warning restore CS8604 // Possible null reference argument.
-                                    Name = domain.Name.Value
-                                })
-                            .ToArray(),
+                        CustomDomains = domainArgs,
                         IpSecurityRestrictions = ingress.AccessList?.Select(
                                 acl => new IpSecurityRestrictionRuleArgs()
-                                { Action = "Allow", Name = acl.Name.Value, IpAddressRange = acl.Address.Value })
+                                    { Action = "Allow", Name = acl.Name.Value, IpAddressRange = acl.Address.Value })
                             .ToList() ?? new()
                     },
                     Secrets = ingress.IdentityProviders.Select(
@@ -466,7 +479,8 @@ public static class ApplicationIngressPulumiExtensions
                         new()
                         {
                             Name = "middleware",
-                            Image = $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
+                            Image =
+                                $"{DockerHubExtensions.AksioOrganization}/{DockerHubExtensions.IngressMiddlewareImage}:{ingress.MiddlewareVersion}",
                             Command =
                             {
                                 "./IngressMiddleware",
@@ -491,6 +505,9 @@ public static class ApplicationIngressPulumiExtensions
                     }
                 }
             });
+
+        return containerApp;
+    }
 
     static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name.Value.Replace(' ', '-')}-authentication-secret".ToLowerInvariant();
 

@@ -32,6 +32,7 @@ public record ApplicationEnvironmentResult(
             environment.BackupEnabled,
             environment.BackupCopyRegion,
             environment.Resources,
-            environment.Storage));
+            environment.Storage,
+            environment.Vnet));
     }
 }
