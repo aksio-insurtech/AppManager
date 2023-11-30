@@ -387,8 +387,7 @@ public static class ApplicationIngressPulumiExtensions
         IEnumerable<Domain> domains,
         IDictionary<CertificateId, Output<string>> certificates)
     {
-        var failoverCertificate = certificates?.Values?.FirstOrDefault();
-
+        // Set up the domain args first, this is a bit more readable.
         var domainArgs = new List<CustomDomainArgs>();
         foreach (var domain in domains)
         {
@@ -396,7 +395,7 @@ public static class ApplicationIngressPulumiExtensions
             {
                 Name = domain.Name.Value
             };
-                
+
             if (domain.CertificateId != null && certificates!.TryGetValue(domain.CertificateId, out var cert))
             {
                 arg.BindingType = BindingType.SniEnabled;
@@ -410,7 +409,7 @@ public static class ApplicationIngressPulumiExtensions
             domainArgs.Add(arg);
         }
 
-        var containerApp = new ContainerApp(
+        return new(
             $"{ingress.Name}-ingress",
             new()
             {
@@ -505,8 +504,6 @@ public static class ApplicationIngressPulumiExtensions
                     }
                 }
             });
-
-        return containerApp;
     }
 
     static string GetSecretNameForIdentityProvider(IdentityProvider idp) => $"{idp.Name.Value.Replace(' ', '-')}-authentication-secret".ToLowerInvariant();
