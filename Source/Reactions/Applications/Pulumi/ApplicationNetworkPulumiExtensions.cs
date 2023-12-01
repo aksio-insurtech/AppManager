@@ -25,7 +25,7 @@ public static class ApplicationNetworkPulumiExtensions
             {
                 AddressPrefixes =
                     {
-                        "10.100.0.0/16"
+                        environment.Vnet?.AddressSpace ?? "10.100.0.0/16"
                     }
             },
             Subnets =
@@ -39,14 +39,14 @@ public static class ApplicationNetworkPulumiExtensions
                             new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.ContainerRegistry" },
                             new ServiceEndpointPropertiesFormatArgs { Service = "Microsoft.KeyVault" }
                         },
-                        AddressPrefix = "10.100.0.0/23",
+                        AddressPrefix = environment.Vnet?.InfraSubnet ?? "10.100.0.0/23",
                         PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
                         PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     },
                     new global::Pulumi.AzureNative.Network.Inputs.SubnetArgs
                     {
                         Name = "mongodb",
-                        AddressPrefix = "10.100.2.0/24",
+                        AddressPrefix = environment.Vnet?.MongoDbSubnet ?? "10.100.2.0/24",
                         PrivateEndpointNetworkPolicies = VirtualNetworkPrivateEndpointNetworkPolicies.Disabled,
                         PrivateLinkServiceNetworkPolicies = VirtualNetworkPrivateLinkServiceNetworkPolicies.Disabled
                     }
